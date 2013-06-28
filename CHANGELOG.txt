@@ -1,0 +1,16 @@
+VisItMeta Release 0.0.1 - 28.06.13
+
+* First prototype version
+  - REST interface between dataservice and visualization
+  - Graph persistence with neo4j
+  - Graph layouting with Jung2
+  - Graph rendering with Piccolo2D
+  - history of MAP server
+  - live view of MAP server
+  - Coloring of metadata, according to its publisher ID
+  - Basic navigation (panning, zooming, auto-zoom)
+
+* Known Bugs:
+  - Visualization breaks when turning off 'live' mode while there are too many
+    metadata present
+  - Redraw-function in the GUI doesn't work correctly sometimes

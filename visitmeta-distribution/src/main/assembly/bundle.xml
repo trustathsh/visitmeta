@@ -1,0 +1,71 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>bundle</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<moduleSets>
+		<moduleSet>
+
+			<!-- Enable access to all projects in the current multimodule build! -->
+			<useAllReactorProjects>true</useAllReactorProjects>
+
+			<!-- Now, select which projects to include in this module-set. -->
+			<includes>
+				<include>de.fhhannover.inform.trust.visitmeta:dataservice</include>
+				<include>de.fhhannover.inform.trust.visitmeta:visualization</include>
+			</includes>
+			<binaries>
+				<outputDirectory>${artifactId}</outputDirectory>
+				<unpack>false</unpack>
+				<includeDependencies>true</includeDependencies>
+				<outputFileNameMapping>${module.artifactId}.${module.extension}</outputFileNameMapping>
+				<dependencySets>
+					<dependencySet>
+						<unpack>false</unpack>
+						<outputDirectory>${artifactId}/lib</outputDirectory>
+					</dependencySet>
+				</dependencySets>
+			</binaries>
+		</moduleSet>
+	</moduleSets>
+
+	<fileSets>
+		<fileSet>
+			<directory>${basedir}/../</directory>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<includes>
+				<include>README.txt</include>
+				<include>LICENSE.txt</include>
+				<include>NOTICE.txt</include>
+				<include>CHANGELOG.txt</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/src/main/templates/</directory>
+			<outputDirectory>${artifactId}</outputDirectory>
+		</fileSet>
+	
+		<fileSet>
+			<directory>${basedir}/../dataservice/src/main/templates/</directory>
+			<outputDirectory>${artifactId}</outputDirectory>
+		</fileSet>
+		
+		<fileSet>
+			<directory>${basedir}/../visualization/src/main/templates/</directory>
+			<outputDirectory>${artifactId}</outputDirectory>
+		</fileSet>
+	</fileSets>
+	
+	<files>
+		<file>
+			<source>${basedir}/../visualization/src/main/java/com/github/ernieyu/swingRangeSlider/LICENSE.txt</source>
+			<destName>LICENSE-swingRangeSlider.txt</destName>
+			<outputDirectory>${artifactId}/</outputDirectory>
+		</file>
+	</files>
+</assembly>

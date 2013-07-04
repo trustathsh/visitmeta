@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <style>
+            .node {
+                stroke: #fff;
+                stroke-width: 1.5px;
+            }
+
+            .link {
+                stroke: #999;
+                stroke-opacity: .6;
+            }
+        </style>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script>
+
+function getGraph(jsonData) { // TODO construct graph
+    var length = jsonData[0].links.length;
+    var nodes = [];
+    var links = [];
+    var nodeCount = 0;
+    for (i = 0; i < length; i++) {
+        var resultItem = jsonData[0].links[i];
+        if (resultItem.identifiers instanceof Array) {
+            var id1 = resultItem.identifiers[0].typename;
+            var id2 = resultItem.identifiers[1].typename;
+            nodes.push({"name": id1, "group": 1});
+            nodes.push({"name": id2, "group": 2});
+            links.push({"source": nodeCount, "target": nodeCount + 1});
+            nodeCount = nodeCount + 2;
+        }
+    }
+    return {"nodes": nodes, "links": links};
+}
+
+function doit() {
+    d3.json("http://localhost:8000/graph/current", function(jsonData) {
+        var width = 960,
+            height = 500;
+
+        var color = d3.scale.category20();
+
+        var force = d3.layout.force()
+            .charge(-120)
+            .linkDistance(30)
+            .size([width, height]);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        var graph = getGraph(jsonData);
+
+        force.nodes(graph.nodes)
+            .links(graph.links)
+            .start();
+
+        var link = svg.selectAll("line.link")
+            .data(graph.links)
+            .enter().append("line")
+            .attr("class", "link")
+            .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+        var node = svg.selectAll("circle.node")
+            .data(graph.nodes)
+            .enter().append("circle")
+            .attr("class", "node")
+            .attr("r", 5)
+            .style("fill", function(d) { return color(d.group); })
+            .call(force.drag);
+
+        node.append("title").text(function(d) { return d.name; });
+            force.on("tick", function() {
+                link.attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+                node.attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+            });
+    });
+}
+        </script>
+        <title>foobar</title>
+    </head>
+    <body onload="doit()">
+    </body>
+</html>

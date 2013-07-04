@@ -22,7 +22,7 @@ information, when this metadata was created, changed and deleted.
 
 The dataservice component is the only component in VisITMeta, that is talking IF-MAP
 with a MAP server.
-Every other component, like the visualization component, connects via a REST-like
+Every other component, like the visualization component, connects via a `REST`-like
 interface to get the current MAP graph, the graph at a specific timestamp or the
 changes between two timestamps, as well as a list of all timestamps with the number
 of changes (separated into updates and deletes).
@@ -40,9 +40,14 @@ The list of visualization features is going to change over the duration of the p
 
 Building
 ========
+This section describes, how to build VisITMeta from scratch.
+
+Prerequisites
+-------------
 In order to build VisITMeta with Maven you need to install
 [Maven 3] [4] manually or via the package manager of your
 operating system.
+
 Before you can build VisITMeta you need to install ifmapj
 in your local Maven repository, to do so download ifmapj 
 from the [Trust@FHH Github account] [5] via
@@ -53,7 +58,10 @@ and execute
 
     $ mvn install
 
-in the newly created directory directory.
+in the newly created directory.
+
+Build VisITMeta
+---------------
 Now you can build VisITMeta, simply execute:
 
     $ mvn package
@@ -67,6 +75,10 @@ After a successful build you should find a zip-archive called
 
 Configuration
 =============
+This section describes the configuration needed to get VisITMeta working.
+
+MAP server configuration
+------------------------
 To use VisITMeta you need to have a MAP server running. 
 Make sure that a basic-authentication user exists in the corresponding
 configuration file of your MAP server.
@@ -78,6 +90,8 @@ If not present, add the line
 
 at the end of the file.
 
+VisITMeta configuration
+-----------------------
 VisITMeta itself has to be configured, too.
 Inside the `config` directory, you find all needed configuration files.
 
@@ -102,16 +116,12 @@ Running
 First, you must start the dataservice-component via
 
 	$ sh start-dataservice.sh
-	
-(or $ java -jar dataservice.jar).
 
 Afterwards, you can start the visualization-component (or at any later time, as the 
 dataservice is already recording and providing the complete history).
 Start the GUI via
 
 	$ sh start-visualization.sh
-	
-(or $ java -jar visualization.jar).
 
 4. Publish some data:
 
@@ -123,7 +133,6 @@ Feedback
 ========
 If you have any questions, problems or comments, please contact
 	trust@f4-i.fh-hannover.de
-
 
 License
 =======

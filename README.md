@@ -136,8 +136,8 @@ If you have any questions, problems or comments, please contact
 
 License
 =======
-VisITMeta is licensed under the Apache License, Version 2.0 [7].
-The visualization component uses the Java Swing Range Slider source code from Ernie You [10][11].
+VisITMeta is licensed under the [Apache License, Version 2.0][7].
+The visualization component uses the Java Swing Range Slider source code from [Ernie You][10] ([Github][11]).
 The corresponding license is provided with the file LICENSE-swingRangeSlider.txt in the
 root-directory of `visitmeta-distribution`.
 

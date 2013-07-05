@@ -144,7 +144,7 @@ root-directory of `visitmeta-distribution`.
 ----
 
 [1]: http://www.trustedcomputinggroup.org/resources/tnc_ifmap_binding_for_soap_specification
-[2]: http://trust.f4.hs-hannover.de/
+[2]: http://www.hs-hannover.de/start/index.html/
 [3]: http://trust.f4.hs-hannover.de/projects/visitmeta.html
 [4]: https://maven.apache.org/download.html
 [5]: https://github.com/trustatfhh/ifmapj.git

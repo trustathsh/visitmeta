@@ -1,13 +1,13 @@
 VisITMeta
 =========
-VisITMeta is an *experimental* IF-MAP 2.0/2.1 [1] compliant MAP client written in Java
+VisITMeta is an *experimental* [IF-MAP][1] 2.0/2.1 compliant MAP client written in Java
 that visualizes metadata stored on a MAP server.
 It supports features like showing a history of all metadata stored on a MAPS, using
 filter and search techniques to navigate the metadata as well as some visualization
 techniques like animations, highlighting and so on.
-Development was done by Hochschule Hannover (University of Applied Sciences and Arts, 
-Hanover) [2] within the VisITMeta research project [3], (support code 17PNT032) which is 
-funded by the german BMBF (Federal Ministry of Education and Research) [8].
+Development was done by [Hochschule Hannover (University of Applied Sciences and Arts, 
+Hanover)][2] within the [VisITMeta research project][3], (support code 17PNT032) which is 
+funded by the german [BMBF (Federal Ministry of Education and Research)][8].
 
 Features
 ========
@@ -17,7 +17,7 @@ The VisITMeta software consists of two main components:
 The dataservice component is responsible for collecting metadata from a MAP server.
 Currently works with one subscription, and so records all data it can get with that
 subscription.
-Metadata is stored via a `neo4j` database [9], with timestamps attached to save the
+Metadata is stored via a [`neo4j`][9] database, with timestamps attached to save the
 information, when this metadata was created, changed and deleted.
 
 The dataservice component is the only component in VisITMeta, that is talking IF-MAP
@@ -45,12 +45,12 @@ This section describes, how to build VisITMeta from scratch.
 Prerequisites
 -------------
 In order to build VisITMeta with Maven you need to install
-[Maven 3] [4] manually or via the package manager of your
+[Maven 3][4] manually or via the package manager of your
 operating system.
 
 Before you can build VisITMeta you need to install ifmapj
 in your local Maven repository, to do so download ifmapj 
-from the [Trust@FHH Github account] [5] via
+from the [Trust@FHH Github account][5] via
 
 	$ git clone https://github.com/trustatfhh/ifmapj.git
 

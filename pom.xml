@@ -9,7 +9,7 @@
 	<!-- general project information -->
 	<groupId>de.fhhannover.inform.trust</groupId>
 	<artifactId>visitmeta</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>pom</packaging>
 	<name>visitmeta</name>
 	<url>http://trust.f4.hs-hannover.de/</url>

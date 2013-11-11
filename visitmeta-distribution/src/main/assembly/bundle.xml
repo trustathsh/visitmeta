@@ -53,15 +53,33 @@
 		<fileSet>
 			<directory>${basedir}/../dataservice/src/main/templates/</directory>
 			<outputDirectory>${artifactId}</outputDirectory>
+			<excludes>
+				<exclude>start-dataservice.sh</exclude>
+			</excludes>
 		</fileSet>
 		
 		<fileSet>
 			<directory>${basedir}/../visualization/src/main/templates/</directory>
 			<outputDirectory>${artifactId}</outputDirectory>
+			<excludes>
+				<exclude>start-visualization.sh</exclude>
+			</excludes>
 		</fileSet>
 	</fileSets>
 	
 	<files>
+		<file>
+			<source>${basedir}/../dataservice/src/main/templates/start-dataservice.sh</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>${basedir}/../visualization/src/main/templates/start-visualization.sh</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>
 		<file>
 			<source>${basedir}/../visualization/src/main/java/com/github/ernieyu/swingRangeSlider/LICENSE.txt</source>
 			<destName>LICENSE-swingRangeSlider.txt</destName>

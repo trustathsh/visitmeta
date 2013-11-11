@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.network;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.1, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH

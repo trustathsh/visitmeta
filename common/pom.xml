@@ -5,13 +5,14 @@
 	<parent>
 		<artifactId>visitmeta</artifactId>
 		<groupId>de.fhhannover.inform.trust</groupId>
-		<version>0.0.1</version>
+		<version>0.0.2</version>
 	</parent>
 
 	<groupId>de.fhhannover.inform.trust.visitmeta</groupId>
 	<artifactId>common</artifactId>
 	<packaging>jar</packaging>
 	<name>common</name>
+	<version>0.0.2</version>
 
 	<build>
 		<plugins>

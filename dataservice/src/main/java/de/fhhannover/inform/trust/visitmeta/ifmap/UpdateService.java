@@ -12,7 +12,7 @@ package de.fhhannover.inform.trust.visitmeta.ifmap;
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.ifmap;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.1, implemented by the Trust@FHH
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
@@ -39,9 +39,14 @@ package de.fhhannover.inform.trust.visitmeta.ifmap;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONTokener;
 
 import de.fhhannover.inform.trust.ifmapj.IfmapJ;
 import de.fhhannover.inform.trust.ifmapj.IfmapJHelper;
@@ -53,6 +58,7 @@ import de.fhhannover.inform.trust.ifmapj.exception.InitializationException;
 import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
 import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
 import de.fhhannover.inform.trust.ifmapj.messages.Requests;
+import de.fhhannover.inform.trust.ifmapj.messages.SubscribeDelete;
 import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
 import de.fhhannover.inform.trust.ifmapj.messages.SubscribeUpdate;
 import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
@@ -75,25 +81,16 @@ public class UpdateService implements Runnable {
 	private static final Logger log = Logger.getLogger(UpdateService.class);
 
 	protected PropertiesReaderWriter config = Application.getIFMAPConfig();
-	protected final String TRUSTSTORE_PATH = config
-			.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
-	protected final String IFMAP_BASIC_AUTH_URL = config
-			.getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
-	protected final String IFMAP_USER = config
-			.getProperty(ConfigParameter.IFMAP_USER);
-	protected final String IFMAP_PASS = config
-			.getProperty(ConfigParameter.IFMAP_PASS);
-	protected final String START_IDENTIFIER = config
-			.getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
-	protected final String START_IDENTIFIER_TYPE = config
-			.getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
-	protected final int MAX_DEPTH = Integer.valueOf(config
-			.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-	protected final int MAX_SIZE = Integer.valueOf(config
-			.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+	protected final String TRUSTSTORE_PATH = config.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+	protected final String IFMAP_BASIC_AUTH_URL = config.getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
+	protected final String IFMAP_USER = config.getProperty(ConfigParameter.IFMAP_USER);
+	protected final String IFMAP_PASS = config.getProperty(ConfigParameter.IFMAP_PASS);
+	protected final String START_IDENTIFIER = config.getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
+	protected final String START_IDENTIFIER_TYPE = config.getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
+	protected final int MAX_DEPTH = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
+	protected final int MAX_SIZE = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
-	protected final String SUBSCRIPTION_NAME = config
-			.getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
+	protected final String SUBSCRIPTION_NAME = config.getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
 
 	protected final int MAX_RETRY;
 	protected final static int DEFAULT_MAX_RETRY = 10;
@@ -107,6 +104,17 @@ public class UpdateService implements Runnable {
 	protected InternalMetadataFactory mMetadataFactory;
 
 	protected de.fhhannover.inform.trust.visitmeta.ifmap.IfmapJHelper mIfmapJHelper;
+	
+	public class IdentifierData {
+		public IdentifierData(String sIdentifierType, String sIdentifier) {
+			type = sIdentifierType;
+			identifier = sIdentifier;
+		}
+		String type;
+		String identifier;
+	}
+	
+	private Map<String, IdentifierData> activeSubscriptions = new HashMap<String, IdentifierData>();
 
 	/**
 	 * Create a new {@link UpdateService} which uses the given writer to submit new
@@ -176,7 +184,7 @@ public class UpdateService implements Runnable {
 	private void setupNewConnection() {
 		initSsrc();
 		connectNewSession();
-		subscribeForStartIdentifier();
+		subscribeForStart();
 	}
 
 	/**
@@ -195,9 +203,9 @@ public class UpdateService implements Runnable {
 					PollResult pollResult = task.call();
 					mWriter.submitPollResult(pollResult);
 				} catch (PollException e) {
-//					log.error("error while executing poll task " + e.getMessage());
-//					setupNewConnection();
-//					arc = mSsrc.getArc();
+					//					log.error("error while executing poll task " + e.getMessage());
+					//					setupNewConnection();
+					//					arc = mSsrc.getArc();
 					throw new RuntimeException(e);
 				}
 			}
@@ -232,32 +240,53 @@ public class UpdateService implements Runnable {
 		}
 	}
 
-	protected void subscribeForStartIdentifier() {
+	protected void subscribeForStart(){
+		String[] sNames = SUBSCRIPTION_NAME.split("[;]");
+		String[] sIdentifierTypes = START_IDENTIFIER_TYPE.split("[;]");
+		String[] sIdentifiers = START_IDENTIFIER.split("[;]");
+
+		if(sNames.length == sIdentifiers.length && sIdentifiers.length == sIdentifierTypes.length){
+
+			for(int i=0; i < sNames.length; i++){
+
+				subscribeUpdate(sNames[i], sIdentifierTypes[i], sIdentifiers[i], MAX_DEPTH, MAX_SIZE);
+
+			}
+
+		}else{
+			
+			throw new RuntimeException("could not subscribe for start identifier: invalide length");
+		
+		}
+	}
+
+	public void subscribeUpdate(String sName, String sIdentifierType, String sIdentifier, int maxDepth, int maxSize) {
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
-		subscribe.setName(SUBSCRIPTION_NAME);
-		subscribe.setMaxDepth(MAX_DEPTH);
-		subscribe.setMaxSize(MAX_SIZE);
+		subscribe.setName(sName);
+		subscribe.setMaxDepth(maxDepth);
+		subscribe.setMaxSize(maxSize);
 
-		subscribe.setStartIdentifier(createStartIdentifier());
+		subscribe.setStartIdentifier(createStartIdentifier(sIdentifierType, sIdentifier));
 
 		request.addSubscribeElement(subscribe);
 		try {
 			mSsrc.subscribe(request);
+			activeSubscriptions.put(sName, new IdentifierData(sIdentifierType, sIdentifier));
 		} catch (IfmapErrorResult | IfmapException e) {
-			throw new RuntimeException("could not subscribe for start identifier: " +
+			throw new RuntimeException("could not subscribe update for identifier: " +
 					e.getMessage());
 		}
 	}
 
-	protected Identifier createStartIdentifier() {
-		switch (START_IDENTIFIER_TYPE) {
+	protected Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
+		switch (sIdentifierType) {
 		case "device":
-			return Identifiers.createDev(START_IDENTIFIER);
+			return Identifiers.createDev(sIdentifier);
 		case "access-request":
-			return Identifiers.createAr(START_IDENTIFIER);
+			return Identifiers.createAr(sIdentifier);
 		case "ip-address":
-			String[] split = START_IDENTIFIER.split(",");
+			String[] split = sIdentifier.split(",");
 			switch (split[0]) {
 			case "IPv4":
 				return Identifiers.createIp4(split[1]);
@@ -267,12 +296,49 @@ public class UpdateService implements Runnable {
 				throw new RuntimeException("unknown IP address type '"+split[0]+"'");
 			}
 		case "mac-address":
-			return Identifiers.createMac(START_IDENTIFIER);
+			return Identifiers.createMac(sIdentifier);
 
-		// TODO identity and extended identifiers
+			// TODO identity and extended identifiers
 
 		default:
-			throw new RuntimeException("unknown identifier type '"+START_IDENTIFIER_TYPE+"'");
+			throw new RuntimeException("unknown identifier type '"+sIdentifierType+"'");
 		}
+	}
+	
+	public void subscribeDeleteAll(){
+		SubscribeRequest request = Requests.createSubscribeReq();
+		
+		for(String sKey: activeSubscriptions.keySet()){
+			
+			SubscribeDelete subscribe = Requests.createSubscribeDelete(sKey);
+			request.addSubscribeElement(subscribe);
+			
+		}
+		
+		try {
+			mSsrc.subscribe(request);
+			activeSubscriptions.clear();
+		} catch (IfmapErrorResult | IfmapException e) {
+			throw new RuntimeException("could not subscribe delete for start identifier: " +
+					e.getMessage());
+		}
+	}
+	
+	public void subscribeDelete(String sName) {
+		SubscribeRequest request = Requests.createSubscribeReq();
+		SubscribeDelete subscribe = Requests.createSubscribeDelete(sName);
+
+		request.addSubscribeElement(subscribe);
+		try {
+			mSsrc.subscribe(request);
+			activeSubscriptions.remove(sName);
+		} catch (IfmapErrorResult | IfmapException e) {
+			throw new RuntimeException("could not subscribe delete for start identifier: " +
+					e.getMessage());
+		}
+	}
+
+	public Set<String> getActiveSubscriptions() {
+		return activeSubscriptions.keySet();
 	}
 }

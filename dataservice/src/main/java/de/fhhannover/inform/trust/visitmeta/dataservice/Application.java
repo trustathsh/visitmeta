@@ -236,6 +236,16 @@ public abstract class Application {
 					"GraphService has not been initialized. This is not good!");
 		return mGraphService;
 	}
+	
+	/**
+	 * @return
+	 */
+	public static UpdateService getUpdateService() {
+		if (mUpdateService == null)
+			throw new RuntimeException(
+					"UpdateService has not been initialized. This is not good!");
+		return mUpdateService;
+	}
 
 	/**
 	 * @return

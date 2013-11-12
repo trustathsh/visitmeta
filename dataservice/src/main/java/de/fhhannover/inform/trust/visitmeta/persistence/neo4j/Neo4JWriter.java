@@ -49,7 +49,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Transaction;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
 
@@ -74,73 +73,6 @@ public class Neo4JWriter extends AbstractWriter {
 	}
 
 	@Override
-	public void submitUpdate(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
-		log.trace("Beginning transaction ...");
-		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
-		try {
-			super.submitUpdate(id1, id2, meta);
-			for (InternalMetadata m : meta) {
-				mConnection.getTimestampManager().incrementCounter(m.getPublishTimestamp());
-			}
-			tx.success();
-		} finally {
-			log.trace("Finishing transaction ...");
-			tx.finish();
-		}
-	}
-/**
- * Submit an update for an identifier.
- */
-	@Override
-	public void submitUpdate(InternalIdentifier id, List<InternalMetadata> meta) {
-		log.trace("Beginning transaction ...");
-		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
-		try {
-			super.submitUpdate(id, meta);
-			for (InternalMetadata m : meta) {
-				mConnection.getTimestampManager().incrementCounter(m.getPublishTimestamp());
-			}
-			tx.success();
-		} finally {
-			log.trace("Finishing transaction ...");
-			tx.finish();
-		}
-	}
-
-	@Override
-	public void submitDelete(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
-		log.trace("Beginning transaction ...");
-		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
-		try {
-			super.submitDelete(id1, id2, meta);
-			for (int i = 0; i < meta.size(); i++) {
-				mConnection.getTimestampManager().incrementCounter(mLastTimestamp);
-			}
-			tx.success();
-		} finally {
-			log.trace("Finishing transaction ...");
-			tx.finish();
-		}
-
-	}
-
-	@Override
-	public void submitDelete(InternalIdentifier id, List<InternalMetadata> meta) {
-		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
-		try {
-			super.submitDelete(id, meta);
-			for (int i = 0; i < meta.size(); i++) {
-				mConnection.getTimestampManager().incrementCounter(mLastTimestamp);
-			}
-			tx.success();
-		} finally {
-			log.trace("Finishing transaction ...");
-			tx.finish();
-		}
-
-	}
-
-	@Override
 	public void finishTransaction() {
 		log.trace("Finishing transaction ...");
 		mTransaction.success();
@@ -154,5 +86,19 @@ public class Neo4JWriter extends AbstractWriter {
 		mLastTimestamp = mConnection.getTimestampManager().getCurrentTime();
 		log.trace("Beginning transaction ...");
 		mTransaction = ((Neo4JRepository) mRepo).beginTx();
+	}
+	
+	@Override
+	protected void submitUpdate(List<InternalMetadata> meta) {
+		for(InternalMetadata m : meta) {
+			mConnection.getTimestampManager().incrementCounter(m.getPublishTimestamp());
+		}
+	}
+	
+	@Override
+	protected void submitDelete(int n) {
+		for(int i = 0; i < n; i++) {
+			mConnection.getTimestampManager().incrementCounter(mLastTimestamp);
+		}
 	}
 }

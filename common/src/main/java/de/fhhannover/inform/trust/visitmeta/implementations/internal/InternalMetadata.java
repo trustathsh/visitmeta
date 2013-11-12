@@ -87,13 +87,19 @@ public abstract class InternalMetadata implements Propable{
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null)
+		if (o == null) {
 			return false;
-		if (! (o instanceof InternalMetadata) )
+		}
+		if (! (o instanceof InternalMetadata) ) {
 			return false;
+		}
 		InternalMetadata other = (InternalMetadata) o;
-		if (!getTypeName().equals(other.getTypeName()))
+		if (!this.getTypeName().equals(other.getTypeName())) {
 			return false;
+		}
+		if(this.isSingleValue()) {
+			return true;
+		}
 		if (getProperties().size() != other.getProperties().size()) {
 			return false;
 		}

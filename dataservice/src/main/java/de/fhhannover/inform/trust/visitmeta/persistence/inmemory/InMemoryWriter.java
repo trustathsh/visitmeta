@@ -80,4 +80,16 @@ public class InMemoryWriter extends AbstractWriter {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	protected void submitUpdate(List<InternalMetadata> meta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void submitDelete(int n) {
+		// TODO Auto-generated method stub
+		
+	}
 }

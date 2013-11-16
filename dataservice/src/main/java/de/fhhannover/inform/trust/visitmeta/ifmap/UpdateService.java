@@ -259,13 +259,22 @@ public class UpdateService implements Runnable {
 		
 		}
 	}
-
+	
 	public void subscribeUpdate(String sName, String sIdentifierType, String sIdentifier, int maxDepth, int maxSize) {
+		subscribeUpdate(sName, sIdentifierType, sIdentifier, maxDepth, maxSize, null, null, null);
+	}
+
+	public void subscribeUpdate(String sName, String sIdentifierType, String sIdentifier, int maxDepth, int maxSize, String linksFilter, String resultFilter, String terminalIdentifierTypes) {
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
+		
 		subscribe.setName(sName);
 		subscribe.setMaxDepth(maxDepth);
 		subscribe.setMaxSize(maxSize);
+		
+		subscribe.setMatchLinksFilter(linksFilter);
+		subscribe.setResultFilter(resultFilter);
+		subscribe.setTerminalIdentifierTypes(terminalIdentifierTypes);
 
 		subscribe.setStartIdentifier(createStartIdentifier(sIdentifierType, sIdentifier));
 

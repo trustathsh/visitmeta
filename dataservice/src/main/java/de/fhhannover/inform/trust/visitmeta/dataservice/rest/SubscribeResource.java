@@ -39,6 +39,9 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
  * #L%
  */
 
+import java.util.Iterator;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -51,6 +54,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
 import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
@@ -69,6 +74,16 @@ import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
 public class SubscribeResource {
 
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
+
+	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
+	public static final String JSON_KEY_IDENTIFIER = "identifier";
+	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";
+	public static final String JSON_KEY_MAX_DEPTH = "maxDepth";
+	public static final String JSON_KEY_MAX_SIZE = "maxSize";
+
+	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
+	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
+	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
 
 	private UpdateService mUpdateService;
 
@@ -112,6 +127,102 @@ public class SubscribeResource {
 		String subscribeName = identifierType + "-" + identifier;
 		mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, MAX_DEPTH, MAX_SIZE);
 		return "OK";
+	}
+
+	/**
+	 * Send a subscribeUpdate to the MAP-Server with a JSONObject.
+	 * Max-Depth and Max-Size have the defaultValue 1000 and 1000000000. To change this values
+	 * use the params "maxDepth" and "maxSize", or set this in the JSONObject.
+	 * 
+	 * On identifier type:
+	 * ip-address:     "[type],[value]" e.g. "IPv4,10.1.1.1"
+	 * device:         "[name]"
+	 * access-request: "[name]"
+	 * mac-address:    "[value]"
+	 * 
+	 * Use the valid JSON-Keys for subscriptions:
+	 * SUBSCRIBE NAME = "subscribeName"
+	 * IDENTIFIER = "identifier"
+	 * IDENTIFIER TYPE = "identifierType"
+	 * MAX DEPTH = "maxDepth"
+	 * MAX SIZE = "maxSize"
+	 * LINKS FILTER = "linksFilter"
+	 * RESULT FILTER = "resultFilter"
+	 * TERMINAL IDENTIFIER TYPES = "terminalIdentifierTypes"
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/subscribe/update</tt>
+	 * Example-JSONObject:
+	 * {
+	 * 	subscribeName:visitmeta,
+	 * 	identifierType:device,
+	 * 	identifier:device12
+	 * }
+	 */
+	@PUT
+	@Path("update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String update(JSONObject jObj) {
+		String subscribeName = null;
+		String identifierType = null;
+		String identifier = null;
+		int maxDepth = MAX_DEPTH;
+		int maxSize = MAX_SIZE;
+
+		String linksFilter = null;
+		String resultFilter = null;
+		String terminalIdentifierTypes = null;
+		
+		try {
+			
+			Iterator<String> i = jObj.keys();
+			
+			while (i.hasNext()) {
+				String jKey = i.next();
+				
+				switch (jKey) {
+				case JSON_KEY_SUBSCRIBE_NAME:
+					subscribeName = jObj.getString(jKey);
+					break;
+				case JSON_KEY_IDENTIFIER_TYPE:
+					identifierType = jObj.getString(jKey);
+					break;
+				case JSON_KEY_IDENTIFIER:
+					identifier = jObj.getString(jKey);
+					break;
+				case JSON_KEY_MAX_DEPTH:
+					maxDepth = jObj.getInt(jKey);
+					break;
+				case JSON_KEY_MAX_SIZE:
+					maxSize = jObj.getInt(jKey);
+					break;
+				case JSON_KEY_LINKS_FILTER:
+					linksFilter = jObj.getString(jKey);
+					break;
+				case JSON_KEY_RESULT_FILTER:
+					resultFilter = jObj.getString(jKey);
+					break;
+				case JSON_KEY_TERMINAL_IDENTIFIER_TYPES:
+					terminalIdentifierTypes = jObj.getString(jKey);
+					break;
+
+				default:
+					log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions.");
+					break;
+				}
+			}
+
+		} catch (JSONException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		try{
+			
+			mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, maxDepth, maxSize, linksFilter, resultFilter, terminalIdentifierTypes);
+		
+		}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "Could not subscribe update for identifier. Make sure to use a valide JSON-Key for subscriptions: " + e.getMessage();
+		}
+		return "subscribe update was send";
 	}
 
 	/**

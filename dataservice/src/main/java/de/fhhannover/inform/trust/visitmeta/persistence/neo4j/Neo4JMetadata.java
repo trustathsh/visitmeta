@@ -54,6 +54,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
 
 import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
@@ -100,17 +101,36 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public String valueFor(String p) {
-		return (String)mMe.getProperty(p);
+		String value = "";
+		try {
+			value = (String) mMe.getProperty(p);
+		} catch(NotFoundException e) {
+			log.warn("Property " + p + " does not exist in Metadata " + this);
+		}
+		return value;
 	}
 
 	@Override
 	public String getTypeName() {
-		return (String)mMe.getProperty(KEY_TYPE_NAME);
+		//TODO handle false Metadata
+		String type = "";
+		try {
+			type = (String) mMe.getProperty(KEY_TYPE_NAME);
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not has a Type declared! " + this);
+		}
+		return type;
 	}
 
 	@Override
 	public boolean isSingleValue() {
-		String value = (String) mMe.getProperty(KEY_META_CARDINALITY);
+		//TODO handle false Metadata
+		String value = "";
+		try {
+		value = (String) mMe.getProperty(KEY_META_CARDINALITY);
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not has the Cardinality-Property set! " + this);
+		}
 		if(value.equals(VALUE_META_CARDINALITY_SINGLE)) {
 			return true;
 		}
@@ -135,14 +155,25 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public long getPublishTimestamp() {
-		String value = mMe.getProperty(KEY_TIMESTAMP_PUBLISH).toString();
+		//TODO handle false Metadata
+		String value = "";
+		try {
+			value = mMe.getProperty(KEY_TIMESTAMP_PUBLISH).toString();
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not has a PublishTimestamp set! " + this);
+		}
 		return Long.parseLong(value);
 	}
 
 	@Override
 	public long getDeleteTimestamp() {
-		String value =
-				mMe.getProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP+"").toString();
+		//TODO handle false Metadata
+		String value = "";
+		try {
+			value = mMe.getProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP+"").toString();
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not has a DeleteTimestamp! " + this);
+		}
 		return Long.parseLong(value);
 	}
 
@@ -159,6 +190,11 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public String getRawData() {
+		try {
 		return (String)mMe.getProperty(KEY_RAW_DATA, "");
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not has Raw Data! " + this);
+		}
+		return "";
 	}
 }

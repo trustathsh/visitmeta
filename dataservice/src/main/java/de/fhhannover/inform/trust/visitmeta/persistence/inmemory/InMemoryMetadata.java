@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.neo4j.graphdb.NotFoundException;
 
 import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
@@ -108,7 +109,12 @@ public class InMemoryMetadata extends InternalMetadata {
 
 	@Override
 	public String valueFor(String p) {
-		return mProperties.get(p);
+		try {
+			return mProperties.get(p);
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not contain the property " + p + "! " + this);
+		}
+		return "";
 	}
 
 	@Override

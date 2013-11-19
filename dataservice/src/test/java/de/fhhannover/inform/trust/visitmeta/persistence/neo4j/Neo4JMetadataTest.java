@@ -133,6 +133,7 @@ public class Neo4JMetadataTest {
 		node.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
 		node.setProperty(KEY_TYPE_NAME, "role");
 		node.setProperty("/role/name", "chef");
+		node.setProperty("/role[@ifmap-cardinality]", "multiValue");
 		tx.success();
 		tx.finish();
 

@@ -125,8 +125,14 @@ public class SubscribeResource {
 	@Path("update/{identifierType}/{identifier}")
 	public String update(@PathParam("identifierType") String identifierType, @PathParam("identifier") String identifier) {
 		String subscribeName = identifierType + "-" + identifier;
-		mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, MAX_DEPTH, MAX_SIZE);
-		return "OK";
+		
+		try{
+			mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, MAX_DEPTH, MAX_SIZE);
+		}catch (RuntimeException e){
+			return e.getMessage();
+		}
+		
+		return "INFO: subscribe successfully";
 	}
 
 	/**
@@ -162,6 +168,40 @@ public class SubscribeResource {
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String update(JSONObject jObj) {
+		try {
+			
+			Iterator<String> i = jObj.keys();
+			
+			while(i.hasNext()){
+				String jKey = i.next();
+				
+				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
+				
+				try{
+					
+					subscribeUpdate(moreSubscribes);
+				
+				}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+					return e.getMessage();
+				}
+			}
+
+		} catch (JSONException e) {
+		
+			try{
+				
+				subscribeUpdate(jObj);
+			
+			}catch (RuntimeException ee){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+				return ee.getMessage();
+			}
+		
+		}
+		
+		return "INFO: subscribe successfully";
+	}
+	
+	private void subscribeUpdate(JSONObject jObj) {
 		String subscribeName = null;
 		String identifierType = null;
 		String identifier = null;
@@ -215,15 +255,9 @@ public class SubscribeResource {
 			log.error(e.getMessage(), e);
 		}
 
-		try{
-			
-			mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, maxDepth, maxSize, linksFilter, resultFilter, terminalIdentifierTypes);
-		
-		}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "Could not subscribe update for identifier. Make sure to use a valide JSON-Key for subscriptions: " + e.getMessage();
-		}
-		return "subscribe update was send";
+		mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, maxDepth, maxSize, linksFilter, resultFilter, terminalIdentifierTypes);
 	}
+
 
 	/**
 	 * Send a subscribeDelete for all active subscriptions to the MAP-Server.
@@ -234,9 +268,14 @@ public class SubscribeResource {
 	@Path("delete")
 	public String deleteAll() {
 		if(mDeleteAll){
-			mUpdateService.subscribeDeleteAll();
+			try{
+				mUpdateService.subscribeDeleteAll();
+		
+			}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+				return e.getMessage();
+			}
 		}
-		return "OK";
+		return "INFO: delete all active subscriptions successfully";
 	}
 
 	/**
@@ -246,8 +285,15 @@ public class SubscribeResource {
 	@DELETE
 	@Path("delete/{identifier}")
 	public String delete(@PathParam("identifier") String identifier) {
-		mUpdateService.subscribeDelete(identifier);
-		return "OK";
+		try{
+			
+			mUpdateService.subscribeDelete(identifier);
+			
+		}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return e.getMessage();
+		}
+		
+		return "INFO: delete subscription successfully";
 	}
 
 	private UpdateService initUpdateService() {

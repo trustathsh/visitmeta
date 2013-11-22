@@ -50,6 +50,7 @@ public final class ConfigParameter {
 	public static final String IFMAP_MAX_DEPTH = "ifmap.maxdepth";
 	public static final String IFMAP_MAX_SIZE = "ifmap.maxsize";
 	public static final String IFMAP_SUBSCRIPTION_NAME = "ifmap.subscription.name";
+	public static final String IFMAP_SUBSCRIPTION_DUMPING = "ifmap.subscription.dumping";
 
 	public static final String IFMAP_MAX_RETRY = "ifmap.connection.maxretry";
 	public static final String IFMAP_RETRY_INTERVAL = "ifmap.connection.retryinterval";

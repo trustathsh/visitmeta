@@ -39,11 +39,10 @@ package de.fhhannover.inform.trust.visitmeta.ifmap;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,7 +53,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import de.fhhannover.inform.trust.ifmapj.IfmapJ;
-import de.fhhannover.inform.trust.ifmapj.channel.ARC;
 import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
 import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
 import de.fhhannover.inform.trust.ifmapj.messages.PollResult;
@@ -71,7 +69,7 @@ public class PollTaskTest {
 
 	private StandardIfmapMetadataFactory mIfmapMetadataFactory;
 
-	private ARC mArc;
+	private Connection mConnection;
 	private InternalMetadataFactory mMetadataFactory;
 	private IfmapJHelper mIfmapJHelper;
 
@@ -79,7 +77,7 @@ public class PollTaskTest {
 
 	@Before
 	public void setup() {
-		mArc = mock(ARC.class);
+		mConnection = mock(Connection.class);
 		mMetadataFactory = mock(InternalMetadataFactory.class);
 		mIfmapJHelper = new IfmapJHelper(new IdentifierFactoryStub());
 		InternalMetadata metadataMock = mock(InternalMetadata.class);
@@ -87,7 +85,7 @@ public class PollTaskTest {
 
 		mIfmapMetadataFactory = IfmapJ.createStandardMetadataFactory();
 
-		mPollTask = new PollTask(mArc, mMetadataFactory, mIfmapJHelper);
+		mPollTask = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
 	}
 
 	@Test
@@ -98,20 +96,20 @@ public class PollTaskTest {
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
 								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-						ResultItemMock(
-								Identifiers.createIp4("10.1.1.9"),
-								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-				), Type.updateResult),
-				SearchResultMock(Arrays.asList(
-						ResultItemMock(
-								Identifiers.createAr("111:33"),
-								Identifiers.createDev("device42"),
-								Arrays.asList(mIfmapMetadataFactory.createArDev()))
-				), Type.updateResult)
-		));
+								ResultItemMock(
+										Identifiers.createIp4("10.1.1.9"),
+										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
+						), Type.updateResult),
+						SearchResultMock(Arrays.asList(
+								ResultItemMock(
+										Identifiers.createAr("111:33"),
+										Identifiers.createDev("device42"),
+										Arrays.asList(mIfmapMetadataFactory.createArDev()))
+								), Type.updateResult)
+				));
 
-		when(mArc.poll()).thenReturn(pollResult);
+		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.fhhannover.inform.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(3, p.getUpdates().size());
@@ -124,10 +122,10 @@ public class PollTaskTest {
 						ResultItemMock(
 								Identifiers.createAr("111:33"),
 								Collections.EMPTY_LIST)
-				), Type.updateResult)
-		));
+						), Type.updateResult)
+				));
 
-		when(mArc.poll()).thenReturn(pollResult);
+		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.fhhannover.inform.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(0, p.getUpdates().size());
@@ -141,10 +139,10 @@ public class PollTaskTest {
 								Identifiers.createAr("111:33"),
 								Identifiers.createDev("device42"),
 								Collections.EMPTY_LIST)
-				), Type.updateResult)
-		));
+						), Type.updateResult)
+				));
 
-		when(mArc.poll()).thenReturn(pollResult);
+		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.fhhannover.inform.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(0, p.getUpdates().size());
@@ -158,20 +156,20 @@ public class PollTaskTest {
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
 								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-						ResultItemMock(
-								Identifiers.createIp4("10.1.1.9"),
-								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-				), Type.deleteResult),
-				SearchResultMock(Arrays.asList(
-						ResultItemMock(
-								Identifiers.createAr("111:33"),
-								Identifiers.createDev("device42"),
-								Arrays.asList(mIfmapMetadataFactory.createArDev()))
-				), Type.deleteResult)
-		));
+								ResultItemMock(
+										Identifiers.createIp4("10.1.1.9"),
+										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
+						), Type.deleteResult),
+						SearchResultMock(Arrays.asList(
+								ResultItemMock(
+										Identifiers.createAr("111:33"),
+										Identifiers.createDev("device42"),
+										Arrays.asList(mIfmapMetadataFactory.createArDev()))
+								), Type.deleteResult)
+				));
 
-		when(mArc.poll()).thenReturn(pollResult);
+		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.fhhannover.inform.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(3, p.getDeletes().size());
@@ -185,26 +183,26 @@ public class PollTaskTest {
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
 								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-						ResultItemMock(
-								Identifiers.createIp4("10.1.1.9"),
-								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-				), Type.updateResult),
-				SearchResultMock(Arrays.asList(
-						ResultItemMock(
-								Identifiers.createAr("111:33"),
-								Identifiers.createDev("device42"),
-								Arrays.asList(mIfmapMetadataFactory.createArDev()))
-				), Type.updateResult),
-				SearchResultMock(Arrays.asList(
-						ResultItemMock(
-								Identifiers.createAr("111:44"),
-								Identifiers.createDev("device77"),
-								Arrays.asList(mIfmapMetadataFactory.createArDev()))
-				), Type.deleteResult)
-		));
+								ResultItemMock(
+										Identifiers.createIp4("10.1.1.9"),
+										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
+						), Type.updateResult),
+						SearchResultMock(Arrays.asList(
+								ResultItemMock(
+										Identifiers.createAr("111:33"),
+										Identifiers.createDev("device42"),
+										Arrays.asList(mIfmapMetadataFactory.createArDev()))
+								), Type.updateResult),
+								SearchResultMock(Arrays.asList(
+										ResultItemMock(
+												Identifiers.createAr("111:44"),
+												Identifiers.createDev("device77"),
+												Arrays.asList(mIfmapMetadataFactory.createArDev()))
+										), Type.deleteResult)
+				));
 
-		when(mArc.poll()).thenReturn(pollResult);
+		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.fhhannover.inform.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(3, p.getUpdates().size());

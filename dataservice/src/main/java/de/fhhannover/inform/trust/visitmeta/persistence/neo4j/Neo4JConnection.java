@@ -69,16 +69,18 @@ public class Neo4JConnection {
 	public Neo4JConnection(String dbPath) {
 		this();
 		mDbPath = dbPath;
-		log.debug("Connecting to database");
 		mGraphDb = new GraphDatabaseFactory().
 				newEmbeddedDatabaseBuilder(mDbPath).
 				setConfig( GraphDatabaseSettings.node_keys_indexable, NODE_TYPE_KEY +","+ KEY_HASH ).
 				setConfig( GraphDatabaseSettings.node_auto_indexing, "true" ).
 				newGraphDatabase();
 		registerShutdownHook(mGraphDb);
+
+		log.trace("... new Neo4JConnection() OK");
 	}
 
 	private Neo4JConnection() {
+		log.trace("new Neo4JConnection() ...");
 		mTimestampManager = new Neo4JTimestampManager(this);
 	}
 

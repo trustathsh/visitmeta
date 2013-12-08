@@ -80,6 +80,7 @@ public class Neo4JRepository implements Repository {
 	private MessageDigest mMessageDigest;
 
 	private Neo4JRepository() {
+		log.trace("new Neo4JRepository()");
 	}
 
 	public Neo4JRepository(Neo4JConnection db, MessageDigest digest) {

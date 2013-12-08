@@ -12,7 +12,7 @@ package de.fhhannover.inform.trust.visitmeta.persistence;
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.persistence;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
@@ -52,6 +52,7 @@ public class ThreadedWriter implements Runnable, Writer {
 
 
 	private ThreadedWriter() {
+		log.trace("new ThreadedWriter()");
 		mTasks = new LinkedBlockingQueue<>();
 	}
 
@@ -68,6 +69,8 @@ public class ThreadedWriter implements Runnable, Writer {
 
 	@Override
 	public void run() {
+		log.debug("run() ...");
+
 		while (!isStopped()) {
 			PollResult pr = null;
 			try {
@@ -79,6 +82,8 @@ public class ThreadedWriter implements Runnable, Writer {
 				e.printStackTrace();
 			}
 		}
+
+		log.debug("... run()");
 	}
 
 	protected boolean isStopped() {

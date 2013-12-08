@@ -57,8 +57,16 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
+import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
+import de.fhhannover.inform.trust.ifmapj.messages.Requests;
+import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
+import de.fhhannover.inform.trust.ifmapj.messages.SubscribeUpdate;
 import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
+import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
  * For each request a new object of this class will be created. The
@@ -70,69 +78,62 @@ import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
  *
  */
 
-@Path("/subscribe")
+@Path("{connectionName}/subscribe")
 public class SubscribeResource {
+
 
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
 
+
+	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
+
+	private static final int MAX_DEPTH = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
+
+	private static final int MAX_SIZE = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+
 	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
+
 	public static final String JSON_KEY_IDENTIFIER = "identifier";
+
 	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";
+
 	public static final String JSON_KEY_MAX_DEPTH = "maxDepth";
+
 	public static final String JSON_KEY_MAX_SIZE = "maxSize";
 
 	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
+
 	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
+
 	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
 
-	private UpdateService mUpdateService;
-
-	@QueryParam("maxDepth")
-	@DefaultValue("1000")
-	private int MAX_DEPTH;
-
-	@QueryParam("maxSize")
-	@DefaultValue("1000000000")					//TODO aus der config auslesen??
-	private int MAX_SIZE;
 
 	@QueryParam("deleteAll")
 	@DefaultValue("false")
-	private boolean mDeleteAll;
+	private boolean mDeleteAll = false;
 
-	public SubscribeResource() {
-		mUpdateService = initUpdateService();
-	}
 
 	/**
-	 * Returns a JSONArray with the active subscriptions for the dataservice.
-	 * Example-URL: <tt>http://example.com:8000/subscribe</tt>
+	 * Returns a JSONArray with the active subscriptions for the dataservice about the default connection.
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe</tt>
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONArray active() {
-		JSONArray activeSubscriptions= new JSONArray(mUpdateService.getActiveSubscriptions());
-		return activeSubscriptions;
-	}
+	public Object getActiveSubscriptions(@PathParam("connectionName") String connectionName) {
 
-	/**
-	 * Send a subscribeUpdate to the MAP-Server.
-	 * Max-Depth and Max-Size have the defaultValue 1000 and 1000000000. To change this values
-	 * use the params "maxDepth" and "maxSize".
-	 * Example-URL: <tt>http://example.com:8000/subscribe/update/access-request/exampleIdentifier1</tt>
-	 * Example-URL: <tt>http://example.com:8000/subscribe/update/device/exampleIdentifier2?maxDepth=5&maxSize=500</tt>
-	 */
-	@PUT
-	@Path("update/{identifierType}/{identifier}")
-	public String update(@PathParam("identifierType") String identifierType, @PathParam("identifier") String identifier) {
-		String subscribeName = identifierType + "-" + identifier;
-		
-		try{
-			mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, MAX_DEPTH, MAX_SIZE);
-		}catch (RuntimeException e){
-			return e.getMessage();
-		}
-		
-		return "INFO: subscribe successfully";
+		JSONArray activeSubscriptions;
+
+		try {
+
+			activeSubscriptions = new JSONArray(ConnectionManager.getActiveSubscriptionsFromConnection(connectionName));
+
+		} catch (ConnectionException e) {
+
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
+		return activeSubscriptions;
 	}
 
 	/**
@@ -149,17 +150,18 @@ public class SubscribeResource {
 	 * Use the valid JSON-Keys for subscriptions:
 	 * SUBSCRIBE NAME = "subscribeName"
 	 * IDENTIFIER = "identifier"
-	 * IDENTIFIER TYPE = "identifierType"
-	 * MAX DEPTH = "maxDepth"
-	 * MAX SIZE = "maxSize"
-	 * LINKS FILTER = "linksFilter"
-	 * RESULT FILTER = "resultFilter"
-	 * TERMINAL IDENTIFIER TYPES = "terminalIdentifierTypes"
+	 * IDENTIFIER-TYPE = "identifierType"
+	 * MAX-DEPTH = "maxDepth"
+	 * MAX-SIZE = "maxSize"
+	 * LINKS-FILTER = "linksFilter"
+	 * RESULT-FILTER = "resultFilter"
+	 * TERMINAL-IDENTIFIER-TYPES = "terminalIdentifierTypes"
 	 * 
-	 * Example-URL: <tt>http://example.com:8000/subscribe/update</tt>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/update</tt>
+	 * 
 	 * Example-JSONObject:
 	 * {
-	 * 	subscribeName:visitmeta,
+	 * 	subscribeName:exampleSub,
 	 * 	identifierType:device,
 	 * 	identifier:device12
 	 * }
@@ -167,41 +169,42 @@ public class SubscribeResource {
 	@PUT
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String update(JSONObject jObj) {
+	public String update(@PathParam("connectionName") String name, JSONObject jObj) {
+
 		try {
-			
+
 			Iterator<String> i = jObj.keys();
-			
+
 			while(i.hasNext()){
 				String jKey = i.next();
-				
+
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
-				
+
 				try{
-					
-					subscribeUpdate(moreSubscribes);
-				
-				}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-					return e.getMessage();
-				}
+
+					subscribeUpdate(name, moreSubscribes);
+
+				} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+
+					return "ERROR: subscribe update was not send: " + e.getClass().getSimpleName();
+				};
 			}
 
 		} catch (JSONException e) {
-		
+
 			try{
-				
-				subscribeUpdate(jObj);
-			
-			}catch (RuntimeException ee){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-				return ee.getMessage();
+
+				subscribeUpdate(name, jObj);
+
+			} catch (ConnectionException ee) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+				return "ERROR: subscribe update was not send: " + ee.getClass().getSimpleName();
 			}
-		
+
 		}
-		
 		return "INFO: subscribe successfully";
 	}
-	
-	private void subscribeUpdate(JSONObject jObj) {
+
+	private void subscribeUpdate(String connectionName, JSONObject jObj) throws ConnectionException {
 		String subscribeName = null;
 		String identifierType = null;
 		String identifier = null;
@@ -211,36 +214,43 @@ public class SubscribeResource {
 		String linksFilter = null;
 		String resultFilter = null;
 		String terminalIdentifierTypes = null;
-		
+
 		try {
-			
+
 			Iterator<String> i = jObj.keys();
-			
+
 			while (i.hasNext()) {
 				String jKey = i.next();
-				
+
 				switch (jKey) {
 				case JSON_KEY_SUBSCRIBE_NAME:
 					subscribeName = jObj.getString(jKey);
 					break;
+
 				case JSON_KEY_IDENTIFIER_TYPE:
 					identifierType = jObj.getString(jKey);
 					break;
+
 				case JSON_KEY_IDENTIFIER:
 					identifier = jObj.getString(jKey);
 					break;
+
 				case JSON_KEY_MAX_DEPTH:
 					maxDepth = jObj.getInt(jKey);
 					break;
+
 				case JSON_KEY_MAX_SIZE:
 					maxSize = jObj.getInt(jKey);
 					break;
+
 				case JSON_KEY_LINKS_FILTER:
 					linksFilter = jObj.getString(jKey);
 					break;
+
 				case JSON_KEY_RESULT_FILTER:
 					resultFilter = jObj.getString(jKey);
 					break;
+
 				case JSON_KEY_TERMINAL_IDENTIFIER_TYPES:
 					terminalIdentifierTypes = jObj.getString(jKey);
 					break;
@@ -250,53 +260,98 @@ public class SubscribeResource {
 					break;
 				}
 			}
-
 		} catch (JSONException e) {
+
 			log.error(e.getMessage(), e);
 		}
 
-		mUpdateService.subscribeUpdate(subscribeName, identifierType, identifier, maxDepth, maxSize, linksFilter, resultFilter, terminalIdentifierTypes);
+		SubscribeRequest request = Requests.createSubscribeReq();
+		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
+
+		subscribe.setName(subscribeName);
+		subscribe.setMaxDepth(maxDepth);
+		subscribe.setMaxSize(maxSize);
+		subscribe.setMatchLinksFilter(linksFilter);
+		subscribe.setResultFilter(resultFilter);
+		subscribe.setTerminalIdentifierTypes(terminalIdentifierTypes);
+		subscribe.setStartIdentifier(createStartIdentifier(identifierType, identifier));
+
+		request.addSubscribeElement(subscribe);
+
+		ConnectionManager.subscribeFromConnection(connectionName, request);
 	}
 
+	private Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
+		switch (sIdentifierType) {
+		case "device":
+			return Identifiers.createDev(sIdentifier);
+		case "access-request":
+			return Identifiers.createAr(sIdentifier);
+		case "ip-address":
+			String[] split = sIdentifier.split(",");
+			switch (split[0]) {
+			case "IPv4":
+				return Identifiers.createIp4(split[1]);
+			case "IPv6":
+				return Identifiers.createIp6(split[1]);
+			default:
+				throw new RuntimeException("unknown IP address type '"+split[0]+"'");
+			}
+		case "mac-address":
+			return Identifiers.createMac(sIdentifier);
+
+			// TODO identity and extended identifiers
+
+		default:
+			throw new RuntimeException("unknown identifier type '"+sIdentifierType+"'");
+		}
+	}
 
 	/**
 	 * Send a subscribeDelete for all active subscriptions to the MAP-Server.
 	 * You must set the deleteAll value of true.
-	 * Example-URL: <tt>http://example.com:8000/subscribe/delete?deleteAll=true</tt>
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
 	 */
 	@DELETE
 	@Path("delete")
-	public String deleteAll() {
+	public String deleteAll(@PathParam("connectionName") String name) {
 		if(mDeleteAll){
 			try{
-				mUpdateService.subscribeDeleteAll();
-		
-			}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-				return e.getMessage();
-			}
+
+				ConnectionManager.deleteSubscriptionsFromConnection(name);
+
+			} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+
+				return "ERROR: subscriptions not deleted: " + e.getClass().getSimpleName();
+			};
+
+			return "INFO: delete all active subscriptions successfully";
+
+		}else {
+
+			return "INFO: deleteAll value is not true, nothing were deleted";
 		}
-		return "INFO: delete all active subscriptions successfully";
 	}
 
 	/**
 	 * Send a subscribeDelete for the active subscription to the MAP-Server.
-	 * Example-URL: <tt>http://example.com:8000/subscribe/delete/(subscriptionName)</tt>
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
 	 */
 	@DELETE
-	@Path("delete/{identifier}")
-	public String delete(@PathParam("identifier") String identifier) {
-		try{
-			
-			mUpdateService.subscribeDelete(identifier);
-			
-		}catch (RuntimeException e){ //TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return e.getMessage();
-		}
-		
-		return "INFO: delete subscription successfully";
-	}
+	@Path("delete/{subscriptionName}")
+	public String delete(@PathParam("connectionName") String name, @PathParam("subscriptionName") String subscriptionName) {
 
-	private UpdateService initUpdateService() {
-		return Application.getUpdateService();
+		try{
+
+			ConnectionManager.deleteSubscribeFromConnection(name, subscriptionName);
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+
+			return "ERROR: subscription not deleted: " + e.getClass().getSimpleName();
+		};
+
+		return "INFO: delete subscription successfully";
 	}
 }

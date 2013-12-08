@@ -12,7 +12,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
@@ -70,7 +70,7 @@ public class SimpleGraphService implements GraphService {
 	private GraphCache mCache;
 
 	private SimpleGraphService() {
-
+		log.trace("new SimpleGraphService");
 	}
 
 	public SimpleGraphService(Reader r, GraphCache cache) {
@@ -96,7 +96,7 @@ public class SimpleGraphService implements GraphService {
 		log.trace("Method getInitialGraph(" + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
-				graph.add(filterGraph(getInternalGraphAt(getChangesMap().firstKey()), filter));
+			graph.add(filterGraph(getInternalGraphAt(getChangesMap().firstKey()), filter));
 		}
 		return graph;
 	}
@@ -114,12 +114,13 @@ public class SimpleGraphService implements GraphService {
 	@Override
 	public List<IdentifierGraph> getCurrentGraph(GraphFilter filter) {
 		log.trace("Method getCurrentGraph(" + filter + ") called.");
-		if (getChangesMap().isEmpty())
+		if (getChangesMap().isEmpty()) {
 			return new ArrayList<>();
-			List<InternalIdentifierGraph> binky = getInternalGraphAt(getChangesMap().lastKey());
-			List<IdentifierGraph> minky = new ArrayList<>();
-			minky.add(filterGraph(binky, filter));
-			return minky;
+		}
+		List<InternalIdentifierGraph> binky = getInternalGraphAt(getChangesMap().lastKey());
+		List<IdentifierGraph> minky = new ArrayList<>();
+		minky.add(filterGraph(binky, filter));
+		return minky;
 	}
 
 	private List<InternalIdentifierGraph> getInternalGraphAt(Long timestamp) {
@@ -167,7 +168,7 @@ public class SimpleGraphService implements GraphService {
 		log.trace("Method getGraphAt(" + timestamp + ", " + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
-				graph.add(filterGraph(getInternalGraphAt(timestamp), filter));
+			graph.add(filterGraph(getInternalGraphAt(timestamp), filter));
 		}
 		return graph;
 	}
@@ -275,19 +276,19 @@ public class SimpleGraphService implements GraphService {
 			InternalIdentifierPair pair = l.getIdentifiers();
 			InternalIdentifier opposite = (pair.getFirst().equals(id)) ? pair
 					.getSecond() : pair.getFirst();
-			for (InternalLink deleteCandidate : id.getLinks()) {
-				InternalIdentifierPair candidatePair = deleteCandidate
-						.getIdentifiers();
-				if ((candidatePair.getFirst().equals(opposite) && candidatePair
-						.getSecond().equals(id))
-						|| (candidatePair.getFirst().equals(id) && candidatePair
-								.getSecond().equals(opposite))) {
-					stripMetadataFromLink(deleteCandidate, l.getMetadata());
-					if (deleteCandidate.getMetadata().isEmpty()) {
-						linksToDelete.add(l);
+					for (InternalLink deleteCandidate : id.getLinks()) {
+						InternalIdentifierPair candidatePair = deleteCandidate
+								.getIdentifiers();
+						if ((candidatePair.getFirst().equals(opposite) && candidatePair
+								.getSecond().equals(id))
+								|| (candidatePair.getFirst().equals(id) && candidatePair
+										.getSecond().equals(opposite))) {
+							stripMetadataFromLink(deleteCandidate, l.getMetadata());
+							if (deleteCandidate.getMetadata().isEmpty()) {
+								linksToDelete.add(l);
+							}
+						}
 					}
-				}
-			}
 		}
 		for (InternalLink l : linksToDelete) {
 			id.removeLink(l);
@@ -354,8 +355,9 @@ public class SimpleGraphService implements GraphService {
 						id.removeMetadata(meta);
 					}
 				}
-				for (InternalMetadata meta : toRemove)
+				for (InternalMetadata meta : toRemove) {
 					id.removeMetadata(meta);
+				}
 				toRemove.clear();
 				for(InternalLink link : id.getLinks()) {
 					for (InternalMetadata linkMeta : link.getMetadata()) {
@@ -363,8 +365,9 @@ public class SimpleGraphService implements GraphService {
 							toRemove.add(linkMeta);
 						}
 					}
-					for (InternalMetadata meta : toRemove)
+					for (InternalMetadata meta : toRemove) {
 						link.removeMetadata(meta);
+					}
 				}
 			}
 		}

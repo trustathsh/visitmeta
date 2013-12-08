@@ -12,7 +12,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
@@ -40,10 +40,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
  */
 
 import java.util.List;
-
 import java.util.Scanner;
-import java.io.File;
-import java.io.InputStream;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -57,10 +54,9 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphFilter;
 import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
 import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
 
@@ -78,20 +74,15 @@ import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
  * @author Ralf Steuerwald
  *
  */
-@Path("/graph")
+@Path("{connectionName}/graph")
 public class GraphResource {
 
 	private static final Logger log = Logger.getLogger(GraphResource.class);
-
-	private SimpleGraphService mGraphService;
 
 	@QueryParam("rawData")
 	@DefaultValue("false")
 	private boolean mIncludeRawXML;
 
-	public GraphResource() {
-		mGraphService = initGraphService();
-	}
 
 	@GET
 	@Path("index")
@@ -114,8 +105,18 @@ public class GraphResource {
 	@GET
 	@Path("changes")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject getChangesMap() {
-		JSONObject changes = new JSONObject(mGraphService.getChangesMap());
+	public Object getChangesMap(@PathParam("connectionName") String name) {
+
+		JSONObject changes;
+
+		try{
+
+			changes = new JSONObject(ConnectionManager.getGraphServiceFromConnection(name).getChangesMap());
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
 		return changes;
 	}
 
@@ -126,9 +127,20 @@ public class GraphResource {
 	@GET
 	@Path("initial")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONArray getInitialGraph() {
-		List<IdentifierGraph> graphs = mGraphService.getInitialGraph();
+	public Object getInitialGraph(@PathParam("connectionName") String name) {
+
+		List<IdentifierGraph> graphs;
+
+		try{
+
+			graphs = ConnectionManager.getGraphServiceFromConnection(name).getInitialGraph();
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
 		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
+
 		return jsonGraphs;
 	}
 
@@ -141,9 +153,20 @@ public class GraphResource {
 	@GET
 	@Path("{at}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONArray getGraphAt(@PathParam("at") long timestamp) {
-		List<IdentifierGraph> graphs = mGraphService.getGraphAt(timestamp);
+	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp) {
+
+		List<IdentifierGraph> graphs;
+
+		try{
+
+			graphs = ConnectionManager.getGraphServiceFromConnection(name).getGraphAt(timestamp);
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
 		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
+
 		return jsonGraphs;
 	}
 
@@ -157,25 +180,20 @@ public class GraphResource {
 	@GET
 	@Path("current")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONArray getCurrentGraph() {
-		List<IdentifierGraph> graphs = mGraphService.getCurrentGraph();
+	public Object getCurrentGraph(@PathParam("connectionName") String name) {
+
+		List<IdentifierGraph> graphs;
+
+		try{
+
+			graphs = ConnectionManager.getGraphServiceFromConnection(name).getCurrentGraph();
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
 		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
 		return jsonGraphs;
-	}
-
-	public List<IdentifierGraph> getInitialGraph(GraphFilter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IdentifierGraph> getGraphAt(long timestamp, GraphFilter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IdentifierGraph> getCurrentGraph(GraphFilter filter) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -190,15 +208,21 @@ public class GraphResource {
 	@GET
 	@Path("{from}/{to}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject getDelta(@PathParam("from") long t1, @PathParam("to") long t2) {
-		Delta delta = mGraphService.getDelta(t1, t2);
-		JSONObject jsonDelta = jsonMarshaller().toJson(delta);
-		return jsonDelta;
-	}
+	public Object getDelta(@PathParam("connectionName") String name, @PathParam("from") long t1, @PathParam("to") long t2) {
 
-	// return the GraphService instance, can be overwritten to return a mock for unit test purposes
-	protected SimpleGraphService initGraphService() {
-		return Application.getGraphservice();
+		Delta delta;
+
+		try{
+
+			delta = ConnectionManager.getGraphServiceFromConnection(name).getDelta(t1, t2);
+
+		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
+		JSONObject jsonDelta = jsonMarshaller().toJson(delta);
+
+		return jsonDelta;
 	}
 
 	/**

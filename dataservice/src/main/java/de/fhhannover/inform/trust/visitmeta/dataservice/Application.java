@@ -12,7 +12,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice;
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -20,7 +20,7 @@ package de.fhhannover.inform.trust.visitmeta.dataservice;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
+ * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH
  * research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
@@ -43,30 +43,18 @@ package de.fhhannover.inform.trust.visitmeta.dataservice;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.glassfish.grizzly.http.server.HttpServer;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
-
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.GraphCache;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphCache;
 import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.fhhannover.inform.trust.visitmeta.dataservice.rest.RestService;
 import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
 import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
 import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
 import de.fhhannover.inform.trust.visitmeta.persistence.Reader;
 import de.fhhannover.inform.trust.visitmeta.persistence.ThreadedWriter;
 import de.fhhannover.inform.trust.visitmeta.persistence.Writer;
-import de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JConnection;
-import de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JReader;
-import de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JRepository;
-import de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JWriter;
 import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
@@ -109,34 +97,24 @@ public abstract class Application {
 	 */
 	private static PropertiesReaderWriter mDSConfig;
 
+	private static RestService restService;
+
+	private static Thread restServiceThread;
+
 	/**
 	 * @param args
+	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
+
 		log.info("Application started");
+
 		initComponents();
+
 		log.info("Components initialized");
-		Thread updateThread = new Thread(mUpdateService, "UpdateThread");
-		updateThread.start();
-		log.info("UpdateService started");
-		Thread writerThread = new Thread(mWriter, "WriterThread");
-		writerThread.start();
-		log.info("Writer thread started");
-		try {
-			Thread.sleep(4000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		if (getDSConfig().getProperty(ConfigParameter.DS_REST_ENABLE).equalsIgnoreCase("true"))
-			startRestService();
+
 		log.info("Dataservice started successfully");
-		try {
-			updateThread.join();
-			writerThread.join();
-		} catch (InterruptedException e) {
-			log.fatal("Main thread got interrupted waiting for updateService");
-			e.printStackTrace();
-		}
+
 	}
 
 	public static GraphService initDataservice() {
@@ -149,41 +127,23 @@ public abstract class Application {
 		Thread writerThread = new Thread(mWriter, "WriterThread");
 		writerThread.start();
 		log.info("Writer thread started");
-		if (getDSConfig().getProperty(ConfigParameter.DS_REST_ENABLE).equalsIgnoreCase("true"))
-			startRestService();
+		if (getDSConfig().getProperty(ConfigParameter.DS_REST_ENABLE).equalsIgnoreCase("true")) {
+
+			restServiceThread.start();
+		}
 		log.info("Dataservice started successfully");
 		return mGraphService;
-	}
-
-	private static void startRestService() {
-		final String url  = Application.getDSConfig().getProperty(ConfigParameter.DS_REST_URL);
-		final Map<String, String> params = new HashMap<String, String>();
-
-		params.put("com.sun.jersey.config.property.packages",
-				"de.fhhannover.inform.trust.visitmeta.dataservice.rest");
-
-		log.info("starting REST service on "+url+"...");
-
-		try {
-			HttpServer server = GrizzlyWebContainerFactory.create(url, params);
-			log.debug("REST service running.");
-			// TODO shutdown server properly
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
 	 *
 	 */
 	private static void initComponents() {
+
 		try {
-			String dbConfig = Application.class.getClassLoader().
-					getResource("config.properties").getPath();
-			String ifmapConfig = Application.class.getClassLoader().
-					getResource("config.properties").getPath();
-			String dsConfig = Application.class.getClassLoader().
-					getResource("config.properties").getPath();
+			String dbConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
+			String ifmapConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
+			String dsConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
 			mDBConfig = new PropertiesReaderWriter(dbConfig, false);
 			mIFMAPConfig = new PropertiesReaderWriter(ifmapConfig, false);
 			mDSConfig = new PropertiesReaderWriter(dsConfig, false);
@@ -193,30 +153,23 @@ public abstract class Application {
 			throw new RuntimeException(msg, e);
 		}
 
-		Neo4JConnection db = new Neo4JConnection(
-				mDBConfig.getProperty(ConfigParameter.NEO4J_DB_PATH));
-		if (mDBConfig.getProperty(ConfigParameter.NEO4J_CLEAR_DB_ON_STARTUP)
-				.equalsIgnoreCase("true")) {
-			db.ClearDatabase();
-		}
-		Neo4JRepository repo = new Neo4JRepository(db, loadHashAlgorithm());
-		mWriter = new ThreadedWriter(new Neo4JWriter(repo, db));
-		mReader = new Neo4JReader(repo, db);
+		restService = new RestService();
+		restServiceThread = new Thread(restService, "RestService-Thread");
 
-		mUpdateService = new UpdateService(mWriter,
-				new InMemoryIdentifierFactory(), new InMemoryMetadataFactory());
-		GraphCache cache = null;
-		if (mDSConfig.getProperty(ConfigParameter.DS_CACHE_ENABLE).equalsIgnoreCase("true")) {
-			cache =
-					new SimpleGraphCache(
-							Integer.parseInt(mDSConfig.getProperty(ConfigParameter.DS_CACHE_SIZE)));
-		} else {
-			cache = new DummyGraphCache();
-		}
-		mGraphService = new SimpleGraphService(mReader, cache);
+		restServiceThread.start();
+
+		log.info("save default connection");
+
+		String TRUSTSTORE_PATH = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
+		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
+		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
+
+		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, IFMAP_PASS);
+
 	}
 
-	private static MessageDigest loadHashAlgorithm() {
+	public static MessageDigest loadHashAlgorithm() {
 		try {
 			String algoname = mDBConfig.getProperty(ConfigParameter.NEO4J_HASH_ALGO);
 			log.trace("try to load MessageDigest for '"+algoname+"'");
@@ -231,19 +184,21 @@ public abstract class Application {
 	 * @return
 	 */
 	public static SimpleGraphService getGraphservice() {
-		if (mGraphService == null)
+		if (mGraphService == null) {
 			throw new RuntimeException(
 					"GraphService has not been initialized. This is not good!");
+		}
 		return mGraphService;
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public static UpdateService getUpdateService() {
-		if (mUpdateService == null)
+		if (mUpdateService == null) {
 			throw new RuntimeException(
 					"UpdateService has not been initialized. This is not good!");
+		}
 		return mUpdateService;
 	}
 
@@ -251,9 +206,10 @@ public abstract class Application {
 	 * @return
 	 */
 	public static Writer getWriter() {
-		if (mWriter == null)
+		if (mWriter == null) {
 			throw new RuntimeException(
 					"Writer has not been initialized. This is not good!");
+		}
 		return mWriter;
 	}
 
@@ -261,9 +217,10 @@ public abstract class Application {
 	 * @return
 	 */
 	public static Reader getReader() {
-		if (mReader == null)
+		if (mReader == null) {
 			throw new RuntimeException(
 					"Reader has not been initialized. This is not good!");
+		}
 		return mReader;
 	}
 
@@ -271,9 +228,10 @@ public abstract class Application {
 	 * @return
 	 */
 	public static PropertiesReaderWriter getDBConfig() {
-		if (mDBConfig == null)
+		if (mDBConfig == null) {
 			throw new RuntimeException(
 					"DBConfig has not been initialized. This is not good!");
+		}
 		return mDBConfig;
 	}
 
@@ -281,9 +239,10 @@ public abstract class Application {
 	 * @return
 	 */
 	public static PropertiesReaderWriter getIFMAPConfig() {
-		if (mIFMAPConfig == null)
+		if (mIFMAPConfig == null) {
 			throw new RuntimeException(
 					"IFMAPConfig has not been initialized. This is not good!");
+		}
 		return mIFMAPConfig;
 	}
 
@@ -291,9 +250,10 @@ public abstract class Application {
 	 * @return
 	 */
 	public static PropertiesReaderWriter getDSConfig() {
-		if (mDSConfig == null)
+		if (mDSConfig == null) {
 			throw new RuntimeException(
 					"DSConfig has not been initialized. This is not good!");
+		}
 		return mDSConfig;
 	}
 

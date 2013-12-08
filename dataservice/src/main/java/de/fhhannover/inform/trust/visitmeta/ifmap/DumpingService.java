@@ -13,49 +13,62 @@ import de.fhhannover.inform.trust.ifmapj.exception.IfmapException;
 import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
 import de.fhhannover.inform.trust.ifmapj.messages.Requests;
 import de.fhhannover.inform.trust.ifmapj.messages.Result;
+import de.fhhannover.inform.trust.ifmapj.messages.SubscribeElement;
 import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
 import de.fhhannover.inform.trust.ifmapj.messages.SubscribeUpdate;
 import de.fhhannover.inform.trust.visitmeta.dataservice.util.CryptoUtil;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.IfmapConnectionException;
 
 public class DumpingService implements Runnable {
 
-	private static final Logger log = Logger.getLogger(UpdateService.class);
+
+	private static final Logger log = Logger.getLogger(DumpingService.class);
+
+	private static Set<String> activeSubscriptions;
 
 	private SSRC mSsrc;
 
-	private static Set<String> activeSubscriptions = new HashSet<String>();
-	
+	private Connection mConnection;
+
 	static {
 		Requests.registerRequestHandler(new DumpRequestHandler());
 	}
-	
-	public DumpingService(SSRC ssrc){
+
+	public DumpingService(Connection connection, SSRC ssrc){
 		log.debug("new DumpingService...");
+
+		activeSubscriptions = new HashSet<String>();
 		mSsrc = ssrc;
+		mConnection = connection;
+
+		log.debug("... new DumpingService");
 	}
 
 	@Override
 	public void run(){
-		Thread.currentThread().setName("DumpingThread");
 		log.debug("run()...");
+
 		long time = 0;
-		
+		activeSubscriptions.clear();
+
 		while(!Thread.currentThread().isInterrupted()){
 
-				DumpResult dump = null;
-				try {
-					dump = dump(null);
-				} catch (IfmapException e) {
-					log.error(e.getDescription(), e);
-				} catch (IfmapErrorResult e) {
-					log.error(e.getErrorString(), e);
-				}
+			DumpResult dump = null;
+			long lastUpdate = 0;
 
-				long lastUpdate = 0;
-				if(dump != null){
-					lastUpdate = Long.parseLong(dump.getLastUpdate());
-				}
-				
+			try {
+
+				dump = dump(null);
+
+			} catch (ConnectionException e) {
+
+				break;
+			}
+
+			if(dump != null){
+				lastUpdate = Long.parseLong(dump.getLastUpdate());
+
 				if (lastUpdate > time) {
 
 					time = lastUpdate;
@@ -63,24 +76,75 @@ public class DumpingService implements Runnable {
 
 					if (identifier != null && !identifier.isEmpty()) {
 
-						Set<String> newUuids = subscribeUpdateForDumping(identifier, 10);
+						Set<String> newUuids;
+
+						try {
+
+							newUuids = subscribeUpdateForDumping(identifier, 10);
+
+						} catch (ConnectionException e) {
+
+							break;
+						}
 
 						activeSubscriptions.addAll(newUuids);
 					}
 				}
+			}
 
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					log.debug(e.getMessage());
-					break;
-				}
+			try {
+
+				Thread.sleep(10000);
+
+			} catch (InterruptedException e) {
+
+				log.debug(e.getMessage());
+				break;
+			}
 		}
-		log.debug("...run() Dumping stopped!");
+		log.debug("...run()");
 	}
 
-	private Set<String> subscribeUpdateForDumping(Collection<Identifier> idents, Integer depth) {
+	public DumpResult dump(String filter) throws ConnectionException {
+
+		mConnection.isConnectionEstablished();
+
+		Result res = null;
+		DumpRequest dreq = new DumpRequestImpl(filter);
+
+		try {
+
+			res = mSsrc.genericRequestWithSessionId(dreq);
+
+		} catch (IfmapErrorResult e) {
+
+			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
+
+			throw new IfmapConnectionException();
+
+		} catch (IfmapException e) {
+
+			log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
+
+			throw new IfmapConnectionException();
+		}
+
+		// If we don't get back a DumpResult instance
+		if (!(res instanceof DumpResult)){
+
+			IfmapConnectionException e = new IfmapConnectionException();
+
+			log.error(e.getMessage(), e);
+
+			throw e;
+		}
+
+		return (DumpResult) res;
+	}
+
+	private Set<String> subscribeUpdateForDumping(Collection<Identifier> idents, Integer depth) throws ConnectionException {
 		log.debug("subscribeUpdateForDumping()...");
+
 		Set<String> uuids = new HashSet<String>();
 
 		if (idents != null && !idents.isEmpty()) {
@@ -101,46 +165,51 @@ public class DumpingService implements Runnable {
 				}
 
 				if(!activeSubscriptions.contains(uuid) && !uuids.contains(uuid)){
+
 					if(req == null){
 						req = Requests.createSubscribeReq();
 					}
+
 					req.addSubscribeElement(update);
 					uuids.add(uuid);
 				}
 
 			}
-			
+
 			if(req != null){
-				try {
-					log.debug("send subscribe(req)...");
-					mSsrc.subscribe(req);
-					log.debug(uuids.size() + " new Identifier was subscribe");
-				} catch (IfmapErrorResult e) {
-					log.error(e.getErrorString(), e);
-				} catch (IfmapException e) {
-					log.error(e.getDescription(), e);
-				}
+
+				log.trace("send subscribe(req)...");
+				subscribe(req);
+				log.debug(uuids.size() + " new Identifier was subscribe");
 			}
 		}
+
 		log.debug("...subscribeUpdateForDumping()");
 		return uuids;
 	}
 
-	public DumpResult dump(String filter) throws IfmapException, IfmapErrorResult {
-		Result res;
-		DumpRequest dreq = new DumpRequestImpl(filter);
+	public void subscribe(SubscribeRequest request) throws ConnectionException {
 
-		// if SSRC not there, do no request!
-		if (mSsrc == null)
-			return null;
+		try {
 
-		res = mSsrc.genericRequestWithSessionId(dreq);
+			mSsrc.subscribe(request);
 
-		// If we don't get back a DumpResult instance something is messed up...
-		if (!(res instanceof DumpResult)){
-			throw new IfmapException("DumpRequestHandler:", "dumpRequest didn't result in dumpResult");
+		} catch (IfmapErrorResult e) {
+
+			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
+
+			throw new IfmapConnectionException();
+
+		} catch (IfmapException e) {
+
+			log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
+
+			throw new IfmapConnectionException();
 		}
-		return (DumpResult) res;
+
+		for(SubscribeElement r: request.getSubscribeElements()){
+
+			activeSubscriptions.add(r.getName());
+		}
 	}
-	
 }

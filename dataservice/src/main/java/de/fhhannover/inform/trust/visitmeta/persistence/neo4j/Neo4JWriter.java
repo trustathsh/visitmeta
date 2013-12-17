@@ -55,9 +55,9 @@ import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
 /**
  * Neo4J extension of AbstractWriter. Basically only adds transactions to the
  * methods of the superclass.
- *
+ * 
  * @author rosso
- *
+ * 
  */
 public class Neo4JWriter extends AbstractWriter {
 	private static Logger log = Logger.getLogger(Neo4JWriter.class);
@@ -87,17 +87,35 @@ public class Neo4JWriter extends AbstractWriter {
 		log.trace("Beginning transaction ...");
 		mTransaction = ((Neo4JRepository) mRepo).beginTx();
 	}
-	
+
+	@Override
+	protected Transaction beginSubmit() {
+		log.trace("Beginning transaction ...");
+		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
+		mLock.lock();
+
+		return tx;
+	}
+
+	@Override
+	protected void finishSubmit(Transaction tx) {
+		log.trace("Finishing transaction ...");
+		tx.success();
+		tx.finish();
+		mLock.unlock();
+	}
+
 	@Override
 	protected void submitUpdate(List<InternalMetadata> meta) {
-		for(InternalMetadata m : meta) {
-			mConnection.getTimestampManager().incrementCounter(m.getPublishTimestamp());
+		for (InternalMetadata m : meta) {
+			mConnection.getTimestampManager().incrementCounter(
+					m.getPublishTimestamp());
 		}
 	}
-	
+
 	@Override
 	protected void submitDelete(int n) {
-		for(int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 			mConnection.getTimestampManager().incrementCounter(mLastTimestamp);
 		}
 	}

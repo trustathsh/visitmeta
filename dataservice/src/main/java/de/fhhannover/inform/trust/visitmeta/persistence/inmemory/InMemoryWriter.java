@@ -41,6 +41,8 @@ package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 
 import java.util.List;
 
+import org.neo4j.graphdb.Transaction;
+
 import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
@@ -89,6 +91,18 @@ public class InMemoryWriter extends AbstractWriter {
 
 	@Override
 	protected void submitDelete(int n) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected Transaction beginSubmit() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void finishSubmit(Transaction tx) {
 		// TODO Auto-generated method stub
 		
 	}

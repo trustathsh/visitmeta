@@ -84,7 +84,7 @@ VisITMeta itself has to be configured, too.
 Inside the `config` directory, you find all needed configuration files.
 
 Most settings will work just fine in your environment (or when using our
-`irondemo` environment [5]), but you maybe have to adjust at least the following entries:
+[irondemo environment][5]), but you maybe have to adjust at least the following entries:
 
 * config.properties
 

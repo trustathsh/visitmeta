@@ -84,7 +84,7 @@ VisITMeta itself has to be configured, too.
 Inside the `config` directory, you find all needed configuration files.
 
 Most settings will work just fine in your environment (or when using our
-`irondemo` environment []), but you maybe have to adjust at least the following entries:
+`irondemo` environment [5]), but you maybe have to adjust at least the following entries:
 
 * config.properties
 
@@ -94,7 +94,7 @@ Most settings will work just fine in your environment (or when using our
 
 Running
 =======
-1. Start a MAP server, e.g. irond (Download section at [Trust@HsH website] [2] or via
+1. Start a MAP server, e.g. irond (Download section at [Trust@HsH website] [12] or via
 [Github] [6]
 
 2. Change your working directory to the root directory of the VisITMeta project.
@@ -135,9 +135,11 @@ root-directory of `visitmeta-distribution`.
 [2]: http://www.hs-hannover.de/start/index.html
 [3]: http://trust.f4.hs-hannover.de/projects/visitmeta.html
 [4]: https://maven.apache.org/download.html
+[5]: https://github.com/trustathsh/irondemo.git
 [6]: https://github.com/trustathsh/irond.git
 [7]: http://www.apache.org/licenses/LICENSE-2.0.html
 [8]: http://www.bmbf.de/en/index.php
 [9]: http://www.neo4j.org/
 [10]: http://ernienotes.wordpress.com/2010/12/27/creating-a-java-swing-range-slider/
 [11]: https://github.com/ernieyu/Swing-range-slider
+[12]: http://trust.f4.hs-hannover.de

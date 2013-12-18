@@ -4,13 +4,13 @@
 
 	<parent>
 		<artifactId>visitmeta</artifactId>
-		<groupId>de.fhhannover.inform.trust</groupId>
-		<version>0.0.2</version>
+		<groupId>de.hshannover.f4.trust</groupId>
+		<version>0.0.3</version>
 	</parent>
 
-    <groupId>de.fhhannover.inform.trust.visitmeta</groupId>
+    <groupId>de.hshannover.f4.trust.visitmeta</groupId>
     <artifactId>visualization</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
     <name>visualization</name>
 
@@ -23,7 +23,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>de.fhhannover.inform.trust.visitmeta.Main</mainClass>
+							<mainClass>de.hshannover.f4.trust.visitmeta.Main</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>./lib/</classpathPrefix>
 						</manifest>
@@ -67,7 +67,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.fhhannover.inform.trust.visitmeta</groupId>
+            <groupId>de.hshannover.f4.trust.visitmeta</groupId>
             <artifactId>common</artifactId>
         </dependency>
         <dependency>

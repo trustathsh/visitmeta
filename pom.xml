@@ -7,9 +7,9 @@
 	</properties>
 
 	<!-- general project information -->
-	<groupId>de.fhhannover.inform.trust</groupId>
+	<groupId>de.hshannover.f4.trust</groupId>
 	<artifactId>visitmeta</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<packaging>pom</packaging>
 	<name>visitmeta</name>
 	<url>http://trust.f4.hs-hannover.de/</url>
@@ -17,7 +17,7 @@
 	Parent project for all VisITMeta components.
 	</description>
 	<organization>
-		<name>Trust@FHH</name>
+		<name>Trust@HsH</name>
 		<url>http://trust.f4.hs-hannover.de/</url>
 	</organization>
 
@@ -34,20 +34,22 @@
 	<!-- the core developers of the project -->
 	<developers>
 		<developer>
-			<id>bhl</id>
+			<name>Trust@HsH</name>
+			<email>trust@f4-i.fh-hannover.de</email>
+		</developer>
+        </developers>
+	
+	<contributors>
+    	<contributor>
 			<name>Bastian Hellmann</name>
-			<email>bastian.hellmann@hs-hannover.de</email>
-		</developer>
-		<developer>
-			<id>tr</id>
+		</contributor>
+		<contributor>
 			<name>Thomas Rossow</name>
-			<email>thomas.rossow@stud.fh-hannover.de</email>
-		</developer>
-		<developer>
+		</contributor>
+		<contributor>
 			<name>Ralf Steuerwald</name>
-			<email>ralf.steuerwald@stud.fh-hannover.de</email>
-		</developer>
-	</developers>
+		</contributor>
+	</contributors>
 
 
 	<modules>
@@ -59,65 +61,7 @@
 		<module>visitmeta-distribution</module>
 	</modules>
 
-	<dependencyManagement>
-		<dependencies>
-    		<dependency>
-				<groupId>de.fhhannover.inform.trust.visitmeta</groupId>
-				<artifactId>common</artifactId>
-				<version>0.0.2</version> 
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.8.2</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>de.fhhannover.inform.trust</groupId>
-				<artifactId>ifmapj</artifactId>
-				<version>0.1.5</version>
-			</dependency>
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.17</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>1.9.0</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.fhhannover.inform.trust</groupId>
-			<artifactId>ifmapj</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
 	<build>
-		<pluginManagement>
-			<plugins>
-				
-			</plugins>
-		</pluginManagement>
-	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -144,6 +88,7 @@
 				<configuration>
 					<licenseName>apache_v2</licenseName>
 					<canUpdateDescription>true</canUpdateDescription>
+					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
 					<descriptionTemplate>${basedir}/src/license/description_template.ftl</descriptionTemplate>
 					<roots>
 						<root>src/main/java</root>
@@ -153,4 +98,56 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencyManagement>
+		<dependencies>
+    		<dependency>
+				<groupId>de.hshannover.f4.trust.visitmeta</groupId>
+				<artifactId>common</artifactId>
+				<version>0.0.3</version> 
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.8.2</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>de.hshannover.f4.trust</groupId>
+				<artifactId>ifmapj</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.17</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>1.9.0</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.hshannover.f4.trust</groupId>
+			<artifactId>ifmapj</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

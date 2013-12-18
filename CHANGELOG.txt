@@ -1,4 +1,20 @@
-VisItMeta Release 0.0.1 - 28.06.13
+VisITMeta Release 0.0.3 - 18.12.13
+
+* Third protype version
+  - Refactors package names and structure to hs-hannover.de domain
+  - Updated to ifmapj 1.0.0
+  - Fixed bugs in metadata' equals method
+  - Support multiple subscriptions per connection
+  - Support for multiple connections
+  - Added dump functionality
+  - new REST interface for connection management
+
+VisITMeta Release 0.0.2 - 11.11.13
+
+* Second protype version
+  - minor tweaks (pom.xml)
+
+VisITMeta Release 0.0.1 - 28.06.13
 
 * First prototype version
   - REST interface between dataservice and visualization

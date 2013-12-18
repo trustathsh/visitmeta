@@ -48,18 +48,6 @@ In order to build VisITMeta with Maven you need to install
 [Maven 3][4] manually or via the package manager of your
 operating system.
 
-Before you can build VisITMeta you need to install ifmapj
-in your local Maven repository, to do so download ifmapj 
-from the [Trust@FHH Github account][5] via
-
-	$ git clone https://github.com/trustatfhh/ifmapj.git
-
-and execute
-
-    $ mvn install
-
-in the newly created directory.
-
 Build VisITMeta
 ---------------
 Now you can build VisITMeta, simply execute:
@@ -106,7 +94,7 @@ Most settings will work just fine in your environment (or when using our
 
 Running
 =======
-1. Start a MAP server, e.g. irond (Download section at [Trust@FHH website] [2] or via
+1. Start a MAP server, e.g. irond (Download section at [Trust@HsH website] [2] or via
 [Github] [6]
 
 2. Change your working directory to the root directory of the VisITMeta project.
@@ -147,8 +135,7 @@ root-directory of `visitmeta-distribution`.
 [2]: http://www.hs-hannover.de/start/index.html
 [3]: http://trust.f4.hs-hannover.de/projects/visitmeta.html
 [4]: https://maven.apache.org/download.html
-[5]: https://github.com/trustatfhh/ifmapj.git
-[6]: https://github.com/trustatfhh/irond.git
+[6]: https://github.com/trustathsh/irond.git
 [7]: http://www.apache.org/licenses/LICENSE-2.0.html
 [8]: http://www.bmbf.de/en/index.php
 [9]: http://www.neo4j.org/

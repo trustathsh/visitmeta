@@ -4,15 +4,15 @@
 	
 	<parent>
 		<artifactId>visitmeta</artifactId>
-		<groupId>de.fhhannover.inform.trust</groupId>
-		<version>0.0.2</version>
+		<groupId>de.hshannover.f4.trust</groupId>
+		<version>0.0.3</version>
 	</parent>
 	
-	<groupId>de.fhhannover.inform.trust.visitmeta</groupId>
+	<groupId>de.hshannover.f4.trust.visitmeta</groupId>
 	<artifactId>dataservice</artifactId>
 	<packaging>jar</packaging>
 	<name>dataservice</name>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	
 	<build>
 		<plugins>
@@ -22,7 +22,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>de.fhhannover.inform.trust.visitmeta.dataservice.Application</mainClass>
+							<mainClass>de.hshannover.f4.trust.visitmeta.dataservice.Application</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>./lib/</classpathPrefix>
 						</manifest>
@@ -66,11 +66,11 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>de.fhhannover.inform.trust</groupId>
+			<groupId>de.hshannover.f4.trust</groupId>
 			<artifactId>ifmapj</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.fhhannover.inform.trust.visitmeta</groupId>
+			<groupId>de.hshannover.f4.trust.visitmeta</groupId>
 			<artifactId>common</artifactId>
 		</dependency>
 		<dependency>

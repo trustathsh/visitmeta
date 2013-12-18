@@ -15,9 +15,9 @@
 
 			<!-- Now, select which projects to include in this module-set. -->
 			<includes>
-				<include>de.fhhannover.inform.trust.visitmeta:common</include>
-				<include>de.fhhannover.inform.trust.visitmeta:dataservice</include>
-				<include>de.fhhannover.inform.trust.visitmeta:visualization</include>
+				<include>de.hshannover.f4.trust.visitmeta:common</include>
+				<include>de.hshannover.f4.trust.visitmeta:dataservice</include>
+				<include>de.hshannover.f4.trust.visitmeta:visualization</include>
 			</includes>
 			
 			<binaries>

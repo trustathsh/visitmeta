@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>visitmeta</artifactId>
-		<groupId>de.fhhannover.inform.trust</groupId>
-		<version>0.0.2</version>
+		<groupId>de.hshannover.f4.trust</groupId>
+		<version>0.0.3</version>
 	</parent>
 
-	<groupId>de.fhhannover.inform.trust.visitmeta</groupId>
+	<groupId>de.hshannover.f4.trust.visitmeta</groupId>
 	<artifactId>visitmeta-distribution</artifactId>
 	<packaging>pom</packaging>
 	<name>visitmeta-distribution</name>

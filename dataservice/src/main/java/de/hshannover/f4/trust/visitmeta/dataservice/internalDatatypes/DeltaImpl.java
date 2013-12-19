@@ -36,15 +36,15 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
+package de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes;
 
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 /**
  * Internal representation of the changes of an IF-MAP graph structure between two points in time.

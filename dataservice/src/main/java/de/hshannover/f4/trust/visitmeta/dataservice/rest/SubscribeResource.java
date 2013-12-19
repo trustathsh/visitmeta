@@ -1,4 +1,4 @@
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 /*
  * #%L
@@ -57,16 +57,16 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
-import de.fhhannover.inform.trust.ifmapj.messages.Requests;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeUpdate;
-import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
  * For each request a new object of this class will be created. The

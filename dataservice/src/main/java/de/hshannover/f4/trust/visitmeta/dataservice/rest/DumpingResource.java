@@ -1,4 +1,4 @@
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 /*
  * #%L
@@ -43,8 +43,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 
 
 @Path("{connectionName}/dump")

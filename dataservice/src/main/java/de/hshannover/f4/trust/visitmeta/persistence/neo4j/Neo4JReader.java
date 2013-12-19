@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 
 
@@ -44,8 +44,8 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.ifmap.Connection;
-import de.fhhannover.inform.trust.visitmeta.persistence.AbstractReader;
+import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
 public class Neo4JReader extends AbstractReader {
 
 	private Logger log = Logger.getLogger(Connection.class);

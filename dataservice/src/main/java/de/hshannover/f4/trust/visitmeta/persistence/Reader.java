@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence;
+package de.hshannover.f4.trust.visitmeta.persistence;
 
 
 
 import java.util.List;
 import java.util.SortedMap;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
 
 public interface Reader {
 	public List<InternalIdentifierGraph> getCurrentState();

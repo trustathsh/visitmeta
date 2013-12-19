@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence;
+package de.hshannover.f4.trust.visitmeta.persistence;
 
 
 
@@ -46,11 +46,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Transaction;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.ifmap.PollResult;
-import de.fhhannover.inform.trust.visitmeta.ifmap.ResultItem;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.ifmap.PollResult;
+import de.hshannover.f4.trust.visitmeta.ifmap.ResultItem;
 
 public abstract class AbstractWriter implements Writer {
 	protected Repository mRepo;

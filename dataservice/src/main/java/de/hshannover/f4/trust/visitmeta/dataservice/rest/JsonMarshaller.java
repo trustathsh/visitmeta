@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
@@ -48,13 +48,13 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Link;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierPair;
+import de.hshannover.f4.trust.visitmeta.interfaces.Link;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class JsonMarshaller {
 

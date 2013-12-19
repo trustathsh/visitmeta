@@ -36,11 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
-import de.fhhannover.inform.trust.ifmapj.messages.Request;
+import de.hshannover.f4.trust.ifmapj.messages.Request;
 
 /**
  * Tobias Ruhe's request for the dump operation.

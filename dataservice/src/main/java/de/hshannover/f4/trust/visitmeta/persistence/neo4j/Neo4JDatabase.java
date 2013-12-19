@@ -36,21 +36,21 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.GraphCache;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphCache;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.fhhannover.inform.trust.visitmeta.ifmap.Connection;
-import de.fhhannover.inform.trust.visitmeta.persistence.Reader;
-import de.fhhannover.inform.trust.visitmeta.persistence.ThreadedWriter;
-import de.fhhannover.inform.trust.visitmeta.persistence.Writer;
-import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphCache;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphCache;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.persistence.Reader;
+import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
+import de.hshannover.f4.trust.visitmeta.persistence.Writer;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class Neo4JDatabase {
 

@@ -37,7 +37,7 @@
  * #L%
  */
 
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,28 +46,28 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.ifmapj.IfmapJHelper;
-import de.fhhannover.inform.trust.ifmapj.exception.CommunicationException;
-import de.fhhannover.inform.trust.ifmapj.exception.EndSessionException;
-import de.fhhannover.inform.trust.ifmapj.exception.IfmapErrorResult;
-import de.fhhannover.inform.trust.ifmapj.exception.IfmapException;
-import de.fhhannover.inform.trust.ifmapj.exception.InitializationException;
-import de.fhhannover.inform.trust.ifmapj.messages.PollResult;
-import de.fhhannover.inform.trust.ifmapj.messages.Requests;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeDelete;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeElement;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ActiveDumpingException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionCloseException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.IfmapConnectionException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.NotConnectedException;
-import de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
+import de.hshannover.f4.trust.ifmapj.IfmapJHelper;
+import de.hshannover.f4.trust.ifmapj.exception.CommunicationException;
+import de.hshannover.f4.trust.ifmapj.exception.EndSessionException;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
+import de.hshannover.f4.trust.ifmapj.exception.InitializationException;
+import de.hshannover.f4.trust.ifmapj.messages.PollResult;
+import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
+import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 
 public class Connection {
 

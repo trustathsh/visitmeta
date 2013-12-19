@@ -36,12 +36,12 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
+package de.hshannover.f4.trust.visitmeta.dataservice.factories;
 
 
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
 
 public interface InternalLinkFactory {
 

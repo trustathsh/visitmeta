@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
 
 /**
  * A cache that does nothing. Not even caching :)

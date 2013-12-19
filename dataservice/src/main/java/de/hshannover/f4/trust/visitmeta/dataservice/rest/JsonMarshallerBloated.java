@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class JsonMarshallerBloated extends JsonMarshaller {
 

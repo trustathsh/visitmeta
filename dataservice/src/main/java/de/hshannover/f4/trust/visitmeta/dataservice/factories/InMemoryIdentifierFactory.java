@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
+package de.hshannover.f4.trust.visitmeta.dataservice.factories;
 
 
 
@@ -47,11 +47,11 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.xml.DomHelper;
-import de.fhhannover.inform.trust.visitmeta.dataservice.xml.SimpleKeyValueExtractor;
-import de.fhhannover.inform.trust.visitmeta.dataservice.xml.XMLDataExtractor;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.xml.DomHelper;
+import de.hshannover.f4.trust.visitmeta.dataservice.xml.SimpleKeyValueExtractor;
+import de.hshannover.f4.trust.visitmeta.dataservice.xml.XMLDataExtractor;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
 
 public class InMemoryIdentifierFactory implements InternalIdentifierFactory{
 

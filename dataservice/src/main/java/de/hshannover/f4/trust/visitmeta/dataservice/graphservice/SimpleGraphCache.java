@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
@@ -45,8 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.GraphHelper;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.GraphHelper;
 
 /**
  * @author rosso

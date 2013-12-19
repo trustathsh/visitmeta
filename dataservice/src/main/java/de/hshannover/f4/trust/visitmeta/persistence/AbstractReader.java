@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence;
+package de.hshannover.f4.trust.visitmeta.persistence;
 
 
 
@@ -46,12 +46,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
 
 public abstract class AbstractReader implements Reader {
 

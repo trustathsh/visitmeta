@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
+package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
@@ -46,9 +46,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
 public class InMemoryIdentifier extends InternalIdentifier {
 	private String mTypename;

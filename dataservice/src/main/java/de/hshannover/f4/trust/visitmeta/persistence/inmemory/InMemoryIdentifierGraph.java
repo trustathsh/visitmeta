@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
+package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
@@ -47,11 +47,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import scala.actors.threadpool.Arrays;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.persistence.Repository;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.persistence.Repository;
 
 
 /**

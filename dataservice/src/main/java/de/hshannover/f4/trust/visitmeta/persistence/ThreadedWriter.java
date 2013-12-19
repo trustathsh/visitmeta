@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence;
+package de.hshannover.f4.trust.visitmeta.persistence;
 
 
 
@@ -44,7 +44,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.ifmap.PollResult;
+import de.hshannover.f4.trust.visitmeta.ifmap.PollResult;
 
 public class ThreadedWriter implements Runnable, Writer {
 	private Writer mWriter;

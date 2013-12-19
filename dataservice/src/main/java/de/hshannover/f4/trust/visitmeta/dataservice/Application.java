@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice;
+package de.hshannover.f4.trust.visitmeta.dataservice;
 
 
 
@@ -47,16 +47,16 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.fhhannover.inform.trust.visitmeta.dataservice.rest.RestService;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
-import de.fhhannover.inform.trust.visitmeta.ifmap.UpdateService;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
-import de.fhhannover.inform.trust.visitmeta.persistence.Reader;
-import de.fhhannover.inform.trust.visitmeta.persistence.ThreadedWriter;
-import de.fhhannover.inform.trust.visitmeta.persistence.Writer;
-import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.persistence.Reader;
+import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
+import de.hshannover.f4.trust.visitmeta.persistence.Writer;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:

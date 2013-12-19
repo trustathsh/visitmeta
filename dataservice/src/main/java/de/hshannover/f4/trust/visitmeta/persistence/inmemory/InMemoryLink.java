@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
+package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
@@ -44,10 +44,10 @@ package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
 public class InMemoryLink extends InternalLink {
 	private InternalIdentifier mFirstIdentifier;

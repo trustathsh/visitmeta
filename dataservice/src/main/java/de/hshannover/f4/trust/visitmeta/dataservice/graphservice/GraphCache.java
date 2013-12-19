@@ -36,13 +36,13 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
 
 /**
  * Interface that describes a cache for graph structures. Implementations are supposed to return

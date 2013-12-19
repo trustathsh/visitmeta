@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
+package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
@@ -49,7 +49,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.NotFoundException;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
 public class InMemoryMetadata extends InternalMetadata {
 

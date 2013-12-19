@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
@@ -47,10 +47,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
-import de.fhhannover.inform.trust.ifmapj.messages.ResultItem;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 
 class IfmapJHelper {
 
@@ -69,7 +69,7 @@ class IfmapJHelper {
 	}
 
 	public InternalIdentifier ifmapjIdentifierToInternalIdentifier(
-			de.fhhannover.inform.trust.ifmapj.identifier.Identifier id) {
+			de.hshannover.f4.trust.ifmapj.identifier.Identifier id) {
 		Document document = mDocumentBuilder.newDocument();
 		Element element = Identifiers.tryToElement(id, document);
 		document.appendChild(element);

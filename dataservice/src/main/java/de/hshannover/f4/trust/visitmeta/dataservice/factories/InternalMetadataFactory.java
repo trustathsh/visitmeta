@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
+package de.hshannover.f4.trust.visitmeta.dataservice.factories;
 
 
 
 
 import org.w3c.dom.Document;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
 
 public interface InternalMetadataFactory {

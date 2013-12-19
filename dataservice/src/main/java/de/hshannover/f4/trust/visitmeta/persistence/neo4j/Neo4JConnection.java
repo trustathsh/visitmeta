@@ -36,12 +36,12 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 
 
-import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
-import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
 
 import java.io.File;
 import java.io.IOException;

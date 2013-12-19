@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
@@ -46,10 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Link;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Link;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 public class IdentifierImpl implements Identifier {
 	private String mTypename;

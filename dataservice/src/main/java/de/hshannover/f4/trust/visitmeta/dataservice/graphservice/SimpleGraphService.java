@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
@@ -46,20 +46,20 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.DeltaImpl;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.GraphHelper;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphFilter;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.persistence.Reader;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.DeltaImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.GraphHelper;
+import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.persistence.Reader;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
 
 public class SimpleGraphService implements GraphService {
 

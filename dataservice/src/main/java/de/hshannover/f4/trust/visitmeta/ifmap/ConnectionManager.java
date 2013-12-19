@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,10 +44,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 public class ConnectionManager {
 

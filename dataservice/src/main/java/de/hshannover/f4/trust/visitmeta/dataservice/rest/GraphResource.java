@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
@@ -55,11 +55,11 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
-import de.fhhannover.inform.trust.visitmeta.interfaces.GraphService;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 /**
  * Represents the graph of the application in a "RESTful" manner.

@@ -36,16 +36,16 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class IdentifierGraphImpl implements IdentifierGraph {
 	/**

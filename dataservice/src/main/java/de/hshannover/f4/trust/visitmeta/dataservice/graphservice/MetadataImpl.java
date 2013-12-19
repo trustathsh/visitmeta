@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
@@ -46,8 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 public class MetadataImpl implements Metadata {
 	private Map<String, String> mProperties;

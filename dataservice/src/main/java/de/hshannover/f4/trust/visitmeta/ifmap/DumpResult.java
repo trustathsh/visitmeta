@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
 import java.util.Collection;
 
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
-import de.fhhannover.inform.trust.ifmapj.messages.Result;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
+import de.hshannover.f4.trust.ifmapj.messages.Result;
 
 /**
  * Tobias Ruhe's result for the dump operation.

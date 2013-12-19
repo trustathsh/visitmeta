@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.util;
+package de.hshannover.f4.trust.visitmeta.dataservice.util;
 
 
 
@@ -45,19 +45,19 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.IdentifierGraphImpl;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.IdentifierImpl;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.LinkImpl;
-import de.fhhannover.inform.trust.visitmeta.dataservice.graphservice.MetadataImpl;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
-import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.IdentifierGraphImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.IdentifierImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.LinkImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.MetadataImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
 
 /**
  * Encapsulates graph utility methods, like copying, transforming and more.

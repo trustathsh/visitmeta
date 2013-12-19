@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
@@ -50,16 +50,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import util.DomHelpers;
-import de.fhhannover.inform.trust.ifmapj.exception.IfmapErrorResult;
-import de.fhhannover.inform.trust.ifmapj.exception.MarshalException;
-import de.fhhannover.inform.trust.ifmapj.exception.UnmarshalException;
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
-import de.fhhannover.inform.trust.ifmapj.messages.Request;
-import de.fhhannover.inform.trust.ifmapj.messages.RequestHandler;
-import de.fhhannover.inform.trust.ifmapj.messages.RequestImpl;
-import de.fhhannover.inform.trust.ifmapj.messages.Requests.Helpers;
-import de.fhhannover.inform.trust.ifmapj.messages.Result;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
+import de.hshannover.f4.trust.ifmapj.exception.MarshalException;
+import de.hshannover.f4.trust.ifmapj.exception.UnmarshalException;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.ifmapj.messages.Request;
+import de.hshannover.f4.trust.ifmapj.messages.RequestHandler;
+import de.hshannover.f4.trust.ifmapj.messages.RequestImpl;
+import de.hshannover.f4.trust.ifmapj.messages.Requests.Helpers;
+import de.hshannover.f4.trust.ifmapj.messages.Result;
 
 class DumpRequestHandler implements RequestHandler<DumpRequest> {
 	

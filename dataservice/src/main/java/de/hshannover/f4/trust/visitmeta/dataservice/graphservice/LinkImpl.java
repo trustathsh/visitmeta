@@ -36,17 +36,17 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
-import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierPair;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Link;
-import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierPair;
+import de.hshannover.f4.trust.visitmeta.interfaces.Link;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 public class LinkImpl implements Link {
 	private Identifier mFirstIdentifier;

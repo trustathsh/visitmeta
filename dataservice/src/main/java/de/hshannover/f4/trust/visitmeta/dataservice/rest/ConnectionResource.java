@@ -1,4 +1,4 @@
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 /*
  * #%L
@@ -53,8 +53,8 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 
 
 @Path("/")

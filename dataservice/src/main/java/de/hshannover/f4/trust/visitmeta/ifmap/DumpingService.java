@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,18 +45,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.ifmapj.channel.SSRC;
-import de.fhhannover.inform.trust.ifmapj.exception.IfmapErrorResult;
-import de.fhhannover.inform.trust.ifmapj.exception.IfmapException;
-import de.fhhannover.inform.trust.ifmapj.identifier.Identifier;
-import de.fhhannover.inform.trust.ifmapj.messages.Requests;
-import de.fhhannover.inform.trust.ifmapj.messages.Result;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeElement;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeRequest;
-import de.fhhannover.inform.trust.ifmapj.messages.SubscribeUpdate;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.CryptoUtil;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.IfmapConnectionException;
+import de.hshannover.f4.trust.ifmapj.channel.SSRC;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
+import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.Result;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.CryptoUtil;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
 
 public class DumpingService implements Runnable {
 

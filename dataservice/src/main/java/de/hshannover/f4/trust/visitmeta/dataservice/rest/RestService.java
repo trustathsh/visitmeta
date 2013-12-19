@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,8 +46,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 
 public class RestService implements Runnable {
 
@@ -63,7 +63,7 @@ public class RestService implements Runnable {
 	public void run() {
 		log.debug("run() ...");
 
-		params.put("com.sun.jersey.config.property.packages", "de.fhhannover.inform.trust.visitmeta.dataservice.rest");
+		params.put("com.sun.jersey.config.property.packages", "de.hshannover.f4.trust.visitmeta.dataservice.rest");
 
 		log.info("starting REST service on "+url+"...");
 

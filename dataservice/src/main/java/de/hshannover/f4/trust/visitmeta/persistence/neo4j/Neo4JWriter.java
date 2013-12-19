@@ -39,7 +39,7 @@
 /**
  *
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 
 
@@ -50,8 +50,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Transaction;
 
-import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.persistence.AbstractWriter;
 
 /**
  * Neo4J extension of AbstractWriter. Basically only adds transactions to the

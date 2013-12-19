@@ -36,11 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 
 
-import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
  *

@@ -36,21 +36,21 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
 import org.apache.log4j.Logger;
 
-import de.fhhannover.inform.trust.ifmapj.channel.ARC;
-import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
-import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionCloseException;
-import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.fhhannover.inform.trust.visitmeta.persistence.Writer;
-import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.ifmapj.channel.ARC;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.persistence.Writer;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
  * When a <tt>UpdateService</tt> is started, it will subscribe for the
@@ -86,7 +86,7 @@ public class UpdateService implements Runnable {
 
 	protected InternalMetadataFactory mMetadataFactory;
 
-	protected de.fhhannover.inform.trust.visitmeta.ifmap.IfmapJHelper mIfmapJHelper;
+	protected de.hshannover.f4.trust.visitmeta.ifmap.IfmapJHelper mIfmapJHelper;
 
 
 	/**
@@ -115,7 +115,7 @@ public class UpdateService implements Runnable {
 		mIdentifierFactory = identifierFactory;
 		mMetadataFactory = metadataFactory;
 
-		mIfmapJHelper = new de.fhhannover.inform.trust.visitmeta.ifmap.IfmapJHelper(mIdentifierFactory);
+		mIfmapJHelper = new de.hshannover.f4.trust.visitmeta.ifmap.IfmapJHelper(mIdentifierFactory);
 
 		int tmp = 0;
 		try {

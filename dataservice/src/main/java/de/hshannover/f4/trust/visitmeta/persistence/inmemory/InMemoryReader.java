@@ -36,14 +36,14 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
+package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
 import java.util.SortedMap;
 
-import de.fhhannover.inform.trust.visitmeta.persistence.AbstractReader;
-import de.fhhannover.inform.trust.visitmeta.persistence.Repository;
+import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
+import de.hshannover.f4.trust.visitmeta.persistence.Repository;
 @Deprecated
 public class InMemoryReader extends AbstractReader{
 	private Object mLock;

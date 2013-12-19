@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.fhhannover.inform.trust.visitmeta.dataservice.xml;
+package de.hshannover.f4.trust.visitmeta.dataservice.xml;
 
 
 

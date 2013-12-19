@@ -36,4 +36,87 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
 
+
+
+import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.HIDDEN_PROPERTIES_KEY_PREFIX;
+
+import java.util.Iterator;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+
+
+public class Neo4JTimestampManager {
+	private Neo4JConnection mConnection;
+	private long mLastTimestamp;
+
+	public Neo4JTimestampManager(Neo4JConnection connection) {
+		mConnection = connection;
+	}
+
+
+	public long getLastTimestamp() {
+		return mLastTimestamp;
+	}
+
+	public void incrementCounter(long timestamp) {
+		Transaction tx = mConnection.getConnection().beginTx();
+		try {
+			Node changeNode = null;
+			Iterator<Relationship> change = mConnection.getConnection()
+					.getReferenceNode().getRelationships(LinkTypes.Change)
+					.iterator();
+			if (!change.hasNext()) {
+				changeNode = mConnection.getConnection().createNode();
+				changeNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_TIME_MAP);
+				mConnection.getConnection().getReferenceNode()
+						.createRelationshipTo(changeNode, LinkTypes.Change);
+			} else {
+				Relationship r = change.next();
+				changeNode = r.getEndNode();
+			}
+			if (!changeNode.hasProperty(timestamp + "")) {
+				changeNode.setProperty(timestamp + "",
+						(long) 1);
+			} else {
+				long count = (long) changeNode.getProperty(timestamp+"");
+				count++;
+				changeNode.setProperty(timestamp+"", count);
+
+			}
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+	}
+
+
+	public SortedMap<Long, Long> getChangesMap() {
+		TreeMap<Long, Long> changeMap = new TreeMap<>();
+		Node changeNode = null;
+		Iterator<Relationship> change = mConnection.getConnection().getReferenceNode().
+				getRelationships(LinkTypes.Change).iterator();
+		if(!change.hasNext()) {
+			return changeMap;
+		}
+		Relationship r = change.next();
+		changeNode = r.getEndNode();
+		for (String s : changeNode.getPropertyKeys()) {
+			if (!s.contains(HIDDEN_PROPERTIES_KEY_PREFIX))
+				changeMap.put(Long.valueOf(s), (Long)changeNode.getProperty(s));
+		}
+		return changeMap;
+	}
+
+
+	public Long getCurrentTime() {
+		mLastTimestamp = System.currentTimeMillis();
+		return mLastTimestamp;
+	}
+
+}

@@ -36,4 +36,176 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+import java.util.Collections;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+
+/**
+ * Internal representation of an IF-MAP identifier.
+ */
+public abstract class InternalIdentifier implements Propable{
+
+	public abstract void addMetadata(InternalMetadata meta);
+
+	/**
+	 * Returns the raw, unparsed XML data used to describe this Identifier. <b>Note: The xml version
+	 * and encoding is included.</b>
+	 */
+	public abstract String getRawData();
+
+	/**
+	 * Removes all Metadata connected to the identifier
+	 */
+	public abstract void clearMetadata();
+
+	public abstract void removeMetadata(InternalMetadata meta);
+
+	public abstract boolean hasMetadata(InternalMetadata meta);
+
+	/**
+	 * Removes all Links connected to the Identifier. <b>Note: The List containing the Links 
+	 * is just cleared. The connected identifier is left unchanged.</b>
+	 */
+	public abstract void clearLinks();
+
+	public abstract void addProperty(String name, String value);
+
+	public abstract List<InternalLink> getLinks();
+
+	public abstract List<InternalMetadata> getMetadata();
+
+	@Deprecated
+	public abstract void removeLink(InternalLink link);
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (o == this)
+			return true;
+		if (!(o instanceof InternalIdentifier)) {
+			return false;
+		}
+		InternalIdentifier other = (InternalIdentifier) o;
+		if (!getTypeName().equals(other.getTypeName()))
+			return false;
+
+		List<String> myProperties = getProperties();
+		if (myProperties.size() != other.getProperties().size()) {
+			return false;
+		}
+		for (String property : myProperties) {
+			String myValue = valueFor(property);
+			if (myValue == null) {
+				if (!(other.valueFor(property) == null))
+					return false;
+			} else {
+				if (!myValue.equals(other.valueFor(property)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result + getTypeName().hashCode();
+		List<String> keys = getProperties();
+		Collections.sort(keys);
+		for (String key : keys) {
+			result = prime * result + valueFor(key).hashCode();
+		}
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append(getTypeName() + "[" + hashCode() + "] Properties[");
+		for (String p : getProperties()) {
+			tmp.append("(" + p + ", " + valueFor(p) + ")");
+		}
+		tmp.append("] Links[");
+		int i = 0;
+		for (InternalLink l : getLinks()) {
+			tmp.append(l.hashCode());
+			if (i != getLinks().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("] Metadata[");
+		i = 0;
+		for (InternalMetadata m : getMetadata()) {
+			tmp.append(m.hashCode());
+			if (i != getMetadata().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+
+	/**
+	 * Checks if this identifier is valid at the given timestamp.
+	 * An identifier is valid if it has any link or metadata which is valid.
+	 * @param timestamp the timestamp to check
+	 * @return the result wether it is valid or not
+	 */
+	public boolean isValidAt(long timestamp) {
+		for (InternalMetadata m : getMetadata()) {
+			if (((InternalMetadata) m).isValidAt(timestamp)) {
+				return true;
+			}
+		}
+		for (InternalLink l : getLinks()) {
+			for (InternalMetadata m : l.getMetadata()) {
+				if (((InternalMetadata) m).isValidAt(timestamp)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Performs a kind of equals check, but for Objects implementing the Identifier interface.
+	 * An Identifier and an InternalIdentifier are equal if they have the same typename and 
+	 * the same properties.
+	 * @param identifier The Identifier to compare with
+	 * @return Wether the identifier is "the same" as this object or not
+	 */
+	public boolean sameAs(Identifier identifier) {
+		InternalIdentifier internal = this;
+		if (!identifier.getTypeName().equals(internal.getTypeName())) {
+			return false;
+		}
+
+		List<String> identifierProperties = identifier.getProperties();
+		if (identifierProperties.size() != internal.getProperties().size()) {
+			return false;
+		}
+		for (String property : identifierProperties) {
+			String identifierValue = identifier.valueFor(property);
+			if (identifierValue == null) {
+				if (!(internal.valueFor(property) == null)) {
+					return false;
+				}
+			} else {
+				if (!identifierValue.equals(internal.valueFor(property))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}

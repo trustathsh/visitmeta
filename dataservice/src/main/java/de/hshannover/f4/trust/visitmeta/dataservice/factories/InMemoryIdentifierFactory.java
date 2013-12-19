@@ -36,4 +36,55 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
 
+
+
+
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.DomHelper;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.SimpleKeyValueExtractor;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.XMLDataExtractor;
+import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
+
+public class InMemoryIdentifierFactory implements InternalIdentifierFactory{
+
+	private static final Logger log = Logger.getLogger(InMemoryIdentifierFactory.class);
+
+	private XMLDataExtractor mXmlExtractor = new SimpleKeyValueExtractor();
+
+	/**
+	 * Create a new identifier based on the typename and properties of the given
+	 * identifier.<br>
+	 * <b>Note:</b> Neither the attached metadata nor the connected links are copied.
+	 */
+	@Override
+	public InternalIdentifier createIdentifier(InternalIdentifier id) {
+		log.trace("creating copy of " + id);
+		InternalIdentifier idCopy = new InMemoryIdentifier(id);
+
+		return idCopy;
+	}
+
+	@Override
+	public InternalIdentifier createIdentifier(Document d) {
+		log.trace("creating identifier from XML");
+		String typename = mXmlExtractor.extractTypename(d);
+		Map<String, String> properties = mXmlExtractor.extractToKeyValuePairs(d);
+
+		InMemoryIdentifier id = new InMemoryIdentifier(typename);
+		id.setRawData(DomHelper.documentToString(d));
+
+		for (Entry<String, String> entry: properties.entrySet()) {
+			id.addProperty(entry.getKey(), entry.getValue());
+		}
+		return id;
+	}
+
+}

@@ -36,4 +36,21 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
 
+
+
+import org.w3c.dom.Document;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+
+
+public interface InternalIdentifierFactory {
+	/**
+	 * @param id
+	 * @return
+	 */
+	public InternalIdentifier createIdentifier(InternalIdentifier id);
+	public InternalIdentifier createIdentifier(Document d);
+
+}

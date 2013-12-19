@@ -36,4 +36,32 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 
+
+
+import java.util.SortedMap;
+
+import de.fhhannover.inform.trust.visitmeta.persistence.AbstractReader;
+import de.fhhannover.inform.trust.visitmeta.persistence.Repository;
+@Deprecated
+public class InMemoryReader extends AbstractReader{
+	private Object mLock;
+
+	public InMemoryReader (Object lock, Repository repo) {
+		mLock = lock;
+		mRepo = repo;
+	}
+
+	@Override
+	public SortedMap<Long, Long> getChangesMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long getTimeOfLastUpdate() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+}

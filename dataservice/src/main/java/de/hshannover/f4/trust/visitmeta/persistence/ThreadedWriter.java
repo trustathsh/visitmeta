@@ -36,4 +36,59 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence;
 
+
+
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.apache.log4j.Logger;
+
+import de.fhhannover.inform.trust.visitmeta.ifmap.PollResult;
+
+public class ThreadedWriter implements Runnable, Writer {
+	private Writer mWriter;
+	private LinkedBlockingQueue<PollResult> mTasks;
+	private Logger log = Logger.getLogger(ThreadedWriter.class);
+
+
+	private ThreadedWriter() {
+		log.trace("new ThreadedWriter()");
+		mTasks = new LinkedBlockingQueue<>();
+	}
+
+	public ThreadedWriter(Writer w) {
+		this();
+		mWriter = w;
+	}
+
+	@Override
+	public void submitPollResult(PollResult pr) {
+		log.debug("Adding new PollResult to queue");
+		mTasks.add(pr);
+	}
+
+	@Override
+	public void run() {
+		log.debug("run() ...");
+
+		while (!isStopped()) {
+			PollResult pr = null;
+			try {
+				pr = mTasks.take();
+				log.debug("Processing PollResult ...");
+				mWriter.submitPollResult(pr);
+			} catch (InterruptedException e) {
+				log.fatal("Writer thread got interrupted");
+				e.printStackTrace();
+			}
+		}
+
+		log.debug("... run()");
+	}
+
+	protected boolean isStopped() {
+		return Thread.currentThread().isInterrupted();
+	}
+
+}

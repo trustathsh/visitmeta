@@ -36,4 +36,38 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+
+/**
+ * Interface that describes a cache for graph structures. Implementations are supposed to return
+ * deep copies of the cached graphs not hard references.
+ * @author rosso
+ *
+ */
+public interface GraphCache {
+	/**
+	 * @param timestamp
+	 * @return
+	 * True if the cache has an entry for the given timestamp, false otherwise.
+	 */
+	public boolean lookup(long timestamp);
+	/**
+	 * @param timestamp
+	 * @return
+	 * A deep copy of the graph structure for the given timestamp. An empty List otherwise.
+	 */
+	public List<InternalIdentifierGraph> fetch(long timestamp);
+	/**
+	 * Puts the graph passed as argument into the cache.
+	 * @param timestamp
+	 * @param graph
+	 */
+	public void put(long timestamp, List<InternalIdentifierGraph> graph);
+
+}

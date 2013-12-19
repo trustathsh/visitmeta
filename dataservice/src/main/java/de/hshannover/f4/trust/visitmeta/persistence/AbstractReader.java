@@ -36,4 +36,178 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence;
 
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
+
+public abstract class AbstractReader implements Reader {
+
+	private static final Logger log = Logger.getLogger(AbstractReader.class);
+
+	protected Repository mRepo;
+
+	@Override
+	public List<InternalIdentifierGraph> getCurrentState() {
+		log.debug("reading current graph state from repository ...");
+		return getGraphAt(Long.MAX_VALUE);
+	}
+
+	/**
+	 * @param available
+	 * @param start
+	 * @param timestamp
+	 * @return
+	 */
+	private InternalIdentifierGraph buildGraph(
+			List<InternalIdentifier> available,
+			InternalIdentifier start,
+			long timestamp
+			) {
+
+		InMemoryIdentifierGraph graph = new InMemoryIdentifierGraph(timestamp);
+		HashSet<InternalIdentifier> seen = new HashSet<>();
+		detachIdentifierSingleGraph(start, seen, graph, timestamp);
+		available.removeAll(seen);
+		return graph;
+	}
+
+	/**
+	 * Detach the identifier <tt>current</tt> and recursively all its neighbors
+	 * from the neo4j database graph. The link between two identifiers is created
+	 * by a backtracking-like approach:
+	 * <ul>
+	 *   <li>first detach the current identifier and store it into the graph</li>
+	 *   <li>iterate over all links of the current identifier</li>
+	 *   <ul>
+	 *     <li>if the other identifier on a link is already in the graph, detach/create
+	 *         the link between the current and the other identifier</li>
+	 *     <li>if the other identifier is not in the graph, start the recursion for the
+	 *         other identifier</li>
+	 *   </ul>
+	 * </ul>
+	 *
+	 * @param current
+	 * @param seen
+	 * @param graph
+	 * @param timestamp
+	 */
+	private void detachIdentifierSingleGraph(
+			InternalIdentifier current,
+			HashSet<InternalIdentifier> seen,
+			InMemoryIdentifierGraph graph,
+			long timestamp
+			) {
+
+		InternalIdentifier detachedCurrent = null;
+		if (!seen.contains(current)) {
+			if (current.isValidAt(timestamp)) {
+				detachedCurrent = graph.insert(current);
+				detachIdentifierMetadata(current, detachedCurrent, graph, timestamp);
+
+				seen.add(current);
+
+				for (InternalLink l : current.getLinks()) {
+					InternalIdentifierPair pair = l.getIdentifiers();
+					InternalIdentifier other = (InternalIdentifier)
+							((pair.getFirst().equals(current)) ? pair.getSecond() : pair.getFirst());
+
+					if (seen.contains(other)) {
+						if (other.isValidAt(timestamp)) {
+							InternalIdentifier detachedOther = graph.findIdentifier(other);
+							InternalLink link = graph.connect(detachedCurrent, detachedOther);
+							detachLinkMetadata(l, link, graph, timestamp);
+						}
+					} else {
+						detachIdentifierSingleGraph(other, seen, graph, timestamp);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Detaches the Metadata of Identifier <tt>from</tt> by copying it to Identifier <tt>to</tt>.
+	 * @param from
+	 * @param to
+	 * @param graph
+	 * @param timestamp
+	 */
+	private void detachIdentifierMetadata(
+			InternalIdentifier from,
+			InternalIdentifier to,
+			InMemoryIdentifierGraph graph,
+			long timestamp
+			) {
+
+		for (InternalMetadata m : from.getMetadata()) {
+			if (((InternalMetadata)m).isValidAt(timestamp)) {
+				InternalMetadata loadedMeta = graph.insert(m);
+				graph.connectMeta(to, loadedMeta);
+			}
+		}
+	}
+
+	/**
+	 * Detaches the Metadata of Link <tt>from</tt> by copying it to Link <tt>to</tt>
+	 * @param from
+	 * @param to
+	 * @param graph
+	 * @param timestamp
+	 */
+	private void detachLinkMetadata(
+			InternalLink from,
+			InternalLink to,
+			InMemoryIdentifierGraph graph,
+			long timestamp
+			) {
+
+		for (InternalMetadata m : from.getMetadata()) {
+			if ((m.isValidAt(timestamp))) {
+				InternalMetadata loadedMeta = graph.insert(m);
+				graph.connectMeta(to, loadedMeta);
+			}
+		}
+	}
+
+	@Override
+	public List<InternalIdentifierGraph> getGraphAt(long timestamp) {
+		log.debug("Get the graph at "+timestamp);
+		ArrayList<InternalIdentifier> validIds = new ArrayList<>();
+		ArrayList<InternalIdentifierGraph> graph = new ArrayList<>();
+
+		for (InternalIdentifier current : mRepo.getAllIdentifier()) {
+			if(current.isValidAt(timestamp)){
+				validIds.add(current);
+			}
+		}
+
+		if (validIds.isEmpty()) {
+			graph.add(new InMemoryIdentifierGraph(timestamp));
+			return graph;
+		}
+		while (!validIds.isEmpty()) {
+			InternalIdentifier start = validIds.get(0);
+			graph.add(buildGraph(validIds, start, timestamp));
+		}
+		return graph;
+	}
+
+
+
+	@Override
+	public abstract long getTimeOfLastUpdate();
+
+}

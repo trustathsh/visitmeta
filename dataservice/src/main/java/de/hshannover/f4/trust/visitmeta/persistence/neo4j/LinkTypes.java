@@ -36,4 +36,25 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
 
+
+
+import org.neo4j.graphdb.RelationshipType;
+/**
+ * Enumerate the different types of Relationship types in the Neo4J database.
+ * <ul>
+ * 	<li>Link: link between a dummy node and an identifier.</li>
+ * 	<li>Meta: link to a metadata.</li>
+ * 	<li>Creation: link between the root node and an identifier.</li>
+ * 	<li>Change:  link between the root node and the history-node.</li>
+ * </ul>
+ * @author ben
+ *
+ */
+public enum LinkTypes implements RelationshipType {
+	Link,
+	Meta,
+	Creation,
+	Change
+}

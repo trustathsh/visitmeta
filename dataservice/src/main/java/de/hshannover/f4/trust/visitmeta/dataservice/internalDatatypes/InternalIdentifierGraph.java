@@ -36,4 +36,33 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+import java.util.List;
+
+/**
+ * Internal representation of a graph structure of Identifiers.
+ * <i>Note: The underlying graph structure is guaranteed to be a simple graph.</i>
+ */
+public interface InternalIdentifierGraph {
+	public void removeIdentifier(InternalIdentifier i);
+	public InternalIdentifier getStartIdentifier();
+	/**
+	 * @return
+	 * All Identifiers in the graph.
+	 */
+	public List<InternalIdentifier> getIdentifiers();
+	/**
+	 * @return
+	 * Unix epoch at when this graph was changed last.
+	 */
+	public long getTimestamp();
+
+	/**
+	 * Changes the graph's timestamp
+	 * @param to
+	 */
+	public void setTimestamp(long timestamp);
+}

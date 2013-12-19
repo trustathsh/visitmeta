@@ -36,4 +36,28 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
 
+
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+
+public class JsonMarshallerBloated extends JsonMarshaller {
+
+	public static final String KEY_RAWDATA = "rawData";
+
+	@Override
+	public JSONObject toJson(Propable propable) {
+		JSONObject jsonPropable = super.toJson(propable);
+		try {
+			jsonPropable.put(KEY_RAWDATA, propable.getRawData());
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
+		return jsonPropable;
+	}
+
+}

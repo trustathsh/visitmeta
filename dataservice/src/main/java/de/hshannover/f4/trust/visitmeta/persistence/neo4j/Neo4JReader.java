@@ -36,4 +36,36 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
 
+
+
+import java.util.SortedMap;
+
+import org.apache.log4j.Logger;
+
+import de.fhhannover.inform.trust.visitmeta.ifmap.Connection;
+import de.fhhannover.inform.trust.visitmeta.persistence.AbstractReader;
+public class Neo4JReader extends AbstractReader {
+
+	private Logger log = Logger.getLogger(Connection.class);
+
+	private Neo4JConnection mConnection;
+
+	public Neo4JReader(Neo4JRepository repo, Neo4JConnection connection) {
+		log.trace("new Neo4JReader()");
+		mRepo = repo;
+		mConnection = connection;
+	}
+
+	@Override
+	public long getTimeOfLastUpdate() {
+		return getChangesMap().lastKey();
+	}
+
+	@Override
+	public SortedMap<Long, Long> getChangesMap() {
+		return mConnection.getTimestampManager().getChangesMap();
+	}
+
+}

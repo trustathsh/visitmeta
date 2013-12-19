@@ -36,4 +36,35 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+
+/**
+ * A cache that does nothing. Not even caching :)
+ * @author rosso
+ *
+ */
+public class DummyGraphCache implements GraphCache {
+
+	@Override
+	public boolean lookup(long timestamp) {
+		return false;
+	}
+
+	@Override
+	public List<InternalIdentifierGraph> fetch(long timestamp) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public void put(long timestamp, List<InternalIdentifierGraph> graph) {
+
+	}
+
+}

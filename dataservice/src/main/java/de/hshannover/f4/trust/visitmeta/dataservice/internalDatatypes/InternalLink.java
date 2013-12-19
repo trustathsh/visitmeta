@@ -36,4 +36,79 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+import java.util.List;
+
+/**
+ * Internal representation of one IF-MAP Link.
+ */
+public abstract class InternalLink {
+	public abstract void addMetadata(InternalMetadata meta);
+	public abstract void clearMetadata();
+	public abstract void removeMetadata(InternalMetadata meta);
+	public abstract boolean hasMetadata(InternalMetadata meta);
+	public abstract InternalIdentifierPair getIdentifiers();
+	public abstract List<InternalMetadata> getMetadata();
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append("Link" + "[" + hashCode() + "] Identifier[");
+		tmp.append(getIdentifiers().getFirst().hashCode() + ", "
+				+ getIdentifiers().getSecond().hashCode() + "] Metadata[");
+		int i = 0;
+		for (InternalMetadata m : getMetadata()) {
+			tmp.append(m.hashCode());
+			if (i != getMetadata().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (! (o instanceof InternalLink))
+			return false;
+		InternalLink other = (InternalLink) o;
+		if (getIdentifiers().getFirst().equals(other.getIdentifiers().getFirst())) {
+			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getSecond()))
+				return true;
+		} else if (getIdentifiers().getFirst().equals(other.getIdentifiers().getSecond())) {
+			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getFirst()))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result +
+				getIdentifiers().getFirst().hashCode() + getIdentifiers().getSecond().hashCode();
+		return result;
+	}
+
+	/**
+	 * Checks if this link is valid at the given timestamp.
+	 * A link is valid if it has any metadata which is valid.
+	 * @param timestamp the timestamp to check
+	 * @return the result wether it is valid or not
+	 */
+	public boolean isValidAt(long timestamp) {
+		for(InternalMetadata m : getMetadata()) {
+			if(((InternalMetadata) m).isValidAt(timestamp)) {
+				return true;
+			}
+		}
+		return false;
+	}
+}

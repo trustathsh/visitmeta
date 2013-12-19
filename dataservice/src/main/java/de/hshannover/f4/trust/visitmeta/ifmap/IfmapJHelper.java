@@ -36,4 +36,54 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
 
+
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import de.fhhannover.inform.trust.ifmapj.identifier.Identifiers;
+import de.fhhannover.inform.trust.ifmapj.messages.ResultItem;
+import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+
+class IfmapJHelper {
+
+	private final DocumentBuilder mDocumentBuilder;
+	private InternalIdentifierFactory mIdentifierFactory;
+
+	public IfmapJHelper(InternalIdentifierFactory idFactory) {
+		mIdentifierFactory = idFactory;
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+		f.setNamespaceAware(true);
+		try {
+			mDocumentBuilder = f.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException("could not create document builder");
+		}
+	}
+
+	public InternalIdentifier ifmapjIdentifierToInternalIdentifier(
+			de.fhhannover.inform.trust.ifmapj.identifier.Identifier id) {
+		Document document = mDocumentBuilder.newDocument();
+		Element element = Identifiers.tryToElement(id, document);
+		document.appendChild(element);
+		return mIdentifierFactory.createIdentifier(document);
+	}
+
+	public InternalIdentifier extractSingleIdentifier(ResultItem item) {
+		if (item.getIdentifier1() != null) {
+			return ifmapjIdentifierToInternalIdentifier(item.getIdentifier1());
+		} else if (item.getIdentifier2() != null) {
+			return ifmapjIdentifierToInternalIdentifier(item.getIdentifier2());
+		} else {
+			throw new RuntimeException("ResultItem '"+item+"' contains no identifier");
+		}
+	}
+
+}

@@ -36,4 +36,97 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
 
+
+
+import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
+import static de.fhhannover.inform.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.kernel.impl.util.FileUtils;
+
+/**
+ * Connection handling for Neo4J database.
+ *
+ * @author rosso
+ *
+ */
+public class Neo4JConnection {
+	private String mDbPath;
+	private GraphDatabaseService mGraphDb;
+	private Neo4JTimestampManager mTimestampManager;
+	private static final Logger log = Logger.getLogger(Neo4JConnection.class);
+/**
+ * Establish a connection to the database.
+ * @param dbPath Path to the Neo4J database.
+ */
+	public Neo4JConnection(String dbPath) {
+		this();
+		mDbPath = dbPath;
+		mGraphDb = new GraphDatabaseFactory().
+				newEmbeddedDatabaseBuilder(mDbPath).
+				setConfig( GraphDatabaseSettings.node_keys_indexable, NODE_TYPE_KEY +","+ KEY_HASH ).
+				setConfig( GraphDatabaseSettings.node_auto_indexing, "true" ).
+				newGraphDatabase();
+		registerShutdownHook(mGraphDb);
+
+		log.trace("... new Neo4JConnection() OK");
+	}
+
+	private Neo4JConnection() {
+		log.trace("new Neo4JConnection() ...");
+		mTimestampManager = new Neo4JTimestampManager(this);
+	}
+
+	public GraphDatabaseService getConnection() {
+		return mGraphDb;
+	}
+
+	public Neo4JTimestampManager getTimestampManager() {
+		return mTimestampManager;
+	}
+
+	/**
+	 * Clears all data in the DB and reconnects to it afterwards.
+	 */
+	public void ClearDatabase(){
+		// Shutdown database before erasing it
+		log.debug("Shutting down the database");
+		mGraphDb.shutdown();
+		try
+        {
+			log.debug("Erasing the database files");
+            FileUtils.deleteRecursively( new File( mDbPath ) );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+		// Restart database
+		log.debug("Reconnecting to database");
+		mGraphDb = new GraphDatabaseFactory().
+				newEmbeddedDatabaseBuilder(mDbPath).
+				setConfig( GraphDatabaseSettings.node_keys_indexable, NODE_TYPE_KEY +","+ KEY_HASH ).
+				setConfig( GraphDatabaseSettings.node_auto_indexing, "true" ).
+				newGraphDatabase();
+		registerShutdownHook(mGraphDb);
+	}
+
+	private void registerShutdownHook( final GraphDatabaseService graphDb ) {
+		// Shutdown the server if closed unexpectedly
+		Runtime.getRuntime().addShutdownHook( new Thread() {
+			@Override
+			public void run() {
+				log.error("Database was forced to shut down");
+				graphDb.shutdown();
+			}
+		} );
+	}
+}

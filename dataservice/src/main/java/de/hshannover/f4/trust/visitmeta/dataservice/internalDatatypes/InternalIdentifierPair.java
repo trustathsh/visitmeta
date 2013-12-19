@@ -36,4 +36,41 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+
+/**
+ * Encapsulates two {@link InternalIdentifier}, since an {@link InternalLink} always carries two identifiers.
+ * <i>Note: In the IF-MAP specification the identifiers have got no order.</i>
+ * <i>Make sure getFirst() and getSecond() are idempotent!</i>
+ */
+public class InternalIdentifierPair {
+	private InternalIdentifier mFirst;
+	private InternalIdentifier mSecond;
+
+	public InternalIdentifierPair(InternalIdentifier id1, InternalIdentifier id2) {
+		mFirst = id1;
+		mSecond = id2;
+	}
+
+	public InternalIdentifier getFirst() {
+		return mFirst;
+	}
+	public InternalIdentifier getSecond() {
+		return mSecond;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer(this.getClass().getSimpleName());
+		buffer.append("(");
+		buffer.append(mFirst.toString());
+		buffer.append(" ---- ");
+		buffer.append(mSecond.toString());
+		buffer.append(")");
+		return buffer.toString();
+	}
+
+}

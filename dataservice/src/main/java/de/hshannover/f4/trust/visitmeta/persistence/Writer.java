@@ -36,4 +36,13 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence;
 
+
+
+
+import de.fhhannover.inform.trust.visitmeta.ifmap.PollResult;
+
+public interface Writer {
+	public void submitPollResult(PollResult pr);
+}

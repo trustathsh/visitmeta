@@ -36,4 +36,91 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
+
+public class IdentifierGraphImpl implements IdentifierGraph {
+	/**
+	 * List of all Identifiers that are in the graph.
+	 */
+	private List<Identifier> mIdentifiers;
+	/**
+	 * Unix Epoch representing the time of the last update to the graph.
+	 */
+	private long mTimestamp;
+
+
+	public IdentifierGraphImpl(long timestamp) {
+		mTimestamp = timestamp;
+		mIdentifiers = new ArrayList<Identifier>();
+	}
+
+	@Override
+	public Identifier getStartIdentifier() {
+		return null;
+	}
+
+	@Override
+	public List<Identifier> getIdentifiers() {
+		return mIdentifiers;
+	}
+
+	@Override
+	public long getTimestamp() {
+		return mTimestamp;
+	}
+
+	/**
+	 * Searches the graph for an {@link IdentifierImpl} representation of the
+	 * {@link InternalIdentifier} passed as argument.
+	 * @param id {@link InternalIdentifier} to look for.
+	 * @return
+	 * {@link IdentifierImpl} representation of the {@link InternalIdentifier} passed as argument.
+	 * Null otherwise.
+	 */
+	public IdentifierImpl findIdentifier(InternalIdentifier id) {
+		for (Identifier identifier : mIdentifiers) {
+			if (id.sameAs(identifier)) {
+				return (IdentifierImpl)identifier;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Takes an {@link Identifier and inserts it into the graph by copying its data into a
+	 * {@link IdentifierImpl} representation.
+	 * @param id
+	 */
+	public void insert(Identifier id) {
+		mIdentifiers.add(id);
+	}
+
+	/**
+	 * Connects two Identifiers in the graph by creating a link and adding it to each Identifier
+	 * @param id1
+	 * @param id2
+	 * @return The freshly created link.
+	 */
+	public LinkImpl connect(IdentifierImpl id1,
+			IdentifierImpl id2) {
+		if (mIdentifiers.contains(id1) && mIdentifiers.contains(id2)) {
+			LinkImpl l = new LinkImpl(id1, id2);
+			id1.addLink(l);
+			id2.addLink(l);
+			return l;
+		}
+		throw new IllegalArgumentException(
+				"Trying to connect two Identifiers of which at least one is not in the graph ... "+
+				"we strongly disapprove");
+	}
+
+}

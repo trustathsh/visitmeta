@@ -36,4 +36,22 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
+
+
+
+import de.fhhannover.inform.trust.ifmapj.messages.Request;
+
+/**
+ * Tobias Ruhe's request for the dump operation.
+ * 
+ * @author 
+ *
+ */
+public interface DumpRequest extends Request {
+	
+	public void setIdentifierFilter(String filter);
+	
+	public String getIdentifierFilter();
+}
 

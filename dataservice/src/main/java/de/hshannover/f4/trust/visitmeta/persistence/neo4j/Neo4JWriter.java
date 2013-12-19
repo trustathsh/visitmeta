@@ -36,4 +36,88 @@
  * limitations under the License.
  * #L%
  */
+/**
+ *
+ */
+package de.fhhannover.inform.trust.visitmeta.persistence.neo4j;
 
+
+
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.neo4j.graphdb.Transaction;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
+
+/**
+ * Neo4J extension of AbstractWriter. Basically only adds transactions to the
+ * methods of the superclass.
+ * 
+ * @author rosso
+ * 
+ */
+public class Neo4JWriter extends AbstractWriter {
+	private static Logger log = Logger.getLogger(Neo4JWriter.class);
+	private Transaction mTransaction;
+	private Lock mLock;
+	private Neo4JConnection mConnection;
+	private Long mLastTimestamp;
+
+	public Neo4JWriter(Neo4JRepository graph, Neo4JConnection connection) {
+		mRepo = graph;
+		mLock = new ReentrantLock();
+		mConnection = connection;
+	}
+
+	@Override
+	public void finishTransaction() {
+		log.trace("Finishing transaction ...");
+		mTransaction.success();
+		mTransaction.finish();
+		mLock.unlock();
+	}
+
+	@Override
+	public void beginTransaction() {
+		mLock.lock();
+		mLastTimestamp = mConnection.getTimestampManager().getCurrentTime();
+		log.trace("Beginning transaction ...");
+		mTransaction = ((Neo4JRepository) mRepo).beginTx();
+	}
+
+	@Override
+	protected Transaction beginSubmit() {
+		log.trace("Beginning transaction ...");
+		Transaction tx = ((Neo4JRepository) mRepo).beginTx();
+		mLock.lock();
+
+		return tx;
+	}
+
+	@Override
+	protected void finishSubmit(Transaction tx) {
+		log.trace("Finishing transaction ...");
+		tx.success();
+		tx.finish();
+		mLock.unlock();
+	}
+
+	@Override
+	protected void submitUpdate(List<InternalMetadata> meta) {
+		for (InternalMetadata m : meta) {
+			mConnection.getTimestampManager().incrementCounter(
+					m.getPublishTimestamp());
+		}
+	}
+
+	@Override
+	protected void submitDelete(int n) {
+		for (int i = 0; i < n; i++) {
+			mConnection.getTimestampManager().incrementCounter(mLastTimestamp);
+		}
+	}
+}

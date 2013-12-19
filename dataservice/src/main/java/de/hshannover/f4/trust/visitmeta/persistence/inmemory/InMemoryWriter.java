@@ -36,4 +36,75 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 
+
+
+import java.util.List;
+
+import org.neo4j.graphdb.Transaction;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.fhhannover.inform.trust.visitmeta.persistence.AbstractWriter;
+import de.fhhannover.inform.trust.visitmeta.persistence.Repository;
+@Deprecated
+public class InMemoryWriter extends AbstractWriter {
+	private Object mLock;
+
+	public InMemoryWriter(Object lock, Repository repo) {
+		mLock = lock;
+		mRepo = repo;
+	}
+
+	@Override
+	public void submitUpdate(InternalIdentifier id, List<InternalMetadata> meta) {
+		synchronized (mLock) {
+			super.submitUpdate(id, meta);
+		}
+	}
+
+
+	@Override
+	public void submitUpdate(InternalIdentifier id1, InternalIdentifier id2,
+			List<InternalMetadata> meta) {
+		synchronized (mLock) {
+			super.submitUpdate(id1, id2, meta);
+		}
+	}
+
+	@Override
+	public void finishTransaction() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void beginTransaction() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void submitUpdate(List<InternalMetadata> meta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void submitDelete(int n) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected Transaction beginSubmit() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void finishSubmit(Transaction tx) {
+		// TODO Auto-generated method stub
+		
+	}
+}

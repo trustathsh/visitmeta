@@ -36,4 +36,30 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
 
+
+
+import java.util.List;
+
+/**
+ * Encapsulates the result of one if-MAP update
+ */
+public class PollResult {
+
+	private final List<ResultItem> mUpdates;
+	private final List<ResultItem> mDeletes;
+
+	public PollResult(List<ResultItem> updates, List<ResultItem> deletes) {
+		mUpdates = updates;
+		mDeletes = deletes;
+	}
+
+	public List<ResultItem> getDeletes() {
+		return mDeletes;
+	}
+
+	public List<ResultItem> getUpdates() {
+		return mUpdates;
+	}
+}

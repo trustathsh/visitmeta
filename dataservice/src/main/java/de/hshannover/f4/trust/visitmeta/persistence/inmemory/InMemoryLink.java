@@ -36,4 +36,85 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+
+public class InMemoryLink extends InternalLink {
+	private InternalIdentifier mFirstIdentifier;
+	private InternalIdentifier mSecondIdentifier;
+	private List<InternalMetadata> mMeta;
+
+	private InMemoryLink() {
+		mMeta = new ArrayList<InternalMetadata>();
+	}
+
+	public InMemoryLink(InternalIdentifier id1, InternalIdentifier id2) {
+		this();
+		mFirstIdentifier = id1;
+		mSecondIdentifier = id2;
+
+	}
+
+	/**
+	 * Creates a new InternalLink based on the original.
+	 * {@link InMemoryMetadata} is copied, but its {@link InMemoryIdentifier}
+	 * are set to null.
+	 *
+	 * @param original
+	 *            The original identifier
+	 */
+	public InMemoryLink(InMemoryLink original) {
+		this();
+		mFirstIdentifier = null;
+		mSecondIdentifier = null;
+	}
+
+	/**
+	 * Returns a clone of the {@link InMemoryLink}, but sets its
+	 * {@link InMemoryIdentifier} to null.
+	 *
+	 * @return An {@link InMemoryLink} Object with clones Metadate, but
+	 *         imcomplete since it does not have a start or end node.
+	 */
+	@Override
+	public InMemoryLink clone() {
+		return new InMemoryLink(this);
+	}
+
+	@Override
+	public InternalIdentifierPair getIdentifiers() {
+		return new InternalIdentifierPair(mFirstIdentifier, mSecondIdentifier);
+	}
+
+	@Override
+	public void addMetadata(InternalMetadata meta) {
+		mMeta.add(meta);
+	}
+
+	public void clearMetadata() {
+		mMeta.clear();
+	}
+
+	public void removeMetadata(InternalMetadata meta) {
+		mMeta.remove(meta);
+	}
+
+	public boolean hasMetadata(InternalMetadata meta) {
+		return mMeta.contains(meta);
+	}
+
+	@Override
+	public List<InternalMetadata> getMetadata() {
+		return mMeta;
+	}
+}

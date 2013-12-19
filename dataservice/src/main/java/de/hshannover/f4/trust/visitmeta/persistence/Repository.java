@@ -36,4 +36,34 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence;
 
+
+
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+
+/**
+ * Interface for the management of the internal graph structure
+ */
+public interface Repository {
+	public InternalIdentifier findIdentifier(InternalIdentifier id);
+	public InternalLink findCommonLink(InternalIdentifier id1, InternalIdentifier id2);
+
+	public InternalLink getLink(long id);
+	public InternalMetadata getMetadata(long id);
+	public InternalIdentifier getIdentifier(long id);
+
+	public InternalIdentifier getStartIdentifier();
+	public List<InternalIdentifier> getAllIdentifier();
+
+	public InternalIdentifier insert(InternalIdentifier id);
+	public InternalMetadata insert(InternalMetadata meta);
+	public InternalLink connect(InternalIdentifier id1, InternalIdentifier id2);
+	public void connectMeta(InternalLink link, InternalMetadata meta);
+	public void connectMeta(InternalIdentifier id, InternalMetadata meta);
+	public void disconnect(InternalIdentifier id1, InternalIdentifier id2);
+}

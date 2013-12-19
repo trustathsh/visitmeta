@@ -36,4 +36,116 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
+import de.fhhannover.inform.trust.visitmeta.dataservice.util.GraphHelper;
+
+/**
+ * @author rosso
+ *
+ */
+public class SimpleGraphCache implements GraphCache {
+	/**
+	 * Maximum size (number of cached graphs) the cache is allowed to grow to. When the maximum
+	 * size is reached, the least recently used entries are purged from the cache.
+	 */
+	private int mMaxCacheSize;
+	/**
+	 * The actual cache mapping timestamps to graph objects.
+	 */
+	private HashMap<Long, List<InternalIdentifierGraph>> mCache;
+	/**
+	 * Data structure to implement least recently used cache purging. Mapping the time of last
+	 * access to graphs' timestamps.
+	 */
+	private TreeMap<Long, Long> mTouched;
+	/**
+	 * Helper data structure to glue together the cache and the touched graph. Mapping graphs'
+	 * timestamps to the time of their last access.
+	 */
+	private HashMap<Long, Long> mCacheToTouched;
+
+	private SimpleGraphCache() {
+		mCache = new HashMap<>();
+		mCacheToTouched = new HashMap<>();
+		mTouched = new TreeMap<>();
+	}
+
+	public SimpleGraphCache(int maxCacheSize) {
+		this();
+		mMaxCacheSize = maxCacheSize;
+	}
+
+	@Override
+	public boolean lookup(long timestamp) {
+		return mCache.containsKey(timestamp);
+	}
+
+
+	@Override
+	public synchronized List<InternalIdentifierGraph> fetch(long timestamp) {
+		if (mCache.containsKey(timestamp)) {
+			List<InternalIdentifierGraph> binky = new ArrayList<>();
+			for (InternalIdentifierGraph graph : mCache.get(timestamp)) {
+				binky.add(GraphHelper.cloneGraph(graph));
+			}
+			touch(timestamp);
+			return binky;
+		}
+		return new ArrayList<InternalIdentifierGraph>();
+	}
+
+	@Override
+	public synchronized void put(long timestamp, List<InternalIdentifierGraph> graph) {
+		long now = System.currentTimeMillis();
+		if (mCache.containsKey(timestamp)) {
+				mCache.remove(timestamp);
+		}
+		if (mCacheToTouched.containsKey(timestamp)) {
+			long oldnow = mCacheToTouched.get(timestamp);
+			mCacheToTouched.remove(timestamp);
+			if (mTouched.containsKey(oldnow)) {
+				mTouched.remove(oldnow);
+			}
+		}
+		mCache.put(timestamp, graph);
+		mCacheToTouched.put(timestamp, now);
+		mTouched.put(now, timestamp);
+
+		if (mCache.size() > mMaxCacheSize) {
+			long oldest = mTouched.firstKey();
+			long oldestTimestamp = mTouched.get(oldest);
+			mTouched.remove(oldest);
+			mCache.remove(oldestTimestamp);
+			mCacheToTouched.remove(oldestTimestamp);
+		}
+	}
+
+
+	/**
+	 * Helper method to update the recently used timestamp for the graph corresponding
+	 * to the timestamp passed as argument.
+	 * @param timestamp
+	 */
+	private void touch(long timestamp) {
+		long now = System.currentTimeMillis();
+		if (mCacheToTouched.containsKey(timestamp)) {
+			long oldnow = mCacheToTouched.get(timestamp);
+			mCacheToTouched.remove(timestamp);
+			if (mTouched.containsKey(oldnow)) {
+				mTouched.remove(oldnow);
+			}
+			mCacheToTouched.put(timestamp, now);
+			mTouched.put(now, timestamp);
+		}
+	}
+
+}

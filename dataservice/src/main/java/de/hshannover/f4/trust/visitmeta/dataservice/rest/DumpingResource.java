@@ -1,3 +1,5 @@
+package de.fhhannover.inform.trust.visitmeta.dataservice.rest;
+
 /*
  * #%L
  * =====================================================
@@ -21,7 +23,7 @@
  * This file is part of visitmeta dataservice, version 0.0.3,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2013 Trust@FHH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,3 +39,63 @@
  * #L%
  */
 
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import de.fhhannover.inform.trust.visitmeta.ifmap.ConnectionManager;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+
+
+@Path("{connectionName}/dump")
+public class DumpingResource {
+
+
+	/**
+	 * Start the Dumping-Service.
+	 * 
+	 * !! Dumping is NOT IF-MAP 2.0 compliant an can only be used with irond. !!
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/default/dump/start</tt>
+	 */
+	@PUT
+	@Path("start")
+	public String startDump(@PathParam("connectionName") String name) {
+
+		try {
+
+			ConnectionManager.deleteSubscriptionsFromConnection(name);
+
+			ConnectionManager.startDumpingServiceFromConnection(name);
+
+		} catch (ConnectionException e) {
+
+			return "ERROR: dumping is not running: " + e.getClass().getSimpleName();
+		};
+
+		return "INFO: dumping starts successfully";
+	}
+
+	/**
+	 * Stop the Dumping-Service.
+	 * 
+	 * !! Dumping is NOT IF-MAP 2.0 compliant an can only be used with irond. !!
+	 * 
+	 * Example-URL: <tt>http://example.com:8000/default/dump/stop</tt>
+	 */
+	@PUT
+	@Path("stop")
+	public String stopDump(@PathParam("connectionName") String name) {
+
+		try{
+
+			ConnectionManager.stopDumpingServiceFromConnection(name);
+
+		} catch (ConnectionException e) {
+
+			return "ERROR: " + e.getClass().getSimpleName();
+		};
+
+		return "INFO: dumping stop successfully";
+	}
+}

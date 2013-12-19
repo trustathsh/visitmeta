@@ -36,4 +36,118 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.persistence.inmemory;
 
+
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.neo4j.graphdb.NotFoundException;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+
+public class InMemoryMetadata extends InternalMetadata {
+
+	private static final Logger log = Logger.getLogger(InMemoryMetadata.class);
+
+	private Map<String, String> mProperties;
+	private String mTypename;
+	private boolean mIsSingleValue;
+	private String mRawData;
+
+	private long mPublishTimestamp;
+	private long mDeleteTimestamp = InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP;
+
+	private InMemoryMetadata() {
+		mProperties = new HashMap<String, String>();
+	}
+
+	public InMemoryMetadata(String typename, boolean isSingleValue, long publishTimestamp) {
+		this();
+		mTypename = typename;
+		mIsSingleValue = isSingleValue;
+		mPublishTimestamp = publishTimestamp;
+	}
+
+	public InMemoryMetadata(InternalMetadata original) {
+		this(original.getTypeName(), original.isSingleValue(), original.getPublishTimestamp());
+		mRawData = original.getRawData();
+		for (String property : original.getProperties()) {
+			this.addProperty(property, original.valueFor(property));
+		}
+	}
+
+	@Override
+	public InMemoryMetadata clone() {
+		return new InMemoryMetadata(this);
+	}
+
+	@Override
+	public void addProperty(String name, String value) {
+		if (mProperties.containsKey(name)) {
+			log.warn("property '"+name+"' already exists, overwriting with '"+value+"'");
+		}
+		mProperties.put(name, value);
+	}
+
+	@Override
+	public List<String> getProperties() {
+		return new ArrayList<String>(mProperties.keySet());
+	}
+
+	@Override
+	public boolean hasProperty(String p) {
+		if (mProperties.containsKey(p)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String valueFor(String p) {
+		try {
+			return mProperties.get(p);
+		} catch(NotFoundException e) {
+			log.warn("This Metadata does not contain the property " + p + "! " + this);
+		}
+		return "";
+	}
+
+	@Override
+	public boolean isSingleValue() {
+		return mIsSingleValue;
+	}
+
+	@Override
+	public String getTypeName() {
+		return mTypename;
+	}
+
+	@Override
+	public long getPublishTimestamp() {
+		return mPublishTimestamp;
+	}
+	@Override
+	public long getDeleteTimestamp() {
+		return mDeleteTimestamp;
+	}
+
+	@Override
+	public void setPublishTimestamp(long timestamp) {
+		mPublishTimestamp = timestamp;
+	}
+
+	@Override
+	public String getRawData() {
+		return mRawData;
+	}
+
+	public void setRawData(String rawData) {
+		mRawData = rawData;
+	}
+}

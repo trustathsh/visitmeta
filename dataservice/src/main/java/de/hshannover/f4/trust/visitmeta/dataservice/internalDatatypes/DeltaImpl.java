@@ -36,4 +36,42 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Delta;
+import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierGraph;
+
+/**
+ * Internal representation of the changes of an IF-MAP graph structure between two points in time.
+ *
+ */
+public class DeltaImpl implements Delta {
+
+	private List<IdentifierGraph> mDeletes;
+	private List<IdentifierGraph> mUpdates;
+
+	public DeltaImpl(List<IdentifierGraph> deletes, List<IdentifierGraph> updates) {
+		this.mDeletes = deletes;
+		this.mUpdates = updates;
+	}
+
+	@Override
+	public List<IdentifierGraph> getDeletes() {
+		List<IdentifierGraph> oink = new ArrayList<>();
+		oink.addAll(mDeletes);
+		return oink;
+	}
+
+	@Override
+	public List<IdentifierGraph> getUpdates() {
+		List<IdentifierGraph> oink = new ArrayList<>();
+		oink.addAll(mUpdates);
+		return oink;
+	}
+
+}

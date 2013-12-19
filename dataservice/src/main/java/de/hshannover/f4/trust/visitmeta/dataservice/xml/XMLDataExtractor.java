@@ -36,4 +36,53 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.xml;
 
+
+
+import java.util.Map;
+
+import org.w3c.dom.Document;
+
+/**
+ * A <tt>XMLDataExtractor</tt> collects all information from a XML document into a simplified
+ * format representing the same information.
+ *
+ * @author Ralf Steuerwald
+ *
+ */
+public interface XMLDataExtractor {
+
+	/**
+	 * Extract the information from the given XML document into a sequence of key/value pair, where
+	 * every key represents a XPATH-like address to its value.
+	 *
+	 * @param document the XML to process
+	 * @return key/value pairs representing the XML document
+	 */
+	public Map<String, String> extractToKeyValuePairs(Document document);
+
+	public String extractTypename(Document document);
+
+	/**
+	 * Returns <tt>true</tt> when the given document is a metadata document
+	 * with <tt>singleValue</tt> metadata. If the document is
+	 * <tt>multiValue</tt> metadata or no metadata at all <tt>false</tt> is
+	 * returned.
+	 *
+	 * @param document the document to check
+	 * @return <tt>true</tt> if document is <tt>singleValue</tt> metadata
+	 */
+	public boolean isSingleValueMetadata(Document document);
+
+	/**
+	 * Extracts the <tt>ifmap-timestamp</tt> from the given document.
+	 * If the attribute is not found or not a valid xsd:dateTime the
+	 * current local time will be returned.
+	 *
+	 * @param document the document to parse
+	 * @return the parsed timestamp in milliseconds since 1970-01-01
+	 */
+	public long extractIfmapMetadataTimestamp(Document document);
+
+}

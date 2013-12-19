@@ -36,4 +36,25 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
 
+
+
+import org.apache.log4j.Logger;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryLink;
+
+public class InMemoryLinkFactory implements InternalLinkFactory {
+
+	private static final Logger log = Logger.getLogger(InMemoryLinkFactory.class);
+
+	@Override
+	public InternalLink createLink(InternalIdentifier id1, InternalIdentifier id2) {
+		log.trace("creating link between '"+id1+"' and '"+id2+"'");
+
+		return new InMemoryLink(id1, id2);
+	}
+
+}

@@ -36,4 +36,137 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
 
+
+
+import org.apache.log4j.Logger;
+
+import de.fhhannover.inform.trust.ifmapj.channel.ARC;
+import de.fhhannover.inform.trust.visitmeta.dataservice.Application;
+import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
+import de.fhhannover.inform.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
+import de.fhhannover.inform.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionCloseException;
+import de.fhhannover.inform.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.fhhannover.inform.trust.visitmeta.persistence.Writer;
+import de.fhhannover.inform.trust.visitmeta.util.PropertiesReaderWriter;
+
+/**
+ * When a <tt>UpdateService</tt> is started, it will subscribe for the
+ * configured start identifier and after that continuously poll for
+ * new information on that subscription.
+ *
+ * @author Ralf Steuerwald
+ *
+ */
+public class UpdateService implements Runnable {
+
+	private static final Logger log = Logger.getLogger(UpdateService.class);
+
+	protected PropertiesReaderWriter config = Application.getIFMAPConfig();
+
+	protected final int MAX_DEPTH = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
+
+	protected final int MAX_SIZE = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+
+	protected final int MAX_RETRY;
+
+	protected final static int DEFAULT_MAX_RETRY = 10;
+
+	protected final int RETRY_INTERVAL;
+
+	protected final static int DEFAULT_RETRY_INTERVAL = 10;
+
+	private Connection mConnection;
+
+	protected Writer mWriter;
+
+	protected InternalIdentifierFactory mIdentifierFactory;
+
+	protected InternalMetadataFactory mMetadataFactory;
+
+	protected de.fhhannover.inform.trust.visitmeta.ifmap.IfmapJHelper mIfmapJHelper;
+
+
+	/**
+	 * Create a new {@link UpdateService} which uses the given writer to submit new
+	 * {@link PollResult}s to the application.
+	 *
+	 * @param writer
+	 * @param identifierFactory
+	 * @param metadataFactory
+	 */
+	public UpdateService(Connection connection, Writer writer, InternalIdentifierFactory identifierFactory, InternalMetadataFactory metadataFactory) {
+		log.trace("new UpdateService() ...");
+
+		if (writer == null) {
+			throw new IllegalArgumentException("writer cannot be null");
+		}
+		if (identifierFactory == null) {
+			throw new IllegalArgumentException("identifierFactory cannot be null");
+		}
+		if (metadataFactory == null) {
+			throw new IllegalArgumentException("metadataFactory cannot be null");
+		}
+
+		mConnection = connection;
+		mWriter = writer;
+		mIdentifierFactory = identifierFactory;
+		mMetadataFactory = metadataFactory;
+
+		mIfmapJHelper = new de.fhhannover.inform.trust.visitmeta.ifmap.IfmapJHelper(mIdentifierFactory);
+
+		int tmp = 0;
+		try {
+			tmp = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_RETRY));
+		} catch (NumberFormatException e) {
+			tmp = DEFAULT_MAX_RETRY;
+		}
+		MAX_RETRY = tmp;
+		try {
+			tmp = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_RETRY_INTERVAL));
+		} catch (NumberFormatException e) {
+			tmp = DEFAULT_RETRY_INTERVAL;
+		}
+		RETRY_INTERVAL = tmp;
+
+		log.trace("... new UpdateService() OK");
+	}
+
+	/**
+	 * Establish a new {@link ARC} to the MAPS and continuously poll for new data. The
+	 * poll results get forwarded to the application.
+	 */
+	@Override
+	public void run() {
+		log.debug("run() ...");
+
+		while (!Thread.interrupted()) {
+
+			PollTask task = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
+
+			try {
+
+				PollResult pollResult = task.call();
+				mWriter.submitPollResult(pollResult);
+
+			} catch (ConnectionCloseException e) {
+
+				log.debug("Stop polling while: " + e.toString());
+				break;
+
+			} catch (PollException  e) {
+
+				log.error(e.toString(), e);
+				break;
+
+			} catch (ConnectionException e) {
+
+				log.error(e.toString(), e);
+				break;
+			}
+		}
+		log.debug("... run()");
+	}
+}

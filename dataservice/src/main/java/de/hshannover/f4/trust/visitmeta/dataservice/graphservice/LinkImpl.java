@@ -36,4 +36,88 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierPair;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Link;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+
+public class LinkImpl implements Link {
+	private Identifier mFirstIdentifier;
+	private Identifier mSecondIdentifier;
+	private List<Metadata> mMeta;
+
+	private LinkImpl() {
+		mMeta = new ArrayList<Metadata>();
+	}
+
+	public LinkImpl(IdentifierImpl id1, IdentifierImpl id2) {
+		this();
+		mFirstIdentifier = id1;
+		mSecondIdentifier = id2;
+	}
+
+	@Override
+	public IdentifierPair getIdentifiers() {
+		return new IdentifierPairImpl(mFirstIdentifier, mSecondIdentifier);
+	}
+
+	@Override
+	public List<Metadata> getMetadata() {
+		return mMeta;
+	}
+
+	public void addMetadata(Metadata m) {
+		mMeta.add(m);
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append("Link" + "[" + hashCode() + "] Identifier[");
+		tmp.append(getIdentifiers().getFirst().hashCode() + ", "
+				+ getIdentifiers().getSecond().hashCode() + "] Metadata[");
+		int i = 0;
+		for (Metadata m : getMetadata()) {
+			tmp.append(m.hashCode());
+			if (i != getMetadata().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (! (o instanceof Link))
+			return false;
+		Link other = (Link) o;
+		if (getIdentifiers().getFirst().equals(other.getIdentifiers().getFirst())) {
+			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getSecond()))
+				return true;
+		} else if (getIdentifiers().getFirst().equals(other.getIdentifiers().getSecond())) {
+			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getFirst()))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result +
+				getIdentifiers().getFirst().hashCode() + getIdentifiers().getSecond().hashCode();
+		return result;
+	}
+}

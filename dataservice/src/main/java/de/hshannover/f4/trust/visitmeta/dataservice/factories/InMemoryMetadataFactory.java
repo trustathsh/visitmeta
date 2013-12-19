@@ -36,4 +36,61 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.factories;
 
+
+
+
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.DomHelper;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.SimpleKeyValueExtractor;
+import de.fhhannover.inform.trust.visitmeta.dataservice.xml.XMLDataExtractor;
+import de.fhhannover.inform.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
+
+public class InMemoryMetadataFactory implements InternalMetadataFactory{
+
+	private static final Logger log = Logger.getLogger(InMemoryMetadataFactory.class);
+
+	private XMLDataExtractor mXmlExtractor = new SimpleKeyValueExtractor();
+
+	@Override
+	public InternalMetadata createMetadata(Document document) {
+		log.trace("creating metadata from XML");
+
+		// extract metadata object attributes
+		String typename = mXmlExtractor.extractTypename(document);
+		boolean isSingleValueMetadata = mXmlExtractor.isSingleValueMetadata(document);
+		long timestamp = mXmlExtractor.extractIfmapMetadataTimestamp(document);
+
+		// recursively collect all information under the top-level element
+		Map<String, String> properties = mXmlExtractor.extractToKeyValuePairs(document);
+
+		// create a internal metadata object
+		InMemoryMetadata metadata = new InMemoryMetadata(
+				typename, isSingleValueMetadata, timestamp);
+		metadata.setRawData(DomHelper.documentToString(document));
+
+		for (Entry<String, String> e : properties.entrySet()) {
+			metadata.addProperty(e.getKey(), e.getValue());
+		}
+
+		return metadata;
+	}
+
+	@Override
+	public InternalMetadata createMetadata(InternalMetadata meta) {
+		log.trace("creating copy of " + meta);
+
+		InternalMetadata metaCopy = new InMemoryMetadata(meta);
+		return metaCopy;
+	}
+
+
+
+}

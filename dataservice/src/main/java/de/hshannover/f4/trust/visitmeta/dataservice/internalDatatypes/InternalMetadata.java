@@ -36,4 +36,121 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes;
 
+
+
+import java.util.Collections;
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Propable;
+
+/**
+ * Internal representation of one IF-MAP metadata.
+ */
+public abstract class InternalMetadata implements Propable{
+	public static final long METADATA_NOT_DELETED_TIMESTAMP = -1;
+
+	/**
+	 * Returns the raw, unparsed XML data used to describe this Metadata. <b>Note: The xml version
+	 * and encoding is included.</b>
+	 */
+	public abstract String getRawData();
+
+	public abstract void addProperty(String name, String value);
+
+	/**
+	 * @deprecated use constructor parameter instead
+	 * @param timestamp
+	 */
+	@Deprecated
+	public abstract void setPublishTimestamp(long timestamp);
+	/**
+	 * Returns the timestamp when this metadata was received with a delete operation.
+	 *
+	 * @return the delete timestamp or
+	 *          {@link Metadata.METADATA_NOT_DELETED_TIMESTAMP}
+	 *          if this metadata is still valid
+	 */
+	public abstract long getDeleteTimestamp();
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append(getTypeName() + "[" + hashCode() + "] Properties[");
+		for (String p : getProperties()) {
+			tmp.append("(" + p + ", " + valueFor(p) + ")");
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (! (o instanceof InternalMetadata) ) {
+			return false;
+		}
+		InternalMetadata other = (InternalMetadata) o;
+		if (!this.getTypeName().equals(other.getTypeName())) {
+			return false;
+		}
+		if(this.isSingleValue()) {
+			return true;
+		}
+		if (getProperties().size() != other.getProperties().size()) {
+			return false;
+		}
+		for (String property : getProperties()) {
+			String value = valueFor(property);
+			if (value == null) {
+				if (!(other.valueFor(property) == null))
+					return false;
+			} else {
+				if (!valueFor(property).equals(other.valueFor(property)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result + getTypeName().hashCode();
+		List<String> keys = getProperties();
+		Collections.sort(keys);
+		for (String key : keys) {
+			result = prime * result + valueFor(key).hashCode();
+		}
+		return result;
+	}
+
+	/**
+	 * @return
+	 * True if corresponding IF-MAP metadata is single value, false otherwise.
+	 */
+	public abstract boolean isSingleValue();
+	/**
+	 * @return
+	 * The (IF-MAP) publish timestamp
+	 */
+	public abstract long getPublishTimestamp();
+
+	/**
+	 * Checks if this metadata is valid at the given timestamp.
+	 * Test is performed on the PublishTimestamp and DeleteTimestamp
+	 * @param timestamp the timestamp to check
+	 * @return the result wether it is valid or not
+	 */
+	public boolean isValidAt(long timestamp) {
+		if(getPublishTimestamp() > timestamp) {
+			return false;
+		}
+		return ((getDeleteTimestamp() == -1) || (timestamp < getDeleteTimestamp()));
+	}
+}

@@ -36,4 +36,17 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
 
+
+
+//package-scoped exception class to signal poll errors
+class PollException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public PollException(Throwable cause) {
+		super(cause);
+	}
+
+}

@@ -36,4 +36,168 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Link;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+
+public class IdentifierImpl implements Identifier {
+	private String mTypename;
+	private Map<String, String> mProperties;
+	private List<Link> mLinks;
+	private List<Metadata> mMeta;
+	private String mRawData;
+
+
+	private IdentifierImpl() {
+		mProperties = new HashMap<String, String>();
+		mLinks = new ArrayList<>();
+		mMeta = new ArrayList<>();
+	}
+
+	public IdentifierImpl(String typename) {
+		this();
+		mTypename = typename;
+	}
+
+	public IdentifierImpl(InternalIdentifier id) {
+		this();
+		mTypename = id.getTypeName();
+		mRawData = id.getRawData();
+		for (String key : id.getProperties()) {
+			addProperty(key, id.valueFor(key));
+		}
+	}
+
+	public void addProperty(String key, String value) {
+		mProperties.put(key, value);
+	}
+	public void addMetadata(Metadata m) {
+		mMeta.add(m);
+	}
+
+	@Override
+	public List<String> getProperties() {
+		return new ArrayList<String>(mProperties.keySet());
+	}
+
+	@Override
+	public boolean hasProperty(String p) {
+		if (mProperties.containsKey(p))
+			return true;
+		return false;
+	}
+
+	@Override
+	public String valueFor(String p) {
+		return mProperties.get(p);
+	}
+
+	@Override
+	public String getTypeName() {
+		return mTypename;
+	}
+
+	@Override
+	public List<Link> getLinks() {
+		return mLinks;
+	}
+
+	@Override
+	public List<Metadata> getMetadata() {
+		return mMeta;
+	}
+
+	public void addLink(Link l) {
+		mLinks.add(l);
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append(getTypeName() + "[" + hashCode() + "] Properties[");
+		for (String p : getProperties()) {
+			tmp.append("(" + p + ", " + valueFor(p) + ")");
+		}
+		tmp.append("] Links[");
+		int i = 0;
+		for (Link l : getLinks()) {
+			tmp.append(l.hashCode());
+			if (i != getLinks().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("] Metadata[");
+		i = 0;
+		for (Metadata m : getMetadata()) {
+			tmp.append(m.hashCode());
+			if (i != getMetadata().size() - 1) {
+				tmp.append(", ");
+			}
+			i++;
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+	@Override
+	public String getRawData() {
+		return mRawData;
+	}
+	
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (o == this)
+			return true;
+		if (!(o instanceof Identifier)) {
+			return false;
+		}
+		Identifier other = (Identifier) o;
+		if (!getTypeName().equals(other.getTypeName()))
+			return false;
+
+		List<String> myProperties = getProperties();
+		if (myProperties.size() != other.getProperties().size()) {
+			return false;
+		}
+		for (String property : myProperties) {
+			String myValue = valueFor(property);
+			if (myValue == null) {
+				if (!(other.valueFor(property) == null))
+					return false;
+			} else {
+				if (!myValue.equals(other.valueFor(property)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result + getTypeName().hashCode();
+		List<String> keys = getProperties();
+		Collections.sort(keys);
+		for (String key : keys) {
+			result = prime * result + valueFor(key).hashCode();
+		}
+		return result;
+	}
+
+
+}

@@ -36,4 +36,33 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.util;
 
+
+
+public final class ConfigParameter {
+
+	public static final String IFMAP_TRUSTSTORE_PATH = "ifmap.truststore.path";
+	public static final String IFMAP_BASIC_AUTH_URL = "ifmap.auth.url";
+	public static final String IFMAP_USER = "ifmap.user";
+	public static final String IFMAP_PASS = "ifmap.pw";
+	public static final String IFMAP_START_IDENTIFIER = "ifmap.start.identifier";
+	public static final String IFMAP_START_IDENTIFIER_TYPE = "ifmap.start.type";
+	public static final String IFMAP_MAX_DEPTH = "ifmap.maxdepth";
+	public static final String IFMAP_MAX_SIZE = "ifmap.maxsize";
+	public static final String IFMAP_SUBSCRIPTION_NAME = "ifmap.subscription.name";
+	public static final String IFMAP_SUBSCRIPTION_DUMPING = "ifmap.subscription.dumping";
+
+	public static final String IFMAP_MAX_RETRY = "ifmap.connection.maxretry";
+	public static final String IFMAP_RETRY_INTERVAL = "ifmap.connection.retryinterval";
+
+	public static final String NEO4J_DB_PATH = "neo4j.db.path";
+	public static final String NEO4J_HASH_ALGO = "neo4j.db.hashalgo";
+	public static final String NEO4J_CLEAR_DB_ON_STARTUP = "neo4j.db.clear";
+
+	public static final String DS_REST_URL = "rest.url";
+	public static final String DS_REST_ENABLE = "rest.enable";
+	public static final String DS_CACHE_ENABLE = "cache.enable";
+	public static final String DS_CACHE_SIZE = "cache.size";
+
+}

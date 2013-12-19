@@ -36,4 +36,138 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.fhhannover.inform.trust.visitmeta.interfaces.Metadata;
+
+public class MetadataImpl implements Metadata {
+	private Map<String, String> mProperties;
+	private String mTypename;
+	private boolean mIsSingleValue;
+	private long mPublishTimestamp;
+	private String mRawData;
+
+	private MetadataImpl() {
+		mProperties = new HashMap<String, String>();
+	}
+
+	public MetadataImpl(InternalMetadata m) {
+		this();
+		mTypename = m.getTypeName();
+		mRawData = m.getRawData();
+		for (String key : m.getProperties()) {
+			addProperty(key, m.valueFor(key));
+		}
+		mIsSingleValue = m.isSingleValue();
+		mPublishTimestamp = m.getPublishTimestamp();
+	}
+
+	public MetadataImpl(String typename, boolean isSingleValue, long publishTimestamp) {
+		this();
+		mTypename = typename;
+		mIsSingleValue = isSingleValue;
+		mPublishTimestamp = publishTimestamp;
+	}
+
+	public void addProperty(String key, String value) {
+		mProperties.put(key, value);
+	}
+
+	@Override
+	public List<String> getProperties() {
+		return new ArrayList<String>(mProperties.keySet());
+	}
+
+	@Override
+	public boolean hasProperty(String p) {
+		if (mProperties.containsKey(p)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String valueFor(String p) {
+		return mProperties.get(p);
+	}
+
+	@Override
+	public String getTypeName() {
+		return mTypename;
+	}
+
+	@Override
+	public boolean isSingleValue() {
+		return mIsSingleValue;
+	}
+
+	@Override
+	public long getPublishTimestamp() {
+		return mPublishTimestamp;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer tmp = new StringBuffer();
+		tmp.append(getTypeName() + "[" + hashCode() + "] Properties[");
+		for (String p : getProperties()) {
+			tmp.append("(" + p + ", " + valueFor(p) + ")");
+		}
+		tmp.append("]");
+		return tmp.toString();
+	}
+
+	@Override
+	public String getRawData() {
+		return mRawData;
+	}
+
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (! (o instanceof Metadata) )
+			return false;
+		Metadata other = (Metadata) o;
+		if (!getTypeName().equals(other.getTypeName()))
+			return false;
+		if (getProperties().size() != other.getProperties().size()) {
+			return false;
+		}
+		for (String property : getProperties()) {
+			String value = valueFor(property);
+			if (value == null) {
+				if (!(other.valueFor(property) == null))
+					return false;
+			} else {
+				if (!valueFor(property).equals(other.valueFor(property)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result + getTypeName().hashCode();
+		List<String> keys = getProperties();
+		Collections.sort(keys);
+		for (String key : keys) {
+			result = prime * result + valueFor(key).hashCode();
+		}
+		return result;
+	}
+	
+}

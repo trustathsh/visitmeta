@@ -36,4 +36,31 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.dataservice.graphservice;
 
+
+
+import de.fhhannover.inform.trust.visitmeta.interfaces.Identifier;
+import de.fhhannover.inform.trust.visitmeta.interfaces.IdentifierPair;
+
+public class IdentifierPairImpl implements IdentifierPair {
+	private Identifier mFirst;
+	private Identifier mSecond;
+
+	public IdentifierPairImpl(Identifier id1,
+			Identifier id2) {
+		mFirst = id1;
+		mSecond = id2;
+	}
+
+	@Override
+	public Identifier getFirst() {
+		return mFirst;
+	}
+
+	@Override
+	public Identifier getSecond() {
+		return mSecond;
+	}
+
+}

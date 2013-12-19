@@ -36,4 +36,74 @@
  * limitations under the License.
  * #L%
  */
+package de.fhhannover.inform.trust.visitmeta.ifmap;
 
+
+
+import java.util.List;
+
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.fhhannover.inform.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+
+/**
+ * Represents one ResultItem as specified by the IF-MAP protocol.
+ */
+public class ResultItem {
+
+	private final InternalIdentifier mId1;
+	private final InternalIdentifier mId2;
+
+	private final List<InternalMetadata> mMetadata;
+
+	private final boolean mIsLinkUpdate;
+
+	public ResultItem(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> metadata) {
+		super();
+		mId1 = id1;
+		mId2 = id2;
+		mMetadata = metadata;
+
+		if (id1 == null) {
+			throw new IllegalArgumentException("id1 cannot be null");
+		}
+
+		if (id1 != null && id2 != null) {
+			mIsLinkUpdate = true;
+		} else {
+			mIsLinkUpdate = false;
+		}
+	}
+
+	public InternalIdentifier getId1() {
+		return mId1;
+	}
+
+	public InternalIdentifier getId2() {
+		return mId2;
+	}
+
+	public List<InternalMetadata> getMetadata() {
+		return mMetadata;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder s = new StringBuilder("ResultItem(");
+		s.append(mId1);
+		s.append(" -- ");
+		for (InternalMetadata m : mMetadata) {
+			s.append(m);
+			s.append(" ");
+		}
+		s.append("-- ");
+		s.append(mId2);
+		s.append("[");
+		s.append(mIsLinkUpdate);
+		s.append("])");
+
+		return s.toString();
+	}
+
+
+
+}

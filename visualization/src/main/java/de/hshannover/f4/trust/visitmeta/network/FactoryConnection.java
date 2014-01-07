@@ -79,28 +79,37 @@ public abstract class FactoryConnection {
 		LOGGER.trace("Method getConnection(" + type + ") called.");
 		GraphService graphService = null;
 		switch(type) {
-			case LOCAL:
-				LOGGER.error("Created a new local connection to dataservice");
-				throw new UnsupportedOperationException("Local connection not implemented.");
-			case REST:
-				String url = PropertiesManager.getProperty(
-						"application",
-						"restservice.url",
-						"http://localhost:8000");
-				boolean includeRawXML = Boolean.parseBoolean(PropertiesManager.getProperty(
-						"application",
-						"restservice.rawxml",
-						"true"));
-				ClientConfig config = new DefaultClientConfig();
-				Client client = Client.create(config);
-				URI uri = UriBuilder.fromUri(url + "/graph").build();
-				WebResource service = client.resource(uri);
-				
-				graphService = new ProxyGraphService(service, includeRawXML);
-				LOGGER.info("Create a new REST connection to dataservice with URI: " + uri);
-				System.out.println(graphService.getCurrentGraph());
-				return new Connection(graphService);
-			default: 
+		case LOCAL:
+			LOGGER.error("Created a new local connection to dataservice");
+			throw new UnsupportedOperationException("Local connection not implemented.");
+		case REST:
+			String url = PropertiesManager.getProperty(
+					"application",
+					"restservice.url",
+					"http://localhost:8000");
+			boolean includeRawXML = Boolean.parseBoolean(PropertiesManager.getProperty(
+					"application",
+					"restservice.rawxml",
+					"true"));
+			ClientConfig config = new DefaultClientConfig();
+			Client client = Client.create(config);
+
+			URI uri_connect = UriBuilder.fromUri(url + "/default/connect").build(); // FIXME HotFix for new Rest Interface
+			WebResource temp1 = client.resource(uri_connect);
+			LOGGER.info("Dataservice: " + temp1.put(String.class));
+
+			URI uri_start_dump = UriBuilder.fromUri(url + "/default/dump/start").build(); // FIXME HotFix for new Rest Interface
+			WebResource temp2 = client.resource(uri_start_dump);
+			LOGGER.info("Dataservice: " + temp2.put(String.class));
+
+			URI uri = UriBuilder.fromUri(url + "/default/graph").build(); // FIXME HotFix for new Rest Interface
+			WebResource service = client.resource(uri);
+
+			graphService = new ProxyGraphService(service, includeRawXML);
+			LOGGER.info("Create a new REST connection to dataservice with URI: " + uri);
+			System.out.println(graphService.getCurrentGraph());
+			return new Connection(graphService);
+		default:
 			throw new RuntimeException("Error creating connection to dataservice; tried with type '" + type.name() + "'");
 		}
 	}

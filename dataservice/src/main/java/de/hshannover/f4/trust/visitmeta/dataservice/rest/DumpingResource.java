@@ -1,5 +1,3 @@
-package de.hshannover.f4.trust.visitmeta.dataservice.rest;
-
 /*
  * #%L
  * =====================================================
@@ -38,13 +36,19 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
  * limitations under the License.
  * #L%
  */
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
+
+
 
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 
 
 @Path("{connectionName}/dump")
@@ -60,20 +64,19 @@ public class DumpingResource {
 	 */
 	@PUT
 	@Path("start")
-	public String startDump(@PathParam("connectionName") String name) {
-
+	public Response startDump(@PathParam("connectionName") String name) {
 		try {
 
 			ConnectionManager.deleteSubscriptionsFromConnection(name);
-
 			ConnectionManager.startDumpingServiceFromConnection(name);
 
+		} catch (ActiveDumpingException e){
+			return Response.ok().entity("INFO: Dumping allready started").build();
 		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-			return "ERROR: dumping is not running: " + e.getClass().getSimpleName();
-		};
-
-		return "INFO: dumping starts successfully";
+		return Response.ok().entity("INFO: dumping starts successfully").build();
 	}
 
 	/**
@@ -85,17 +88,17 @@ public class DumpingResource {
 	 */
 	@PUT
 	@Path("stop")
-	public String stopDump(@PathParam("connectionName") String name) {
-
+	public Response stopDump(@PathParam("connectionName") String name) {
 		try{
 
 			ConnectionManager.stopDumpingServiceFromConnection(name);
 
+		} catch (NoActiveDumpingException e){
+			return Response.ok().entity("INFO: Dumping allready stoped").build();
 		} catch (ConnectionException e) {
-
-			return "ERROR: " + e.getClass().getSimpleName();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		};
 
-		return "INFO: dumping stop successfully";
+		return Response.ok().entity("INFO: dumping stop successfully").build();
 	}
 }

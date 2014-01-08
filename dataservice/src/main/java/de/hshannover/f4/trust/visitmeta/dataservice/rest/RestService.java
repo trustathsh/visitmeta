@@ -38,6 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
+
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,23 +76,19 @@ public class RestService implements Runnable {
 			// TODO shutdown server properly
 
 		} catch (Exception e) {
-
 			throw new RuntimeException(e);
 		}
 
 		try {
 
 			synchronized (this){
-
-				wait();
+				wait(); // FIXME
 			}
 
 		} catch (InterruptedException e) {
-
 			log.error(e.getMessage(), e);
 		}
 
 		log.debug("... run()");
 	}
-
 }

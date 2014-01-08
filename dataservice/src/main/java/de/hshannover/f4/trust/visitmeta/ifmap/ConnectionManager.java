@@ -38,6 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +47,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -54,8 +58,15 @@ public class ConnectionManager {
 
 	private static Logger log = Logger.getLogger(ConnectionManager.class);
 
+	private static final String TRUSTSTORE_PATH = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+	private static final String TRUSTSTORE_PASS = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+
 	private static Map<String, Connection> conPool = new HashMap<String,Connection>();
 
+
+	public static Connection newConnection(String name, String url, String user, String userPass){
+		return newConnection(name, url, user, userPass, TRUSTSTORE_PATH, TRUSTSTORE_PASS);
+	}
 
 	public static Connection newConnection(String name, String url, String user, String userPass, String truststore, String truststorePass){
 		log.trace("new connection " + name + "...");
@@ -68,22 +79,13 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * Delete a a saved connection.
+	 * Delete a saved connection.
 	 * 
 	 * @param name Is the connection name.
 	 * @throws ConnectionException
 	 */
 	public static void removeConnection(String name) throws ConnectionException{
-		//		log.trace("remove connection " + name + "...");
-
-		//		if(!getConnection(name).isConnected()){
-		//			conPool.remove(name);
-		//		}
-		//TODO läuft der updateThread noch ? Dumping??
-
-		log.info(" TODO ");
-
-		//		log.info("connection " + name + " were deleted");
+		log.info(" TODO "); //TODO removeConnection()
 	}
 
 	/**
@@ -117,18 +119,34 @@ public class ConnectionManager {
 	/**
 	 * @return All saved connections.
 	 */
-	// TODO aktive connections abfragen
 	public static String getSavedConnections(){
+		log.trace("getSavedConnections()...");
 
 		StringBuilder sb = new StringBuilder();
 
 		for(Connection c: conPool.values()){
-
 			sb.append(c).append("\n");
 		}
 
-		log.trace("get active connections ...\n" + sb.toString());
+		log.trace("Saved-Connections: \n" + sb.toString());
+		return sb.toString();
+	}
 
+	/**
+	 * @return All active connections.
+	 */
+	public static String getActiveConnections(){
+		log.trace("getActiveConnections()...");
+
+		StringBuilder sb = new StringBuilder();
+
+		for(Connection c: conPool.values()){
+			if(c.isConnected()){
+				sb.append(c).append("\n");
+			}
+		}
+
+		log.trace("Active-Connections: \n" + sb.toString());
 		return sb.toString();
 	}
 
@@ -213,20 +231,16 @@ public class ConnectionManager {
 	}
 
 	private static Connection getConnection(String connectionName) throws NoSavedConnectionException{
-
 		if(conPool.containsKey(connectionName)){
-
 			return conPool.get(connectionName);
 		}
 
 		NoSavedConnectionException e = new NoSavedConnectionException();
-		log.error(e.getClass().getSimpleName());
+		log.error(e.toString());
 		throw e;
 	}
 
 	/**
-	 * 
-	 * 
 	 * @param name Is the connection name.
 	 * @return A SimpleGraphService from the Neo4J-Database.
 	 * @throws ConnectionException

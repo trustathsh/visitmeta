@@ -38,6 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,9 +65,10 @@ import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class DumpingService implements Runnable {
 
-	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
-	
+
 	private static final Logger log = Logger.getLogger(DumpingService.class);
+
+	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
 
 	private static Set<String> activeSubscriptions;
 
@@ -104,7 +107,6 @@ public class DumpingService implements Runnable {
 				dump = dump(null);
 
 			} catch (ConnectionException e) {
-
 				break;
 			}
 
@@ -112,23 +114,18 @@ public class DumpingService implements Runnable {
 				lastUpdate = Long.parseLong(dump.getLastUpdate());
 
 				if (lastUpdate > time) {
-
 					time = lastUpdate;
 					Collection<Identifier> identifier = dump.getIdentifiers();
 
 					if (identifier != null && !identifier.isEmpty()) {
-
 						Set<String> newUuids;
-
 						try {
 
 							newUuids = subscribeUpdateForDumping(identifier, 10);
 
 						} catch (ConnectionException e) {
-
 							break;
 						}
-
 						activeSubscriptions.addAll(newUuids);
 					}
 				}
@@ -139,7 +136,6 @@ public class DumpingService implements Runnable {
 				Thread.sleep(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_DUMPING_SLEEPTIME)));
 
 			} catch (InterruptedException e) {
-
 				log.debug(e.getMessage());
 				break;
 			}
@@ -148,36 +144,28 @@ public class DumpingService implements Runnable {
 	}
 
 	public DumpResult dump(String filter) throws ConnectionException {
-
-		mConnection.isConnectionEstablished();
+		mConnection.checkIsConnectionEstablished();
 
 		Result res = null;
 		DumpRequest dreq = new DumpRequestImpl(filter);
-
 		try {
 
 			res = mSsrc.genericRequestWithSessionId(dreq);
 
 		} catch (IfmapErrorResult e) {
-
-			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		} catch (IfmapException e) {
-
-			log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 		}
 
-		// If we don't get back a DumpResult instance
 		if (!(res instanceof DumpResult)){
-
-			IfmapConnectionException e = new IfmapConnectionException();
-
-			log.error(e.getMessage(), e);
-
+			IfmapConnectionException e = new IfmapConnectionException(new IfmapException("Can't cast to DumpResult", "If we don't get back a DumpResult instance"));
+			log.error(e.toString(), e);
 			throw e;
 		}
 
@@ -196,11 +184,10 @@ public class DumpingService implements Runnable {
 			while (iter.hasNext()) {
 				SubscribeUpdate update = Requests.createSubscribeUpdate();
 				Identifier ident = iter.next();
-
 				String uuid = CryptoUtil.generateMD5BySize(ident.toString(), 16);
 				update.setName(uuid);
-
 				update.setStartIdentifier(ident);
+
 				update.setMaxSize(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
 				log.trace("Setting max_size for connection to: " + update.getMaxSize());
 
@@ -212,7 +199,6 @@ public class DumpingService implements Runnable {
 				log.trace("Setting max_depth for connection to: " + update.getMaxDepth());
 
 				if(!activeSubscriptions.contains(uuid) && !uuids.contains(uuid)){
-
 					if(req == null){
 						req = Requests.createSubscribeReq();
 					}
@@ -220,11 +206,9 @@ public class DumpingService implements Runnable {
 					req.addSubscribeElement(update);
 					uuids.add(uuid);
 				}
-
 			}
 
 			if(req != null){
-
 				log.trace("send subscribe(req)...");
 				subscribe(req);
 				log.debug(uuids.size() + " new Identifier was subscribe");
@@ -236,26 +220,22 @@ public class DumpingService implements Runnable {
 	}
 
 	public void subscribe(SubscribeRequest request) throws ConnectionException {
-
 		try {
 
 			mSsrc.subscribe(request);
 
 		} catch (IfmapErrorResult e) {
-
-			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		} catch (IfmapException e) {
-
-			log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 		}
 
 		for(SubscribeElement r: request.getSubscribeElements()){
-
 			activeSubscriptions.add(r.getName());
 		}
 	}

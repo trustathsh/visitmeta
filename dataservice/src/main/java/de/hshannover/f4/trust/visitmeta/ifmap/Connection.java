@@ -36,8 +36,9 @@
  * limitations under the License.
  * #L%
  */
-
 package de.hshannover.f4.trust.visitmeta.ifmap;
+
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -74,40 +75,27 @@ import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class Connection {
 
-	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
-	
 	private Logger log = Logger.getLogger(Connection.class);
 
+	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
 
 	private Neo4JDatabase mNeo4JDb;
-
 	private UpdateService mUpdateService;
-
 	private DumpingService mDumpingService;
 
-
 	private Thread mUpdateThread;
-
 	private Thread mDumpingThread;
-
 
 	private ThreadSafeSsrc mSsrc;
 
 	private boolean connected = false;
 
-
 	private String mConnectionName;
-
 	private String mUrl;
-
 	private String mUser;
-
 	private String mUserPass;
-
 	private String mTruststore;
-
 	private String mTruststorePass;
-
 
 	private Set<String> activeSubscriptions;
 
@@ -134,16 +122,14 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void connect() throws ConnectionException {
-
-		isConnectionDisconnected();
+		checkIsConnectionDisconnected();
 
 		initSsrc(mUrl, mUser, mUserPass, mTruststore, mTruststorePass);
 		initSession();
-
 	}
 
 	private void initSsrc(String url, String user, String userPass, String truststore, String truststorePass) throws IfmapConnectionException {
-		log.debug("init SSRC ...");
+		log.trace("init SSRC ...");
 
 		try {
 
@@ -151,44 +137,37 @@ public class Connection {
 			mSsrc = new ThreadSafeSsrc(url, user, userPass, tms);
 
 		} catch (InitializationException e) {
-
-			log.error("Description: " + e.getDescription() + " | ErrorMessage: " + e.getMessage(), e);
-
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
 			resetConnection();
-
-			throw new IfmapConnectionException();
+			throw ee;
 		}
 
-		log.debug("... init SSRC OK");
+		log.debug("init SSRC OK");
 	}
 
 	private void initSession() throws IfmapConnectionException {
-		log.debug("creating new SSRC session ...");
+		log.trace("creating new SSRC session ...");
 
 		try {
 
 			mSsrc.newSession(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
-
 			setConnected(true);
 
 		} catch (IfmapErrorResult e) {
-
-			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
 			resetConnection();
-
-			throw new IfmapConnectionException();
+			throw ee;
 
 		} catch (IfmapException e) {
-
-			log.error("Description: " + e.getDescription() + " | ErrorMessage: " + e.getMessage(), e);
-
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
 			resetConnection();
-
-			throw new IfmapConnectionException();
+			throw ee;
 		}
 
-		log.debug("... new SSRC session OK");
+		log.debug("new SSRC session OK");
 	}
 
 	/**
@@ -197,57 +176,49 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void disconnect() throws ConnectionException {
-
-		isConnectionEstablished();
+		checkIsConnectionEstablished();
 
 		try {
 
-			log.debug("endSession() ...");
+			log.trace("endSession() ...");
 			mSsrc.endSession();
-			log.debug("... endSession() OK");
+			log.debug("endSession() OK");
 
-			log.debug("closeTcpConnection() ...");
+			log.trace("closeTcpConnection() ...");
 			mSsrc.closeTcpConnection();
-			log.debug("... closeTcpConnection() OK");
+			log.debug("closeTcpConnection() OK");
 
 		} catch (IfmapErrorResult e) {
-
-			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		} catch (CommunicationException e) {
-
-			log.error("ErrorMessage: " + e.getMessage(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		} catch (IfmapException e) {
-
-			log.error("Description: " + e.getDescription() + " | ErrorMessage: " + e.getMessage(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		}finally{
-
 			resetConnection();
 		}
 	}
 
 	private void startUpdateService() throws ConnectionException{
-
 		if(mUpdateThread == null || !mUpdateThread.isAlive()){
-
 			log.trace("start UpdateService from connection " + mConnectionName + " ...");
 
-			isConnectionEstablished();
+			checkIsConnectionEstablished();
 
 			if(mUpdateService == null){
 				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(), new InMemoryIdentifierFactory(), new InMemoryMetadataFactory());
 			}
 
 			mUpdateThread = new Thread(mUpdateService, "UpdateThread-" + mConnectionName);
-
 			mUpdateThread.start();
 
 			log.debug("UpdateService for connection " + mConnectionName + " started");
@@ -260,21 +231,13 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void startDumpingService() throws ConnectionException{
-
-		isConnectionEstablished();
-
-		isDumpingStopped();
-
+		checkIsConnectionEstablished();
+		checkIsDumpingStopped();
 		startUpdateService();
 
-		if(mDumpingService == null){
-			mDumpingService = new DumpingService(this, mSsrc);
-		}
-
 		if(mDumpingThread == null || !mDumpingThread.isAlive()){
-
+			mDumpingService = new DumpingService(this, mSsrc);
 			mDumpingThread = new Thread(mDumpingService, "DumpingThread-" + mConnectionName);
-
 			mDumpingThread.start();
 		}
 	}
@@ -285,10 +248,8 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void stopDumpingService() throws ConnectionException{
-
-		isConnectionEstablished();
-
-		isDumpingActive();
+		checkIsConnectionEstablished();
+		checkIsDumpingActive();
 
 		mDumpingThread.interrupt();
 		mDumpingThread = null;
@@ -301,39 +262,31 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void subscribe(SubscribeRequest request) throws ConnectionException {
-
-		isConnectionEstablished();
-
-		isDumpingStopped();
-
+		checkIsConnectionEstablished();
+		checkIsDumpingStopped();
 		startUpdateService();
 
 		if(request == null || !request.getSubscribeElements().isEmpty()){
-
 			try {
 
 				mSsrc.subscribe(request);
 
 			} catch (IfmapErrorResult e) {
-
-				log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
-				throw new IfmapConnectionException();
+				IfmapConnectionException ee = new IfmapConnectionException(e);
+				log.error(ee.toString(), ee);
+				throw ee;
 
 			} catch (IfmapException e) {
+				IfmapConnectionException ee = new IfmapConnectionException(e);
+				log.error(ee.toString(), ee);
+				throw ee;
 
-				log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
-
-				throw new IfmapConnectionException();
 			}
 
 			for(SubscribeElement r: request.getSubscribeElements()){
-
 				activeSubscriptions.add(r.getName());
 			}
-
 		}else{
-
 			log.warn("Subscribe-Request was null or empty.");
 		}
 	}
@@ -345,30 +298,26 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public PollResult poll() throws ConnectionException {
-
-		isConnectionEstablished();
+		checkIsConnectionEstablished();
 
 		try {
 
 			return mSsrc.getArc().poll();
 
 		} catch (IfmapErrorResult e) {
-
-			log.error("ErrorCode: " + e.getErrorCode() + " | ErrorString: " + e.getErrorString(), e);
-
-			throw new IfmapConnectionException();
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
 		} catch (EndSessionException e) {
-
 			//	Nothing to log while disconnecting from MAP-Server
-
 			throw new ConnectionCloseException();
 
 		} catch (IfmapException e) {
+			IfmapConnectionException ee = new IfmapConnectionException(e);
+			log.error(ee.toString(), ee);
+			throw ee;
 
-			log.error("Description: " + e.getDescription()+ " | ErrorMessage: " + e.getMessage(), e);
-
-			throw new IfmapConnectionException();
 		}
 	}
 
@@ -379,12 +328,10 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void deleteSubscribe(String sName) throws ConnectionException {
-
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeDelete subscribe = Requests.createSubscribeDelete(sName);
 
 		request.addSubscribeElement(subscribe);
-
 		subscribe(request);
 
 		activeSubscriptions.remove(sName);
@@ -396,11 +343,9 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public void deleteSubscriptions() throws ConnectionException{
-
 		SubscribeRequest request = Requests.createSubscribeReq();
 
 		for(String sKey: activeSubscriptions){
-
 			SubscribeDelete subscribe = Requests.createSubscribeDelete(sKey);
 			request.addSubscribeElement(subscribe);
 		}
@@ -412,7 +357,6 @@ public class Connection {
 
 	@Override
 	public String toString(){
-
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Connection: ").append(mConnectionName).append(" | URL: ");
@@ -426,9 +370,7 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public String getSessionId() throws ConnectionException {
-
-		isConnectionEstablished();
-
+		checkIsConnectionEstablished();
 		return mSsrc.getSessionId();
 	}
 
@@ -437,68 +379,41 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public String getPublisherId() throws ConnectionException{
-
-		isConnectionEstablished();
-
+		checkIsConnectionEstablished();
 		return mSsrc.getPublisherId();
 	}
 
-	public boolean isConnectionEstablished() throws NotConnectedException{
-
+	public void checkIsConnectionEstablished() throws NotConnectedException{
 		if(mSsrc == null || !isConnected() || mSsrc.getSessionId() == null){
-
 			NotConnectedException e = new NotConnectedException();
-
-			log.error(e.getClass().getSimpleName());
-
+			log.error(e.toString());
 			resetConnection();
-
 			throw e;
 		}
-
-		return true;
 	}
 
-	private boolean isConnectionDisconnected() throws ConnectionEstablishedException {
-
+	private void checkIsConnectionDisconnected() throws ConnectionEstablishedException {
 		if(mSsrc != null && isConnected() && mSsrc.getSessionId() != null){
-
 			ConnectionEstablishedException e = new ConnectionEstablishedException();
-
-			log.error(e.getClass().getSimpleName());
-
+			log.error(e.toString());
 			throw e;
 		}
-
-		return true;
 	}
 
-	private boolean isDumpingActive() throws NoActiveDumpingException {
-
+	private void checkIsDumpingActive() throws NoActiveDumpingException {
 		if(mDumpingThread == null || !mDumpingThread.isAlive()){
-
 			NoActiveDumpingException e = new NoActiveDumpingException();
-
-			log.error(e.getClass().getSimpleName());
-
+			log.error(e.toString());
 			throw e;
 		}
-
-		return true;
 	}
 
-	private boolean isDumpingStopped() throws ActiveDumpingException {
-
+	private void checkIsDumpingStopped() throws ActiveDumpingException {
 		if(mDumpingThread != null && mDumpingThread.isAlive()){
-
 			ActiveDumpingException e = new ActiveDumpingException();
-
-			log.error(e.getClass().getSimpleName());
-
+			log.error(e.toString());
 			throw e;
 		}
-
-		return true;
 	}
 
 	/**
@@ -506,15 +421,11 @@ public class Connection {
 	 * @throws ConnectionException
 	 */
 	public Set<String> getActiveSubscriptions() throws ConnectionException {
-
-		isConnectionEstablished();
-
-		isDumpingStopped();
-
+		checkIsConnectionEstablished();
+		checkIsDumpingStopped();
 		HashSet<String> temp = new HashSet<String>(activeSubscriptions);
 
 		log.trace("getActiveSubscriptions(): " + temp);
-
 		return temp;
 	}
 
@@ -546,3 +457,4 @@ public class Connection {
 		return mNeo4JDb.getGraphService();
 	}
 }
+

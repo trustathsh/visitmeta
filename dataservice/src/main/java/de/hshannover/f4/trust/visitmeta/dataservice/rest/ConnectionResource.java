@@ -1,5 +1,3 @@
-package de.hshannover.f4.trust.visitmeta.dataservice.rest;
-
 /*
  * #%L
  * =====================================================
@@ -38,109 +36,106 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
  * limitations under the License.
  * #L%
  */
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.util.Iterator;
+
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpException;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 
 
 @Path("/")
 public class ConnectionResource {
 
-
 	private static final Logger log = Logger.getLogger(ConnectionResource.class);
 
-
-	public static final String JSON_KEY_CONNECTION_NAME = "connectionName";
-
 	public static final String JSON_KEY_CONNECTION_URL = "url";
-
 	public static final String JSON_KEY_CONNECTION_USER = "user";
-
 	public static final String JSON_KEY_CONNECTION_USER_PASS = "userPass";
 
-	public static final String JSON_KEY_CONNECTION_TRUSTSTORE = "truststore";
-
-	public static final String JSON_KEY_CONNECTION_TRUSTSTORE_PASS = "truststorePass";
+	@QueryParam("onlyActive")
+	@DefaultValue("false")
+	private boolean mOnlyActive = false;
 
 
 	/**
-	 * Delete a a saved connection.
+	 * Delete a saved connection.
 	 * 
-	 * Example-URL: <tt>http://example.com:8000/default/delete</tt>
+	 * Example-URL: <tt>http://example.com:8000/default</tt>
 	 */
 	@DELETE
-	@Path("{connectionName}/delete")
-	public String deleteConnection(@PathParam("connectionName") String name) {
-		return "INFO: TODO"; // TODO
+	@Path("{connectionName}")
+	public Response deleteConnection(@PathParam("connectionName") String name) {
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Not implemented").build();
 	}
 
 	/**
 	 * Saved a new connection to a MAP-Server with a JSONObject.
 	 * 
-	 * Example-URL: <tt>http://example.com:8000/save</tt>
+	 * Example-URL: <tt>http://example.com:8000/default</tt>
 	 * 
 	 * Example-JSONObject:
 	 * {
-	 *  connectionName:con1,
 	 *  url:"https://localhost:8443",
 	 *  user:visitmeta,
 	 *  userPass:visitmeta,
-	 *  truststore:"/visitmeta.jks",
-	 *  truststorePass:visitmeta
 	 * }
 	 */
 	@PUT
-	@Path("save")
+	@Path("{connectionName}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String saveConnection(JSONObject jObj) {
-
+	public Response saveConnection(@PathParam("connectionName") String name, JSONObject jObj) {
 		try {
 
-			saveNewConnection(jObj);
+			ConnectionManager.newConnection(name, jObj.getString(JSON_KEY_CONNECTION_URL), jObj.getString(JSON_KEY_CONNECTION_USER),
+					jObj.getString(JSON_KEY_CONNECTION_USER_PASS));
 
 		} catch (JSONException e) {
-
-			return e.getMessage();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
-		return "INFO: connection was saved";
+		return Response.ok().entity("INFO: connection was saved").build();
 	}
-
 
 	/**
 	 * Conneced the dataservice with connection default to a MAP-Server.
 	 * 
 	 * Example-URL: <tt>http://example.com:8000/default/connect</tt>
+	 * @throws HttpException
 	 * 
 	 **/
 	@PUT
 	@Path("{connectionName}/connect")
-	public String connect(@PathParam("connectionName") String name) {
-
+	public Response connect(@PathParam("connectionName") String name) {
 		try {
 
 			ConnectionManager.connectTo(name);
 
+		} catch (ConnectionEstablishedException e){
+			return Response.ok().entity("INFO: connection allready aktive").build();
 		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-			return "ERROR: " + e.getClass().getSimpleName() +", connecting fail.";
-		};
-
-		return "INFO: connection successfully";
+		return Response.ok("INFO: connecting successfully").build();
 	}
 
 	/**
@@ -151,87 +146,34 @@ public class ConnectionResource {
 	 **/
 	@PUT
 	@Path("{connectionName}/disconnect")
-	public String disconnect(@PathParam("connectionName") String name) {
-
+	public Response disconnect(@PathParam("connectionName") String name) {
 		try {
 
 			ConnectionManager.disconnectFrom(name);
 
+		} catch (NotConnectedException e){
+			return Response.ok().entity("INFO: connection allready disconnected").build();
 		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-			return "ERROR: " + e.getClass().getSimpleName() + ", disconnecting fail.";
-		};
-
-		return "INFO: disconnection successfully";
+		return Response.ok().entity("INFO: disconnection successfully").build();
 	}
 
 	/**
 	 * Returns a JSONObject with saved connections to a MAP-Server.
-	 * 
 	 * Example-URL: <tt>http://example.com:8000/</tt>
 	 * 
+	 * You can set the onlyActive value of true.
+	 * Example-URL: <tt>http://example.com:8000/?onlyActive=true</tt>
 	 **/
 	@GET
 	public String getConnections() {
-		return ConnectionManager.getSavedConnections().toString();
+		if(mOnlyActive){
+			return ConnectionManager.getActiveConnections().toString();
+		}else{
+			return ConnectionManager.getSavedConnections().toString();
+		}
 	}
 
-	private void saveNewConnection(JSONObject jObj) throws JSONException {
-		String connectionName = null;
-		String url = null;
-		String user = null;
-		String userPass = null;
-		String truststore = null;
-		String truststorePass = null;
-
-		Iterator<String> i = jObj.keys();
-
-		while (i.hasNext()) {
-			String jKey = i.next();
-
-			switch (jKey) {
-
-			case JSON_KEY_CONNECTION_NAME:
-
-				connectionName = jObj.getString(jKey);
-				break;
-
-			case JSON_KEY_CONNECTION_URL:
-
-				url = jObj.getString(jKey);
-				break;
-
-			case JSON_KEY_CONNECTION_USER:
-
-				user = jObj.getString(jKey);
-				break;
-
-			case JSON_KEY_CONNECTION_USER_PASS:
-
-				userPass = jObj.getString(jKey);
-				break;
-
-			case JSON_KEY_CONNECTION_TRUSTSTORE:
-
-				truststore = jObj.getString(jKey);
-				break;
-
-			case JSON_KEY_CONNECTION_TRUSTSTORE_PASS:
-
-				truststorePass = jObj.getString(jKey);
-				break;
-
-			default:
-				log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for connections.");
-				break;
-			}
-		}
-
-		if(connectionName == null || url == null || user == null || userPass == null || truststore == null ||
-				truststorePass == null){
-			throw new JSONException("One or more keys was not a valide JSON-Key for connections.");
-		}
-
-		ConnectionManager.newConnection(connectionName, url, user, userPass, truststore, truststorePass);
-	}
 }

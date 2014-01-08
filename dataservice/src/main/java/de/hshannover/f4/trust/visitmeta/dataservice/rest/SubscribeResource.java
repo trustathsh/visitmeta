@@ -1,5 +1,3 @@
-package de.hshannover.f4.trust.visitmeta.dataservice.rest;
-
 /*
  * #%L
  * =====================================================
@@ -38,6 +36,9 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
  * limitations under the License.
  * #L%
  */
+package de.hshannover.f4.trust.visitmeta.dataservice.rest;
+
+
 
 import java.util.Iterator;
 
@@ -51,6 +52,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -70,9 +72,9 @@ import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
  * For each request a new object of this class will be created. The
- * resource is accessible under the path <tt>/subscribe</tt>.
+ * resource is accessible under the path <tt>{connectionName}/subscribe</tt>.
  * About this interface can be update and delete subscriptions. Untder the
- * path /subscribe/active return a list for all active subscriptions.
+ * path {connectionName}/subscribe/active return a list for all active subscriptions.
  *
  * @author Marcel Reichenbach
  *
@@ -84,29 +86,19 @@ public class SubscribeResource {
 
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
 
-
 	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
 
 	private static final int MAX_DEPTH = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-
 	private static final int MAX_SIZE = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
 	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
-
 	public static final String JSON_KEY_IDENTIFIER = "identifier";
-
 	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";
-
 	public static final String JSON_KEY_MAX_DEPTH = "maxDepth";
-
 	public static final String JSON_KEY_MAX_SIZE = "maxSize";
-
 	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
-
 	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
-
 	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
-
 
 	@QueryParam("deleteAll")
 	@DefaultValue("false")
@@ -121,17 +113,14 @@ public class SubscribeResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getActiveSubscriptions(@PathParam("connectionName") String connectionName) {
-
 		JSONArray activeSubscriptions;
-
 		try {
 
 			activeSubscriptions = new JSONArray(ConnectionManager.getActiveSubscriptionsFromConnection(connectionName));
 
 		} catch (ConnectionException e) {
-
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
 		return activeSubscriptions;
 	}
@@ -169,39 +158,32 @@ public class SubscribeResource {
 	@PUT
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String update(@PathParam("connectionName") String name, JSONObject jObj) {
-
+	public Response update(@PathParam("connectionName") String name, JSONObject jObj) {
 		try {
 
 			Iterator<String> i = jObj.keys();
-
 			while(i.hasNext()){
 				String jKey = i.next();
-
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
-
 				try{
 
 					subscribeUpdate(name, moreSubscribes);
 
-				} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-
-					return "ERROR: subscribe update was not send: " + e.getClass().getSimpleName();
-				};
+				} catch (ConnectionException e) {
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+				}
 			}
 
 		} catch (JSONException e) {
-
 			try{
 
 				subscribeUpdate(name, jObj);
 
-			} catch (ConnectionException ee) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-				return "ERROR: subscribe update was not send: " + ee.getClass().getSimpleName();
+			} catch (ConnectionException ee) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}
-
 		}
-		return "INFO: subscribe successfully";
+		return Response.ok().entity("INFO: subscribe successfully").build();
 	}
 
 	private void subscribeUpdate(String connectionName, JSONObject jObj) throws ConnectionException {
@@ -261,7 +243,6 @@ public class SubscribeResource {
 				}
 			}
 		} catch (JSONException e) {
-
 			log.error(e.getMessage(), e);
 		}
 
@@ -315,22 +296,19 @@ public class SubscribeResource {
 	 */
 	@DELETE
 	@Path("delete")
-	public String deleteAll(@PathParam("connectionName") String name) {
+	public Response delete(@PathParam("connectionName") String name) {
 		if(mDeleteAll){
 			try{
 
 				ConnectionManager.deleteSubscriptionsFromConnection(name);
 
-			} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+			} catch (ConnectionException e) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			}
 
-				return "ERROR: subscriptions not deleted: " + e.getClass().getSimpleName();
-			};
-
-			return "INFO: delete all active subscriptions successfully";
-
+			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
 		}else {
-
-			return "INFO: deleteAll value is not true, nothing were deleted";
+			return Response.status(Response.Status.NOT_MODIFIED).entity("INFO: deleteAll value is not true, nothing were deleted").build();
 		}
 	}
 
@@ -341,17 +319,15 @@ public class SubscribeResource {
 	 */
 	@DELETE
 	@Path("delete/{subscriptionName}")
-	public String delete(@PathParam("connectionName") String name, @PathParam("subscriptionName") String subscriptionName) {
-
+	public Response delete(@PathParam("connectionName") String name, @PathParam("subscriptionName") String subscriptionName) {
 		try{
 
 			ConnectionManager.deleteSubscribeFromConnection(name, subscriptionName);
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-			return "ERROR: subscription not deleted: " + e.getClass().getSimpleName();
-		};
-
-		return "INFO: delete subscription successfully";
+		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();
 	}
 }

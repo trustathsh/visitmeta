@@ -43,6 +43,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.util;
 public final class ConfigParameter {
 
 	public static final String IFMAP_TRUSTSTORE_PATH = "ifmap.truststore.path";
+	public static final String IFMAP_TRUSTSTORE_PASS = "ifmap.truststore.pw";
 	public static final String IFMAP_BASIC_AUTH_URL = "ifmap.auth.url";
 	public static final String IFMAP_USER = "ifmap.user";
 	public static final String IFMAP_PASS = "ifmap.pw";

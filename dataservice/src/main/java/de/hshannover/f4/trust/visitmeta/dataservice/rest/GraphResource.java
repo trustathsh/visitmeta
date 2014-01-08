@@ -50,9 +50,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
@@ -107,16 +107,14 @@ public class GraphResource {
 	@Path("changes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getChangesMap(@PathParam("connectionName") String name) {
-
 		JSONObject changes;
-
 		try{
 
 			changes = new JSONObject(ConnectionManager.getGraphServiceFromConnection(name).getChangesMap());
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
 		return changes;
 	}
@@ -129,20 +127,16 @@ public class GraphResource {
 	@Path("initial")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getInitialGraph(@PathParam("connectionName") String name) {
-
 		List<IdentifierGraph> graphs;
-
 		try{
 
 			graphs = ConnectionManager.getGraphServiceFromConnection(name).getInitialGraph();
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
-
-		return jsonGraphs;
+		return jsonMarshaller().toJson(graphs);
 	}
 
 	/**
@@ -155,20 +149,16 @@ public class GraphResource {
 	@Path("{at}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp) {
-
 		List<IdentifierGraph> graphs;
-
 		try{
 
 			graphs = ConnectionManager.getGraphServiceFromConnection(name).getGraphAt(timestamp);
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
-
-		return jsonGraphs;
+		return jsonMarshaller().toJson(graphs);
 	}
 
 	/**
@@ -182,19 +172,16 @@ public class GraphResource {
 	@Path("current")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getCurrentGraph(@PathParam("connectionName") String name) {
-
 		List<IdentifierGraph> graphs;
-
 		try{
 
 			graphs = ConnectionManager.getGraphServiceFromConnection(name).getCurrentGraph();
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-		JSONArray jsonGraphs = jsonMarshaller().toJson(graphs);
-		return jsonGraphs;
+		return jsonMarshaller().toJson(graphs);
 	}
 
 	/**
@@ -210,20 +197,16 @@ public class GraphResource {
 	@Path("{from}/{to}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getDelta(@PathParam("connectionName") String name, @PathParam("from") long t1, @PathParam("to") long t2) {
-
 		Delta delta;
-
 		try{
 
 			delta = ConnectionManager.getGraphServiceFromConnection(name).getDelta(t1, t2);
 
-		} catch (ConnectionException e) {	//TODO HTTP Status Code von 200 OK auf nin Fehler setzen
-			return "ERROR: " + e.getClass().getSimpleName();
-		};
+		} catch (ConnectionException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
 
-		JSONObject jsonDelta = jsonMarshaller().toJson(delta);
-
-		return jsonDelta;
+		return jsonMarshaller().toJson(delta);
 	}
 
 	/**

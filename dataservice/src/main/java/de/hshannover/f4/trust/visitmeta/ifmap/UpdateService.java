@@ -64,19 +64,15 @@ public class UpdateService implements Runnable {
 
 	private static final Logger log = Logger.getLogger(UpdateService.class);
 
+	protected final static int DEFAULT_MAX_RETRY = 10;
+	protected final static int DEFAULT_RETRY_INTERVAL = 10;
+
 	protected PropertiesReaderWriter config = Application.getIFMAPConfig();
 
 	protected final int MAX_DEPTH = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-
 	protected final int MAX_SIZE = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
-
 	protected final int MAX_RETRY;
-
-	protected final static int DEFAULT_MAX_RETRY = 10;
-
 	protected final int RETRY_INTERVAL;
-
-	protected final static int DEFAULT_RETRY_INTERVAL = 10;
 
 	private Connection mConnection;
 
@@ -143,26 +139,21 @@ public class UpdateService implements Runnable {
 		log.debug("run() ...");
 
 		while (!Thread.interrupted()) {
-
 			PollTask task = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
-
 			try {
 
 				PollResult pollResult = task.call();
 				mWriter.submitPollResult(pollResult);
 
 			} catch (ConnectionCloseException e) {
-
 				log.debug("Stop polling while: " + e.toString());
 				break;
 
 			} catch (PollException  e) {
-
 				log.error(e.toString(), e);
 				break;
 
 			} catch (ConnectionException e) {
-
 				log.error(e.toString(), e);
 				break;
 			}

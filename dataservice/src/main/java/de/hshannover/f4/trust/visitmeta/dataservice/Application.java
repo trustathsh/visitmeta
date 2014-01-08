@@ -40,22 +40,15 @@ package de.hshannover.f4.trust.visitmeta.dataservice;
 
 
 
-
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
-import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.persistence.Reader;
-import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
-import de.hshannover.f4.trust.visitmeta.persistence.Writer;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
@@ -69,22 +62,6 @@ public abstract class Application {
 
 	private static final Logger log = Logger.getLogger(Application.class);
 
-	/**
-	 * Interface to obtain IF-Map data graphs.
-	 */
-	private static SimpleGraphService mGraphService;
-	/**
-	 * Interface to submit raw IF-Map data into the database.
-	 */
-	private static ThreadedWriter mWriter;
-	/**
-	 * Interface to read raw IF-Map data from the database.
-	 */
-	private static Reader mReader;
-	/**
-	 * Service that subscribes to an IF-Map server to gather IF-Map data.
-	 */
-	private static UpdateService mUpdateService;
 	/**
 	 * Configuration class for the database.
 	 */
@@ -114,31 +91,35 @@ public abstract class Application {
 
 		log.info("Components initialized");
 
+		startRestService();
+
+		saveDefaultConnection();
+
 		log.info("Dataservice started successfully");
 
 	}
 
-	public static GraphService initDataservice() {
-		log.info("Application started");
-		initComponents();
-		log.info("Components initialized");
-		Thread updateThread = new Thread(mUpdateService, "UpdateThread");
-		updateThread.start();
-		log.info("UpdateService started");
-		Thread writerThread = new Thread(mWriter, "WriterThread");
-		writerThread.start();
-		log.info("Writer thread started");
-		if (getDSConfig().getProperty(ConfigParameter.DS_REST_ENABLE).equalsIgnoreCase("true")) {
+	private static void saveDefaultConnection() {
+		log.trace("save default connection...");
 
-			restServiceThread.start();
-		}
-		log.info("Dataservice started successfully");
-		return mGraphService;
+		String TRUSTSTORE_PATH = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+		String TRUSTSTORE_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
+		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
+		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
+
+		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS);
+
+		log.info("Default-Connection was saved!");
 	}
 
-	/**
-	 *
-	 */
+	private static void startRestService() {
+		restService = new RestService();
+		restServiceThread = new Thread(restService, "RestService-Thread");
+
+		restServiceThread.start();
+	}
+
 	private static void initComponents() {
 
 		try {
@@ -154,20 +135,6 @@ public abstract class Application {
 			throw new RuntimeException(msg, e);
 		}
 
-		restService = new RestService();
-		restServiceThread = new Thread(restService, "RestService-Thread");
-
-		restServiceThread.start();
-
-		log.info("save default connection");
-
-		String TRUSTSTORE_PATH = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
-		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
-		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
-		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
-
-		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, IFMAP_PASS);
-
 	}
 
 	public static MessageDigest loadHashAlgorithm() {
@@ -178,51 +145,6 @@ public abstract class Application {
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("could not load requested hash algorithm", e);
 		}
-	}
-
-
-	/**
-	 * @return
-	 */
-	public static SimpleGraphService getGraphservice() {
-		if (mGraphService == null) {
-			throw new RuntimeException(
-					"GraphService has not been initialized. This is not good!");
-		}
-		return mGraphService;
-	}
-
-	/**
-	 * @return
-	 */
-	public static UpdateService getUpdateService() {
-		if (mUpdateService == null) {
-			throw new RuntimeException(
-					"UpdateService has not been initialized. This is not good!");
-		}
-		return mUpdateService;
-	}
-
-	/**
-	 * @return
-	 */
-	public static Writer getWriter() {
-		if (mWriter == null) {
-			throw new RuntimeException(
-					"Writer has not been initialized. This is not good!");
-		}
-		return mWriter;
-	}
-
-	/**
-	 * @return
-	 */
-	public static Reader getReader() {
-		if (mReader == null) {
-			throw new RuntimeException(
-					"Reader has not been initialized. This is not good!");
-		}
-		return mReader;
 	}
 
 	/**

@@ -57,9 +57,11 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
@@ -68,10 +70,12 @@ import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class Connection {
 
-
+	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
+	
 	private Logger log = Logger.getLogger(Connection.class);
 
 
@@ -163,7 +167,7 @@ public class Connection {
 
 		try {
 
-			mSsrc.newSession();
+			mSsrc.newSession(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
 
 			setConnected(true);
 

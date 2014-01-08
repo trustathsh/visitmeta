@@ -202,12 +202,14 @@ public class DumpingService implements Runnable {
 
 				update.setStartIdentifier(ident);
 				update.setMaxSize(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
+				log.trace("Setting max_size for connection to: " + update.getMaxSize());
 
 				if (depth != null && depth > 0){
 					update.setMaxDepth(depth);
 				} else {
 					update.setMaxDepth(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH)));
 				}
+				log.trace("Setting max_depth for connection to: " + update.getMaxDepth());
 
 				if(!activeSubscriptions.contains(uuid) && !uuids.contains(uuid)){
 

@@ -54,13 +54,17 @@ import de.hshannover.f4.trust.ifmapj.messages.Result;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.CryptoUtil;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class DumpingService implements Runnable {
 
-
+	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
+	
 	private static final Logger log = Logger.getLogger(DumpingService.class);
 
 	private static Set<String> activeSubscriptions;
@@ -132,7 +136,7 @@ public class DumpingService implements Runnable {
 
 			try {
 
-				Thread.sleep(10000);
+				Thread.sleep(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_DUMPING_SLEEPTIME)));
 
 			} catch (InterruptedException e) {
 
@@ -197,9 +201,12 @@ public class DumpingService implements Runnable {
 				update.setName(uuid);
 
 				update.setStartIdentifier(ident);
+				update.setMaxSize(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
 
 				if (depth != null && depth > 0){
 					update.setMaxDepth(depth);
+				} else {
+					update.setMaxDepth(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH)));
 				}
 
 				if(!activeSubscriptions.contains(uuid) && !uuids.contains(uuid)){

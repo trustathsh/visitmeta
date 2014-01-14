@@ -42,7 +42,9 @@ package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
@@ -52,10 +54,10 @@ import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMe
 public class InMemoryLink extends InternalLink {
 	private InternalIdentifier mFirstIdentifier;
 	private InternalIdentifier mSecondIdentifier;
-	private List<InternalMetadata> mMeta;
+	private Set<InternalMetadata> mMeta;
 
 	private InMemoryLink() {
-		mMeta = new ArrayList<InternalMetadata>();
+		mMeta = new HashSet<InternalMetadata>();
 	}
 
 	public InMemoryLink(InternalIdentifier id1, InternalIdentifier id2) {
@@ -115,6 +117,8 @@ public class InMemoryLink extends InternalLink {
 
 	@Override
 	public List<InternalMetadata> getMetadata() {
-		return mMeta;
+		List<InternalMetadata> result = new ArrayList<>();
+		result.addAll(mMeta);
+		return result;
 	}
 }

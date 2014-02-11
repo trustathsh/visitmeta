@@ -127,7 +127,7 @@ public class Neo4JLink extends InternalLink {
 	public void removeMetadata(InternalMetadata meta) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 			Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
-			if (meta.equals(neo4jMetadata)) {
+			if (meta.equalsForLinks(neo4jMetadata)) {
 				mRepo.remove(neo4jMetadata.getNode().getId());
 				break;
 			}
@@ -140,7 +140,7 @@ public class Neo4JLink extends InternalLink {
 	public boolean hasMetadata(InternalMetadata meta) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 			Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
-			if (meta.equals(neo4jMetadata)) {
+			if (meta.equalsForLinks(neo4jMetadata)) {
 				return true;
 			}
 		}

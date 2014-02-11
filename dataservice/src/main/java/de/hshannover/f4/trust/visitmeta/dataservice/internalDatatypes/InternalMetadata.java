@@ -86,6 +86,30 @@ public abstract class InternalMetadata implements Propable{
 		return tmp.toString();
 	}
 
+	/**
+	 * Equals method for metadata contained in a link, where the singleValue field is decision making
+	 *  
+	 * @param o other metadata object
+	 * @return boolean value whether both metadata objects are equal 
+	 * 
+	 */
+	public boolean equalsForLinks(Object o) {
+		if(o == null) {
+			return false;
+		}
+		if(! (o instanceof InternalMetadata)) {
+			return false;
+		}
+		InternalMetadata other = (InternalMetadata) o;
+		if(this.isSingleValue() != other.isSingleValue()) {
+			return false;
+		}
+		if(this.getTypeName().equals(other.getTypeName())) {
+			return true;
+		}
+		return this.equals(other);
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -98,8 +122,8 @@ public abstract class InternalMetadata implements Propable{
 		if (!this.getTypeName().equals(other.getTypeName())) {
 			return false;
 		}
-		if(this.isSingleValue()) {
-			return true;
+		if(this.isSingleValue() != other.isSingleValue()) {
+			return false;
 		}
 		if (getProperties().size() != other.getProperties().size()) {
 			return false;

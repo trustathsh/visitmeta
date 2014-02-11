@@ -146,7 +146,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	public void removeMetadata(InternalMetadata m) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 			Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
-			if (m.equals(n4jm)) {
+			if (m.equalsForLinks(n4jm)) {
 				mRepo.remove(n4jm.getNode().getId());
 			}
 		}
@@ -163,7 +163,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	public boolean hasMetadata(InternalMetadata meta) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 			Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
-			if (meta.equals(n4jm)) {
+			if (meta.equalsForLinks(n4jm)) {
 				return true;
 			}
 		}

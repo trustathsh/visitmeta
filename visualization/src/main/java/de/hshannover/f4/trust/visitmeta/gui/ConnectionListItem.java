@@ -1,30 +1,38 @@
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import javax.swing.JComponent;
-
 public class ConnectionListItem {
 	private String mName;
-	private JComponent mConnectionPanel;
-	private int mIndex;
-	
-	public ConnectionListItem(String pName, JComponent pConnectionPanel) {
+	private ConnectionTab mConnectionTab;
+
+	public ConnectionListItem(String pName, ConnectionTab pConnectionTab) {
 		mName = pName;
-		mConnectionPanel = pConnectionPanel;
+		mConnectionTab = pConnectionTab;
 	}
-	
-	public JComponent getConnectionPanel() {
-		return this.mConnectionPanel;
+
+	public ConnectionTab getConnectionTab() {
+		return this.mConnectionTab;
 	}
-	
-	public int getIndex() {
-		return this.mIndex;
+
+	@Override
+	public int hashCode() {
+		return this.mName.hashCode();
 	}
-	
-	public void setIndex(int pIndex) {
-		this.mIndex = pIndex;
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof ConnectionListItem)) {
+			return false;
+		}
+		ConnectionListItem other = (ConnectionListItem) o;
+		return this.mName.equals(other.mName);
 	}
-	
-	@Override public String toString() {
+
+	@Override
+	public String toString() {
+		return this.mName;
+	}
+
+	public String getName() {
 		return this.mName;
 	}
 }

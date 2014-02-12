@@ -41,6 +41,8 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -50,12 +52,17 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
+
+import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 
 public class VisITMetaWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -65,7 +72,8 @@ public class VisITMetaWindow extends JFrame {
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
-	private JList<Object> mConnectionList = null;
+	private JList<ConnectionListItem> mConnectionList = null;
+	private Vector<ConnectionListItem> mListItems = null;
 	private JTabbedPane mTabbedConnectionPane = null;
 
 	public VisITMetaWindow(GuiController pController, JComponent pGraphPanel) {
@@ -75,99 +83,79 @@ public class VisITMetaWindow extends JFrame {
 
 		mMenuBar = new MenuBar(pController);
 		this.setJMenuBar(mMenuBar);
-		
-		mConnectionList = new JList<Object>();
-		Vector<ConnectionListItem> listItems = new Vector<ConnectionListItem>();
-		listItems.add(new ConnectionListItem("TestConn1", pGraphPanel));
-		listItems.add(new ConnectionListItem("TestConn2", pGraphPanel));
-		mConnectionList.setListData(listItems);
+
+		// Initializing left hand side
+		mConnectionList = new JList<ConnectionListItem>();
+		mConnectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		mListItems = new Vector<ConnectionListItem>();
+		mListItems.add(new ConnectionListItem("TestConn1", new ConnectionTab("TestConn1", pGraphPanel)));
+		mListItems.add(new ConnectionListItem("TestConn2", new ConnectionTab("TestConn2", pGraphPanel)));
+		mConnectionList.setListData(mListItems);
 		mConnectionList.addListSelectionListener(new ListSelectionListener() {
-			
 			@Override
 			public void valueChanged(ListSelectionEvent event) {
 				ConnectionListItem conn = (ConnectionListItem) mConnectionList.getSelectedValue();
-				ConnectionTab tab = new ConnectionTab(conn.toString(), new JPanel());
 				boolean alreadyOpen = false;
-				for(Component t : mTabbedConnectionPane.getComponents()) {
-					if(t.equals(tab)) {
+				for (Component t : mTabbedConnectionPane.getComponents()) {
+					if (t.equals(conn.getConnectionTab())) {
 						alreadyOpen = true;
 					}
 				}
-				if(!alreadyOpen) {
-					mTabbedConnectionPane.add(conn.toString(), conn.getConnectionPanel());
+				if (!alreadyOpen) {
+					mTabbedConnectionPane.add(conn.getName(), conn.getConnectionTab());
+				} else {
+					mTabbedConnectionPane.setSelectedComponent(conn.getConnectionTab());
 				}
 			}
 		});
-		
+
 		mLeftMainPanel = new JPanel();
 		mLeftMainPanel.setLayout(new GridLayout());
 		mLeftMainPanel.add(mConnectionList);
-		
+
+		// Initializing right hand side
 		mTabbedConnectionPane = new JTabbedPane();
+		mTabbedConnectionPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				ConnectionTab tab = (ConnectionTab) mTabbedConnectionPane.getComponentAt(mTabbedConnectionPane.getSelectedIndex());
+				if (tab != null) {
+					mConnectionList.setSelectedIndex(mListItems.indexOf(new ConnectionListItem(tab.getTabName(), tab)));
+				}
+			}
+		});
 
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPane);
 
+		// Initializing main component
 		mMainSplitPane = new JSplitPane();
 		mMainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		mMainSplitPane.setRightComponent(mRightMainPanel);
-		mMainSplitPane.setResizeWeight(0.2);
+		mMainSplitPane.setResizeWeight(0.15);
 		mMainSplitPane.setLeftComponent(mLeftMainPanel);
 
 		this.getContentPane().add(mMainSplitPane);
 
-//		/* Components */
-//		JSplitPane vSplitPane = new JSplitPane();
-//		MenuBar vMenuBar = new MenuBar(pController);
-//		JPanel vRightComponent = new JPanel();
-//		SpringLayout vSpringLayout = new SpringLayout();
-//		PanelTimeLine vTimeLine = new PanelTimeLine();
-//		Log4jAppender vLog4jAppender = new Log4jAppender();
-//		JComponent vLogPane = vLog4jAppender.getComponent();
-//		Logger.getRootLogger().addAppender(vLog4jAppender);
-//		/* vSpringLayout */
-//		vSpringLayout.putConstraint(SpringLayout.NORTH, vTimeLine, 0, SpringLayout.NORTH, vRightComponent);
-//		vSpringLayout.putConstraint(SpringLayout.EAST, vTimeLine, 0, SpringLayout.EAST, vRightComponent);
-//		vSpringLayout.putConstraint(SpringLayout.WEST, vTimeLine, 0, SpringLayout.WEST, vRightComponent);
-//		vSpringLayout.putConstraint(SpringLayout.NORTH, vLogPane, 0, SpringLayout.SOUTH, vTimeLine);
-//		vSpringLayout.putConstraint(SpringLayout.EAST, vLogPane, 0, SpringLayout.EAST, vRightComponent);
-//		vSpringLayout.putConstraint(SpringLayout.WEST, vLogPane, 0, SpringLayout.WEST, vRightComponent);
-//		vSpringLayout.putConstraint(SpringLayout.SOUTH, vLogPane, 0, SpringLayout.SOUTH, vRightComponent);
-//		/* vRightComponent */
-//		vRightComponent.setLayout(vSpringLayout);
-//		vRightComponent.add(vTimeLine);
-//		vRightComponent.add(vLogPane);
-//		/* vSplitPane */
-//		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-//		mSplitPane.setLeftComponent(pGraphPanel);
-//		mSplitPane.setRightComponent(vRightComponent);
-//		/* mMainWindow */
-//		setJMenuBar(vMenuBar);
-//		getContentPane().add(mSplitPane);
-//		/* Load Properties */
-//		setTitle(PropertiesManager.getProperty("window", "title", "VisITMeta"));
-//		setLocation(Integer.parseInt(PropertiesManager.getProperty("window", "position.x", "0")), // x
-//				Integer.parseInt(PropertiesManager.getProperty("window", "position.y", "0")) // y
-//		);
-//		setPreferredSize(new Dimension(Integer.parseInt(PropertiesManager.getProperty("window", "width", "700")), // width
-//				Integer.parseInt(PropertiesManager.getProperty("window", "height", "700")) // height
-//		));
-//		mSplitPane.setResizeWeight(Double.parseDouble(PropertiesManager.getProperty("window", "splitpercent", "0.8")));
-//		/* Close Listener */
-//		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-//		addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowClosing(WindowEvent we) {
-//				PropertiesManager.storeProperty("window", "position.x", String.valueOf((int) getLocationOnScreen().getX())); // x
-//				PropertiesManager.storeProperty("window", "position.y", String.valueOf((int) getLocationOnScreen().getY())); // y
-//				PropertiesManager.storeProperty("window", "width", String.valueOf(getWidth())); // width
-//				PropertiesManager.storeProperty("window", "height", String.valueOf(getHeight())); // height
-//				// PropertiesManager.storeProperty("window", "splitpercent",
-//				// String.valueOf(mSplitPane.getResizeWeight()));
-//				System.exit(0);
-//			}
-//		});
+		// Load Properties
+		setTitle(PropertiesManager.getProperty("window", "title", "VisITMeta"));
+		setLocation(Integer.parseInt(PropertiesManager.getProperty("window", "position.x", "0")),
+				Integer.parseInt(PropertiesManager.getProperty("window", "position.y", "0")));
+		setPreferredSize(new Dimension(Integer.parseInt(PropertiesManager.getProperty("window", "width", "700")), Integer.parseInt(PropertiesManager
+				.getProperty("window", "height", "700"))));
+		// Close Listener
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent we) {
+				PropertiesManager.storeProperty("window", "position.x", String.valueOf((int) getLocationOnScreen().getX()));
+				PropertiesManager.storeProperty("window", "position.y", String.valueOf((int) getLocationOnScreen().getY()));
+				PropertiesManager.storeProperty("window", "width", String.valueOf(getWidth()));
+				PropertiesManager.storeProperty("window", "height", String.valueOf(getHeight()));
+				System.exit(0);
+			}
+		});
 	}
 
 	/**

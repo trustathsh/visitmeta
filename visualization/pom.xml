@@ -28,9 +28,8 @@
 							<classpathPrefix>./lib/</classpathPrefix>
 						</manifest>
 						<manifestEntries>
-							<Class-Path>./lib/</Class-Path>
-							<Class-Path>./config/</Class-Path>
-						</manifestEntries>
+							<Class-Path>./lib/ ./config/ ./img/</Class-Path>
+						</manifestEntries>)
 					</archive>
 				</configuration>
 			</plugin>

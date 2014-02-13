@@ -51,6 +51,7 @@ public class ConnectionTabListMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
 	private JMenuItem mConnect = null;
 	private JMenuItem mDisconnect = null;
+	private JMenuItem mDelete = null;
 	private ConnectionTab mConnection = null;
 
 	/**
@@ -63,25 +64,54 @@ public class ConnectionTabListMenu extends JPopupMenu {
 	public ConnectionTabListMenu(ConnectionTab connection) {
 		LOGGER.trace("Creating new ConnectionTabListMenu for " + connection);
 		this.mConnection = connection;
+
+		initConnectButton();
+		initDisconnectButton();
+		initDeleteButton();
+
+		this.add(mConnect);
+		this.add(mDisconnect);
+		this.add(mDelete);
+	}
+
+	/**
+	 * Initializes the connect button and adds an ActionListener
+	 */
+	private void initConnectButton() {
 		mConnect = new JMenuItem("Connect");
 		mConnect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO connect the Connection
-				mConnection.setConnectionStatus(true);
+				mConnection.connect();
 			}
 		});
+	}
 
+	/**
+	 * Initializes the disconnect button and adds an ActionListener
+	 */
+	private void initDisconnectButton() {
 		mDisconnect = new JMenuItem("Disconnect");
 		mDisconnect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO disconnect the Connection
-				mConnection.setConnectionStatus(false);
+				mConnection.disconnect();
 			}
 		});
+	}
 
-		this.add(mConnect);
-		this.add(mDisconnect);
+	/**
+	 * Initializes the delete button and adds an ActionListener
+	 */
+	private void initDeleteButton() {
+		mDelete = new JMenuItem("Delete");
+		mDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO delete the Connection
+			}
+		});
 	}
 }

@@ -78,12 +78,22 @@ public class ConnectionTab extends JPanel {
 			connectionStatusIcon[0] = new ImageIcon(getClass().getClassLoader().getResource("ball_green_small.png"));
 			connectionStatusIcon[1] = new ImageIcon(getClass().getClassLoader().getResource("ball_red_small.png"));
 		}
+
 		this.mName = name;
-		this.mConnected = true;
+		this.mConnected = false;
 		this.setLayout(new GridLayout());
 		mGraphPanel = graphPanel;
 		mTimeLine = new PanelTimeLine();
 
+		initPanels();
+
+		this.add(mSplitPane);
+	}
+
+	/**
+	 * Initializes the panels
+	 */
+	private void initPanels() {
 		mUpperPanel = new JPanel();
 		mLowerPanel = new JPanel();
 
@@ -99,7 +109,6 @@ public class ConnectionTab extends JPanel {
 		mSplitPane.setEnabled(false);
 		mSplitPane.setLeftComponent(mUpperPanel);
 		mSplitPane.setRightComponent(mLowerPanel);
-		this.add(mSplitPane);
 	}
 
 	/**
@@ -121,6 +130,20 @@ public class ConnectionTab extends JPanel {
 	 */
 	public boolean isConnected() {
 		return this.mConnected;
+	}
+
+	/**
+	 * TODO implement connect stuff
+	 */
+	public void connect() {
+		this.setConnectionStatus(true);
+	}
+
+	/**
+	 * TODO implement disconnect stuff
+	 */
+	public void disconnect() {
+		this.setConnectionStatus(false);
 	}
 
 	public void setConnectionStatus(boolean status) {

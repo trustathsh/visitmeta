@@ -45,8 +45,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashSet;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -79,22 +79,87 @@ public class VisITMetaWindow extends JFrame {
 	private JTabbedPane mTabbedConnectionPane = null;
 	private DefaultTableModel mTableModel = null;
 	private JTable mConnectionTable = null;
+	private HashSet<ConnectionTab> mConnectionTabs = null;
 	private JScrollPane mConnectionScrollPane = null;
+	private GuiController mGuiController = null;
 
 	/**
 	 * 
-	 * @param pController
-	 * @param pGraphPanel
+	 * @param guiController
 	 */
-	public VisITMetaWindow(GuiController pController, JComponent pGraphPanel) {
+	public VisITMetaWindow(GuiController guiController) {
 		super("VisITmeta");
+		this.mGuiController = guiController;
+		mMenuBar = new MenuBar(mGuiController);
+		this.setJMenuBar(mMenuBar);
+		this.mConnectionTabs = new HashSet<ConnectionTab>();
+
+		init();
+	}
+
+	/**
+	 * 
+	 * @param name
+	 * @param graphPanel
+	 */
+	public void addConnection(String name, JComponent graphPanel) {
+		Object[] tmpTab = new Object[1];
+		tmpTab[0] = new ConnectionTab(name, graphPanel);
+		this.mConnectionTabs.add((ConnectionTab) tmpTab[0]);
+		this.mTableModel.addRow(tmpTab);
+	}
+
+	/**
+	 * Removes a connection
+	 * 
+	 * @param connection
+	 *            the should be removed
+	 */
+	public void removeConnection(ConnectionTab connection) {
+		for (int i = 0; i < mTableModel.getRowCount(); i++) {
+			if (mTableModel.getValueAt(i, 0).equals(connection)) {
+				mTableModel.removeRow(i);
+				mConnectionTabs.remove(connection);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Removes a given connection
+	 * 
+	 * @param name
+	 *            of the connection that should be removed
+	 */
+	public void removeConnection(String name) {
+		this.removeConnection(new ConnectionTab(name, null));
+	}
+
+	/**
+	 * Initializes the main panel
+	 */
+	private void init() {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		mMenuBar = new MenuBar(pController);
-		this.setJMenuBar(mMenuBar);
+		initLeftHandSide();
+		initRightHandSide();
 
-		// Initializing left hand side
+		mMainSplitPane = new JSplitPane();
+		mMainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		mMainSplitPane.setRightComponent(mRightMainPanel);
+		mMainSplitPane.setLeftComponent(mLeftMainPanel);
+
+		this.getContentPane().add(mMainSplitPane);
+
+		loadProperties();
+		setCloseOperation();
+	}
+
+	/**
+	 * Initializes the left hand side of the main panel
+	 */
+	private void initLeftHandSide() {
 		mTableModel = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -105,15 +170,12 @@ public class VisITMetaWindow extends JFrame {
 		};
 
 		mTableModel.addColumn("Connections");
-		ConnectionTab[] testConn = new ConnectionTab[1];
-		testConn[0] = new ConnectionTab("TestConn1", pGraphPanel);
-		mTableModel.addRow(testConn);
-		testConn[0] = new ConnectionTab("TestConn2", pGraphPanel);
-		mTableModel.addRow(testConn);
 		mConnectionTable = new JTable(mTableModel);
 		mConnectionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		DefaultTableCellRenderer iconCellRenderer = new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void setValue(Object value) {
 				if (value instanceof ConnectionTab) {
@@ -126,7 +188,7 @@ public class VisITMetaWindow extends JFrame {
 			}
 		};
 
-		iconCellRenderer.setHorizontalAlignment(JLabel.CENTER);
+		iconCellRenderer.setHorizontalAlignment(JLabel.LEFT);
 
 		mConnectionTable.setDefaultRenderer(Object.class, iconCellRenderer);
 
@@ -191,29 +253,35 @@ public class VisITMetaWindow extends JFrame {
 		mLeftMainPanel = new JPanel();
 		mLeftMainPanel.setLayout(new GridLayout());
 		mLeftMainPanel.add(mConnectionScrollPane);
+	}
 
-		// Initializing right hand side
+	/**
+	 * Initializes the right hand side of the main panel
+	 */
+	private void initRightHandSide() {
 		mTabbedConnectionPane = new JTabbedPane();
 
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPane);
+	}
 
-		// Initializing main component
-		mMainSplitPane = new JSplitPane();
-		mMainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		mMainSplitPane.setRightComponent(mRightMainPanel);
-		mMainSplitPane.setLeftComponent(mLeftMainPanel);
-
-		this.getContentPane().add(mMainSplitPane);
-
-		// Load Properties
+	/**
+	 * Loads Properties
+	 */
+	private void loadProperties() {
 		setTitle(PropertiesManager.getProperty("window", "title", "VisITMeta"));
 		setLocation(Integer.parseInt(PropertiesManager.getProperty("window", "position.x", "0")),
 				Integer.parseInt(PropertiesManager.getProperty("window", "position.y", "0")));
 		setPreferredSize(new Dimension(Integer.parseInt(PropertiesManager.getProperty("window", "width", "700")),
 				Integer.parseInt(PropertiesManager.getProperty("window", "height", "700"))));
-		// Close Listener
+	}
+
+	/**
+	 * Adds a listener to the window in order to save the windows' position and
+	 * size and sets the close operation
+	 */
+	private void setCloseOperation() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override

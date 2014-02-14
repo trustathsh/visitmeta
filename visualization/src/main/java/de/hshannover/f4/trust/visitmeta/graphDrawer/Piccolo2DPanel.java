@@ -65,7 +65,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
-import de.hshannover.f4.trust.visitmeta.gui.GuiController;
+import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -108,7 +108,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	private List<String> mPublisher      = new ArrayList<>();
 /* Constructors ***************************************************************/
-	public Piccolo2DPanel(GuiController pGuiController) {
+	public Piccolo2DPanel(GraphConnection pGuiController) {
 		mNodeTranslationDuration = SettingManager.getInstance().getNodeTranslationDuration();
 		/* Set render quality */
 		mPanel.setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);

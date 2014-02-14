@@ -44,7 +44,7 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.gui.GuiController;
+import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 
 /* Imports ********************************************************************/
 /* Class **********************************************************************/
@@ -63,7 +63,7 @@ public class GraphPanelFactory {
 	 *         TODO "OpenGL" a Panel that use OpenGL to draw the graph.
 	 * @return a Panel that shows the graph.
 	 */
-	public static GraphPanel getGraphPanel(String type, GuiController pController) {
+	public static GraphPanel getGraphPanel(String type, GraphConnection pController) {
 		LOGGER.trace("Method getGraphPanel(" + type + ") called.");
 		switch(type) {
 			case "Piccolo2D": return new Piccolo2DPanel(pController);

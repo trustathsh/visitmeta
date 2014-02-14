@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta visualization, version 0.0.3,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,10 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.gui;
-
-
-
-
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -71,23 +67,27 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowColorSettings.class);
-	GuiController                  mController      = null;
-	private JPanel                 mPanel           = null;
-	private JColorChooser          mColorChooser    = null;
-	private Timer                  mDelay           = null;
-	private JComboBox<String>      mSelectPublisher = null;
-	private ButtonGroup            mGroup           = null;
-	private List<String>           mPublisher       = null;
-	private SpringLayout           mSpringLayout    = null;
+	private GuiController mController = null;
+	private JPanel mPanel = null;
+	private JColorChooser mColorChooser = null;
+	private Timer mDelay = null;
+	private JComboBox<String> mSelectPublisher = null;
+	private ButtonGroup mGroup = null;
+	private List<String> mPublisher = null;
+	private SpringLayout mSpringLayout = null;
 
-	public WindowColorSettings(GuiController pController) {
+	/**
+	 * 
+	 * @param pController
+	 */
+	public WindowColorSettings(GuiController controller) {
 		super();
-		mController    = pController;
-		mPanel         = new JPanel();
-		mPublisher     = mController.getPublisher();
+		mController = controller;
+		mPanel = new JPanel();
+		mPublisher = mController.getSelectedConnection().getPublisher();
 
 		setTitle("Color Settings");
-		mSpringLayout  = new SpringLayout();
+		mSpringLayout = new SpringLayout();
 		setMinimumSize(new Dimension(570, 270));
 		setPreferredSize(new Dimension(650, 300));
 
@@ -107,11 +107,11 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		mDelay = new Timer(500, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				if(mSelectPublisher.getItemCount() > 0) {
-					String vParam     = mGroup.getSelection().getActionCommand();
-					String vType      = "";
+				if (mSelectPublisher.getItemCount() > 0) {
+					String vParam = mGroup.getSelection().getActionCommand();
+					String vType = "";
 					String vPublisher = "";
-					String vProperty  = "";
+					String vProperty = "";
 					if (mSelectPublisher.getSelectedIndex() == 0) {
 						/* First item is the default identifier color */
 						vType = "identifier";
@@ -127,14 +127,14 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 					}
 					String vColor = "0x" + Integer.toHexString(mColorChooser.getColor().getRGB()).substring(2);
 					PropertiesManager.storeProperty("color", vProperty, vColor);
-					mController.repaintNodes(vType, vPublisher);
+					mController.getSelectedConnection().repaintNodes(vType, vPublisher);
 				}
 				mDelay.stop();
 			}
 		});
 
 		/* Color Chooser */
-		mColorChooser  = new JColorChooser(Color.BLACK);
+		mColorChooser = new JColorChooser(Color.BLACK);
 		mColorChooser.setPreviewPanel(new JPanel());
 		mColorChooser.getSelectionModel().addChangeListener(new ChangeListener() {
 			@Override
@@ -145,13 +145,13 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		});
 
 		/* Radio buttons */
-		JRadioButton vColorInside  = new JRadioButton("Inside");
+		JRadioButton vColorInside = new JRadioButton("Inside");
 		vColorInside.setActionCommand("inside");
 		JRadioButton vColorOutside = new JRadioButton("Outside");
 		vColorOutside.setActionCommand("outside");
-		JRadioButton vColorText    = new JRadioButton("Text");
+		JRadioButton vColorText = new JRadioButton("Text");
 		vColorText.setActionCommand("text");
-		JRadioButton vColorBorder  = new JRadioButton("Border");
+		JRadioButton vColorBorder = new JRadioButton("Border");
 		vColorBorder.setActionCommand("border");
 
 		/* Group the radio buttons */
@@ -168,19 +168,19 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 
 		/* Arrange elements in layout */
 		mPanel.setLayout(mSpringLayout);
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSelectPublisher,  5, SpringLayout.NORTH, mPanel);
-		mSpringLayout.putConstraint(SpringLayout.WEST,  mSelectPublisher,  5, SpringLayout.WEST,  mPanel);
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mColorChooser,     5, SpringLayout.SOUTH, mSelectPublisher);
-		mSpringLayout.putConstraint(SpringLayout.EAST,  mColorChooser,    -5, SpringLayout.EAST,  mPanel);
-		mSpringLayout.putConstraint(SpringLayout.WEST,  mColorChooser,    20, SpringLayout.EAST,  vColorOutside);
-		mSpringLayout.putConstraint(SpringLayout.SOUTH, mColorChooser,    -5, SpringLayout.SOUTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSelectPublisher, 5, SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mSelectPublisher, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mColorChooser, 5, SpringLayout.SOUTH, mSelectPublisher);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mColorChooser, -5, SpringLayout.EAST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mColorChooser, 20, SpringLayout.EAST, vColorOutside);
+		mSpringLayout.putConstraint(SpringLayout.SOUTH, mColorChooser, -5, SpringLayout.SOUTH, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorInside,  5, SpringLayout.SOUTH, mSelectPublisher);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorInside, 5, SpringLayout.SOUTH, mSelectPublisher);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorOutside, 5, SpringLayout.SOUTH, vColorInside);
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorText,    5, SpringLayout.SOUTH, vColorOutside);
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorBorder,  5, SpringLayout.SOUTH, vColorText);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorText, 5, SpringLayout.SOUTH, vColorOutside);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, vColorBorder, 5, SpringLayout.SOUTH, vColorText);
 
-		/* Add elements to panel*/
+		/* Add elements to panel */
 		mPanel.add(mSelectPublisher);
 		mPanel.add(mColorChooser);
 		mPanel.add(vColorInside);
@@ -190,6 +190,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		add(mPanel);
 		pack();
 	}
+
 	/**
 	 * Updates the list of known publishers.
 	 */
@@ -198,10 +199,11 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		mSelectPublisher.removeAllItems();
 		mSelectPublisher.addItem("identifier");
 		mSelectPublisher.addItem("default metadata");
-		for(String s : mPublisher) {
+		for (String s : mPublisher) {
 			mSelectPublisher.addItem(s);
 		}
 	}
+
 	/**
 	 * Set the displayed color of the ColorChooser.
 	 */
@@ -209,11 +211,13 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		LOGGER.trace("Method setColorChooserColor() called.");
 		ButtonModel vButton = mGroup.getSelection();
 		String vKey = "color." + mSelectPublisher.getSelectedItem() + "." + vButton.getActionCommand();
-		String vDefault = PropertiesManager.getProperty("color", "color.metadata." + vButton.getActionCommand(), "0xFFFFFF");
-		Color  vColor   = Color.decode(PropertiesManager.getProperty("color", vKey, vDefault));
+		String vDefault = PropertiesManager.getProperty("color", "color.metadata." + vButton.getActionCommand(),
+				"0xFFFFFF");
+		Color vColor = Color.decode(PropertiesManager.getProperty("color", vKey, vDefault));
 		mColorChooser.setColor(vColor);
 		mDelay.stop();
 	}
+
 	@Override
 	public void actionPerformed(ActionEvent pE) {
 		setColorChooserColor();

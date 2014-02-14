@@ -44,7 +44,7 @@ package de.hshannover.f4.trust.visitmeta.datawrapper;
 /* Imports ********************************************************************/
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.gui.GuiController;
+import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 /* Class **********************************************************************/
 public class TimeManagerCreation extends TimeManager {
 /* Attributes *****************************************************************/
@@ -52,7 +52,7 @@ public class TimeManagerCreation extends TimeManager {
 	/** Singleton */
 	private static TimeManagerCreation mInstance = null;
 
-	private GuiController mController = null;
+	private GraphConnection mController = null;
 /* Constructors ***************************************************************/
 	private TimeManagerCreation() {
 		super();
@@ -73,7 +73,7 @@ public class TimeManagerCreation extends TimeManager {
 		}
 		return mInstance;
 	}
-	public void setController(GuiController pController) {
+	public void setController(GraphConnection pController) {
 		mController = pController;
 	}
 	@Override

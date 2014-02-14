@@ -41,7 +41,6 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import java.awt.GridLayout;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
@@ -55,22 +54,22 @@ public class ConnectionTab extends JPanel {
 
 	private String mName;
 	private boolean mConnected;
+	private GraphConnection mConnection = null;
 
 	private PanelTimeLine mTimeLine = null;
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
-	private JComponent mGraphPanel = null;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
 	 * 
 	 * @param name
 	 *            Name of the Connection
-	 * @param graphPanel
+	 * @param connection
 	 *            Panel Object that represents the Connection
 	 */
-	public ConnectionTab(String name, JComponent graphPanel) {
+	public ConnectionTab(String name, GraphConnection connection) {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + name);
 		if (connectionStatusIcon == null) {
@@ -80,9 +79,9 @@ public class ConnectionTab extends JPanel {
 		}
 
 		this.mName = name;
-		this.mConnected = false;
+		this.mConnected = true;
 		this.setLayout(new GridLayout());
-		mGraphPanel = graphPanel;
+		mConnection = connection;
 		mTimeLine = new PanelTimeLine();
 
 		initPanels();
@@ -100,7 +99,7 @@ public class ConnectionTab extends JPanel {
 		mUpperPanel.setLayout(new GridLayout());
 		mLowerPanel.setLayout(new GridLayout());
 
-		mUpperPanel.add(mGraphPanel);
+		mUpperPanel.add(mConnection.getGraphPanel());
 		mLowerPanel.add(mTimeLine);
 
 		mSplitPane = new JSplitPane();
@@ -130,6 +129,10 @@ public class ConnectionTab extends JPanel {
 	 */
 	public boolean isConnected() {
 		return this.mConnected;
+	}
+
+	public GraphConnection getConnection() {
+		return this.mConnection;
 	}
 
 	/**

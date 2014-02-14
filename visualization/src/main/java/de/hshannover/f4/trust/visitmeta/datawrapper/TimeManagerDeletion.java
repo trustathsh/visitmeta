@@ -45,7 +45,7 @@ package de.hshannover.f4.trust.visitmeta.datawrapper;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
-import de.hshannover.f4.trust.visitmeta.gui.GuiController;
+import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 /* Class **********************************************************************/
 public class TimeManagerDeletion extends TimeManager {
 /* Attributes *****************************************************************/
@@ -54,7 +54,7 @@ public class TimeManagerDeletion extends TimeManager {
 	private static TimeManagerDeletion mInstance = null;
 
 	private FacadeLogic   mLogic      = null;
-	private GuiController mController = null;
+	private GraphConnection mController = null;
 /* Constructors ***************************************************************/
 /* Constructors ***************************************************************/
 	private TimeManagerDeletion() {
@@ -79,7 +79,7 @@ public class TimeManagerDeletion extends TimeManager {
 	public void setLogic(FacadeLogic pLogic) {
 		mLogic = pLogic;
 	}
-	public void setController(GuiController pController) {
+	public void setController(GraphConnection pController) {
 		mController = pController;
 	}
 	@Override

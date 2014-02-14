@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta visualization, version 0.0.3,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,10 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.gui;
-
-
-
-
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,63 +51,67 @@ import org.apache.log4j.Logger;
  *
  */
 public class MenuBar extends JMenuBar {
-	private static final long   serialVersionUID = 1L;
-	private static final Logger LOGGER           = Logger.getLogger(MenuBar.class);
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
-	private GuiController mContoller         = null;
+	private GuiController mContoller = null;
 	/* Actions */
-	private JMenu         mMenuActions       = null;
-	private JMenu         mMenuLevelOfDetail = null;
-	private JMenuItem     mItemLevel0        = null;
-	private JMenuItem     mItemLevel1        = null;
-	private JMenuItem     mItemLevel2        = null;
-	private JMenuItem     mItemStopMotion    = null;
-	private JMenuItem     mItemRedrawGraph   = null;
-	private JMenuItem     mItemSetColors     = null;
-	private JMenuItem     mItemTimings      = null;
+	private JMenu mMenuActions = null;
+	private JMenu mMenuLevelOfDetail = null;
+	private JMenuItem mItemLevel0 = null;
+	private JMenuItem mItemLevel1 = null;
+	private JMenuItem mItemLevel2 = null;
+	private JMenuItem mItemStopMotion = null;
+	private JMenuItem mItemRedrawGraph = null;
+	private JMenuItem mItemSetColors = null;
+	private JMenuItem mItemTimings = null;
 
-	public MenuBar(GuiController pController) {
+	/**
+	 * 
+	 * @param guiController
+	 */
+	public MenuBar(GuiController guiController) {
 		super();
-		mContoller = pController;
+		mContoller = guiController;
 		/* Connections */
-//		JMenu mnConnections = new JMenu("Connections");
-//		add(mnConnections);
-//
-//		JMenu mnConnectTo = new JMenu("Connect To");
-//		mnConnections.add(mnConnectTo);
-//
-//		JMenuItem mntmServer = new JMenuItem("Server 1");
-//		mnConnectTo.add(mntmServer);
-//
-//		JMenuItem mntmServer_1 = new JMenuItem("Server 2");
-//		mnConnectTo.add(mntmServer_1);
-//
-//		JMenuItem menuItem = new JMenuItem("...");
-//		mnConnectTo.add(menuItem);
-//
-//		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
-//		mnConnections.add(mntmAddConnection);
+		// JMenu mnConnections = new JMenu("Connections");
+		// add(mnConnections);
+		//
+		// JMenu mnConnectTo = new JMenu("Connect To");
+		// mnConnections.add(mnConnectTo);
+		//
+		// JMenuItem mntmServer = new JMenuItem("Server 1");
+		// mnConnectTo.add(mntmServer);
+		//
+		// JMenuItem mntmServer_1 = new JMenuItem("Server 2");
+		// mnConnectTo.add(mntmServer_1);
+		//
+		// JMenuItem menuItem = new JMenuItem("...");
+		// mnConnectTo.add(menuItem);
+		//
+		// JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
+		// mnConnections.add(mntmAddConnection);
 		/* Actions */
 		mMenuActions = new JMenu("Actions");
 		add(mMenuActions);
 
-//		mMenuLevelOfDetail = new JMenu("Level of Detail");
-//		mMenuActions.add(mMenuLevelOfDetail);
-//
-//		mItemLevel0 = new JMenuItem("High Detail");
-//		mMenuLevelOfDetail.add(mItemLevel0);
-//
-//		mItemLevel1 = new JMenuItem("Middle Detail");
-//		mMenuLevelOfDetail.add(mItemLevel1);
-//
-//		mItemLevel2 = new JMenuItem("Low Detail");
-//		mMenuLevelOfDetail.add(mItemLevel2);
+		// mMenuLevelOfDetail = new JMenu("Level of Detail");
+		// mMenuActions.add(mMenuLevelOfDetail);
+		//
+		// mItemLevel0 = new JMenuItem("High Detail");
+		// mMenuLevelOfDetail.add(mItemLevel0);
+		//
+		// mItemLevel1 = new JMenuItem("Middle Detail");
+		// mMenuLevelOfDetail.add(mItemLevel1);
+		//
+		// mItemLevel2 = new JMenuItem("Low Detail");
+		// mMenuLevelOfDetail.add(mItemLevel2);
 
 		mItemStopMotion = new JMenuItem("Stop Motion");
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				if(mContoller.isGraphMotion()) {
+				if (mContoller.isGraphMotion()) {
 					LOGGER.debug("Stop motion of the graph.");
 					mContoller.stopGraphMotion();
 					mItemStopMotion.setText("Start Motion");
@@ -135,23 +135,25 @@ public class MenuBar extends JMenuBar {
 		mMenuActions.add(mItemRedrawGraph);
 
 		/* Filter */
-//		JMenu mnFilter = new JMenu("Filter");
-//		add(mnFilter);
-//
-//		JMenu mnActivate = new JMenu("Activate");
-//		mnFilter.add(mnActivate);
-//
-//		JCheckBoxMenuItem chckbxmntmFilter = new JCheckBoxMenuItem("Filter 1");
-//		mnActivate.add(chckbxmntmFilter);
-//
-//		JCheckBoxMenuItem chckbxmntmFilter_1 = new JCheckBoxMenuItem("Filter 2");
-//		mnActivate.add(chckbxmntmFilter_1);
-//
-//		JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem("...");
-//		mnActivate.add(checkBoxMenuItem);
-//
-//		JMenuItem mntmManageFilter = new JMenuItem("Manage Filter");
-//		mnFilter.add(mntmManageFilter);
+		// JMenu mnFilter = new JMenu("Filter");
+		// add(mnFilter);
+		//
+		// JMenu mnActivate = new JMenu("Activate");
+		// mnFilter.add(mnActivate);
+		//
+		// JCheckBoxMenuItem chckbxmntmFilter = new
+		// JCheckBoxMenuItem("Filter 1");
+		// mnActivate.add(chckbxmntmFilter);
+		//
+		// JCheckBoxMenuItem chckbxmntmFilter_1 = new
+		// JCheckBoxMenuItem("Filter 2");
+		// mnActivate.add(chckbxmntmFilter_1);
+		//
+		// JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem("...");
+		// mnActivate.add(checkBoxMenuItem);
+		//
+		// JMenuItem mntmManageFilter = new JMenuItem("Manage Filter");
+		// mnFilter.add(mntmManageFilter);
 		/* Settings */
 		JMenu mnSettings = new JMenu("Settings");
 		add(mnSettings);
@@ -174,28 +176,28 @@ public class MenuBar extends JMenuBar {
 		});
 		mnSettings.add(mItemTimings);
 
-//		JMenu mnGraphDrawer = new JMenu("Graph Drawer");
-//		mnSettings.add(mnGraphDrawer);
-//
-//		JMenuItem mntmPiccolod = new JMenuItem("Piccolo2D");
-//		mnGraphDrawer.add(mntmPiccolod);
-//
-//		JMenu mnGraphCalculator = new JMenu("Graph Calculator");
-//		mnSettings.add(mnGraphCalculator);
-//
-//		JMenuItem mntmJung = new JMenuItem("Jung2");
-//		mnGraphCalculator.add(mntmJung);
-//
-//		JMenuItem mntmColot = new JMenuItem("Color");
-//		mnSettings.add(mntmColot);
+		// JMenu mnGraphDrawer = new JMenu("Graph Drawer");
+		// mnSettings.add(mnGraphDrawer);
+		//
+		// JMenuItem mntmPiccolod = new JMenuItem("Piccolo2D");
+		// mnGraphDrawer.add(mntmPiccolod);
+		//
+		// JMenu mnGraphCalculator = new JMenu("Graph Calculator");
+		// mnSettings.add(mnGraphCalculator);
+		//
+		// JMenuItem mntmJung = new JMenuItem("Jung2");
+		// mnGraphCalculator.add(mntmJung);
+		//
+		// JMenuItem mntmColot = new JMenuItem("Color");
+		// mnSettings.add(mntmColot);
 		/* Help */
-//		JMenu mnHelp = new JMenu("Help");
-//		add(mnHelp);
-//
-//		JMenuItem mntmHelp = new JMenuItem("Help");
-//		mnHelp.add(mntmHelp);
-//
-//		JMenuItem mntmAbout = new JMenuItem("About");
-//		mnHelp.add(mntmAbout);
+		// JMenu mnHelp = new JMenu("Help");
+		// add(mnHelp);
+		//
+		// JMenuItem mntmHelp = new JMenuItem("Help");
+		// mnHelp.add(mntmHelp);
+		//
+		// JMenuItem mntmAbout = new JMenuItem("About");
+		// mnHelp.add(mntmAbout);
 	}
 }

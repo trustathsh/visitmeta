@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta visualization, version 0.0.3,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,10 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.gui;
-
-
-
-
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -66,26 +62,26 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 
 public class PanelTimeLine extends JPanel implements Observer {
-	private static final long   serialVersionUID = 1L;
-	private static final String mTimeformat      = "yyyy-MM-FF HH:mm:ss";
+	private static final long serialVersionUID = 1L;
+	private static final String mTimeformat = "yyyy-MM-FF HH:mm:ss";
 
-	private SortedMap<Long, Long> mChangesMap                = null;
-	private TimeHolder            mTimeHolder                = null;
-	private TimeSelector          mTimeSelector              = null;
-	private Timer                 mDelay                     = null;
+	private SortedMap<Long, Long> mChangesMap = null;
+	private TimeHolder mTimeHolder = null;
+	private TimeSelector mTimeSelector = null;
+	private Timer mDelay = null;
 	/* GUI components */
-	private SpringLayout          mSpringLayout              = null;
-	private JSpinner              mSpinnerTimeStart          = null;
-	private SpinnerDateModel      mSpinnerTimeStartDateModel = null;
-	private JSpinner              mSpinnerTimeEnd            = null;
-	private SpinnerDateModel      mSpinnerTimeEndDateModel   = null;
-	private RangeSlider           mSlider                    = null;
-	private JCheckBox             mChckbxLive                = null;
+	private SpringLayout mSpringLayout = null;
+	private JSpinner mSpinnerTimeStart = null;
+	private SpinnerDateModel mSpinnerTimeStartDateModel = null;
+	private JSpinner mSpinnerTimeEnd = null;
+	private SpinnerDateModel mSpinnerTimeEndDateModel = null;
+	private RangeSlider mSlider = null;
+	private JCheckBox mChckbxLive = null;
 	/* Listener */
-	private ChangeListener        mListenerSpinnerTimeStart  = null;
-	private ChangeListener        mListenerSpinnerTimeEnd    = null;
-	private ChangeListener        mListenerSlider            = null;
-	private ChangeListener        mListenerChckbxLive        = null;
+	private ChangeListener mListenerSpinnerTimeStart = null;
+	private ChangeListener mListenerSpinnerTimeEnd = null;
+	private ChangeListener mListenerSlider = null;
+	private ChangeListener mListenerChckbxLive = null;
 
 	public PanelTimeLine() {
 		super();
@@ -99,7 +95,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mSpringLayout = new SpringLayout();
 		/* spinnerTimeStart */
 		mSpinnerTimeStartDateModel = new SpinnerDateModel(new Date(0L), null, null, Calendar.SECOND);
-		mSpinnerTimeStart          = new JSpinner();
+		mSpinnerTimeStart = new JSpinner();
 		mSpinnerTimeStart.setToolTipText("Start Time");
 		mSpinnerTimeStart.setModel(mSpinnerTimeStartDateModel);
 		mSpinnerTimeStart.setEditor(new JSpinner.DateEditor(mSpinnerTimeStart, mTimeformat));
@@ -113,8 +109,9 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mSlider.setEnabledLowerDragging(false);
 		mSlider.setEnabledUpperDragging(false);
 		/* spinnerTimeEnd */
-		mSpinnerTimeEndDateModel = new SpinnerDateModel(new Date(System.currentTimeMillis()), null, null, Calendar.SECOND);
-		mSpinnerTimeEnd          = new JSpinner();
+		mSpinnerTimeEndDateModel = new SpinnerDateModel(new Date(System.currentTimeMillis()), null, null,
+				Calendar.SECOND);
+		mSpinnerTimeEnd = new JSpinner();
 		mSpinnerTimeEnd.setToolTipText("End Time");
 		mSpinnerTimeEnd.setModel(mSpinnerTimeEndDateModel);
 		mSpinnerTimeEnd.setEditor(new JSpinner.DateEditor(mSpinnerTimeEnd, mTimeformat));
@@ -126,18 +123,18 @@ public class PanelTimeLine extends JPanel implements Observer {
 		/* SpringLayout */
 		setLayout(mSpringLayout);
 		/* Add spinnerTimeStart in SpringLayout */
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeStart,  6, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.WEST,  mSpinnerTimeStart, 15, SpringLayout.WEST,  this);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeStart, 6, SpringLayout.NORTH, this);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mSpinnerTimeStart, 15, SpringLayout.WEST, this);
 		/* Add slider in SpringLayout */
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSlider,  8, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.WEST,  mSlider,  8, SpringLayout.EAST,  mSpinnerTimeStart);
-		mSpringLayout.putConstraint(SpringLayout.EAST,  mSlider, -8, SpringLayout.WEST, mSpinnerTimeEnd);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSlider, 8, SpringLayout.NORTH, this);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mSlider, 8, SpringLayout.EAST, mSpinnerTimeStart);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mSlider, -8, SpringLayout.WEST, mSpinnerTimeEnd);
 		/* Add spinnerTimeEnd in SpringLayout */
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeEnd,  6, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.EAST,  mSpinnerTimeEnd, -8, SpringLayout.WEST,  mChckbxLive);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeEnd, 6, SpringLayout.NORTH, this);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mSpinnerTimeEnd, -8, SpringLayout.WEST, mChckbxLive);
 		/* Add chckbxCurrent in SpringLayout */
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mChckbxLive,   4, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.EAST,  mChckbxLive, -15, SpringLayout.EAST,  this);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mChckbxLive, 4, SpringLayout.NORTH, this);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mChckbxLive, -15, SpringLayout.EAST, this);
 		/* Add components to panel. */
 		add(mSpinnerTimeStart);
 		add(mSlider);
@@ -147,6 +144,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 		addListener();
 		mTimeHolder.addObserver(this);
 	}
+
 	/**
 	 * Add Listener to GUI elements.
 	 */
@@ -177,7 +175,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mListenerChckbxLive = new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent pE) {
-				if(mChckbxLive.isSelected()) {
+				if (mChckbxLive.isSelected()) {
 					mSlider.setEnabled(false);
 					mSlider.setEnabledLowerDragging(false);
 					mSlider.setEnabledUpperDragging(false);
@@ -213,7 +211,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 
 	@Override
 	public void update(Observable pO, Object pArg) {
-		if(pO instanceof TimeHolder) {
+		if (pO instanceof TimeHolder) {
 			/* Remove Listener */
 			mSpinnerTimeStart.removeChangeListener(mListenerSpinnerTimeStart);
 			mSpinnerTimeEnd.removeChangeListener(mListenerSpinnerTimeEnd);
@@ -222,10 +220,14 @@ public class PanelTimeLine extends JPanel implements Observer {
 			/* Make changes */
 			mChangesMap = mTimeHolder.getChangesMap();
 			mSlider.setMaximum(mChangesMap.size() - 1);
-//			mSpinnerTimeStartDateModel.setStart(new Date(mTimeHolder.getBigBang()));
-//			mSpinnerTimeStartDateModel.setEnd(new Date(mTimeHolder.getNewestTime()));
-//			mSpinnerTimeEndDateModel.setStart(new Date(mTimeHolder.getBigBang()));
-//			mSpinnerTimeEndDateModel.setEnd(new Date(mTimeHolder.getNewestTime()));
+			// mSpinnerTimeStartDateModel.setStart(new
+			// Date(mTimeHolder.getBigBang()));
+			// mSpinnerTimeStartDateModel.setEnd(new
+			// Date(mTimeHolder.getNewestTime()));
+			// mSpinnerTimeEndDateModel.setStart(new
+			// Date(mTimeHolder.getBigBang()));
+			// mSpinnerTimeEndDateModel.setEnd(new
+			// Date(mTimeHolder.getNewestTime()));
 			if (mTimeSelector.isLiveView()) {
 				mSlider.setUpperValue(mChangesMap.size() - 1);
 				mSpinnerTimeStartDateModel.setValue(new Date(mTimeHolder.getTimeStart()));

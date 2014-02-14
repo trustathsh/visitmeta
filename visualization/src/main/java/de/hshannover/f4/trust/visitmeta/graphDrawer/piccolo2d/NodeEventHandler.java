@@ -53,7 +53,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
-import de.hshannover.f4.trust.visitmeta.gui.GuiController;
+import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -66,10 +66,10 @@ import edu.umd.cs.piccolox.nodes.PComposite;
 public class NodeEventHandler extends PDragEventHandler{
 /* Attributes *****************************************************************/
 	private static final Logger LOGGER = Logger.getLogger(NodeEventHandler.class);
-	GuiController  mController = null;
+	GraphConnection  mController = null;
 	Piccolo2DPanel mPanel      = null;
 /* Constructors ***************************************************************/
-	public NodeEventHandler(GuiController pController, Piccolo2DPanel pPanel) {
+	public NodeEventHandler(GraphConnection pController, Piccolo2DPanel pPanel) {
 		mController = pController;
 		mPanel      = pPanel;
 	}

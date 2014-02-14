@@ -45,12 +45,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.HashSet;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -68,33 +65,36 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 
-public class VisITMetaWindow extends JFrame {
+public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = Logger.getLogger(VisITMetaWindow.class);
+	private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
 
-	private JMenuBar mMenuBar = null;
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private DefaultTableModel mTableModel = null;
 	private JTable mConnectionTable = null;
-	private HashSet<ConnectionTab> mConnectionTabs = null;
 	private JScrollPane mConnectionScrollPane = null;
-	private GuiController mGuiController = null;
 
 	/**
 	 * 
 	 * @param guiController
 	 */
-	public VisITMetaWindow(GuiController guiController) {
+	public MainWindow() {
 		super("VisITmeta");
-		this.mGuiController = guiController;
-		mMenuBar = new MenuBar(mGuiController);
-		this.setJMenuBar(mMenuBar);
-		this.mConnectionTabs = new HashSet<ConnectionTab>();
-
 		init();
+	}
+
+	/**
+	 * 
+	 * @param connection
+	 */
+	public void addConnection(ConnectionTab connection) {
+		Object[] tmpTab = new Object[1];
+		tmpTab[0] = connection;
+		this.mTableModel.addRow(tmpTab);
+		this.mTableModel.fireTableDataChanged();
 	}
 
 	/**
@@ -102,11 +102,8 @@ public class VisITMetaWindow extends JFrame {
 	 * @param name
 	 * @param graphPanel
 	 */
-	public void addConnection(String name, JComponent graphPanel) {
-		Object[] tmpTab = new Object[1];
-		tmpTab[0] = new ConnectionTab(name, graphPanel);
-		this.mConnectionTabs.add((ConnectionTab) tmpTab[0]);
-		this.mTableModel.addRow(tmpTab);
+	public void addConnection(String name, GraphConnection connection) {
+		this.addConnection(new ConnectionTab(name, connection));
 	}
 
 	/**
@@ -119,7 +116,7 @@ public class VisITMetaWindow extends JFrame {
 		for (int i = 0; i < mTableModel.getRowCount(); i++) {
 			if (mTableModel.getValueAt(i, 0).equals(connection)) {
 				mTableModel.removeRow(i);
-				mConnectionTabs.remove(connection);
+				this.mTableModel.fireTableDataChanged();
 				break;
 			}
 		}

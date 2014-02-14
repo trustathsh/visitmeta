@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta visualization, version 0.0.3,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-
-
-
-/* Imports ********************************************************************/
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -62,35 +58,36 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-/* Class **********************************************************************/
+
 /**
  * A Panel that shows the a tree generated of XML data.
  */
 public class PanelXmlTree extends JScrollPane {
-/* Attributes *****************************************************************/
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(PanelXmlTree.class);
-	private JTree                  mTree          = null;
-	private DocumentBuilderFactory mFactory       = null;
-	private DocumentBuilder        mBuilder       = null;
-/* Constructors ***************************************************************/
+	private JTree mTree = null;
+	private DocumentBuilderFactory mFactory = null;
+	private DocumentBuilder mBuilder = null;
+
 	public PanelXmlTree() {
 		super();
-		mTree    = new JTree(new DefaultMutableTreeNode("No Data."));
+		mTree = new JTree(new DefaultMutableTreeNode("No Data."));
 		mFactory = DocumentBuilderFactory.newInstance();
 		try {
 			mBuilder = mFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		setViewportView(mTree);
 	}
-/* Methods ********************************************************************/
+
 	/**
 	 * Generate a tree of XML data.
-	 * @param pXml the XML data to show in a tree.
-	 * @param pTimer the timer to hide the window.
+	 * 
+	 * @param pXml
+	 *            the XML data to show in a tree.
+	 * @param pTimer
+	 *            the timer to hide the window.
 	 */
 	public void fill(String pXml, final Timer pTimer) {
 		LOGGER.trace("Method initTreeRoot(" + pXml + ", " + pTimer + ") called.");
@@ -114,25 +111,30 @@ public class PanelXmlTree extends JScrollPane {
 		mTree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent pE) {
-				LOGGER.trace("MouseListener mouseExited(" + pE +") called.");
+				LOGGER.trace("MouseListener mouseExited(" + pE + ") called.");
 				LOGGER.debug("Start timer to hide WindowNodeProperties.");
 				pTimer.start();
 			}
+
 			@Override
 			public void mouseEntered(MouseEvent pE) {
-				LOGGER.trace("MouseListener mouseEntered(" + pE +") called.");
+				LOGGER.trace("MouseListener mouseEntered(" + pE + ") called.");
 				LOGGER.debug("Stop timer to hide WindowNodeProperties.");
 				pTimer.stop();
 			}
 		});
-		/* Redraw Panel */
 		repaint();
 	}
+
 	/**
 	 * Walks throw the tree.
-	 * @param pNode the Node.
-	 * @param pLevel the currentlevel of node in the tree.
-	 * @param pParentNode the ParrentNode of Node.
+	 * 
+	 * @param pNode
+	 *            the Node.
+	 * @param pLevel
+	 *            the currentlevel of node in the tree.
+	 * @param pParentNode
+	 *            the ParrentNode of Node.
 	 */
 	private void treeWalk(Node pNode, int pLevel, DefaultMutableTreeNode pParentNode) {
 		LOGGER.trace("Method treeWalk(" + pNode + ", " + pLevel + ", " + pParentNode + ") called.");
@@ -143,42 +145,44 @@ public class PanelXmlTree extends JScrollPane {
 			int vLength = vList.getLength();
 			for (int i = 0; i < vLength; ++i) {
 				Node vChild = vList.item(i);
-				if(vChild.getNodeType() == Node.TEXT_NODE) {
+				if (vChild.getNodeType() == Node.TEXT_NODE) {
 					String vValue = vChild.getNodeValue();
-					if(vValue != null && vValue.length() > 0) {
-		    			vChildNode = new DefaultMutableTreeNode(vValue);
-		    			vChildNode.setAllowsChildren(false);
-		    			pParentNode.add(vChildNode);
+					if (vValue != null && vValue.length() > 0) {
+						vChildNode = new DefaultMutableTreeNode(vValue);
+						vChildNode.setAllowsChildren(false);
+						pParentNode.add(vChildNode);
 					}
 				} else {
-    				vChildNode = new DefaultMutableTreeNode(getNodeName(vChild));
-    				pParentNode.add(vChildNode);
-    				treeWalk(vList.item(i), pLevel, vChildNode);
+					vChildNode = new DefaultMutableTreeNode(getNodeName(vChild));
+					pParentNode.add(vChildNode);
+					treeWalk(vList.item(i), pLevel, vChildNode);
 				}
 			}
 		} else {
 			String vValue = pNode.getNodeValue();
-			if(vValue != null && vValue.length() > 0) {
-    			vChildNode = new DefaultMutableTreeNode(vValue);
-    			vChildNode.setAllowsChildren(false);
-    			pParentNode.add(vChildNode);
+			if (vValue != null && vValue.length() > 0) {
+				vChildNode = new DefaultMutableTreeNode(vValue);
+				vChildNode.setAllowsChildren(false);
+				pParentNode.add(vChildNode);
 			}
 		}
 	}
 
 	/**
 	 * Returns the Label for the node.
-	 * @param pNode the node.
+	 * 
+	 * @param pNode
+	 *            the node.
 	 * @return String with NodeName + attributes (NodeName + NodeValue).
 	 */
 	private StringBuffer getNodeName(Node pNode) {
 		StringBuffer vResult = new StringBuffer();
 		vResult.append(pNode.getNodeName());
-		if(pNode.hasAttributes()) {
+		if (pNode.hasAttributes()) {
 			int vLastIndex = pNode.getAttributes().getLength() - 1;
 			vResult.append(" (");
 			/* Attributes */
-			for(int k = 0 ; k < vLastIndex; ++k) {
+			for (int k = 0; k < vLastIndex; ++k) {
 				vResult.append(pNode.getAttributes().item(k).getNodeName());
 				vResult.append(": ");
 				vResult.append(pNode.getAttributes().item(k).getNodeValue());

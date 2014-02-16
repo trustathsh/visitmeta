@@ -47,6 +47,8 @@ import javax.swing.JMenuItem;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
+
 /**
  *
  */
@@ -74,8 +76,8 @@ public class MenuBar extends JMenuBar {
 		super();
 		mContoller = guiController;
 		/* Connections */
-		// JMenu mnConnections = new JMenu("Connections");
-		// add(mnConnections);
+		JMenu mnConnections = new JMenu("Connections");
+		add(mnConnections);
 		//
 		// JMenu mnConnectTo = new JMenu("Connect To");
 		// mnConnections.add(mnConnectTo);
@@ -89,8 +91,16 @@ public class MenuBar extends JMenuBar {
 		// JMenuItem menuItem = new JMenuItem("...");
 		// mnConnectTo.add(menuItem);
 		//
-		// JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
-		// mnConnections.add(mntmAddConnection);
+		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
+		mntmAddConnection.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ConnectionDialog cD = new ConnectionDialog(null);
+				cD.setVisible(true);
+			}
+		});
+
+		mnConnections.add(mntmAddConnection);
 		/* Actions */
 		mMenuActions = new JMenu("Actions");
 		add(mMenuActions);

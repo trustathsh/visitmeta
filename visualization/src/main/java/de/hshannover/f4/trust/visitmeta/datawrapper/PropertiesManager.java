@@ -106,4 +106,23 @@ public class PropertiesManager {
 			LOGGER.warn("Couldn't store properties in file \"" + pFileName + ".properties\".");
 		}
 	}
+
+
+	public static synchronized void removeProperty(String pFileName, String pKey) {
+		LOGGER.trace("Method removeProperty(" + pFileName + ", " + pKey + ", " + ") called.");
+		String                 vPath         = null;
+		PropertiesReaderWriter vReaderWriter = mPropertyFiles.get(pFileName);
+		try {
+			if(vReaderWriter == null) {
+				/* Get PropertiesReaderWriter */
+				vPath         = PropertiesManager.class.getClassLoader().getResource(pFileName + ".properties").getPath();
+				vReaderWriter = new PropertiesReaderWriter(vPath, false);
+				mPropertyFiles.put(pFileName, vReaderWriter);
+			}
+			/* Remove Properties */
+			vReaderWriter.removePr(pKey);
+		} catch (IOException | NullPointerException e) {
+			LOGGER.warn("Couldn't remove property in file \"" + pFileName + ".properties\".");
+		}
+	}
 }

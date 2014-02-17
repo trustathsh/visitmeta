@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionListener;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 
 public class ConnectionDialog extends JFrame {
@@ -61,6 +62,8 @@ public class ConnectionDialog extends JFrame {
 	public Set<Integer> indexesToRemove;
 
 	private RESTConnection mPreviousConnection;
+
+	private GuiController mContoller;
 
 	private void newPanels(){
 		mJpContent = new JPanel();
@@ -181,7 +184,7 @@ public class ConnectionDialog extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String name = "New Connection (" + (mListModel.getSize() + 1) + ")";
-				String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_DEFAULT_URL, "http://localhost:8000");
+				String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_DEFAULT_URL, "http://localhost:8000/default");
 				RESTConnection param = new RESTConnection(name, url, false);
 				param.setName(name);
 				mListModel.add(mListModel.getSize(), param);
@@ -267,6 +270,8 @@ public class ConnectionDialog extends JFrame {
 	}
 
 	public ConnectionDialog(RESTConnection[] cons) {
+		//		mContoller = guiController;
+
 		setResizable(false);
 		setTitle("Manage REST connections");
 		setBounds(100, 100, 671, 500);
@@ -312,7 +317,7 @@ public class ConnectionDialog extends JFrame {
 
 		for(int i=0; i<count; i++){
 			String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_NAME(i), "default");
-			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_URL(i), "http://localhost:8000");
+			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_URL(i), "http://localhost:8000/default");
 			boolean dumping = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_DUMPING(i), "false").toLowerCase());
 
 			RESTConnection tmpConnection = new RESTConnection(name, url, dumping);

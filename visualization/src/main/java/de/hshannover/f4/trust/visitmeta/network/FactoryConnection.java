@@ -53,6 +53,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
@@ -109,6 +110,56 @@ public abstract class FactoryConnection {
 			LOGGER.info("Create a new REST connection to dataservice with URI: " + uri);
 			System.out.println(graphService.getCurrentGraph());
 			return new Connection(graphService);
+		default:
+			throw new RuntimeException("Error creating connection to dataservice; tried with type '" + type.name() + "'");
+		}
+	}
+
+	/**
+	 * Returns a Connection defined by type.
+	 * @param type define witch Connection to return.
+	 *        "LOCAL" a Connection that run the DataService in an extra thread and connect to the
+	 *                if-map server.
+	 *        TODO "REST" a Connection that connect to the DataService over REST.
+	 */
+	public static Connection getConnection(ConnectionType type, int restIndex) {
+		LOGGER.trace("Method getConnection(" + type + ") called.");
+		GraphService graphService = null;
+		switch(type) {
+		case LOCAL:
+			LOGGER.error("Created a new local connection to dataservice");
+			throw new UnsupportedOperationException("Local connection not implemented.");
+		case REST:
+			if(restIndex >= 0){
+
+				String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_URL(restIndex), "http://localhost:8000/default");
+				boolean dumping = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_DUMPING(restIndex), "false").toLowerCase());
+				boolean includeRawXML = Boolean.parseBoolean(PropertiesManager.getProperty("application", "restservice.rawxml", "true"));
+
+				ClientConfig config = new DefaultClientConfig();
+				Client client = Client.create(config);
+
+				URI uri_connect = UriBuilder.fromUri(url + "/connect").build(); // FIXME HotFix for new Rest Interface
+				WebResource temp1 = client.resource(uri_connect);
+				LOGGER.info("Dataservice: " + temp1.put(String.class));
+
+				if(dumping){
+					URI uri_start_dump = UriBuilder.fromUri(url + "/dump/start").build(); // FIXME HotFix for new Rest Interface
+					WebResource temp2 = client.resource(uri_start_dump);
+					LOGGER.info("Dataservice: " + temp2.put(String.class));
+				}
+
+				URI uri = UriBuilder.fromUri(url + "/graph").build(); // FIXME HotFix for new Rest Interface
+				WebResource service = client.resource(uri);
+
+				graphService = new ProxyGraphService(service, includeRawXML);
+				LOGGER.info("Create a new REST connection to dataservice with URI: " + uri);
+				System.out.println(graphService.getCurrentGraph());
+				return new Connection(graphService);
+
+			}else{
+				throw new UnsupportedOperationException("If the connection type REST, must be given a valid connection index.");
+			}
 		default:
 			throw new RuntimeException("Error creating connection to dataservice; tried with type '" + type.name() + "'");
 		}

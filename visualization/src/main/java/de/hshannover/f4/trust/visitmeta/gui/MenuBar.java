@@ -40,13 +40,19 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
 /**
@@ -60,6 +66,7 @@ public class MenuBar extends JMenuBar {
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuLevelOfDetail = null;
+	private JMenu mMenuLayout = null;
 	private JMenuItem mItemLevel0 = null;
 	private JMenuItem mItemLevel1 = null;
 	private JMenuItem mItemLevel2 = null;
@@ -185,6 +192,35 @@ public class MenuBar extends JMenuBar {
 			}
 		});
 		mnSettings.add(mItemTimings);
+
+		mMenuLayout = new JMenu("Layout");
+		mnSettings.add(mMenuLayout);
+
+		final List<SupportedLaF> supportedLaFs = guiController.getMainWindow().getSupportedLaFs();
+		final MainWindow mainWindow = guiController.getMainWindow();
+
+		for (final SupportedLaF lAf: supportedLaFs){
+			mMenuLayout.add(lAf.menuItem);
+			lAf.menuItem.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					LookAndFeel laf = lAf.laf;
+					try {
+						UIManager.setLookAndFeel(laf);
+						SwingUtilities.updateComponentTreeUI(mainWindow);
+						mainWindow.pack();
+					} catch (UnsupportedLookAndFeelException e) {
+						System.out.println(e.getMessage());
+					}
+
+					for (SupportedLaF lAf2 : supportedLaFs){
+						if(lAf != lAf2){
+							lAf2.menuItem.setSelected(false);
+						}
+					}
+				}
+			});
+		}
 
 		// JMenu mnGraphDrawer = new JMenu("Graph Drawer");
 		// mnSettings.add(mnGraphDrawer);

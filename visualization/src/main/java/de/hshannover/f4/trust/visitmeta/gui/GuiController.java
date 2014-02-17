@@ -63,7 +63,7 @@ public class GuiController {
 	public GuiController() {
 		initMainWindow();
 		initConnections();
-//		initSettingsWindows();
+		//		initSettingsWindows();
 	}
 
 	/**
@@ -82,36 +82,36 @@ public class GuiController {
 		mConnections = new HashSet<ConnectionTab>();
 	}
 
-//	/**
-//	 * 
-//	 */
-//	private void initSettingsWindows() {
-//		mWindowSettings = new WindowSettings(this);
-//		mWindowSettings.setAlwaysOnTop(true);
-//		mWindowSettings.setVisible(false);
-//		mWindowColorSettings = new WindowColorSettings(this);
-//		mWindowColorSettings.setAlwaysOnTop(true);
-//		mWindowColorSettings.setVisible(false);
-//		mWindowNodeProperties = new WindowNodeProperties(mMainWindow, this);
-//		mTimerPropertiesShow = new Timer(750, new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent pE) {
-//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-//				mTimerPropertiesShow.stop();
-//				mWindowNodeProperties.setVisible(true);
-//			}
-//		});
-//		mTimerPropertiesHide = new Timer(500, new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent pE) {
-//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-//				mTimerPropertiesHide.stop();
-//				mWindowNodeProperties.setVisible(false);
-//			}
-//		});
-//	}
+	//	/**
+	//	 *
+	//	 */
+	//	private void initSettingsWindows() {
+	//		mWindowSettings = new WindowSettings(this);
+	//		mWindowSettings.setAlwaysOnTop(true);
+	//		mWindowSettings.setVisible(false);
+	//		mWindowColorSettings = new WindowColorSettings(this);
+	//		mWindowColorSettings.setAlwaysOnTop(true);
+	//		mWindowColorSettings.setVisible(false);
+	//		mWindowNodeProperties = new WindowNodeProperties(mMainWindow, this);
+	//		mTimerPropertiesShow = new Timer(750, new ActionListener() {
+	//			@Override
+	//			public void actionPerformed(ActionEvent pE) {
+	//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
+	//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
+	//				mTimerPropertiesShow.stop();
+	//				mWindowNodeProperties.setVisible(true);
+	//			}
+	//		});
+	//		mTimerPropertiesHide = new Timer(500, new ActionListener() {
+	//			@Override
+	//			public void actionPerformed(ActionEvent pE) {
+	//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
+	//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
+	//				mTimerPropertiesHide.stop();
+	//				mWindowNodeProperties.setVisible(false);
+	//			}
+	//		});
+	//	}
 
 	public GraphConnection getSelectedConnection() {
 		return mSelectedConnection.getConnection();
@@ -243,5 +243,9 @@ public class GuiController {
 	 */
 	public boolean isGraphMotion() {
 		return mSelectedConnection.getConnection().isGraphMotion();
+	}
+
+	public MainWindow getMainWindow() {
+		return mMainWindow;
 	}
 }

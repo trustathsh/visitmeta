@@ -45,7 +45,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,6 +57,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionEvent;
@@ -76,6 +80,7 @@ public class MainWindow extends JFrame {
 	private DefaultTableModel mTableModel = null;
 	private JTable mConnectionTable = null;
 	private JScrollPane mConnectionScrollPane = null;
+	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
 
 	/**
 	 * 
@@ -294,33 +299,60 @@ public class MainWindow extends JFrame {
 		});
 	}
 
+
+	static class SupportedLaF {
+		JCheckBoxMenuItem menuItem;
+		String name;
+		LookAndFeel laf;
+
+		SupportedLaF(String name, LookAndFeel laf) {
+			this.name = name;
+			this.laf = laf;
+			this.menuItem = new JCheckBoxMenuItem(name);
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
+
 	/**
 	 * Set the look and feel of java depending on the operating system.
 	 */
 	private void setLookAndFeel() {
 		LOGGER.trace("Method setLookAndFeel() called.");
-		try {
-			switch (System.getProperty("os.name").toLowerCase()) {
-			case "win": // Windows
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-				break;
-			case "linux": // Linux
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-				break;
-			// case "nix": // Unix
-			// break;
-			// case "mac": // Mac
-			// break;
-			// case "sunos": // Solaris
-			// UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-			// break;
-			default:
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-				break;
+
+		UIManager.LookAndFeelInfo[] installedLafs = UIManager.getInstalledLookAndFeels();
+		for (UIManager.LookAndFeelInfo lafInfo : installedLafs) {
+			try {
+				Class lnfClass = Class.forName(lafInfo.getClassName());
+				LookAndFeel laf = (LookAndFeel)(lnfClass.newInstance());
+				if (laf.isSupportedLookAndFeel()) {
+					String name = lafInfo.getName();
+					supportedLaFs.add(new SupportedLaF(name, laf));
+
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				continue;
 			}
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
 		}
+
+		for (SupportedLaF lAf : supportedLaFs) {
+			if(lAf.name.equals("Windows")){
+				LookAndFeel laf = lAf.laf;
+				try {
+					UIManager.setLookAndFeel(laf);
+					lAf.menuItem.setSelected(true);
+				} catch (UnsupportedLookAndFeelException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+		}
+	}
+
+	public List<SupportedLaF> getSupportedLaFs() {
+		return supportedLaFs;
 	}
 }

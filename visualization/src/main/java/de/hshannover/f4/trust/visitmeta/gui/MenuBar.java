@@ -54,7 +54,7 @@ public class MenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
-	private GuiController mContoller = null;
+	private GuiController mController = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuLevelOfDetail = null;
@@ -72,7 +72,7 @@ public class MenuBar extends JMenuBar {
 	 */
 	public MenuBar(GuiController guiController) {
 		super();
-		mContoller = guiController;
+		mController = guiController;
 		/* Connections */
 		// JMenu mnConnections = new JMenu("Connections");
 		// add(mnConnections);
@@ -111,13 +111,13 @@ public class MenuBar extends JMenuBar {
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				if (mContoller.isGraphMotion()) {
+				if (mController.isGraphMotion()) {
 					LOGGER.debug("Stop motion of the graph.");
-					mContoller.stopGraphMotion();
+					mController.stopGraphMotion();
 					mItemStopMotion.setText("Start Motion");
 				} else {
 					LOGGER.debug("Start motion of the graph.");
-					mContoller.startGraphMotion();
+					mController.startGraphMotion();
 					mItemStopMotion.setText("Stop Motion");
 				}
 			}
@@ -129,7 +129,7 @@ public class MenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
 				LOGGER.debug("Redraw the graph.");
-				mContoller.redrawGraph();
+				mController.redrawGraph();
 			}
 		});
 		mMenuActions.add(mItemRedrawGraph);
@@ -162,7 +162,7 @@ public class MenuBar extends JMenuBar {
 		mItemSetColors.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mContoller.showColorSettings();
+				mController.showColorSettings();
 			}
 		});
 		mnSettings.add(mItemSetColors);
@@ -171,7 +171,7 @@ public class MenuBar extends JMenuBar {
 		mItemTimings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mContoller.showSettings();
+				mController.showSettings();
 			}
 		});
 		mnSettings.add(mItemTimings);

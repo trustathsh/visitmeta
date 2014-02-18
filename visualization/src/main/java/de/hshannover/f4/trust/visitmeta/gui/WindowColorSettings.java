@@ -60,14 +60,10 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 
-/**
- * A Window for defining color settings of different publishers.
- */
 public class WindowColorSettings extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowColorSettings.class);
-	private GuiController mController = null;
 	private JPanel mPanel = null;
 	private JColorChooser mColorChooser = null;
 	private Timer mDelay = null;
@@ -75,23 +71,19 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 	private ButtonGroup mGroup = null;
 	private List<String> mPublisher = null;
 	private SpringLayout mSpringLayout = null;
+	private ConnectionTab mConnection = null;
 
-	/**
-	 * 
-	 * @param pController
-	 */
-	public WindowColorSettings(GuiController controller) {
+	public WindowColorSettings(ConnectionTab connection) {
 		super();
-		mController = controller;
 		mPanel = new JPanel();
-		mPublisher = mController.getSelectedConnection().getPublisher();
+		mConnection = connection;
+		mPublisher = mConnection.getPublisher();
 
 		setTitle("Color Settings");
 		mSpringLayout = new SpringLayout();
 		setMinimumSize(new Dimension(570, 270));
 		setPreferredSize(new Dimension(650, 300));
 
-		/* publisher select box */
 		mSelectPublisher = new JComboBox<String>(mPublisher.toArray(new String[0]));
 		mSelectPublisher.addItem("identifier");
 		mSelectPublisher.addItem("default metadata");
@@ -127,7 +119,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 					}
 					String vColor = "0x" + Integer.toHexString(mColorChooser.getColor().getRGB()).substring(2);
 					PropertiesManager.storeProperty("color", vProperty, vColor);
-					mController.getSelectedConnection().repaintNodes(vType, vPublisher);
+					mConnection.getConnection().repaintNodes(vType, vPublisher);
 				}
 				mDelay.stop();
 			}

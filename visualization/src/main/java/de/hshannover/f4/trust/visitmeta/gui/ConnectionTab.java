@@ -39,12 +39,19 @@
 package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.Timer;
 
 import org.apache.log4j.Logger;
+
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class ConnectionTab extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -61,6 +68,12 @@ public class ConnectionTab extends JPanel {
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
 
+	private WindowColorSettings mWindowColorSettings;
+	private WindowSettings mWindowSettings;
+	private WindowNodeProperties mWindowNodeProperties;
+	private Timer mTimerPropertiesShow;
+	private Timer mTimerPropertiesHide;
+
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
 	 * 
@@ -69,7 +82,7 @@ public class ConnectionTab extends JPanel {
 	 * @param connection
 	 *            Panel Object that represents the Connection
 	 */
-	public ConnectionTab(String name, GraphConnection connection) {
+	public ConnectionTab(String name, GraphConnection connection, JFrame window) {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + name);
 		if (connectionStatusIcon == null) {
@@ -78,13 +91,16 @@ public class ConnectionTab extends JPanel {
 			connectionStatusIcon[1] = new ImageIcon(getClass().getClassLoader().getResource("ball_red_small.png"));
 		}
 
-		this.mName = name;
-		this.mConnected = true;
-		this.setLayout(new GridLayout());
+		mName = name;
+		mConnected = true;
 		mConnection = connection;
+		mConnection.setParentTab(this);
 		mTimeLine = new PanelTimeLine();
+		this.setLayout(new GridLayout());
 
 		initPanels();
+		initSettingsWindows();
+		initNodeSettings(window);
 
 		this.add(mSplitPane);
 	}
@@ -108,6 +124,40 @@ public class ConnectionTab extends JPanel {
 		mSplitPane.setEnabled(false);
 		mSplitPane.setLeftComponent(mUpperPanel);
 		mSplitPane.setRightComponent(mLowerPanel);
+	}
+
+	/**
+	 * Initializes the settings windows
+	 */
+	private void initSettingsWindows() {
+		mWindowSettings = new WindowSettings();
+		mWindowSettings.setAlwaysOnTop(true);
+		mWindowSettings.setVisible(false);
+		mWindowColorSettings = new WindowColorSettings(this);
+		mWindowColorSettings.setAlwaysOnTop(true);
+		mWindowColorSettings.setVisible(false);
+	}
+
+	private void initNodeSettings(JFrame window) {
+		mWindowNodeProperties = new WindowNodeProperties(window);
+		mTimerPropertiesShow = new Timer(750, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent pE) {
+				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
+				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
+				mTimerPropertiesShow.stop();
+				mWindowNodeProperties.setVisible(true);
+			}
+		});
+		mTimerPropertiesHide = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent pE) {
+				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
+				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
+				mTimerPropertiesHide.stop();
+				mWindowNodeProperties.setVisible(false);
+			}
+		});
 	}
 
 	/**
@@ -178,5 +228,40 @@ public class ConnectionTab extends JPanel {
 		}
 		ConnectionTab other = (ConnectionTab) o;
 		return this.mName.equals(other.mName);
+	}
+
+	public void showColorSettings(JFrame window) {
+		mWindowColorSettings.updateWindow();
+		mWindowColorSettings.setLocationRelativeTo(window);
+		mWindowColorSettings.setVisible(true);
+
+	}
+
+	public void showSettings(JFrame window) {
+		mWindowSettings.setLocationRelativeTo(window);
+		mWindowSettings.setVisible(true);
+	}
+
+	public List<String> getPublisher() {
+		return mConnection.getPublisher();
+	}
+
+	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
+		mTimerPropertiesHide.stop();
+		mWindowNodeProperties.fill(pData.getRawData(), mTimerPropertiesHide);
+		mWindowNodeProperties.repaint();
+		mWindowNodeProperties.setLocation(pX + 1, pY + 1);
+		mTimerPropertiesShow.start();
+	}
+
+	public void hidePropertiesOfNode() {
+		mTimerPropertiesShow.stop();
+		mTimerPropertiesHide.start();
+	}
+
+	public void hidePropertiesOfNodeNow() {
+		mTimerPropertiesShow.stop();
+		mTimerPropertiesHide.stop();
+		mWindowNodeProperties.setVisible(false);
 	}
 }

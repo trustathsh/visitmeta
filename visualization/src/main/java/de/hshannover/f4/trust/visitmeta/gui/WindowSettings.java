@@ -57,7 +57,6 @@ public class WindowSettings extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowSettings.class);
-	private GuiController mController = null;
 	private SettingManager mSettingManager = null;
 	private JPanel mPanel = null;
 	private SpringLayout mSpringLayout = null;
@@ -66,6 +65,13 @@ public class WindowSettings extends JFrame {
 	private JTextField mInputCalculationIterations = null;
 	private JTextField mInputHighlightsTimeout = null;
 	private JTextField mInputNodeTranslationDuration = null;
+	private JLabel mLabelNetwork = null;
+	private JLabel mLabelCalculation = null;
+	private JLabel mLabelIterations = null;
+	private JLabel mLabelHighlights = null;
+	private JLabel mLabelNodeTranslationDuration = null;
+	
+	private JPanel mPanelButton = null;
 	private JButton mButtonSave = null;
 	private JButton mButtonCancel = null;
 
@@ -74,37 +80,73 @@ public class WindowSettings extends JFrame {
 	private String mCalculationIterations = null;
 	private String mHighlightsTimeout = null;
 	private String mNodeTranslationDuration = null;
+	
+	/**
+	 * Calls the init() method to initialize the settings window
+	 */
+	public WindowSettings() {
+		super();
+		init();
+		pack();
+	}
+	
+	/**
+	 * Initializes a settings window
+	 */
+	private void init() {
+		LOGGER.trace("Init Settings Window");
+		initWindow();
+		loadSettings();
+		initInputFields();
+		initSaveButton();
+		initCancelButton();
+		setElements();
+		addElements();
+	}
 
 	/**
-	 * 
-	 * @param controller
+	 * Initializes the main components
 	 */
-	public WindowSettings(GuiController controller) {
-		mController = controller;
+	private void initWindow() {
 		mSettingManager = SettingManager.getInstance();
 		mPanel = new JPanel();
 		mSpringLayout = new SpringLayout();
 		setTitle("Timing Settings");
 		setMinimumSize(new Dimension(200, 195));
 		setPreferredSize(new Dimension(290, 195));
-		/* Get default settings */
+	}
+
+	/**
+	 * Loads previous saved settings
+	 */
+	private void loadSettings() {
 		mNetworkInterval = Integer.toString(mSettingManager.getNetworkInterval());
 		mCalculationInterval = Integer.toString(mSettingManager.getCalculationInterval());
 		mCalculationIterations = Integer.toString(mSettingManager.getCalculationIterations());
 		mHighlightsTimeout = Integer.toString(mSettingManager.getHighlightsTimeout());
 		mNodeTranslationDuration = Integer.toString(mSettingManager.getNodeTranslationDuration());
-		/* Text input and labels */
+	}
+
+	/**
+	 * Initializes the input fields and their labels
+	 */
+	private void initInputFields() {
 		mInputNetworkInterval = new JTextField(mNetworkInterval, 10);
-		JLabel vLabelNetwork = new JLabel("Network Interval");
+		mLabelNetwork = new JLabel("Network Interval");
 		mInputCalculationInterval = new JTextField(mCalculationInterval, 10);
-		JLabel vLabelCalculation = new JLabel("Calculation Interval");
+		mLabelCalculation = new JLabel("Calculation Interval");
 		mInputCalculationIterations = new JTextField(mCalculationIterations, 10);
-		JLabel vLabelIterations = new JLabel("Calculation Iterations");
+		mLabelIterations = new JLabel("Calculation Iterations");
 		mInputHighlightsTimeout = new JTextField(mHighlightsTimeout, 10);
-		JLabel vLabelHighlights = new JLabel("Highlights Timeout");
+		mLabelHighlights = new JLabel("Highlights Timeout");
 		mInputNodeTranslationDuration = new JTextField(mNodeTranslationDuration, 10);
-		JLabel vLabelNodeTranslationDuration = new JLabel("Translation Duration");
-		/* Save and Cancel buttons */
+		mLabelNodeTranslationDuration = new JLabel("Translation Duration");
+	}
+
+	/**
+	 * Initializes the save button and adds an ActionListener
+	 */
+	private void initSaveButton() {
 		mButtonSave = new JButton("Save");
 		mButtonSave.addActionListener(new ActionListener() {
 			@Override
@@ -115,7 +157,7 @@ public class WindowSettings extends JFrame {
 				int vCalculationIterations = -1;
 				int vHighlightsTimeout = -1;
 				int vNodeTranslationDuration = -1;
-				/* Try to parse input */
+
 				if (!mInputNetworkInterval.getText().equals(mNetworkInterval)) {
 					try {
 						vNetworkInterval = Integer.parseInt(mInputNetworkInterval.getText());
@@ -156,7 +198,7 @@ public class WindowSettings extends JFrame {
 						mInputNodeTranslationDuration.setText(mNodeTranslationDuration);
 					}
 				}
-				/* Save changes and notify observers */
+
 				if (hasChanged) {
 					if (vNetworkInterval > 0) {
 						mSettingManager.setNetworkInterval(vNetworkInterval);
@@ -183,11 +225,17 @@ public class WindowSettings extends JFrame {
 				setVisible(false);
 			}
 		});
+		
+	}
+
+	/**
+	 * Initializes the cancel button and adds an ActionListener
+	 */
+	private void initCancelButton() {
 		mButtonCancel = new JButton("Cancel");
 		mButtonCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				/* Restore previous values */
 				mInputNetworkInterval.setText(mNetworkInterval);
 				mInputCalculationInterval.setText(mCalculationInterval);
 				mInputCalculationIterations.setText(mCalculationIterations);
@@ -196,71 +244,78 @@ public class WindowSettings extends JFrame {
 				setVisible(false);
 			}
 		});
-		/* Arrange elements in layout */
+	}
+
+	/**
+	 * Arranges the elements in a SpringLayout
+	 */
+	private void setElements() {
 		mPanel.setLayout(mSpringLayout);
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vLabelNetwork, 10, SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mLabelNetwork, 10, SpringLayout.NORTH, mPanel);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, mInputNetworkInterval, 5, SpringLayout.NORTH, mPanel);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vLabelNetwork, 5, SpringLayout.WEST, mPanel);
-		mSpringLayout.putConstraint(SpringLayout.WEST, mInputNetworkInterval, 5, SpringLayout.EAST, vLabelIterations);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mLabelNetwork, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mInputNetworkInterval, 5, SpringLayout.EAST, mLabelIterations);
 		mSpringLayout.putConstraint(SpringLayout.EAST, mInputNetworkInterval, -5, SpringLayout.EAST, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vLabelCalculation, 10, SpringLayout.SOUTH,
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mLabelCalculation, 10, SpringLayout.SOUTH,
 				mInputNetworkInterval);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, mInputCalculationInterval, 5, SpringLayout.SOUTH,
 				mInputNetworkInterval);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vLabelCalculation, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mLabelCalculation, 5, SpringLayout.WEST, mPanel);
 		mSpringLayout.putConstraint(SpringLayout.WEST, mInputCalculationInterval, 5, SpringLayout.EAST,
-				vLabelIterations);
+				mLabelIterations);
 		mSpringLayout.putConstraint(SpringLayout.EAST, mInputCalculationInterval, -5, SpringLayout.EAST, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vLabelIterations, 10, SpringLayout.SOUTH,
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mLabelIterations, 10, SpringLayout.SOUTH,
 				mInputCalculationInterval);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, mInputCalculationIterations, 5, SpringLayout.SOUTH,
 				mInputCalculationInterval);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vLabelIterations, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mLabelIterations, 5, SpringLayout.WEST, mPanel);
 		mSpringLayout.putConstraint(SpringLayout.WEST, mInputCalculationIterations, 5, SpringLayout.EAST,
-				vLabelIterations);
+				mLabelIterations);
 		mSpringLayout.putConstraint(SpringLayout.EAST, mInputCalculationIterations, -5, SpringLayout.EAST, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vLabelHighlights, 10, SpringLayout.SOUTH,
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mLabelHighlights, 10, SpringLayout.SOUTH,
 				mInputCalculationIterations);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, mInputHighlightsTimeout, 5, SpringLayout.SOUTH,
 				mInputCalculationIterations);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vLabelHighlights, 5, SpringLayout.WEST, mPanel);
-		mSpringLayout.putConstraint(SpringLayout.WEST, mInputHighlightsTimeout, 5, SpringLayout.EAST, vLabelIterations);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mLabelHighlights, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mInputHighlightsTimeout, 5, SpringLayout.EAST, mLabelIterations);
 		mSpringLayout.putConstraint(SpringLayout.EAST, mInputHighlightsTimeout, -5, SpringLayout.EAST, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vLabelNodeTranslationDuration, 10, SpringLayout.SOUTH,
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mLabelNodeTranslationDuration, 10, SpringLayout.SOUTH,
 				mInputHighlightsTimeout);
 		mSpringLayout.putConstraint(SpringLayout.NORTH, mInputNodeTranslationDuration, 5, SpringLayout.SOUTH,
 				mInputHighlightsTimeout);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vLabelNodeTranslationDuration, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mLabelNodeTranslationDuration, 5, SpringLayout.WEST, mPanel);
 		mSpringLayout.putConstraint(SpringLayout.WEST, mInputNodeTranslationDuration, 5, SpringLayout.EAST,
-				vLabelIterations);
+				mLabelIterations);
 		mSpringLayout.putConstraint(SpringLayout.EAST, mInputNodeTranslationDuration, -5, SpringLayout.EAST, mPanel);
 
-		JPanel vPanelButton = new JPanel();
-		mSpringLayout.putConstraint(SpringLayout.NORTH, vPanelButton, 5, SpringLayout.SOUTH,
+		mPanelButton = new JPanel();
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mPanelButton, 5, SpringLayout.SOUTH,
 				mInputNodeTranslationDuration);
-		mSpringLayout.putConstraint(SpringLayout.WEST, vPanelButton, 5, SpringLayout.WEST, mPanel);
-		mSpringLayout.putConstraint(SpringLayout.EAST, mPanel, 5, SpringLayout.EAST, vPanelButton);
-		/* Add elements to panel */
-		mPanel.add(vLabelNetwork);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mPanelButton, 5, SpringLayout.WEST, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mPanel, 5, SpringLayout.EAST, mPanelButton);
+	}
+
+	/**
+	 * Adds the elements to the frame
+	 */
+	private void addElements() {
+		mPanel.add(mLabelNetwork);
 		mPanel.add(mInputNetworkInterval);
-		mPanel.add(vLabelCalculation);
+		mPanel.add(mLabelCalculation);
 		mPanel.add(mInputCalculationInterval);
-		mPanel.add(vLabelIterations);
+		mPanel.add(mLabelIterations);
 		mPanel.add(mInputCalculationIterations);
-		mPanel.add(vLabelHighlights);
+		mPanel.add(mLabelHighlights);
 		mPanel.add(mInputHighlightsTimeout);
-		mPanel.add(vLabelNodeTranslationDuration);
+		mPanel.add(mLabelNodeTranslationDuration);
 		mPanel.add(mInputNodeTranslationDuration);
-		mPanel.add(vPanelButton);
-		vPanelButton.add(mButtonSave);
-		vPanelButton.add(mButtonCancel);
-		// mPanel.add(mButtonSave);
-		// mPanel.add(mButtonCancel);
+		mPanel.add(mPanelButton);
+		mPanelButton.add(mButtonSave);
+		mPanelButton.add(mButtonCancel);
 		add(mPanel);
-		pack();
 	}
 }

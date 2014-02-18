@@ -103,7 +103,7 @@ public class MainWindow extends JFrame {
 	 * @param graphPanel
 	 */
 	public void addConnection(String name, GraphConnection connection) {
-		this.addConnection(new ConnectionTab(name, connection));
+		this.addConnection(new ConnectionTab(name, connection, this));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class MainWindow extends JFrame {
 	 *            of the connection that should be removed
 	 */
 	public void removeConnection(String name) {
-		this.removeConnection(new ConnectionTab(name, null));
+		this.removeConnection(new ConnectionTab(name, null, null));
 	}
 
 	/**

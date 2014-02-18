@@ -40,30 +40,17 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.util.HashSet;
 
-import javax.swing.Timer;
-
 import org.apache.log4j.Logger;
-
-import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class GuiController {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private MainWindow mMainWindow = null;
-	private WindowNodeProperties mWindowNodeProperties = null;
-	private WindowColorSettings mWindowColorSettings = null;
-	private WindowSettings mWindowSettings = null;
-	private Timer mTimerPropertiesShow = null;
-	private Timer mTimerPropertiesHide = null;
 	private ConnectionTab mSelectedConnection = null;
 	private HashSet<ConnectionTab> mConnections = null;
 
-	/**
-	 * 
-	 */
 	public GuiController() {
 		initMainWindow();
 		initConnections();
-//		initSettingsWindows();
 	}
 
 	/**
@@ -74,44 +61,9 @@ public class GuiController {
 		mMainWindow.setJMenuBar(new MenuBar(this));
 	}
 
-	/**
-	 * 
-	 * @param connection
-	 */
 	private void initConnections() {
 		mConnections = new HashSet<ConnectionTab>();
 	}
-
-//	/**
-//	 * 
-//	 */
-//	private void initSettingsWindows() {
-//		mWindowSettings = new WindowSettings(this);
-//		mWindowSettings.setAlwaysOnTop(true);
-//		mWindowSettings.setVisible(false);
-//		mWindowColorSettings = new WindowColorSettings(this);
-//		mWindowColorSettings.setAlwaysOnTop(true);
-//		mWindowColorSettings.setVisible(false);
-//		mWindowNodeProperties = new WindowNodeProperties(mMainWindow, this);
-//		mTimerPropertiesShow = new Timer(750, new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent pE) {
-//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-//				mTimerPropertiesShow.stop();
-//				mWindowNodeProperties.setVisible(true);
-//			}
-//		});
-//		mTimerPropertiesHide = new Timer(500, new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent pE) {
-//				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-//				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-//				mTimerPropertiesHide.stop();
-//				mWindowNodeProperties.setVisible(false);
-//			}
-//		});
-//	}
 
 	public GraphConnection getSelectedConnection() {
 		return mSelectedConnection.getConnection();
@@ -134,7 +86,7 @@ public class GuiController {
 	 *            ConnectionController object
 	 */
 	public void addConnection(String name, GraphConnection connection) {
-		ConnectionTab tmp = new ConnectionTab(name, connection);
+		ConnectionTab tmp = new ConnectionTab(name, connection, mMainWindow);
 		this.setSelectedConnectionTab(tmp);
 		mMainWindow.addConnection(tmp);
 		mConnections.add(tmp);
@@ -147,7 +99,7 @@ public class GuiController {
 	 *            of the connection that needs to be removed
 	 */
 	public void removeConnection(String name) {
-		mConnections.remove(new ConnectionTab(name, null));
+		mConnections.remove(new ConnectionTab(name, null, null));
 	}
 
 	/**
@@ -164,9 +116,7 @@ public class GuiController {
 	 */
 	public void showColorSettings() {
 		LOGGER.trace("Method showColorSettings() called.");
-		mWindowColorSettings.updateWindow();
-		mWindowColorSettings.setLocationRelativeTo(mMainWindow);
-		mWindowColorSettings.setVisible(true);
+		mSelectedConnection.showColorSettings(mMainWindow);
 	}
 
 	/**
@@ -174,8 +124,7 @@ public class GuiController {
 	 */
 	public void showSettings() {
 		LOGGER.trace("Method showSettings() called.");
-		mWindowSettings.setLocationRelativeTo(mMainWindow);
-		mWindowSettings.setVisible(true);
+		mSelectedConnection.showSettings(mMainWindow);
 	}
 
 	/**
@@ -188,59 +137,39 @@ public class GuiController {
 	 * @param pY
 	 *            the y coordinate of the window.
 	 */
-	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
-		LOGGER.trace("Method showPropertiesOfNode(" + pData + ", " + pX + ", " + pY + ") called.");
-		mTimerPropertiesHide.stop();
-		mWindowNodeProperties.fill(pData.getRawData(), mTimerPropertiesHide);
-		mWindowNodeProperties.repaint();
-		mWindowNodeProperties.setLocation(pX + 1, pY + 1);
-		mTimerPropertiesShow.start();
-	}
+//	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
+//		LOGGER.trace("Method showPropertiesOfNode(" + pData + ", " + pX + ", " + pY + ") called.");
+//		mSelectedConnection.showPropertiesOfNode(pData, pX, pY);
+//	}
 
 	/**
 	 * Hide the property window after a period of time.
 	 */
-	public void hidePropertiesOfNode() {
-		LOGGER.trace("Method hidePropertiesOfNode() called.");
-		mTimerPropertiesShow.stop();
-		mTimerPropertiesHide.start();
-	}
+//	public void hidePropertiesOfNode() {
+//		LOGGER.trace("Method hidePropertiesOfNode() called.");
+//		mSelectedConnection.hidePropertiesOfNode();
+//	}
 
 	/**
 	 * Hide the property window.
 	 */
-	public void hidePropertiesOfNodeNow() {
-		LOGGER.trace("Method hidePropertiesOfNodeNow() called.");
-		mTimerPropertiesShow.stop();
-		mTimerPropertiesHide.stop();
-		mWindowNodeProperties.setVisible(false);
-	}
+//	public void hidePropertiesOfNodeNow() {
+//		LOGGER.trace("Method hidePropertiesOfNodeNow() called.");
+//		mSelectedConnection.hidePropertiesOfNodeNow();
+//	}
 
-	/**
-	 * 
-	 */
 	public void redrawGraph() {
 		mSelectedConnection.getConnection().redrawGraph();
 	}
 
-	/**
-	 * 
-	 */
 	public void startGraphMotion() {
 		mSelectedConnection.getConnection().startGraphMotion();
 	}
 
-	/**
-	 * 
-	 */
 	public void stopGraphMotion() {
 		mSelectedConnection.getConnection().stopGraphMotion();
 	}
 
-	/**
-	 * 
-	 * @return stuff
-	 */
 	public boolean isGraphMotion() {
 		return mSelectedConnection.getConnection().isGraphMotion();
 	}

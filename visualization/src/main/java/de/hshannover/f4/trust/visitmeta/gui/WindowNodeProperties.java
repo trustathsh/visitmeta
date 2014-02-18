@@ -52,7 +52,6 @@ import org.apache.log4j.Logger;
 public class WindowNodeProperties extends JWindow {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowNodeProperties.class);
-	GuiController mControler = null;
 	PanelXmlTree mPanel = null;
 
 	/**
@@ -60,9 +59,8 @@ public class WindowNodeProperties extends JWindow {
 	 * @param owner
 	 * @param controller
 	 */
-	public WindowNodeProperties(Frame owner, GuiController controller) {
+	public WindowNodeProperties(Frame owner) {
 		super(owner);
-		mControler = controller;
 		mPanel = new PanelXmlTree();
 		mPanel.setPreferredSize(new Dimension(250, 200));
 		add(mPanel);

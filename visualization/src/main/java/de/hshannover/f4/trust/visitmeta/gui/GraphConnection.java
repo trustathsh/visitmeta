@@ -61,9 +61,6 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 
-/**
- * Controller for interaction with user.
- */
 public class GraphConnection implements Observer {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private FacadeLogic mFacadeLogic = null;
@@ -73,28 +70,33 @@ public class GraphConnection implements Observer {
 	private TimeManagerCreation mTimerCreation = null;
 	private TimeManagerDeletion mTimerDeletion = null;
 	private boolean mAddHighlights = true;
+	private ConnectionTab mParentTab = null;
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 
-	/**
-	 * 
-	 * @param pLogic
-	 */
 	public GraphConnection(FacadeLogic pLogic) {
 		mFacadeLogic = pLogic;
 		mTimeSelector = TimeSelector.getInstance();
 		mSettingManager = SettingManager.getInstance();
 		mGraphPanel = GraphPanelFactory.getGraphPanel("Piccolo2D", this);
-		/* Time manager for the nodes in the graph */
+
 		mTimerCreation = TimeManagerCreation.getInstance();
 		mTimerDeletion = TimeManagerDeletion.getInstance();
 		mTimerCreation.setController(this);
 		mTimerDeletion.setController(this);
-		/* Add as observer */
+
 		mSettingManager.addObserver(this);
 		mFacadeLogic.addObserver(this);
 		mTimeSelector.addObserver(this);
 	}
 
+	public void setParentTab(ConnectionTab parentTab) {
+		this.mParentTab = parentTab;
+	}
+	
+	public ConnectionTab getParentTab() {
+		return mParentTab;
+	}
+	
 	public JComponent getGraphPanel() {
 		return mGraphPanel.getPanel();
 	}
@@ -108,12 +110,12 @@ public class GraphConnection implements Observer {
 	private synchronized void addIdentifier(List<NodeIdentifier> pIdentifier) {
 		LOGGER.trace("Method addIdentifier(" + pIdentifier + ") called.");
 		for (NodeIdentifier vIdentifier : pIdentifier) {
-			mGraphPanel.addIdentifier(vIdentifier); // Add identifier to panel
+			mGraphPanel.addIdentifier(vIdentifier);
 			if (mAddHighlights) {
 				mGraphPanel.markAsNew(vIdentifier);
 				mTimerCreation.addNode(vIdentifier);
 			}
-			vIdentifier.addObserver(this); // Set GuiController as Observer
+			vIdentifier.addObserver(this);
 			mObservables.put(vIdentifier, vIdentifier);
 		}
 	}
@@ -309,11 +311,9 @@ public class GraphConnection implements Observer {
 	 */
 	private void loadInitialGraph() {
 		LOGGER.trace("Method loadInitialGraph() called.");
-		/* Remove all data */
 		mTimerCreation.removeAll();
 		mTimerDeletion.removeAll();
 		clearGraph();
-		/* Call for initial graph */
 		mFacadeLogic.loadInitialGraph();
 	}
 
@@ -324,7 +324,6 @@ public class GraphConnection implements Observer {
 	 */
 	private void loadDelta() {
 		LOGGER.trace("Method loadDelta() called.");
-		/* Call for delta */
 		mFacadeLogic.loadDelta();
 	}
 
@@ -336,14 +335,12 @@ public class GraphConnection implements Observer {
 	 */
 	private void delta() {
 		LOGGER.trace("Method delta() called.");
-		/* Load initial graph */
 		mGraphPanel.setNodeTranslationDuration(0);
 		mAddHighlights = false;
 		loadInitialGraph();
 		mTimerCreation.removeAll();
 		mTimerDeletion.removeAll();
 		mAddHighlights = true;
-		/* Load delta */
 		loadDelta();
 		mGraphPanel.setNodeTranslationDuration(mSettingManager.getNodeTranslationDuration());
 	}
@@ -369,7 +366,6 @@ public class GraphConnection implements Observer {
 		for (Entry<ExpandedLink, List<NodeMetadata>> vSet : pData.getListAddMetadataLinks().entrySet()) {
 			addMetadata(vSet.getKey(), vSet.getValue());
 		}
-		/* Remove nodes from graph */
 		for (List<NodeMetadata> vMetadata : pData.getListDeleteMetadataLinks().values()) {
 			deleteMetadata(vMetadata);
 		}
@@ -377,7 +373,7 @@ public class GraphConnection implements Observer {
 			deleteMetadata(vMetadata);
 		}
 		deleteIdentifier(pData.getListDeleteIdentifier());
-		/* Adjust panel size */
+
 		mGraphPanel.adjustPanelSize();
 	}
 

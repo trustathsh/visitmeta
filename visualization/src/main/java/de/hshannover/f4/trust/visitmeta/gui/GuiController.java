@@ -173,4 +173,8 @@ public class GuiController {
 	public boolean isGraphMotion() {
 		return mSelectedConnection.getConnection().isGraphMotion();
 	}
+	
+	public MainWindow getMainWindow() {
+		return mMainWindow;
+	}
 }

@@ -65,6 +65,7 @@ public class GuiController {
 		mConnections = new HashSet<ConnectionTab>();
 	}
 
+
 	public GraphConnection getSelectedConnection() {
 		return mSelectedConnection.getConnection();
 	}
@@ -173,7 +174,7 @@ public class GuiController {
 	public boolean isGraphMotion() {
 		return mSelectedConnection.getConnection().isGraphMotion();
 	}
-	
+
 	public MainWindow getMainWindow() {
 		return mMainWindow;
 	}

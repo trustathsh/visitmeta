@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
@@ -75,32 +76,42 @@ public final class Main {
 	public static void main(String[] args) {
 		LOGGER.trace("Method main(" + args + ") called.");
 
-		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype",
-				"local").toUpperCase();
+		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype", "local").toUpperCase();
 		ConnectionType vConnectionType = ConnectionType.valueOf(vConnectionTypeString);
 
-		Connection vConnection = FactoryConnection.getConnection(vConnectionType);
-		Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+		GuiController gui = new GuiController();
+
+		if(vConnectionType == ConnectionType.REST){
+			int count = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT, "0"));
+
+			for(int i=0; i<count; i++){
+				String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_NAME(i), "default");
+
+				Connection vConnection = FactoryConnection.getConnection(vConnectionType, i);
+				Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+
+				FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
+				FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
+				GraphConnection connController = new GraphConnection(vLogic);
+
+				gui.addConnection(name , connController);
+
+				Thread vThreadNetwork = new Thread(vNetwork);
+				Thread vThreadLogic = new Thread(vLogic);
+				vThreadNetwork.start();
+				vThreadLogic.start();
+			}
+		}
 
 		TimeManagerCreation vTimerCreation = TimeManagerCreation.getInstance();
 		TimeManagerDeletion vTimerDeletion = TimeManagerDeletion.getInstance();
 
-		FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
-		FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
-		GraphConnection connController = new GraphConnection(vLogic);
-		GuiController gui = new GuiController();
-		gui.addConnection("Default", connController);
-
 		Thread vThreadCreation = new Thread(vTimerCreation);
 		Thread vThreadDeletion = new Thread(vTimerDeletion);
-		Thread vThreadNetwork = new Thread(vNetwork);
-		Thread vThreadLogic = new Thread(vLogic);
 
 		vThreadCreation.start();
 		vThreadDeletion.start();
 		gui.show();
-		vThreadNetwork.start();
-		vThreadLogic.start();
 
 	}
 }

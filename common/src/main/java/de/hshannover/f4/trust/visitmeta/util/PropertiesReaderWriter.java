@@ -144,6 +144,11 @@ public class PropertiesReaderWriter {
 		fileWriter.close();
 	}
 
+	public void removePr(String key){
+		NullCheck.check(key, "key is null");
+		mProperties.remove(key);
+	}
+
 	/**
 	 * @return a list of all keys in the {@link Properties} map.
 	 */

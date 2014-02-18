@@ -40,12 +40,20 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
+
+import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
 /**
  *
@@ -54,10 +62,11 @@ public class MenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
-	private GuiController mController = null;
+	private GuiController mContoller = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuLevelOfDetail = null;
+	private JMenu mMenuLayout = null;
 	private JMenuItem mItemLevel0 = null;
 	private JMenuItem mItemLevel1 = null;
 	private JMenuItem mItemLevel2 = null;
@@ -72,10 +81,10 @@ public class MenuBar extends JMenuBar {
 	 */
 	public MenuBar(GuiController guiController) {
 		super();
-		mController = guiController;
+		mContoller = guiController;
 		/* Connections */
-		// JMenu mnConnections = new JMenu("Connections");
-		// add(mnConnections);
+		JMenu mnConnections = new JMenu("Connections");
+		add(mnConnections);
 		//
 		// JMenu mnConnectTo = new JMenu("Connect To");
 		// mnConnections.add(mnConnectTo);
@@ -89,8 +98,16 @@ public class MenuBar extends JMenuBar {
 		// JMenuItem menuItem = new JMenuItem("...");
 		// mnConnectTo.add(menuItem);
 		//
-		// JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
-		// mnConnections.add(mntmAddConnection);
+		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
+		mntmAddConnection.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ConnectionDialog cD = new ConnectionDialog(null);
+				cD.setVisible(true);
+			}
+		});
+
+		mnConnections.add(mntmAddConnection);
 		/* Actions */
 		mMenuActions = new JMenu("Actions");
 		add(mMenuActions);
@@ -111,13 +128,13 @@ public class MenuBar extends JMenuBar {
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				if (mController.isGraphMotion()) {
+				if (mContoller.isGraphMotion()) {
 					LOGGER.debug("Stop motion of the graph.");
-					mController.stopGraphMotion();
+					mContoller.stopGraphMotion();
 					mItemStopMotion.setText("Start Motion");
 				} else {
 					LOGGER.debug("Start motion of the graph.");
-					mController.startGraphMotion();
+					mContoller.startGraphMotion();
 					mItemStopMotion.setText("Stop Motion");
 				}
 			}
@@ -129,7 +146,7 @@ public class MenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
 				LOGGER.debug("Redraw the graph.");
-				mController.redrawGraph();
+				mContoller.redrawGraph();
 			}
 		});
 		mMenuActions.add(mItemRedrawGraph);
@@ -162,7 +179,7 @@ public class MenuBar extends JMenuBar {
 		mItemSetColors.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mController.showColorSettings();
+				mContoller.showColorSettings();
 			}
 		});
 		mnSettings.add(mItemSetColors);
@@ -171,10 +188,39 @@ public class MenuBar extends JMenuBar {
 		mItemTimings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mController.showSettings();
+				mContoller.showSettings();
 			}
 		});
 		mnSettings.add(mItemTimings);
+
+		mMenuLayout = new JMenu("Layout");
+		mnSettings.add(mMenuLayout);
+
+		final List<SupportedLaF> supportedLaFs = guiController.getMainWindow().getSupportedLaFs();
+		final MainWindow mainWindow = guiController.getMainWindow();
+
+		for (final SupportedLaF lAf: supportedLaFs){
+			mMenuLayout.add(lAf.menuItem);
+			lAf.menuItem.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					LookAndFeel laf = lAf.laf;
+					try {
+						UIManager.setLookAndFeel(laf);
+						SwingUtilities.updateComponentTreeUI(mainWindow);
+						mainWindow.pack();
+					} catch (UnsupportedLookAndFeelException e) {
+						System.out.println(e.getMessage());
+					}
+
+					for (SupportedLaF lAf2 : supportedLaFs){
+						if(lAf != lAf2){
+							lAf2.menuItem.setSelected(false);
+						}
+					}
+				}
+			});
+		}
 
 		// JMenu mnGraphDrawer = new JMenu("Graph Drawer");
 		// mnSettings.add(mnGraphDrawer);

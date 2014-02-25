@@ -18,4 +18,8 @@ public final class ConfigParameter {
 	public static String VISUALIZATION_USER_CONNECTION_COUNT_DUMPING(int count){
 		return PRE_VISUALIZATION_USER_CONNECTION + count + ".dumping";
 	}
+
+	public static String VISUALIZATION_USER_CONNECTION_COUNT_RAWXML(int count){
+		return PRE_VISUALIZATION_USER_CONNECTION + count + ".rawxml";
+	}
 }

@@ -119,6 +119,13 @@ public class ConnectionManager {
 	/**
 	 * @return All saved connections.
 	 */
+	public static Map<String, Connection> getSavedConnectionMap(){
+		return conPool;
+	}
+
+	/**
+	 * @return All saved connections.
+	 */
 	public static String getSavedConnections(){
 		log.trace("getSavedConnections()...");
 

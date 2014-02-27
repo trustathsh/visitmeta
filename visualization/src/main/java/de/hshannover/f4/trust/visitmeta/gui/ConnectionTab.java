@@ -51,6 +51,7 @@ import javax.swing.Timer;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class ConnectionTab extends JPanel {
@@ -74,6 +75,8 @@ public class ConnectionTab extends JPanel {
 	private Timer mTimerPropertiesShow;
 	private Timer mTimerPropertiesHide;
 
+	private RESTConnection mRestCon;
+
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
 	 * 
@@ -85,6 +88,32 @@ public class ConnectionTab extends JPanel {
 	public ConnectionTab(String name, GraphConnection connection, JFrame window) {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + name);
+		if (connectionStatusIcon == null) {
+			connectionStatusIcon = new ImageIcon[2];
+			connectionStatusIcon[0] = new ImageIcon(getClass().getClassLoader().getResource("ball_green_small.png"));
+			connectionStatusIcon[1] = new ImageIcon(getClass().getClassLoader().getResource("ball_red_small.png"));
+		}
+
+		mName = name;
+		mConnected = true;
+		mConnection = connection;
+		mConnection.setParentTab(this);
+		mTimeLine = new PanelTimeLine();
+		this.setLayout(new GridLayout());
+
+		initPanels();
+		initSettingsWindows();
+		initNodeSettings(window);
+
+		this.add(mSplitPane);
+	}
+
+	public ConnectionTab(String name, GraphConnection connection, JFrame window, RESTConnection restCon) {
+		super();
+		LOGGER.trace("Init ConnectionTab for the Connection " + name);
+
+		mRestCon = restCon;
+
 		if (connectionStatusIcon == null) {
 			connectionStatusIcon = new ImageIcon[2];
 			connectionStatusIcon[0] = new ImageIcon(getClass().getClassLoader().getResource("ball_green_small.png"));
@@ -189,13 +218,25 @@ public class ConnectionTab extends JPanel {
 	 * TODO implement connect stuff
 	 */
 	public void connect() {
+		mRestCon.connect();
 		this.setConnectionStatus(true);
+	}
+
+	public void startDump() {
+		mRestCon.startDump();
+
+	}
+
+	public void stopDump() {
+		mRestCon.stopDump();
+
 	}
 
 	/**
 	 * TODO implement disconnect stuff
 	 */
 	public void disconnect() {
+		mRestCon.disconnect();
 		this.setConnectionStatus(false);
 	}
 

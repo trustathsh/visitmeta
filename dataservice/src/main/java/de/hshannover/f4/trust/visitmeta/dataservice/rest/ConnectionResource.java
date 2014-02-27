@@ -40,6 +40,10 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -47,6 +51,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -56,6 +61,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
@@ -168,12 +174,36 @@ public class ConnectionResource {
 	 * Example-URL: <tt>http://example.com:8000/?onlyActive=true</tt>
 	 **/
 	@GET
-	public String getConnections() {
-		if(mOnlyActive){
-			return ConnectionManager.getActiveConnections().toString();
-		}else{
-			return ConnectionManager.getSavedConnections().toString();
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object getConnections() {
+
+
+		JSONObject changes = new JSONObject();
+		for(Entry<String,Connection> entry: ConnectionManager.getSavedConnectionMap().entrySet()){
+			Map<String,String> connectionMap = new HashMap<String,String>();
+
+			connectionMap.put("URL", entry.getValue().getUrl());
+			connectionMap.put("Username", entry.getValue().getUser());
+			connectionMap.put("Password", entry.getValue().getUserPass());
+
+			JSONObject jsonConnection = new JSONObject(connectionMap);
+
+			try {
+
+				changes.put(entry.getKey(), jsonConnection);
+
+			} catch (JSONException e) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			}
 		}
+
+		return changes;
+
+		//		if(mOnlyActive){
+		//			return ConnectionManager.getActiveConnections().toString();
+		//		}else{
+		//			return ConnectionManager.getSavedConnections().toString();
+		//		}
 	}
 
 }

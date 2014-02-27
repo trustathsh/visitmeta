@@ -53,8 +53,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 /**
@@ -122,7 +122,7 @@ public abstract class FactoryConnection {
 	 *                if-map server.
 	 *        TODO "REST" a Connection that connect to the DataService over REST.
 	 */
-	public static Connection getConnection(ConnectionType type, int restIndex) {
+	public static Connection getConnection(ConnectionType type, RESTConnection restConn) {
 		LOGGER.trace("Method getConnection(" + type + ") called.");
 		GraphService graphService = null;
 		switch(type) {
@@ -130,36 +130,34 @@ public abstract class FactoryConnection {
 			LOGGER.error("Created a new local connection to dataservice");
 			throw new UnsupportedOperationException("Local connection not implemented.");
 		case REST:
-			if(restIndex >= 0){
 
-				String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_URL(restIndex), "http://localhost:8000/default");
-				boolean dumping = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_COUNT_DUMPING(restIndex), "false").toLowerCase());
-				boolean includeRawXML = Boolean.parseBoolean(PropertiesManager.getProperty("application", "restservice.rawxml", "true"));
 
-				ClientConfig config = new DefaultClientConfig();
-				Client client = Client.create(config);
+			String url = restConn.getDataserviceConnection().getUrl();
+			boolean dumping = restConn.isDumping();
+			boolean includeRawXML = restConn.getDataserviceConnection().isRawXml();
 
-				URI uri_connect = UriBuilder.fromUri(url + "/connect").build(); // FIXME HotFix for new Rest Interface
-				WebResource temp1 = client.resource(uri_connect);
-				LOGGER.info("Dataservice: " + temp1.put(String.class));
+			ClientConfig config = new DefaultClientConfig();
+			Client client = Client.create(config);
 
-				if(dumping){
-					URI uri_start_dump = UriBuilder.fromUri(url + "/dump/start").build(); // FIXME HotFix for new Rest Interface
-					WebResource temp2 = client.resource(uri_start_dump);
-					LOGGER.info("Dataservice: " + temp2.put(String.class));
-				}
+			//				URI uri_connect = UriBuilder.fromUri(url + "/connect").build(); // FIXME HotFix for new Rest Interface
+			//				WebResource temp1 = client.resource(uri_connect);
+			//				LOGGER.info("Dataservice: " + temp1.put(String.class));
+			//
+			//				if(dumping){
+			//					URI uri_start_dump = UriBuilder.fromUri(url + "/dump/start").build(); // FIXME HotFix for new Rest Interface
+			//					WebResource temp2 = client.resource(uri_start_dump);
+			//					LOGGER.info("Dataservice: " + temp2.put(String.class));
+			//				}
 
-				URI uri = UriBuilder.fromUri(url + "/graph").build(); // FIXME HotFix for new Rest Interface
-				WebResource service = client.resource(uri);
+			//			URI uri = UriBuilder.fromUri(url + "/graph").build(); // FIXME HotFix for new Rest Interface
+			//			WebResource service = client.resource(uri);
 
-				graphService = new ProxyGraphService(service, includeRawXML);
-				LOGGER.info("Create a new REST connection to dataservice with URI: " + uri);
-				System.out.println(graphService.getCurrentGraph());
-				return new Connection(graphService);
+			graphService = new ProxyGraphService(restConn.getGraphResource(), includeRawXML);
+			LOGGER.info("Create a new REST connection to dataservice with URI: " + restConn.getGraphResource().getURI());
 
-			}else{
-				throw new UnsupportedOperationException("If the connection type REST, must be given a valid connection index.");
-			}
+			return new Connection(graphService);
+
+
 		default:
 			throw new RuntimeException("Error creating connection to dataservice; tried with type '" + type.name() + "'");
 		}

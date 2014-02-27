@@ -104,9 +104,9 @@ public class Connection {
 		log.trace("new Connection() ...");
 
 		mConnectionName = name;
-		mUrl = url;
-		mUser = user;
-		mUserPass = userPass;
+		setUrl(url);
+		setUser(user);
+		setUserPass(userPass);
 		mTruststore = truststore;
 		mTruststorePass = truststorePass;
 
@@ -124,7 +124,7 @@ public class Connection {
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 
-		initSsrc(mUrl, mUser, mUserPass, mTruststore, mTruststorePass);
+		initSsrc(getUrl(), getUser(), getUserPass(), mTruststore, mTruststorePass);
 		initSession();
 	}
 
@@ -360,7 +360,7 @@ public class Connection {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Connection: ").append(mConnectionName).append(" | URL: ");
-		sb.append(mUrl).append(" | User: ").append(mUser);
+		sb.append(getUrl()).append(" | User: ").append(getUser());
 
 		return sb.toString();
 	}
@@ -455,6 +455,30 @@ public class Connection {
 	 */
 	public SimpleGraphService getGraphService() {
 		return mNeo4JDb.getGraphService();
+	}
+
+	public String getUrl() {
+		return mUrl;
+	}
+
+	public void setUrl(String url) {
+		mUrl = url;
+	}
+
+	public String getUser() {
+		return mUser;
+	}
+
+	public void setUser(String user) {
+		this.mUser = user;
+	}
+
+	public String getUserPass() {
+		return mUserPass;
+	}
+
+	public void setUserPass(String userPass) {
+		this.mUserPass = userPass;
 	}
 }
 

@@ -77,7 +77,7 @@ public class ConnectionTab extends JPanel {
 	private Timer mTimerPropertiesShow;
 	private Timer mTimerPropertiesHide;
 
-	private RESTConnection mRestCon;
+	private RESTConnection mRestConnection;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -99,6 +99,7 @@ public class ConnectionTab extends JPanel {
 		mName = name;
 		mConnected = true;
 		mConnection = connection;
+		mRestConnection = mConnection.getRestConnection();
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
 		mTimeLine = new PanelTimeLine(mConnection.getTimeSelector());
@@ -192,22 +193,22 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public void connect() {
-		mRestCon.connect();
+		mRestConnection.connect();
 		setConnectionStatus(true);
 	}
 
 	public void startDump() {
-		mRestCon.startDump();
+		mRestConnection.startDump();
 
 	}
 
 	public void stopDump() {
-		mRestCon.stopDump();
+		mRestConnection.stopDump();
 
 	}
 
 	public void disconnect() {
-		mRestCon.disconnect();
+		mRestConnection.disconnect();
 		setConnectionStatus(false);
 	}
 

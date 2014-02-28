@@ -138,6 +138,12 @@ public class NewConnectionDialog extends JDialog{
 		mJpSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 		mJbClose = new JButton("Close");
+		mJbClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setVisible(false);
+			}
+		});
 
 		mJpSouth.add(mJbClose);
 

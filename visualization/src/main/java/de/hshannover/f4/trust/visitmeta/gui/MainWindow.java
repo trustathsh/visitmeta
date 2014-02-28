@@ -97,10 +97,18 @@ public class MainWindow extends JFrame {
 	 * @param connection
 	 */
 	public void addConnection(ConnectionTab connection) {
-		Object[] tmpTab = new Object[1];
-		tmpTab[0] = connection;
-		this.mTableModel.addRow(tmpTab);
-		this.mTableModel.fireTableDataChanged();
+		boolean alreadyOpen = false;
+		for (Component t : mTabbedConnectionPane.getComponents()) {
+			if (t.equals(connection)) {
+				alreadyOpen = true;
+			}
+		}
+			if (!alreadyOpen) {
+			Object[] tmpTab = new Object[1];
+			tmpTab[0] = connection;
+			this.mTableModel.addRow(tmpTab);
+			this.mTableModel.fireTableDataChanged();
+		}
 	}
 
 	/**

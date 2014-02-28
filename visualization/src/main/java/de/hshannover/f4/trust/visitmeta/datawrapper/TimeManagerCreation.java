@@ -38,48 +38,29 @@
  */
 package de.hshannover.f4.trust.visitmeta.datawrapper;
 
-
-
-
-/* Imports ********************************************************************/
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
-/* Class **********************************************************************/
+
 public class TimeManagerCreation extends TimeManager {
-/* Attributes *****************************************************************/
+
 	private static final Logger LOGGER = Logger.getLogger(TimeManagerCreation.class);
-	/** Singleton */
-	private static TimeManagerCreation mInstance = null;
 
 	private GraphConnection mController = null;
-/* Constructors ***************************************************************/
-	private TimeManagerCreation() {
-		super();
+
+
+	public TimeManagerCreation(GraphContainer connection) {
+		super(connection);
 	}
-/* Methods ********************************************************************/
-	/**
-	 * Singleton Thread-Safe
-	 * @return the instance of TimeManagerCreation.
-	 */
-	public static TimeManagerCreation getInstance() {
-		LOGGER.trace("Method getInstance() called.");
-		if(mInstance == null) { // DoubleCheck
-			synchronized (TimeManagerCreation.class) {
-				if (mInstance == null) {
-					mInstance = new TimeManagerCreation();
-				}
-			}
-		}
-		return mInstance;
-	}
+
 	public void setController(GraphConnection pController) {
 		mController = pController;
 	}
+
 	@Override
 	protected void processNode(Position pNode) {
 		LOGGER.trace("Method processNode(" + pNode + ") called.");
-		if(mController != null) {
+		if (mController != null) {
 			mController.removeHighlight(pNode);
 		}
 	}

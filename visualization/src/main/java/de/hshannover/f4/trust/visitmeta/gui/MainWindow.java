@@ -67,6 +67,7 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 
 public class MainWindow extends JFrame {
@@ -107,8 +108,8 @@ public class MainWindow extends JFrame {
 	 * @param name
 	 * @param graphPanel
 	 */
-	public void addConnection(String name, GraphConnection connection) {
-		this.addConnection(new ConnectionTab(name, connection, this));
+	public void addConnection(GraphContainer connection) {
+		this.addConnection(new ConnectionTab(connection.getName(), connection, this));
 	}
 
 	/**

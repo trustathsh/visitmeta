@@ -47,17 +47,19 @@ import org.apache.log4j.Logger;
  */
 public class SettingManager extends Observable {
 	private static final Logger LOGGER = Logger.getLogger(SettingManager.class);
-	/** Singleton */
-	private static SettingManager mInstance = null;
 
 	private int mNetworkInterval = 0;
 	private int mCalculationInterval = 0;
 	private int mCalculationIterations = 0;
 	private int mHighlightsTimeout = 0;
 	private int mNodeTranslationDuration = 0;
+	
+	private GraphContainer mConnection = null;
 
-	private SettingManager() {
+	public SettingManager(GraphContainer connection) {
 		LOGGER.debug("Load settings.");
+		mConnection = connection;
+		mConnection.getName();
 		mNetworkInterval = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig", "network.interval",
 				"10000"));
 		mCalculationInterval = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig",
@@ -84,23 +86,6 @@ public class SettingManager extends Observable {
 				.storeProperty("visualizationConfig", "highlights.timeout", String.valueOf(mHighlightsTimeout));
 		PropertiesManager.storeProperty("visualizationConfig", "node.translation.duration",
 				String.valueOf(mNodeTranslationDuration));
-	}
-
-	/**
-	 * Singleton Thread-Safe
-	 * 
-	 * @return the instance of SettingManager.
-	 */
-	public static SettingManager getInstance() {
-		LOGGER.trace("Method getInstance() called.");
-		if (mInstance == null) {
-			synchronized (SettingManager.class) {
-				if (mInstance == null) {
-					mInstance = new SettingManager();
-				}
-			}
-		}
-		return mInstance;
 	}
 
 	public synchronized int getNetworkInterval() {

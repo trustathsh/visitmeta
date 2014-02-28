@@ -51,6 +51,7 @@ import javax.swing.Timer;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
@@ -62,7 +63,8 @@ public class ConnectionTab extends JPanel {
 
 	private String mName;
 	private boolean mConnected;
-	private GraphConnection mConnection = null;
+	private GraphContainer mConnection = null;
+	private GraphConnection mGraphConnection = null;
 
 	private PanelTimeLine mTimeLine = null;
 	private JSplitPane mSplitPane = null;
@@ -85,7 +87,7 @@ public class ConnectionTab extends JPanel {
 	 * @param connection
 	 *            Panel Object that represents the Connection
 	 */
-	public ConnectionTab(String name, GraphConnection connection, JFrame window) {
+	public ConnectionTab(String name, GraphContainer connection, JFrame window) {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + name);
 		if (connectionStatusIcon == null) {
@@ -97,34 +99,9 @@ public class ConnectionTab extends JPanel {
 		mName = name;
 		mConnected = true;
 		mConnection = connection;
-		mConnection.setParentTab(this);
-		mTimeLine = new PanelTimeLine();
-		this.setLayout(new GridLayout());
-
-		initPanels();
-		initSettingsWindows();
-		initNodeSettings(window);
-
-		this.add(mSplitPane);
-	}
-
-	public ConnectionTab(String name, GraphConnection connection, JFrame window, RESTConnection restCon) {
-		super();
-		LOGGER.trace("Init ConnectionTab for the Connection " + name);
-
-		mRestCon = restCon;
-
-		if (connectionStatusIcon == null) {
-			connectionStatusIcon = new ImageIcon[2];
-			connectionStatusIcon[0] = new ImageIcon(getClass().getClassLoader().getResource("ball_green_small.png"));
-			connectionStatusIcon[1] = new ImageIcon(getClass().getClassLoader().getResource("ball_red_small.png"));
-		}
-
-		mName = name;
-		mConnected = true;
-		mConnection = connection;
-		mConnection.setParentTab(this);
-		mTimeLine = new PanelTimeLine();
+		mGraphConnection = mConnection.getGraphConnection();
+		mGraphConnection.setParentTab(this);
+		mTimeLine = new PanelTimeLine(mConnection.getTimeSelector());
 		this.setLayout(new GridLayout());
 
 		initPanels();
@@ -144,7 +121,7 @@ public class ConnectionTab extends JPanel {
 		mUpperPanel.setLayout(new GridLayout());
 		mLowerPanel.setLayout(new GridLayout());
 
-		mUpperPanel.add(mConnection.getGraphPanel());
+		mUpperPanel.add(mGraphConnection.getGraphPanel());
 		mLowerPanel.add(mTimeLine);
 
 		mSplitPane = new JSplitPane();
@@ -159,7 +136,7 @@ public class ConnectionTab extends JPanel {
 	 * Initializes the settings windows
 	 */
 	private void initSettingsWindows() {
-		mWindowSettings = new WindowSettings();
+		mWindowSettings = new WindowSettings(mConnection.getSettingManager());
 		mWindowSettings.setAlwaysOnTop(true);
 		mWindowSettings.setVisible(false);
 		mWindowColorSettings = new WindowColorSettings(this);
@@ -211,15 +188,12 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public GraphConnection getConnection() {
-		return this.mConnection;
+		return this.mGraphConnection;
 	}
 
-	/**
-	 * TODO implement connect stuff
-	 */
 	public void connect() {
 		mRestCon.connect();
-		this.setConnectionStatus(true);
+		setConnectionStatus(true);
 	}
 
 	public void startDump() {
@@ -232,12 +206,9 @@ public class ConnectionTab extends JPanel {
 
 	}
 
-	/**
-	 * TODO implement disconnect stuff
-	 */
 	public void disconnect() {
 		mRestCon.disconnect();
-		this.setConnectionStatus(false);
+		setConnectionStatus(false);
 	}
 
 	public void setConnectionStatus(boolean status) {
@@ -284,7 +255,7 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public List<String> getPublisher() {
-		return mConnection.getPublisher();
+		return mGraphConnection.getPublisher();
 	}
 
 	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {

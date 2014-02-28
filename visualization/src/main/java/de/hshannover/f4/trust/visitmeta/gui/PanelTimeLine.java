@@ -66,7 +66,6 @@ public class PanelTimeLine extends JPanel implements Observer {
 	private static final String mTimeformat = "yyyy-MM-FF HH:mm:ss";
 
 	private SortedMap<Long, Long> mChangesMap = null;
-	private TimeHolder mTimeHolder = null;
 	private TimeSelector mTimeSelector = null;
 	private Timer mDelay = null;
 	/* GUI components */
@@ -83,14 +82,12 @@ public class PanelTimeLine extends JPanel implements Observer {
 	private ChangeListener mListenerSlider = null;
 	private ChangeListener mListenerChckbxLive = null;
 
-	public PanelTimeLine() {
+	public PanelTimeLine(TimeSelector timeSelector) {
 		super();
 		setPreferredSize(new Dimension(400, 33));
 		setMinimumSize(new Dimension(400, 0));
 		/* Add TimeSelector */
-		mTimeSelector = TimeSelector.getInstance();
-		/* Add TimeHolder */
-		mTimeHolder = TimeHolder.getInstance();
+		mTimeSelector = timeSelector;
 		/* SpringLayout */
 		mSpringLayout = new SpringLayout();
 		/* spinnerTimeStart */
@@ -142,7 +139,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 		add(mChckbxLive);
 
 		addListener();
-		mTimeHolder.addObserver(this);
+		mTimeSelector.getTimeHolder().addObserver(this);
 	}
 
 	/**
@@ -218,7 +215,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 			mSlider.removeChangeListener(mListenerSlider);
 			mChckbxLive.removeChangeListener(mListenerChckbxLive);
 			/* Make changes */
-			mChangesMap = mTimeHolder.getChangesMap();
+			mChangesMap = mTimeSelector.getTimeHolder().getChangesMap();
 			mSlider.setMaximum(mChangesMap.size() - 1);
 			// mSpinnerTimeStartDateModel.setStart(new
 			// Date(mTimeHolder.getBigBang()));
@@ -230,8 +227,8 @@ public class PanelTimeLine extends JPanel implements Observer {
 			// Date(mTimeHolder.getNewestTime()));
 			if (mTimeSelector.isLiveView()) {
 				mSlider.setUpperValue(mChangesMap.size() - 1);
-				mSpinnerTimeStartDateModel.setValue(new Date(mTimeHolder.getTimeStart()));
-				mSpinnerTimeEndDateModel.setValue(new Date(mTimeHolder.getTimeEnd()));
+				mSpinnerTimeStartDateModel.setValue(new Date(mTimeSelector.getTimeHolder().getTimeStart()));
+				mSpinnerTimeEndDateModel.setValue(new Date(mTimeSelector.getTimeHolder().getTimeEnd()));
 			}
 			/* Add Listener */
 			mSpinnerTimeStart.addChangeListener(mListenerSpinnerTimeStart);

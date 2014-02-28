@@ -56,6 +56,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
@@ -97,7 +98,6 @@ public final class Main {
 		LOGGER.trace("Method main(" + args + ") called.");
 
 		loadDataserviceConnections();
-		loadRESTConnections();
 
 		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype", "local").toUpperCase();
 		ConnectionType vConnectionType = ConnectionType.valueOf(vConnectionTypeString);
@@ -106,32 +106,37 @@ public final class Main {
 
 		if(vConnectionType == ConnectionType.REST){
 
-			for(RESTConnection restCon: mRestConnections){
-				Connection vConnection = FactoryConnection.getConnection(vConnectionType, restCon);
-				Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
-
-				FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
-				FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
-				GraphConnection connController = new GraphConnection(vLogic);
-
-				gui.addConnection(restCon.getName() , connController, restCon);
-
-				Thread vThreadNetwork = new Thread(vNetwork);
-				Thread vThreadLogic = new Thread(vLogic);
-
-				vThreadNetwork.start();
-				vThreadLogic.start();
+			for(DataserviceConnection dc : mDataserviceConnections) {
+				GraphContainer tmpCon = new GraphContainer(dc.getName(), dc);
+				gui.addConnection(tmpCon);
 			}
+			
+//			for(RESTConnection restCon: mRestConnections){
+//				Connection vConnection = FactoryConnection.getConnection(vConnectionType, restCon);
+//				Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+//
+//				FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
+//				FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
+//				GraphConnection connController = new GraphConnection(vLogic);
+//
+//				gui.addConnection(restCon.getName() , connController, restCon);
+//
+//				Thread vThreadNetwork = new Thread(vNetwork);
+//				Thread vThreadLogic = new Thread(vLogic);
+//
+//				vThreadNetwork.start();
+//				vThreadLogic.start();
+//			}
 		}
-
-		TimeManagerCreation vTimerCreation = TimeManagerCreation.getInstance();
-		TimeManagerDeletion vTimerDeletion = TimeManagerDeletion.getInstance();
-
-		Thread vThreadCreation = new Thread(vTimerCreation);
-		Thread vThreadDeletion = new Thread(vTimerDeletion);
-
-		vThreadCreation.start();
-		vThreadDeletion.start();
+//
+//		TimeManagerCreation vTimerCreation = TimeManagerCreation.getInstance();
+//		TimeManagerDeletion vTimerDeletion = TimeManagerDeletion.getInstance();
+//
+//		Thread vThreadCreation = new Thread(vTimerCreation);
+//		Thread vThreadDeletion = new Thread(vTimerDeletion);
+//
+//		vThreadCreation.start();
+//		vThreadDeletion.start();
 		gui.show();
 
 	}
@@ -150,37 +155,37 @@ public final class Main {
 		}
 	}
 
-	private static void loadRESTConnections(){
-		mRestConnections = new ArrayList<RESTConnection>();
-
-
-		for(DataserviceConnection dc: mDataserviceConnections){
-
-			ClientConfig config = new DefaultClientConfig();
-			Client client = Client.create(config);
-
-			URI uri_connect = UriBuilder.fromUri(dc.getUrl()).build();
-			WebResource temp1 = client.resource(uri_connect);
-			JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-			System.out.println(jsonResponse);
-
-			Iterator<String> ii = jsonResponse.keys();
-			while(ii.hasNext()){
-				String jKey = ii.next();
-				JSONObject jsonConnection;
-				try {
-					jsonConnection = jsonResponse.getJSONObject(jKey);
-					RESTConnection restConn = new RESTConnection(dc, jKey, jsonConnection.getString("URL"), false);
-					restConn.setBasicAuthentication(true);
-					restConn.setUsername(jsonConnection.getString("Username"));
-					restConn.setPassword(jsonConnection.getString("Password"));
-
-					mRestConnections.add(restConn);
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+//	private static void loadRESTConnections(){
+//		mRestConnections = new ArrayList<RESTConnection>();
+//
+//
+//		for(DataserviceConnection dc: mDataserviceConnections){
+//
+//			ClientConfig config = new DefaultClientConfig();
+//			Client client = Client.create(config);
+//
+//			URI uri_connect = UriBuilder.fromUri(dc.getUrl()).build();
+//			WebResource temp1 = client.resource(uri_connect);
+//			JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
+//			System.out.println(jsonResponse);
+//
+//			Iterator<String> ii = jsonResponse.keys();
+//			while(ii.hasNext()){
+//				String jKey = ii.next();
+//				JSONObject jsonConnection;
+//				try {
+//					jsonConnection = jsonResponse.getJSONObject(jKey);
+//					RESTConnection restConn = new RESTConnection(dc, jKey, jsonConnection.getString("URL"), false);
+//					restConn.setBasicAuthentication(true);
+//					restConn.setUsername(jsonConnection.getString("Username"));
+//					restConn.setPassword(jsonConnection.getString("Password"));
+//
+//					mRestConnections.add(restConn);
+//
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//	}
 }

@@ -42,6 +42,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 
 public class GuiController {
@@ -88,8 +89,8 @@ public class GuiController {
 	 * @param connection
 	 *            ConnectionController object
 	 */
-	public void addConnection(String name, GraphConnection connection) {
-		ConnectionTab tmp = new ConnectionTab(name, connection, mMainWindow);
+	public void addConnection(GraphContainer connection) {
+		ConnectionTab tmp = new ConnectionTab(connection.getName(), connection, mMainWindow);
 		this.setSelectedConnectionTab(tmp);
 		mMainWindow.addConnection(tmp);
 		mConnections.add(tmp);
@@ -130,37 +131,6 @@ public class GuiController {
 		mSelectedConnection.showSettings(mMainWindow);
 	}
 
-	/**
-	 * Open a window with the properties of the node
-	 * 
-	 * @param pData
-	 *            the properties of the node.
-	 * @param pX
-	 *            the x coordinate of the window.
-	 * @param pY
-	 *            the y coordinate of the window.
-	 */
-	//	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
-	//		LOGGER.trace("Method showPropertiesOfNode(" + pData + ", " + pX + ", " + pY + ") called.");
-	//		mSelectedConnection.showPropertiesOfNode(pData, pX, pY);
-	//	}
-
-	/**
-	 * Hide the property window after a period of time.
-	 */
-	//	public void hidePropertiesOfNode() {
-	//		LOGGER.trace("Method hidePropertiesOfNode() called.");
-	//		mSelectedConnection.hidePropertiesOfNode();
-	//	}
-
-	/**
-	 * Hide the property window.
-	 */
-	//	public void hidePropertiesOfNodeNow() {
-	//		LOGGER.trace("Method hidePropertiesOfNodeNow() called.");
-	//		mSelectedConnection.hidePropertiesOfNodeNow();
-	//	}
-
 	public void redrawGraph() {
 		mSelectedConnection.getConnection().redrawGraph();
 	}
@@ -179,13 +149,5 @@ public class GuiController {
 
 	public MainWindow getMainWindow() {
 		return mMainWindow;
-	}
-
-	public void addConnection(String name, GraphConnection connection, RESTConnection restCon) {
-		ConnectionTab tmp = new ConnectionTab(name, connection, mMainWindow, restCon);
-		this.setSelectedConnectionTab(tmp);
-		mMainWindow.addConnection(tmp);
-		mConnections.add(tmp);
-
 	}
 }

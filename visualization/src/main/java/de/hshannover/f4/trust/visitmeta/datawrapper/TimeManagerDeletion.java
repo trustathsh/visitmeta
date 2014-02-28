@@ -38,57 +38,36 @@
  */
 package de.hshannover.f4.trust.visitmeta.datawrapper;
 
-
-
-
-/* Imports ********************************************************************/
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
-/* Class **********************************************************************/
-public class TimeManagerDeletion extends TimeManager {
-/* Attributes *****************************************************************/
-	private static final Logger LOGGER = Logger.getLogger(TimeManagerDeletion.class);
-	/** Singleton */
-	private static TimeManagerDeletion mInstance = null;
 
-	private FacadeLogic   mLogic      = null;
+public class TimeManagerDeletion extends TimeManager {
+	private static final Logger LOGGER = Logger.getLogger(TimeManagerDeletion.class);
+
+	private FacadeLogic mLogic = null;
 	private GraphConnection mController = null;
-/* Constructors ***************************************************************/
-/* Constructors ***************************************************************/
-	private TimeManagerDeletion() {
-		super();
+
+	public TimeManagerDeletion(GraphContainer connection) {
+		super(connection);
 	}
-/* Methods ********************************************************************/
-	/**
-	 * Singleton Thread-Safe
-	 * @return the instance of TimeManagerDeletion.
-	 */
-	public static TimeManagerDeletion getInstance() {
-		LOGGER.trace("Method getInstance() called.");
-		if(mInstance == null) { // DoubleCheck
-			synchronized (TimeManagerDeletion.class) {
-				if (mInstance == null) {
-					mInstance = new TimeManagerDeletion();
-				}
-			}
-		}
-		return mInstance;
-	}
+
 	public void setLogic(FacadeLogic pLogic) {
 		mLogic = pLogic;
 	}
+
 	public void setController(GraphConnection pController) {
 		mController = pController;
 	}
+
 	@Override
 	protected void processNode(Position pNode) {
 		LOGGER.trace("Method processNode(" + pNode + ") called.");
-		if(mLogic != null) {
+		if (mLogic != null) {
 			mLogic.deleteNode(pNode);
 		}
-		if(mController != null) {
+		if (mController != null) {
 			mController.deleteNode(pNode);
 		}
 	}

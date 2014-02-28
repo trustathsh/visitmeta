@@ -38,10 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphCalculator;
 
-
-
-
-
 import java.util.Observable;
 import java.util.Observer;
 
@@ -50,6 +46,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
@@ -59,27 +56,29 @@ import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
  */
 public class FacadeLogic extends Observable implements Observer, Runnable {
 
-	private static final Logger  LOGGER  = Logger.getLogger(FacadeLogic.class);
+	private static final Logger LOGGER = Logger.getLogger(FacadeLogic.class);
 
-	private FacadeNetwork       mFacadeNetwork   = null;
-	private Calculator          mCalculator      = null;
-	private UpdateContainer     mUpdateContainer = null;
-	private SettingManager      mSettingManager  = null;
-	private boolean             mIsDone          = false;
-	private boolean             mDoCalculation   = true;
-	private int                 mInterval        = 0;
-	private int                 mIterations      = 0;
-	private TimeManagerDeletion mTimerDeletion   = null;
+	private GraphContainer mConnection = null;
+	private FacadeNetwork mFacadeNetwork = null;
+	private Calculator mCalculator = null;
+	private UpdateContainer mUpdateContainer = null;
+	private SettingManager mSettingManager = null;
+	private boolean mIsDone = false;
+	private boolean mDoCalculation = true;
+	private int mInterval = 0;
+	private int mIterations = 0;
+	private TimeManagerDeletion mTimerDeletion = null;
 
-	public FacadeLogic(FacadeNetwork facadeNetwork, Calculator calculator) {
+	public FacadeLogic(GraphContainer connection) {
+		mConnection = connection;
 		mUpdateContainer = new UpdateContainer();
-		mFacadeNetwork   = facadeNetwork;
-		mCalculator      = calculator;
-		mSettingManager  = SettingManager.getInstance();
-		mInterval        = mSettingManager.getCalculationInterval();
-		mIterations      = mSettingManager.getCalculationIterations();
+		mFacadeNetwork = mConnection.getFacadeNetwork();
+		mCalculator = mConnection.getCalculator();
+		mSettingManager = mConnection.getSettingManager();
+		mInterval = mSettingManager.getCalculationInterval();
+		mIterations = mSettingManager.getCalculationIterations();
 		mCalculator.setIterations(mIterations);
-		mTimerDeletion = TimeManagerDeletion.getInstance();
+		mTimerDeletion = mConnection.getTimeManagerDeletion();
 		mTimerDeletion.setLogic(this);
 		mSettingManager.addObserver(this);
 		mFacadeNetwork.addObserver(this);
@@ -100,19 +99,18 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Set the new position for a Position-Object.
-	 * @param pNode the Object.
-	 * @param pNewX the new x coordinate.
-	 * @param pNewY the new y coordinate.
-	 * @param pNewZ the new z coordinate.
+	 * 
+	 * @param pNode
+	 *            the Object.
+	 * @param pNewX
+	 *            the new x coordinate.
+	 * @param pNewY
+	 *            the new y coordinate.
+	 * @param pNewZ
+	 *            the new z coordinate.
 	 */
 	public synchronized void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ) {
-		LOGGER.trace(
-				"Method updateNode(" +
-				pNode + ", " +
-				pNewX + ", " +
-				pNewY + ", " +
-				pNewZ + ") called."
-		);
+		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
 		mCalculator.updateNode(pNode, pNewX, pNewY, pNewZ);
 	}
 
@@ -134,8 +132,8 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Return if the thread is calculation positions.
-	 * @return False = Motion of graph is Off.
-	 *         True  = Motion of graph is On.
+	 * 
+	 * @return False = Motion of graph is Off. True = Motion of graph is On.
 	 */
 	public boolean isCalculationRunning() {
 		LOGGER.trace("Method isCalculationRunning() called.");
@@ -143,8 +141,9 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	}
 
 	/**
-	 * Load the initial graph to the timestamp in TimeSelector.
-	 * This methode notify the observers.
+	 * Load the initial graph to the timestamp in TimeSelector. This methode
+	 * notify the observers.
+	 * 
 	 * @see FacadeNetwork#loadInitialGraph()
 	 */
 	public synchronized void loadInitialGraph() {
@@ -156,8 +155,9 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	}
 
 	/**
-	 * Load the delta to the timestamps in TimeSelector.
-	 * This methode notify the observers.
+	 * Load the delta to the timestamps in TimeSelector. This methode notify the
+	 * observers.
+	 * 
 	 * @see FacadeNetwork#loadDelta()
 	 */
 	public synchronized void loadDelta() {
@@ -176,39 +176,39 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Remove a node from the graph.
-	 * @param pNode the node.
+	 * 
+	 * @param pNode
+	 *            the node.
 	 */
 	public synchronized void deleteNode(Position pNode) {
 		LOGGER.trace("Method deleteNode(" + pNode + ") called.");
 		mCalculator.deleteNode(pNode);
 	}
 
-
 	/**
 	 * Recalculate the position of all nodes.
 	 */
 	public synchronized void recalculateGraph() {
 		LOGGER.trace("Method recalculateGraph() called.");
-		mCalculator.adjustGraphAnew(Integer.parseInt(PropertiesManager.getProperty(
-				"visualizationConfig",    // FileName
+		mCalculator.adjustGraphAnew(Integer.parseInt(PropertiesManager.getProperty("visualizationConfig", // FileName
 				"calculation.iterations", // Key
-				"100"                     // Alternative
+				"100" // Alternative
 		)));
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		LOGGER.trace("Method update(" + o + ", " + arg + ") called.");
-		if(o instanceof FacadeNetwork) {
-			synchronized(this) {
+		if (o instanceof FacadeNetwork) {
+			synchronized (this) {
 				/* Add nodes to calculator. */
 				mUpdateContainer = mFacadeNetwork.getUpdate();
 				mCalculator.addRemoveNodesLinksMetadatas(mUpdateContainer);
 			}
 			setChanged();
 			notifyObservers();
-		} else if(o instanceof SettingManager) {
-			mInterval   = mSettingManager.getCalculationInterval();
+		} else if (o instanceof SettingManager) {
+			mInterval = mSettingManager.getCalculationInterval();
 			mIterations = mSettingManager.getCalculationIterations();
 			mCalculator.setIterations(mIterations);
 		}
@@ -220,7 +220,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 		try {
 			synchronized (this) {
 				while (!mIsDone) {
-					if(mDoCalculation) {
+					if (mDoCalculation) {
 						mCalculator.adjustAllNodes(mIterations, true, true);
 					}
 					wait(mInterval);

@@ -38,25 +38,19 @@
  */
 package de.hshannover.f4.trust.visitmeta.datawrapper;
 
-
-
-
-/* Imports ********************************************************************/
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-/* Class **********************************************************************/
 public abstract class TimeManager implements Runnable, Observer {
-	
+
 	/**
-	 * Simple Pair class.
-	 * (copied from ifmapj)
+	 * Simple Pair class. (copied from ifmapj)
 	 * 
 	 * @author aw
-	 *
+	 * 
 	 * @param <T>
 	 * @param <V>
 	 */
@@ -64,67 +58,70 @@ public abstract class TimeManager implements Runnable, Observer {
 
 		public T first;
 		public V second;
-		
+
 		public Pair(T first, V second) {
 			this.first = first;
 			this.second = second;
 		}
 	}
 
-	
-/* Attributes *****************************************************************/
 	private static final Logger LOGGER = Logger.getLogger(TimeManager.class);
 
-	protected ArrayList<Pair<Long, Position>> mNodes         = null;
-	private   SettingManager                  mSettingManger = null;
-	private   TimeSelector                    mTimeSelector  = null;
-	private   boolean                         mIsDone        = false;
-	private   int                             mTimeout       = 0;
-	private   boolean                         mLiveView      = true;
-/* Constructors ***************************************************************/
-	public TimeManager() {
-		mSettingManger = SettingManager.getInstance();
-		mTimeSelector  = TimeSelector.getInstance();
-		mNodes         = new ArrayList<>();
-		mTimeout       = mSettingManger.getHighlightsTimeout();
-		mLiveView      = mTimeSelector.isLiveView();
+	protected ArrayList<Pair<Long, Position>> mNodes = null;
+	private GraphContainer mConnection = null;
+	private SettingManager mSettingManger = null;
+	private TimeSelector mTimeSelector = null;
+	private boolean mIsDone = false;
+	private int mTimeout = 0;
+	private boolean mLiveView = true;
+
+	public TimeManager(GraphContainer connection) {
+		mConnection = connection;
+		mSettingManger = mConnection.getSettingManager();
+		mTimeSelector = mConnection.getTimeSelector();
+		mNodes = new ArrayList<>();
+		mTimeout = mSettingManger.getHighlightsTimeout();
+		mLiveView = mTimeSelector.isLiveView();
 		mSettingManger.addObserver(this);
 		mTimeSelector.addObserver(this);
 	}
-/* Methods ********************************************************************/
+
 	/**
 	 * Add a node to the list.
-	 * @param pNode the node.
+	 * 
+	 * @param pNode
+	 *            the node.
 	 */
 	public void addNode(Position pNode) {
 		LOGGER.trace("Method addNewNode(" + pNode + ") called.");
 		synchronized (this) {
-			mNodes.add(new Pair<Long, Position>(
-					System.currentTimeMillis(),
-					pNode
-			));
+			mNodes.add(new Pair<Long, Position>(System.currentTimeMillis(), pNode));
 		}
 	}
+
 	/**
-	 * Delete all nodes in the list and call for each {@link TimeManager#processNode(Position)}.
+	 * Delete all nodes in the list and call for each
+	 * {@link TimeManager#processNode(Position)}.
 	 */
 	public void removeAll() {
 		LOGGER.trace("Method removeAll() called.");
 		synchronized (this) {
-			for(Pair<Long, Position> vNode : mNodes) {
+			for (Pair<Long, Position> vNode : mNodes) {
 				processNode(vNode.second);
 			}
 			mNodes.clear();
 		}
 	}
+
 	/**
-	 * Delete all node in the list without calling {@link TimeManager#processNode(Position)}
-	 * for each node in the list.
+	 * Delete all node in the list without calling
+	 * {@link TimeManager#processNode(Position)} for each node in the list.
 	 */
 	public void dropAll() {
 		LOGGER.trace("Method dropAll() called.");
 		mNodes.clear();
 	}
+
 	/**
 	 * Stop the loop of the run()-Method.
 	 */
@@ -134,34 +131,36 @@ public abstract class TimeManager implements Runnable, Observer {
 			mIsDone = true;
 		}
 	}
+
 	@Override
 	public synchronized void update(Observable pO, Object pArg) {
 		LOGGER.trace("Method update(" + pO + ", " + pArg + ") called.");
-		if(pO instanceof TimeSelector) {
+		if (pO instanceof TimeSelector) {
 			synchronized (this) {
 				boolean vLiveView = mTimeSelector.isLiveView();
-//				if(mLiveView != vLiveView) {
-//					removeAll();
-					mLiveView = vLiveView;
-//				}
-//				notify();
+				// if(mLiveView != vLiveView) {
+				// removeAll();
+				mLiveView = vLiveView;
+				// }
+				// notify();
 			}
-		} else if(pO instanceof SettingManager) {
+		} else if (pO instanceof SettingManager) {
 			synchronized (this) {
 				mTimeout = mSettingManger.getHighlightsTimeout();
 			}
-//			notify();
+			// notify();
 		}
 	}
+
 	@Override
 	public void run() {
 		LOGGER.trace("Method run() called.");
 		try {
 			synchronized (this) {
-				while(!mIsDone) {
-					if(mNodes.size() > 0 && mLiveView) {
-						long vTime   = mNodes.get(0).first + mTimeout - System.currentTimeMillis();
-						if(vTime > 0) {
+				while (!mIsDone) {
+					if (mNodes.size() > 0 && mLiveView) {
+						long vTime = mNodes.get(0).first + mTimeout - System.currentTimeMillis();
+						if (vTime > 0) {
 							/* Wait */
 							wait(vTime);
 						} else {
@@ -170,7 +169,7 @@ public abstract class TimeManager implements Runnable, Observer {
 							mNodes.remove(0);
 						}
 					} else {
-						if(mTimeout > 0) {
+						if (mTimeout > 0) {
 							wait(mTimeout);
 						} else {
 							wait(1_000);
@@ -183,8 +182,10 @@ public abstract class TimeManager implements Runnable, Observer {
 			e.printStackTrace();
 		}
 	}
+
 	/**
-	 * Is called by {@link TimeManager#removeAll()} and {@link TimeManager#run()}.
+	 * Is called by {@link TimeManager#removeAll()} and
+	 * {@link TimeManager#run()}.
 	 */
 	protected abstract void processNode(Position pNode);
 }

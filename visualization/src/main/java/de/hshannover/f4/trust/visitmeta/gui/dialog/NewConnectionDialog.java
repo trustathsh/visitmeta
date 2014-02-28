@@ -48,6 +48,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.Calculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
@@ -412,41 +413,44 @@ public class NewConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					DataserviceConnection tmpCon = mJlMapServerConnections.getSelectedValue().getDataserviceConnection();
+					
+					GraphContainer connection = new GraphContainer(tmpCon.getName(), tmpCon);
+					mGuiController.addConnection(connection);
 
-					ClientConfig config = new DefaultClientConfig();
-					Client client = Client.create(config);
-
-					URI uri_connect = UriBuilder.fromUri(tmpCon.getUrl()).build();
-					WebResource temp1 = client.resource(uri_connect);
-
-					JSONObject jObj = new JSONObject();
-					try {
-
-						jObj.put("url", mJlMapServerConnections.getSelectedValue().getUrl());
-						jObj.put("user", mJlMapServerConnections.getSelectedValue().getUsername());
-						jObj.put("userPass", mJlMapServerConnections.getSelectedValue().getPassword());
-
-					} catch (JSONException e1) {
-						e1.printStackTrace();
-					}
-
-					String response = temp1.path(mJlMapServerConnections.getSelectedValue().getName()).type(MediaType.APPLICATION_JSON).put(String.class, jObj);
-					System.out.println(response);
-
-					Connection vConnection = FactoryConnection.getConnection(ConnectionType.REST, mJlMapServerConnections.getSelectedValue());
-					Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
-
-					FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
-					FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
-					GraphConnection connController = new GraphConnection(vLogic);
-
-					mGuiController.addConnection(mJlMapServerConnections.getSelectedValue().getName(), connController, mJlMapServerConnections.getSelectedValue());
-
-					Thread vThreadNetwork = new Thread(vNetwork);
-					Thread vThreadLogic = new Thread(vLogic);
-
-					vThreadNetwork.start();
-					vThreadLogic.start();
+//					ClientConfig config = new DefaultClientConfig();
+//					Client client = Client.create(config);
+//
+//					URI uri_connect = UriBuilder.fromUri(tmpCon.getUrl()).build();
+//					WebResource temp1 = client.resource(uri_connect);
+//
+//					JSONObject jObj = new JSONObject();
+//					try {
+//
+//						jObj.put("url", mJlMapServerConnections.getSelectedValue().getUrl());
+//						jObj.put("user", mJlMapServerConnections.getSelectedValue().getUsername());
+//						jObj.put("userPass", mJlMapServerConnections.getSelectedValue().getPassword());
+//
+//					} catch (JSONException e1) {
+//						e1.printStackTrace();
+//					}
+//
+//					String response = temp1.path(mJlMapServerConnections.getSelectedValue().getName()).type(MediaType.APPLICATION_JSON).put(String.class, jObj);
+//					System.out.println(response);
+//
+//					Connection vConnection = FactoryConnection.getConnection(ConnectionType.REST, mJlMapServerConnections.getSelectedValue());
+//					Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+//
+//					FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
+//					FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
+//					GraphConnection connController = new GraphConnection(vLogic);
+//
+//					mGuiController.addConnection(mJlMapServerConnections.getSelectedValue().getName(), connController, mJlMapServerConnections.getSelectedValue());
+//
+//					Thread vThreadNetwork = new Thread(vNetwork);
+//					Thread vThreadLogic = new Thread(vLogic);
+//
+//					vThreadNetwork.start();
+//					vThreadLogic.start();
 				}
 
 			});

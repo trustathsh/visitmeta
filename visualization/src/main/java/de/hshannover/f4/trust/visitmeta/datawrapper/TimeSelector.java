@@ -38,103 +38,95 @@
  */
 package de.hshannover.f4.trust.visitmeta.datawrapper;
 
-
-
-
-/* Imports ********************************************************************/
 import java.util.Observable;
 
 import org.apache.log4j.Logger;
-/* Class **********************************************************************/
+
 /**
  * The class holds the next timestamps.
  */
 public class TimeSelector extends Observable {
-/* Attributes *****************************************************************/
 	private static final Logger LOGGER = Logger.getLogger(TimeSelector.class);
-	/** Singleton */
-	private static TimeSelector mInstance = null;
 	private TimeHolder mTimeHolder = null;
-	private long       mTimeStart  = 0L;
-	private long       mTimeEnd    = 0L;
-	private boolean    mLiveView   = true;
-/* Constructors ***************************************************************/
-	private TimeSelector() {
-		mTimeHolder = TimeHolder.getInstance();
+	private GraphContainer mConnection = null;
+	private long mTimeStart = 0L;
+	private long mTimeEnd = 0L;
+	private boolean mLiveView = true;
+
+	public TimeSelector(GraphContainer connection) {
+		mConnection = connection;
+		mTimeHolder = mConnection.getTimeHolder();
 	}
-/* Methods ********************************************************************/
+
+	public TimeHolder getTimeHolder() {
+		return mTimeHolder;
+	}
+	
 	public synchronized boolean hasTimeStartChanged() {
 		LOGGER.trace("Method hasTimeStartChanged() called.");
 		return mTimeStart != mTimeHolder.getTimeStart();
 	}
+
 	public synchronized boolean hasTimeEndChanged() {
 		LOGGER.trace("Method hasTimeEndChanged() called.");
 		return mTimeEnd != mTimeHolder.getTimeEnd();
 	}
+
 	public synchronized boolean isLiveView() {
 		LOGGER.trace("Method isLiveView() called.");
 		return mLiveView;
 	}
-/* Methods - Getter ***********************************************************/
-	/**
-	 * Singleton Thread-Safe
-	 * @return the instance of TimeSelector.
-	 */
-	public static TimeSelector getInstance() {
-		LOGGER.trace("Method getInstance() called.");
-		if(mInstance == null) { // DoubleCheck
-			synchronized (TimeSelector.class) {
-				if (mInstance == null) {
-					mInstance = new TimeSelector();
-				}
-			}
-		}
-		return mInstance;
-	}
+
 	public synchronized long getTimeStart() {
 		LOGGER.trace("Method getTimeStart() called.");
 		return mTimeStart;
 	}
+
 	public synchronized long getTimeEnd() {
 		LOGGER.trace("Method getTimeEnd() called.");
 		return mTimeEnd;
 	}
-/* Methods - Setter ***********************************************************/
+
 	public synchronized void setTimeStart(long pTime) {
 		setTimeStart(pTime, true);
 	}
+
 	public synchronized void setTimeStart(long pTime, boolean pNotify) {
-		LOGGER.trace("Method setTimeStart(" + pTime + ", " + pNotify +") called.");
-		if (mTimeStart != pTime) {// && mTimeHolder.getTimeStart() != pTime) {
+		LOGGER.trace("Method setTimeStart(" + pTime + ", " + pNotify + ") called.");
+		if (mTimeStart != pTime) {
 			mTimeStart = pTime;
 			setChanged();
-			if(pNotify) {
+			if (pNotify) {
 				notifyObservers();
 			}
 		}
 	}
+
 	public synchronized void setTimeEnd(long pTime) {
 		setTimeEnd(pTime, true);
 	}
+
 	public synchronized void setTimeEnd(long pTime, boolean pNotify) {
-		LOGGER.trace("Method setTimeEnd(" + pTime + ", " + pNotify +") called.");
-		if (mTimeEnd != pTime) {// && mTimeHolder.getTimeEnd() != pTime) {
+		LOGGER.trace("Method setTimeEnd(" + pTime + ", " + pNotify + ") called.");
+		if (mTimeEnd != pTime) {
 			mTimeEnd = pTime;
 			setChanged();
-			if(pNotify) {
+			if (pNotify) {
 				notifyObservers();
 			}
 		}
 	}
+
 	public synchronized void setLiveView(boolean pLive) {
 		setLiveView(pLive, true);
 	}
+
 	public synchronized void setLiveView(boolean pLive, boolean pNotify) {
 		LOGGER.trace("Method setLiveView(" + pLive + ", " + pNotify + ") called.");
-		if(mLiveView != pLive) {
+		if (mLiveView != pLive) {
 			mLiveView = pLive;
 			setChanged();
-			if(pNotify) {
+			if (pNotify) {
 				notifyObservers();
 			}
 		}

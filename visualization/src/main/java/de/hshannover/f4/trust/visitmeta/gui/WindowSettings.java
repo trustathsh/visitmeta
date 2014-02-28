@@ -84,18 +84,19 @@ public class WindowSettings extends JFrame {
 	/**
 	 * Calls the init() method to initialize the settings window
 	 */
-	public WindowSettings() {
+	public WindowSettings(SettingManager settingManager) {
 		super();
-		init();
+		init(settingManager);
 		pack();
 	}
 	
 	/**
 	 * Initializes a settings window
+	 * @param settingManager 
 	 */
-	private void init() {
+	private void init(SettingManager settingManager) {
 		LOGGER.trace("Init Settings Window");
-		initWindow();
+		initWindow(settingManager);
 		loadSettings();
 		initInputFields();
 		initSaveButton();
@@ -106,9 +107,10 @@ public class WindowSettings extends JFrame {
 
 	/**
 	 * Initializes the main components
+	 * @param settingManager 
 	 */
-	private void initWindow() {
-		mSettingManager = SettingManager.getInstance();
+	private void initWindow(SettingManager settingManager) {
+		mSettingManager = settingManager;
 		mPanel = new JPanel();
 		mSpringLayout = new SpringLayout();
 		setTitle("Timing Settings");

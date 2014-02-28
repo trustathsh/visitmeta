@@ -53,6 +53,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
@@ -63,6 +64,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 
 public class GraphConnection implements Observer {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
+	private GraphContainer mConnetion = null;
 	private FacadeLogic mFacadeLogic = null;
 	private GraphPanel mGraphPanel = null;
 	private SettingManager mSettingManager = null;
@@ -73,14 +75,15 @@ public class GraphConnection implements Observer {
 	private ConnectionTab mParentTab = null;
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 
-	public GraphConnection(FacadeLogic pLogic) {
-		mFacadeLogic = pLogic;
-		mTimeSelector = TimeSelector.getInstance();
-		mSettingManager = SettingManager.getInstance();
+	public GraphConnection(GraphContainer connection) {
+		mConnetion = connection;
+		mFacadeLogic = mConnetion.getFacadeLogic();
+		mTimeSelector = mConnetion.getTimeSelector();
+		mSettingManager = mConnetion.getSettingManager();
 		mGraphPanel = GraphPanelFactory.getGraphPanel("Piccolo2D", this);
 
-		mTimerCreation = TimeManagerCreation.getInstance();
-		mTimerDeletion = TimeManagerDeletion.getInstance();
+		mTimerCreation = mConnetion.getTimeManagerCreation();
+		mTimerDeletion = mConnetion.getTimeManagerDeletion();
 		mTimerCreation.setController(this);
 		mTimerDeletion.setController(this);
 
@@ -88,7 +91,19 @@ public class GraphConnection implements Observer {
 		mFacadeLogic.addObserver(this);
 		mTimeSelector.addObserver(this);
 	}
+	
+	public SettingManager getSettingManager() {
+		return mSettingManager;
+	}
+	
+	public TimeSelector getTimeSelector() {
+		return mTimeSelector;
+	}
 
+	public FacadeLogic getLogic() {
+		return mFacadeLogic;
+	}
+	
 	public void setParentTab(ConnectionTab parentTab) {
 		this.mParentTab = parentTab;
 	}

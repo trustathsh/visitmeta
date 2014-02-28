@@ -38,16 +38,13 @@
  */
 package de.hshannover.f4.trust.visitmeta.network;
 
-
-
-
-
 import java.util.Observable;
 import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 
@@ -56,27 +53,29 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
  */
 public class FacadeNetwork extends Observable implements Runnable, Observer {
 
-	private static final Logger LOGGER     = Logger.getLogger(FacadeNetwork.class);
+	private static final Logger LOGGER = Logger.getLogger(FacadeNetwork.class);
 
-	private Connection     mConnection     = null;
-	private TimeSelector   mTimeSelector   = null;
+	private GraphContainer mConnection = null;
+	private Connection mNetworkConnection = null;
+	private TimeSelector mTimeSelector = null;
 	private SettingManager mSettingManager = null;
-	private boolean        mIsDone         = false;
-	private boolean        mLoadNewest     = true;
-	private int            mInterval       = 0;
+	private boolean mIsDone = false;
+	private boolean mLoadNewest = true;
+	private int mInterval = 0;
 
-	public FacadeNetwork(Connection connection) {
-		mConnection     = connection;
-		mTimeSelector   = TimeSelector.getInstance();
-		mSettingManager = SettingManager.getInstance();
-		mInterval       = mSettingManager.getNetworkInterval();
+	public FacadeNetwork(GraphContainer connection) {
+		mConnection = connection;
+		mNetworkConnection = mConnection.getConnection();
+		mSettingManager = mConnection.getSettingManager();
+		mTimeSelector = mConnection.getTimeSelector();
+		mInterval = mSettingManager.getNetworkInterval();
 		mSettingManager.addObserver(this);
 		mTimeSelector.addObserver(this);
 	}
 
 	public synchronized UpdateContainer getUpdate() {
 		LOGGER.trace("Method getUpdate() called.");
-		return mConnection.getUpdate();
+		return mNetworkConnection.getUpdate();
 	}
 
 	/**
@@ -88,32 +87,35 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	}
 
 	/**
-	 * Load the initial graph to the timestamp in TimeSelector.
-	 * This methode notify the observers.
+	 * Load the initial graph to the timestamp in TimeSelector. This methode
+	 * notify the observers.
+	 * 
 	 * @see Connection#loadInitialGraph()
 	 */
 	public synchronized void loadInitialGraph() {
 		LOGGER.trace("Method loadInitialGraph() called.");
 		clearGraph();
-		mConnection.loadInitialGraph();
+		mNetworkConnection.loadInitialGraph();
 		setChanged();
 		notifyObservers();
 	}
 
 	/**
-	 * Load the delta to the timestamps in TimeSelector.
-	 * This methode notify the observers.
+	 * Load the delta to the timestamps in TimeSelector. This methode notify the
+	 * observers.
+	 * 
 	 * @see Connection#loadDelta()
 	 */
 	public synchronized void loadDelta() {
 		LOGGER.trace("Method loadDelta() called.");
-		mConnection.loadDelta();
+		mNetworkConnection.loadDelta();
 		setChanged();
 		notifyObservers();
 	}
 
 	/**
 	 * Clear the pools.
+	 * 
 	 * @see PoolNodeIdentifier#clear()
 	 * @see PoolNodeMetadata#clear()
 	 * @see PoolExpandedLink#clear()
@@ -131,9 +133,8 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 		try {
 			synchronized (this) {
 				while (!mIsDone) {
-					mConnection.loadChangesMap();
-					if (mLoadNewest && mConnection.updateGraph()
-					) {
+					mNetworkConnection.loadChangesMap();
+					if (mLoadNewest && mNetworkConnection.updateGraph()) {
 						setChanged();
 						notifyObservers();
 					}
@@ -150,13 +151,13 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	public void update(Observable pO, Object pArg) {
 		LOGGER.trace("Method update(" + pO + ", " + pArg + ") called.");
 		synchronized (this) {
-			if(pO instanceof TimeSelector) {
+			if (pO instanceof TimeSelector) {
 				mLoadNewest = mTimeSelector.isLiveView();
-//				if (mConnection.delta()) {
-//					setChanged();
-//					notifyObservers();
-//				}
-			} else if(pO instanceof SettingManager) {
+				// if (mConnection.delta()) {
+				// setChanged();
+				// notifyObservers();
+				// }
+			} else if (pO instanceof SettingManager) {
 				mInterval = mSettingManager.getNetworkInterval();
 			}
 		}

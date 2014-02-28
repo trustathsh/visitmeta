@@ -38,118 +38,113 @@
  */
 package de.hshannover.f4.trust.visitmeta.datawrapper;
 
-
-
-
-/* Imports ********************************************************************/
 import java.util.Observable;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-/* Class **********************************************************************/
+
 /**
  * The class holds the timestamps.
  */
 public class TimeHolder extends Observable {
-/* Attributes *****************************************************************/
 	private static final Logger LOGGER = Logger.getLogger(TimeHolder.class);
-	/** Singleton */
-	private static TimeHolder mInstance = null;
 	private SortedMap<Long, Long> mChangesMap = null;
-	private long                  mTimeStart  = 0L;
-	private long                  mTimeEnd    = 0L;
-/* Constructors ***************************************************************/
-	private TimeHolder() {}
-/* Methods ********************************************************************/
-	private boolean hasChangeMap() {
+	private long mTimeStart = 0L;
+	private long mTimeEnd = 0L;
+	private GraphContainer mConnection = null;
+
+	public TimeHolder(GraphContainer connection) {
+		mConnection = connection;
+	}
+
+	/**
+	 * Detects whether the TimeHolder object hat a ChangeMap
+	 * 
+	 * @return boolean whether the TimeHolder object has a ChangeMap or not
+	 */
+	public boolean hasChangeMap() {
 		LOGGER.trace("Method hasChangeMap() called.");
 		return mChangesMap != null && mChangesMap.size() > 0;
 	}
-/* Methods - Getter ***********************************************************/
+
 	/**
-	 * Singleton Thread-Safe
-	 * @return the instance of TimeHolder.
-	 */
-	public static TimeHolder getInstance() {
-		LOGGER.trace("Method getInstance() called.");
-		if(mInstance == null) { // DoubleCheck
-			synchronized (TimeHolder.class) {
-				if (mInstance == null) {
-					mInstance = new TimeHolder();
-				}
-			}
-		}
-		return mInstance;
-	}
-	/**
-	 * The oldest timestamp to select.
+	 * The oldest possible timestamp to select.
 	 */
 	public synchronized long getBigBang() {
 		LOGGER.trace("Method getBigBang() called.");
-		if(hasChangeMap()) {
+		if (hasChangeMap()) {
 			return mChangesMap.firstKey();
 		}
 		return 0L;
 	}
+
 	/**
-	 * The newest timestamp to select
+	 * The newest possible timestamp to select
 	 */
 	public synchronized long getNewestTime() {
 		LOGGER.trace("Method getNewestTime() called.");
-		if(hasChangeMap()) {
+		if (hasChangeMap()) {
 			return mChangesMap.lastKey();
 		}
 		return 0L;
 	}
+
 	public synchronized long getTimeStart() {
 		LOGGER.trace("Method getTimeStart() called.");
 		return mTimeStart;
 	}
+
 	public synchronized long getTimeEnd() {
 		LOGGER.trace("Method getTimeEnd() called.");
 		return mTimeEnd;
 	}
+
 	public synchronized SortedMap<Long, Long> getChangesMap() {
 		LOGGER.trace("Method getChangesMap() called.");
 		return mChangesMap;
 	}
-/* Methods - Setter ***********************************************************/
+
 	public synchronized void setChangesMap(SortedMap<Long, Long> pMap) {
 		setChangesMap(pMap, true);
 	}
+
 	public synchronized void setChangesMap(SortedMap<Long, Long> pMap, boolean pNotify) {
 		LOGGER.trace("Method setChangesMap(" + pMap + ", " + pNotify + ") called.");
 		mChangesMap = pMap;
 		setChanged();
-		if(pNotify) {
+		if (pNotify) {
 			notifyObservers();
 		}
 	}
+
 	public synchronized void setTimeStart(long pTime) {
 		setTimeStart(pTime, true);
 	}
+
 	public synchronized void setTimeStart(long pTime, boolean pNotify) {
 		LOGGER.trace("Method setTimeStart(" + pTime + ", " + pNotify + ") called.");
-		if(hasChangeMap()) {
+		if (hasChangeMap()) {
 			if (mChangesMap.firstKey() <= pTime && pTime <= mChangesMap.lastKey() && mTimeStart != pTime) {
 				mTimeStart = pTime;
 				setChanged();
-				if(pNotify) {
+				if (pNotify) {
 					notifyObservers();
 				}
 			}
 		}
 	}
+
 	public synchronized void setTimeEnd(long pTime) {
 		setTimeEnd(pTime, true);
 	}
+
 	public synchronized void setTimeEnd(long pTime, boolean pNotify) {
 		LOGGER.trace("Method setTimeEnd(" + pTime + ", " + pNotify + ") called.");
-		if(hasChangeMap()) {
+		if (hasChangeMap()) {
 			if (mChangesMap.firstKey() <= pTime && pTime <= mChangesMap.lastKey() && mTimeEnd != pTime) {
 				mTimeEnd = pTime;
 				setChanged();
-				if(pNotify) {
+				if (pNotify) {
 					notifyObservers();
 				}
 			}

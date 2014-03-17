@@ -53,7 +53,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
-import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
 /**
  *
@@ -102,7 +102,7 @@ public class MenuBar extends JMenuBar {
 		mntmAddConnection.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				NewConnectionDialog cD = new NewConnectionDialog(guiController);
+				ConnectionDialog cD = new ConnectionDialog(guiController);
 				cD.setVisible(true);
 			}
 		});

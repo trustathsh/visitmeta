@@ -226,7 +226,7 @@ public class ConnectionTab extends JPanel {
 
 	@Override
 	public String toString() {
-		return this.mName;
+		return mRestConnection.toString();
 	}
 
 	@Override

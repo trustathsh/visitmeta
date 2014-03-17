@@ -81,7 +81,11 @@ public class RESTConnection {
 
 	@Override
 	public RESTConnection clone() {
-		return new RESTConnection(mDataserviceConnection, mName, mUrl, mDumping);
+		RESTConnection tmp = new RESTConnection(mDataserviceConnection, mName + "(clone)", mUrl, mDumping);
+		tmp.setBasicAuthentication(mBasicAuthentication);
+		tmp.setUsername(mUsername);
+		tmp.setPassword(mPassword);
+		return tmp;
 	}
 
 	public String getName() {
@@ -118,7 +122,7 @@ public class RESTConnection {
 		return mDataserviceConnection;
 	}
 
-	public void setDataserviceConnection(DataserviceConnection dataConnection) {
+	private void setDataserviceConnection(DataserviceConnection dataConnection) {
 		mDataserviceConnection = dataConnection;
 	}
 

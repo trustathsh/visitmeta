@@ -42,16 +42,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Category;
-import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.spi.ErrorHandler;
-import org.apache.log4j.spi.Filter;
-import org.apache.log4j.spi.HierarchyEventListener;
-import org.apache.log4j.spi.LoggerRepository;
-import org.apache.log4j.spi.LoggingEvent;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -71,7 +62,9 @@ public class ConnectionDialog extends JDialog{
 
 	private static final long serialVersionUID = 3274298974215759835L;
 
-	private static int gg = 0;
+	private static final Logger log = Logger.getLogger(ConnectionDialog.class);
+
+	private JTextAreaAppander mJTextAreaAppander;
 
 	private Insets mXinsets;
 	private Insets mLblInsets;
@@ -94,6 +87,8 @@ public class ConnectionDialog extends JDialog{
 	}
 
 	public ConnectionDialog() {
+		mJTextAreaAppander = new JTextAreaAppander();
+		log.addAppender(mJTextAreaAppander);
 
 		// Hilfsobjekte, damit alle Abstaende harmonisch sind.
 		mNullInsets= new Insets(0,0,0,0); // keine Abstaende
@@ -132,8 +127,8 @@ public class ConnectionDialog extends JDialog{
 	public void createPanels() {
 		getContentPane().setLayout(new GridBagLayout());
 
-		mConnectionPanelDataService = new DataServicePanel(this);
 		mConnectionPanelMapServer = new MapServerPanel(this);
+		mConnectionPanelDataService = new DataServicePanel(this);
 
 		mJtpMain = new JTabbedPane();
 		mJtpMain.add("Map Server Connections", mConnectionPanelMapServer);
@@ -181,6 +176,12 @@ public class ConnectionDialog extends JDialog{
 		cont.add(comp, gbc);
 	}
 
+	private static void switchJPanel(int x, int y, int width, int height, double weightx, double weighty, JPanel cont, Component compToAdd, Component compToRemove, Insets insets) {
+		cont.remove(compToRemove);
+		addComponent(x, y, width, height, weightx, weighty, cont, compToAdd, insets);
+		cont.updateUI();
+	}
+
 	public static List<DataserviceConnection> getDataserviceConnectionsFromProperties(){
 		ArrayList<DataserviceConnection> dataserviceList = new ArrayList<DataserviceConnection>();
 		int connectionCount = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
@@ -199,8 +200,6 @@ public class ConnectionDialog extends JDialog{
 	private abstract class TabPanel extends JPanel{
 
 		private static final long serialVersionUID = -1419963248354632788L;
-
-		private final static String newline = "\n";
 
 
 		protected ConnectionDialog mContext;
@@ -276,117 +275,18 @@ public class ConnectionDialog extends JDialog{
 
 			mJspContent = new JSplitPane();
 			mJspContent.setLeftComponent(mJpLeftSplitPane);
-			mJspContent.setRightComponent(mJlNoConnectionsYet);
+			mJspContent.setRightComponent(mJpRightSplitPane);
 
-			LoggerRepository test = Logger.getDefaultHierarchy();
-			test.addHierarchyEventListener(new HierarchyEventListener() {
+			mJtaLogWindows = new JTextArea(5, 30);
+			mJTextAreaAppander.addJTextArea(mJtaLogWindows);
 
-				@Override
-				public void removeAppenderEvent(Category arg0, Appender arg1) {
-					System.out.println("removeAppenderEvent");
-
-				}
-
-				@Override
-				public void addAppenderEvent(Category arg0, Appender arg1) {
-					System.out.println("addAppenderEvent" + arg1.getName());
-
-				}
-			});
-
-			mJtaLogWindows = new JTextArea(5, 20);
 			mJspLogWindows = new JScrollPane(mJtaLogWindows);
 			mJtaLogWindows.setEditable(false);
-			//			mJtaLogWindows.setCaretPosition(mJtaLogWindows.getDocument().getLength());
-
-
-			Logger hh = Logger.getLogger(ConnectionDialog.class);
-			hh.addAppender(new Appender() {
-
-				@Override
-				public void setName(String arg0) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void setLayout(Layout arg0) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void setErrorHandler(ErrorHandler arg0) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public boolean requiresLayout() {
-					// TODO Auto-generated method stub
-					return false;
-				}
-
-				@Override
-				public String getName() {
-					return "Connection Log Appander";
-				}
-
-				@Override
-				public Layout getLayout() {
-					return new SimpleLayout();
-				}
-
-				@Override
-				public Filter getFilter() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				@Override
-				public ErrorHandler getErrorHandler() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				@Override
-				public void doAppend(LoggingEvent lEvent) {
-					mJtaLogWindows.append(lEvent.getMessage() + newline);
-
-					mJtaLogWindows.setCaretPosition(mJtaLogWindows.getDocument().getLength());
-
-				}
-
-				@Override
-				public void close() {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void clearFilters() {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void addFilter(Filter arg0) {
-					// TODO Auto-generated method stub
-
-				}
-			});
-
-			hh.info(gg + "Hallo test");
-			gg++;
-			hh.info(gg + "Hallo test2");
-			gg++;
-			hh.info(gg + "Hallo test3");
-			gg++;
 
 			//			 x  y  w  h  wx   wy
 			addComponent(0, 2, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpAddDeleteCopy, mNullInsets);
 			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJspContent, mLblInsets);
-			addComponent(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mLblInsets);
+			addComponent(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, mLblInsets);
 			addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRightSplitPane, mJpConnectionParameter, mLblInsets);
 			addComponent(0, 0, 1, 1, 0.0, 0.0, mJpLog, mJspLogWindows, mLblInsets);
 			addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRightSplitPane, mJpLog, mLblInsets);
@@ -428,6 +328,8 @@ public class ConnectionDialog extends JDialog{
 
 		public MapServerPanel(ConnectionDialog context) {
 			super(context);
+
+			mParameterPanel = new MapServerParameterPanel();
 
 			mJcbDataServiceConnection = new JComboBox<DataserviceConnection>();
 
@@ -474,8 +376,8 @@ public class ConnectionDialog extends JDialog{
 					mParameterPanel.mJtfUsername.setText(param.getUsername());
 					mParameterPanel.mJtfPassword.setText(param.getPassword());
 					mParameterPanel.mJcbBasicAuthentication.setSelected(param.isBasicAuthentication());
-					mJspContent.setRightComponent(mJpRightSplitPane);
-					mJspContent.updateUI();
+
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
 
 					mPreviousConnection = param;
 				}
@@ -490,7 +392,9 @@ public class ConnectionDialog extends JDialog{
 					param.setBasicAuthentication(true);
 
 					mListModelMapServer.add(mListModelMapServer.getSize(), param);
-					mJspContent.setRightComponent(mJpRightSplitPane);
+
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
+
 					mJlMapServerConnections.setSelectedIndex(mListModelMapServer.getSize() - 1);
 
 				}
@@ -506,9 +410,7 @@ public class ConnectionDialog extends JDialog{
 							index = (index == 0) ? 0 : index - 1;
 							mJlMapServerConnections.setSelectedIndex(index);
 						} else {
-							mJspContent.setRightComponent(mJlNoConnectionsYet);
-							mJspContent.updateUI();
-
+							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), mLblInsets);
 						}
 					}
 				}
@@ -670,6 +572,9 @@ public class ConnectionDialog extends JDialog{
 
 		private DataServicePanel(ConnectionDialog context){
 			super(context);
+
+			mParameterPanel = new DataServiceParameterPanel();
+
 			readProperties();
 			addListeners();
 
@@ -695,8 +600,7 @@ public class ConnectionDialog extends JDialog{
 					mParameterPanel.mJtfUrl.setText(param.getUrl());
 					mParameterPanel.mJcbRawXML.setSelected(param.isRawXml());
 
-					mJspContent.setRightComponent(mJpRightSplitPane);
-					mJspContent.updateUI();
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
 
 					mPreviousConnection = param;
 				}
@@ -711,7 +615,7 @@ public class ConnectionDialog extends JDialog{
 
 					mListModelDataService.add(mListModelDataService.getSize(), param);
 
-					mJspContent.setRightComponent(mJpRightSplitPane);
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
 
 					mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
 
@@ -728,9 +632,7 @@ public class ConnectionDialog extends JDialog{
 							index = (index == 0) ? 0 : index - 1;
 							mJlDataServiceConnections.setSelectedIndex(index);
 						} else {
-							mJspContent.setRightComponent(mJlNoConnectionsYet);
-							mJspContent.updateUI();
-
+							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), mLblInsets);
 						}
 					}
 				}

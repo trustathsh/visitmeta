@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.SystemColor;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -75,6 +76,7 @@ public class ConnectionDialog extends JDialog{
 	private JPanel mJpSouth;
 
 	private JButton mJbClose;
+	private JButton mJbSave;
 
 	private MapServerPanel mConnectionPanelMapServer;
 	private DataServicePanel mConnectionPanelDataService;
@@ -98,6 +100,9 @@ public class ConnectionDialog extends JDialog{
 		createDialog();
 		createPanels();
 
+		pack();
+
+		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)/2 - getWidth()/2, (Toolkit.getDefaultToolkit().getScreenSize().height)/2 - getHeight()/2);
 	}
 
 	public ConnectionDialog(GuiController guiController) {
@@ -109,7 +114,6 @@ public class ConnectionDialog extends JDialog{
 		setTitle("Manage REST connections");
 		setModal(true);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 671, 500);
 
 		addWindowListener(new WindowListener() {
 			@Override public void windowClosing(WindowEvent arg0) {
@@ -127,13 +131,6 @@ public class ConnectionDialog extends JDialog{
 	public void createPanels() {
 		getContentPane().setLayout(new GridBagLayout());
 
-		mConnectionPanelMapServer = new MapServerPanel(this);
-		mConnectionPanelDataService = new DataServicePanel(this);
-
-		mJtpMain = new JTabbedPane();
-		mJtpMain.add("Map Server Connections", mConnectionPanelMapServer);
-		mJtpMain.add("Dataservice Connections", mConnectionPanelDataService);
-
 		mJpSouth = new JPanel();
 		mJpSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -145,7 +142,17 @@ public class ConnectionDialog extends JDialog{
 			}
 		});
 
+		mJbSave = new JButton("Save");
+
 		mJpSouth.add(mJbClose);
+		mJpSouth.add(mJbSave);
+
+		mConnectionPanelMapServer = new MapServerPanel(this);
+		mConnectionPanelDataService = new DataServicePanel(this);
+
+		mJtpMain = new JTabbedPane();
+		mJtpMain.add("Map Server Connections", mConnectionPanelMapServer);
+		mJtpMain.add("Dataservice Connections", mConnectionPanelDataService);
 
 		//			 x  y  w  h  wx   wy
 		addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJtpMain, mLblInsets);
@@ -211,7 +218,7 @@ public class ConnectionDialog extends JDialog{
 		protected JPanel mJpLog;
 
 		private JPanel mJpAddDeleteCopy;
-		private JPanel mJpSouth;
+		//		private JPanel mJpSouth;
 
 		private JTextArea mJtaLogWindows;
 		private JScrollPane mJspLogWindows;
@@ -219,7 +226,6 @@ public class ConnectionDialog extends JDialog{
 		protected JButton mJbAdd;
 		protected JButton mJbDelete;
 		protected JButton mJbCopy;
-		protected JButton mJbSave;
 
 		protected JLabel mJlNoConnectionsYet;
 
@@ -235,7 +241,7 @@ public class ConnectionDialog extends JDialog{
 			}
 		}
 
-		public void createPanels() {
+		private void createPanels() {
 			setLayout(new GridBagLayout());
 
 			mJpLeftSplitPane= new JPanel();
@@ -264,11 +270,10 @@ public class ConnectionDialog extends JDialog{
 			mJpAddDeleteCopy.add(mJbDelete);
 			mJpAddDeleteCopy.add(mJbCopy);
 
-			mJpSouth = new JPanel();
-			mJpSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
+			//			mJpSouth = new JPanel();
+			//			mJpSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
+			//
 
-			mJbSave = new JButton("Save");
-			mJpSouth.add(mJbSave);
 
 			mJlNoConnectionsYet = new JLabel("No connections yet.");
 			mJlNoConnectionsYet.setHorizontalAlignment(SwingConstants.CENTER);
@@ -277,11 +282,12 @@ public class ConnectionDialog extends JDialog{
 			mJspContent.setLeftComponent(mJpLeftSplitPane);
 			mJspContent.setRightComponent(mJpRightSplitPane);
 
-			mJtaLogWindows = new JTextArea(5, 30);
+			mJtaLogWindows = new JTextArea(5, 40);
+			mJtaLogWindows.setEditable(false);
+			// for append logging messages
 			mJTextAreaAppander.addJTextArea(mJtaLogWindows);
 
 			mJspLogWindows = new JScrollPane(mJtaLogWindows);
-			mJtaLogWindows.setEditable(false);
 
 			//			 x  y  w  h  wx   wy
 			addComponent(0, 2, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpAddDeleteCopy, mNullInsets);
@@ -290,7 +296,7 @@ public class ConnectionDialog extends JDialog{
 			addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRightSplitPane, mJpConnectionParameter, mLblInsets);
 			addComponent(0, 0, 1, 1, 0.0, 0.0, mJpLog, mJspLogWindows, mLblInsets);
 			addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRightSplitPane, mJpLog, mLblInsets);
-			addComponent(0, 3, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpSouth, mNullInsets);
+			//			addComponent(0, 3, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpSouth, mNullInsets);
 		}
 
 		private void addConnectionList() {
@@ -368,6 +374,7 @@ public class ConnectionDialog extends JDialog{
 						mPreviousConnection.update(mParameterPanel.mJtfName.getText().trim(), mParameterPanel.mJtfUrl.getText().trim(), mParameterPanel.mJcbDump.isSelected());
 						mPreviousConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
 						mPreviousConnection.setPassword(new String(mParameterPanel.mJtfPassword.getPassword()).trim());
+						mPreviousConnection.setConnectAtStartUp(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
 					}
 
 					mParameterPanel.mJtfName.setText(param.getName());
@@ -376,6 +383,7 @@ public class ConnectionDialog extends JDialog{
 					mParameterPanel.mJtfUsername.setText(param.getUsername());
 					mParameterPanel.mJtfPassword.setText(param.getPassword());
 					mParameterPanel.mJcbBasicAuthentication.setSelected(param.isBasicAuthentication());
+					mParameterPanel.mJcbConnectingAtStartUp.setSelected(param.isConnectAtStartUp());
 
 					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
 
@@ -430,45 +438,51 @@ public class ConnectionDialog extends JDialog{
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					DataserviceConnection tmpCon = mJlMapServerConnections.getSelectedValue().getDataserviceConnection();
+					if(mJtpMain.getSelectedComponent() == mConnectionPanelMapServer){
+						DataserviceConnection tmpCon = mJlMapServerConnections.getSelectedValue().getDataserviceConnection();
 
-					ClientConfig config = new DefaultClientConfig();
-					Client client = Client.create(config);
+						ClientConfig config = new DefaultClientConfig();
+						Client client = Client.create(config);
 
-					URI uri_connect = UriBuilder.fromUri(tmpCon.getUrl()).build();
-					WebResource temp1 = client.resource(uri_connect);
+						URI uri_connect = UriBuilder.fromUri(tmpCon.getUrl()).build();
+						WebResource temp1 = client.resource(uri_connect);
 
-					JSONObject jObj = new JSONObject();
-					try {
+						JSONObject jObj = new JSONObject();
+						try {
 
-						jObj.put("url", mParameterPanel.mJtfUrl.getText().trim());
-						jObj.put("user", mParameterPanel.mJtfUsername.getText().trim());
-						jObj.put("userPass", new String(mParameterPanel.mJtfPassword.getPassword()).trim());
+							jObj.put("url", mParameterPanel.mJtfUrl.getText().trim());
+							jObj.put("user", mParameterPanel.mJtfUsername.getText().trim());
+							jObj.put("userPass", new String(mParameterPanel.mJtfPassword.getPassword()).trim());
+							jObj.put("connectAtStartUp", mParameterPanel.mJcbConnectingAtStartUp.isSelected());
+							jObj.put("basicAuthentication", mParameterPanel.mJcbBasicAuthentication.isSelected());
 
-					} catch (JSONException e1) {
-						e1.printStackTrace();
+						} catch (JSONException e1) {
+							e1.printStackTrace();
+						}
+
+						String response = temp1.path(mJlMapServerConnections.getSelectedValue().getName()).type(MediaType.APPLICATION_JSON).put(String.class, jObj);
+						System.out.println(response);
+
+						GraphContainer connection = new GraphContainer(mJlMapServerConnections.getSelectedValue().getName(), mJlMapServerConnections.getSelectedValue());
+						mGuiController.addConnection(connection);
+
+						log.info("new Map-Server connection is stored in " + tmpCon.getName());
+
+						//										Connection vConnection = FactoryConnection.getConnection(ConnectionType.REST, mJlMapServerConnections.getSelectedValue());
+						//										Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+						//
+						//										FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
+						//										FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
+						//										GraphConnection connController = new GraphConnection(vLogic);
+						//
+						//										mGuiController.addConnection(mJlMapServerConnections.getSelectedValue().getName(), connController, mJlMapServerConnections.getSelectedValue());
+						//
+						//										Thread vThreadNetwork = new Thread(vNetwork);
+						//										Thread vThreadLogic = new Thread(vLogic);
+						//
+						//										vThreadNetwork.start();
+						//										vThreadLogic.start();
 					}
-
-					String response = temp1.path(mJlMapServerConnections.getSelectedValue().getName()).type(MediaType.APPLICATION_JSON).put(String.class, jObj);
-					System.out.println(response);
-
-					GraphContainer connection = new GraphContainer(mJlMapServerConnections.getSelectedValue().getName(), mJlMapServerConnections.getSelectedValue());
-					mGuiController.addConnection(connection);
-
-					//										Connection vConnection = FactoryConnection.getConnection(ConnectionType.REST, mJlMapServerConnections.getSelectedValue());
-					//										Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
-					//
-					//										FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
-					//										FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
-					//										GraphConnection connController = new GraphConnection(vLogic);
-					//
-					//										mGuiController.addConnection(mJlMapServerConnections.getSelectedValue().getName(), connController, mJlMapServerConnections.getSelectedValue());
-					//
-					//										Thread vThreadNetwork = new Thread(vNetwork);
-					//										Thread vThreadLogic = new Thread(vLogic);
-					//
-					//										vThreadNetwork.start();
-					//										vThreadLogic.start();
 				}
 
 			});
@@ -509,6 +523,7 @@ public class ConnectionDialog extends JDialog{
 		}
 
 		private void updateRestConnectionsList(DataserviceConnection dConnection){
+			log.info("Update connection list from Dataservice(" + dConnection.getName() + ")");
 			mListModelMapServer.removeAllElements();
 
 			ClientConfig config = new DefaultClientConfig();
@@ -526,9 +541,12 @@ public class ConnectionDialog extends JDialog{
 				try {
 					jsonConnection = jsonResponse.getJSONObject(jKey);
 					RESTConnection restConn = new RESTConnection(dConnection, jKey, jsonConnection.getString("URL"), false);
-					restConn.setBasicAuthentication(true);
+					restConn.setBasicAuthentication(jsonConnection.optBoolean("BasicAuthentication", true));
 					restConn.setUsername(jsonConnection.getString("Username"));
 					restConn.setPassword(jsonConnection.getString("Password"));
+					restConn.setConnectAtStartUp(jsonConnection.optBoolean("connectAtStartUp", false));
+					restConn.setDumping(jsonConnection.optBoolean("Dumping", false));
+					restConn.setMaxPollResultSize(jsonConnection.optString("MaxPollResultSize"));
 					mListModelMapServer.addElement(restConn);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -651,8 +669,12 @@ public class ConnectionDialog extends JDialog{
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					persistDataServiceConnections();
-					mContext.mConnectionPanelMapServer.updateDataserviceComboBox();
+					if(mJtpMain.getSelectedComponent() == mConnectionPanelDataService){
+						persistDataServiceConnections();
+						mContext.mConnectionPanelMapServer.updateDataserviceComboBox();
+						log.info("DataService Connections was persist");
+					}
+
 				}
 
 			});
@@ -726,10 +748,14 @@ public class ConnectionDialog extends JDialog{
 		private JLabel mJlName;
 		private JLabel mJlUrl ;
 		private JLabel mJlDump;
+		private JLabel mJlDumpDescription;
+		private JLabel mJlDumpDescription2;
+		private JLabel mJlDumpDescription3;
 		private JLabel mJlBasicAuthentication;
 		private JLabel mJlUsername ;
 		private JLabel mJlPassword;
 		private JLabel mJlMaxPollResultSize;
+		private JLabel mJlConnectingAtStartUp;
 
 		private JTextField mJtfUrl;
 		private JTextField mJtfName;
@@ -740,6 +766,7 @@ public class ConnectionDialog extends JDialog{
 
 		private JCheckBox mJcbDump;
 		private JCheckBox mJcbBasicAuthentication;
+		private JCheckBox mJcbConnectingAtStartUp;
 
 
 		private MapServerParameterPanel(){
@@ -771,12 +798,23 @@ public class ConnectionDialog extends JDialog{
 			mJlUsername = new JLabel("Username");
 			mJlPassword = new JLabel("Password");
 			mJlMaxPollResultSize = new JLabel("max-poll-result-size");
+			mJlConnectingAtStartUp = new JLabel("Connecting at start-up");
 			mJlDump = new JLabel("Dump");
+			mJlDumpDescription = new JLabel("Dumping is NOT IF-MAP 2.0 compliant!");
+			mJlDumpDescription.setHorizontalAlignment(SwingConstants.CENTER);
+			mJlDumpDescription.setEnabled(false);
+			mJlDumpDescription2 = new JLabel("That is currently only supported by irond.");
+			mJlDumpDescription2.setHorizontalAlignment(SwingConstants.CENTER);
+			mJlDumpDescription2.setEnabled(false);
+			mJlDumpDescription3 = new JLabel("The dump is used to bootstrap the visualization process.");
+			mJlDumpDescription3.setHorizontalAlignment(SwingConstants.CENTER);
+			mJlDumpDescription3.setEnabled(false);
 
 			mJtfName = new JTextField();
 			mJtfUrl = new JTextField();
 			mJcbBasicAuthentication = new JCheckBox();
 			mJcbBasicAuthentication.setEnabled(false);
+			mJcbConnectingAtStartUp = new JCheckBox();
 			mJtfUsername = new JTextField();
 			mJtfPassword = new JPasswordField();
 			mJtfMaxPollResultSize = new JTextField();
@@ -790,7 +828,11 @@ public class ConnectionDialog extends JDialog{
 			addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlUsername, mLblInsets);
 			addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, mLblInsets);
 			addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, mLblInsets);
-			addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlDump, mLblInsets);
+			addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, mLblInsets);
+			addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlDump, mLblInsets);
+			addComponent(0, 8, 2, 1, 1.0, 1.0, this, mJlDumpDescription, mNullInsets);
+			addComponent(0, 9, 2, 1, 1.0, 1.0, this, mJlDumpDescription2, mNullInsets);
+			addComponent(0, 10, 2, 1, 1.0, 1.0, this, mJlDumpDescription3, mNullInsets);
 
 			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, mLblInsets);
 			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, mLblInsets);
@@ -798,7 +840,8 @@ public class ConnectionDialog extends JDialog{
 			addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfUsername, mLblInsets);
 			addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, mLblInsets);
 			addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, mLblInsets);
-			addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbDump, mLblInsets);
+			addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, mLblInsets);
+			addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJcbDump, mLblInsets);
 		}
 	}
 

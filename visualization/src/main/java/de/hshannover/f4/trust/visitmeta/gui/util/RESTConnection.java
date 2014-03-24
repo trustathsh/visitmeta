@@ -17,6 +17,7 @@ public class RESTConnection {
 	private String mName;
 	private String mUrl;
 	private boolean mDumping;
+	private boolean mConnectAtStartUp;
 	private boolean mBasicAuthentication;
 	private String mUsername ;
 	private String mPassword;
@@ -156,6 +157,14 @@ public class RESTConnection {
 
 	public void setMaxPollResultSize(String maxPollResultSize) {
 		mMaxPollResultSize = maxPollResultSize;
+	}
+
+	public void setConnectAtStartUp(boolean connectAtStartUp) {
+		mConnectAtStartUp = connectAtStartUp;
+	}
+
+	public boolean isConnectAtStartUp() {
+		return mConnectAtStartUp;
 	}
 
 }

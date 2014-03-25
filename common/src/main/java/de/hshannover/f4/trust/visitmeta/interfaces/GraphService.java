@@ -54,7 +54,7 @@ public interface GraphService {
 	 * @return
 	 * A {@ SortedMap} that maps timestamps to the number of changes that occured at that time
 	 * in acscending order. <i>Note: Due to the nature of the IF-MAP protocol, this call is not
-	 * idempotent! Called at different points of, it can yield varying results.</i>
+	 * idempotent! Called at different points of time may yield varying results.</i>
 	 */
 	public SortedMap<Long, Long> getChangesMap();
 	/**
@@ -67,7 +67,7 @@ public interface GraphService {
 	 * @param timestamp
 	 * @return
 	 * State of the IF-MAP graph structure are time <tt>timestamp</tt>. <i>Note: Due to the nature
-	 * of the IF-MAP protocol, this call is not idempotent! Called at different points of, it can
+	 * of the IF-MAP protocol, this call is not idempotent! Called at different points of time may
 	 * yield varying results.</i>
 	 */
 	public List<IdentifierGraph> getGraphAt(long timestamp);

@@ -75,11 +75,11 @@ public class Connection {
 	private SettingManager mSettingManager = null;
 	int mInterval = 0;
 
-	public Connection(GraphService graphService, GraphContainer time) {
+	public Connection(GraphService graphService, GraphContainer con) {
 		mUpdateContainer = new UpdateContainer();
 		mGraphService = graphService;
-		mTimeSelector = time.getTimeSelector();
-		mSettingManager = time.getSettingManager();
+		mTimeSelector = con.getTimeSelector();
+		mSettingManager = con.getSettingManager();
 		mInterval = mSettingManager.getNetworkInterval();
 	}
 

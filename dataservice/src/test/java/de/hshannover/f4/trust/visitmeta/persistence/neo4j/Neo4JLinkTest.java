@@ -37,4 +37,100 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_IDENTIFIER;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.security.MessageDigest;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.test.TestGraphDatabaseFactory;
+
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryLink;
+
+public class Neo4JLinkTest {
+	private GraphDatabaseService mGraphDb;
+	private Neo4JRepository mRepo;
+
+	private Node mLinkNode, mIpNode, mMacNode;
+	private Neo4JIdentifier mIpID, mMacID;
+	private Neo4JLink mLink;
+
+	@Before
+	public void prepareTestDatabase() throws Exception {
+		mGraphDb = new TestGraphDatabaseFactory()
+				.newImpermanentDatabaseBuilder().newGraphDatabase();
+
+		Neo4JConnection neo4jConnection = mock(Neo4JConnection.class);
+		when(neo4jConnection.getConnection()).thenReturn(mGraphDb);
+
+		mRepo = new Neo4JRepository(neo4jConnection,
+				MessageDigest.getInstance("MD5"));
+		insertTestData();
+	}
+
+	private void insertTestData() {
+		Transaction tx = mGraphDb.beginTx();
+		mIpNode = mGraphDb.createNode();
+		mMacNode = mGraphDb.createNode();
+
+		mIpNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
+		mIpNode.setProperty("/ip-address/value", "10.1.1.1");
+		mIpNode.setProperty("/ip-address/type", "IPv4");
+
+		mMacNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		mMacNode.setProperty(KEY_TYPE_NAME, "mac-address");
+		mMacNode.setProperty("/mac-address/value", "ee:ee:ee:ee:ee:ee");
+
+		mIpID= new Neo4JIdentifier(mIpNode, mRepo);
+		mMacID = new Neo4JIdentifier(mMacNode, mRepo);
+		mLink = (Neo4JLink) mRepo.connect(mIpID, mMacID);
+		mLinkNode = mLink.getNode();
+		// TODO insert hash property
+		tx.success();
+		tx.finish();
+	}
+
+	@After
+	public void destroyTestDatabase() {
+		mGraphDb.shutdown();
+	}
+
+	@Test
+	public void testEqualsTrueForNeo4jOnly() {
+		Neo4JLink neo4jL1 = new Neo4JLink(mLinkNode, mRepo);
+		Neo4JLink neo4jL2 = new Neo4JLink(mLinkNode, mRepo);
+		assertEquals(neo4jL1, neo4jL2);
+		assertEquals(neo4jL2, neo4jL1);
+		assertEquals(mLink, neo4jL1);
+		assertEquals(neo4jL1, mLink);
+		assertEquals(neo4jL1.hashCode(), neo4jL2.hashCode());
+	}
+
+	@Test
+	public void testEqualsTrueForInMemory() {
+		InMemoryLink imL1 = new InMemoryLink(mIpID, mMacID);
+		Neo4JLink neo4jL1 = new Neo4JLink(mLinkNode, mRepo);
+		assertEquals(neo4jL1, imL1);
+		assertEquals(imL1, neo4jL1);
+		assertEquals(mLink, imL1);
+		assertEquals(imL1, mLink);
+		assertEquals(neo4jL1.hashCode(), imL1.hashCode());
+	}
+
+	// TODO testEqualsTrueForMixed (InternalLinkStub?!)
+	// TODO testEqualsFalseFor[Neo4jOnly,InMemory, Mixed]
+	// TODO test transitivity: 1 equlas 2, 2 equals 3 => 1 equlas 3
+
+}

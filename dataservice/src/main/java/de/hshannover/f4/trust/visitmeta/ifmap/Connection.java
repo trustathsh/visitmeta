@@ -58,11 +58,9 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
@@ -71,13 +69,10 @@ import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
-import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class Connection {
 
 	private Logger log = Logger.getLogger(Connection.class);
-
-	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
@@ -96,11 +91,12 @@ public class Connection {
 	private String mUserPass;
 	private String mTruststore;
 	private String mTruststorePass;
+	private int mMaxSize;
 
 	private Set<String> activeSubscriptions;
 
 
-	public Connection(String name, String url, String user, String userPass, String truststore, String truststorePass) {
+	public Connection(String name, String url, String user, String userPass, String truststore, String truststorePass, int maxSize) {
 		log.trace("new Connection() ...");
 
 		mConnectionName = name;
@@ -109,6 +105,7 @@ public class Connection {
 		mUserPass = userPass;
 		mTruststore = truststore;
 		mTruststorePass = truststorePass;
+		mMaxSize = maxSize;
 
 		mNeo4JDb = new Neo4JDatabase(name);
 		activeSubscriptions = new HashSet<String>();
@@ -151,7 +148,7 @@ public class Connection {
 
 		try {
 
-			mSsrc.newSession(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
+			mSsrc.newSession(mMaxSize);
 			setConnected(true);
 
 		} catch (IfmapErrorResult e) {

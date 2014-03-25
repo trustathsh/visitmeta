@@ -37,4 +37,81 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice.xml;
 
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import static org.junit.Assert.*;
+
+public class AbstractXMLDataExtractorTest {
+
+	class AbstractXMLDataExtractorStub extends AbstractXMLDataExtractor {
+
+		@Override
+		public Map<String, String> extractToKeyValuePairs(Document document) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	private DocumentBuilder mBuilder;
+	private AbstractXMLDataExtractor mExtractor;
+
+	@Before
+	public void setup() throws Exception {
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+		f.setNamespaceAware(true);
+		mBuilder = f.newDocumentBuilder();
+		mExtractor = new AbstractXMLDataExtractorStub();
+	}
+
+	// TODO test for malformed XML
+
+	@Test
+	public void extractCorrectUnixTimestampFromDocument() {
+		String xsdTimestamp = "2012-11-26T12:01:22Z"; /*==*/ long timestamp = 1353931282000L;
+		Document role = createRoleDocument(xsdTimestamp);
+		assertEquals(timestamp, mExtractor.extractIfmapMetadataTimestamp(role));
+	}
+
+	@Test
+	public void extractMultiValueIfmapCardinalityFromDocument() {
+		Document role = createRoleDocument();
+		assertFalse(mExtractor.isSingleValueMetadata(role));
+	}
+
+	@Test
+	public void extractTypenameFromDocument() {
+		Document role = createRoleDocument();
+		assertEquals("role", mExtractor.extractTypename(role));
+	}
+
+	private Document createRoleDocument(String xsdTimestamp) {
+		final String NAMESPACE = "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2";
+		final String NAMESPACE_PRFIX = "meta";
+		Document doc = mBuilder.newDocument();
+
+		Element role = doc.createElementNS(NAMESPACE, NAMESPACE_PRFIX + ":role");
+		role.setAttributeNS(null, "ifmap-cardinality", "multiValue");
+		role.setAttributeNS(null, "ifmap-publisher-id", "publisher-42");
+		role.setAttributeNS(null, "ifmap-timestamp", xsdTimestamp);
+		doc.appendChild(role);
+
+		Element name = doc.createElement("name");
+		name.setTextContent("admin");
+		role.appendChild(name);
+
+		return doc;
+	}
+
+	private Document createRoleDocument() {
+		return createRoleDocument("2012-11-26T12:01:22Z");
+	}
+}

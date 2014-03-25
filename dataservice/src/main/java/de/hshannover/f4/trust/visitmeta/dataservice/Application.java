@@ -107,8 +107,9 @@ public abstract class Application {
 		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
 		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
 		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
+		int IFMAP_MAX_SIZE = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS));
 
-		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS);
+		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS, IFMAP_MAX_SIZE);
 
 		log.info("Default-Connection was saved!");
 	}

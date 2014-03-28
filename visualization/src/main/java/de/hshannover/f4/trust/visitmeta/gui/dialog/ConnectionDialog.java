@@ -14,9 +14,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -40,17 +37,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
@@ -58,6 +46,8 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
+import de.hshannover.f4.trust.visitmeta.network.DataserviceConnectionFactory;
+import de.hshannover.f4.trust.visitmeta.network.RestConnectionFactory;
 
 public class ConnectionDialog extends JDialog{
 
@@ -67,21 +57,28 @@ public class ConnectionDialog extends JDialog{
 
 	private JTextAreaAppander mJTextAreaAppander;
 
-	private Insets mXinsets;
-	private Insets mLblInsets;
-	private Insets mNullInsets;
+	// Auxiliary objects so that all distances are harmonious.
+	private static final Insets nullInsets= new Insets(0,0,0,0); // no free space
+	private static final Insets lblInsets= new Insets(2,5,2,2); // label distances
+	private static final Insets xinsets= new Insets(0,10,0,10); // Input components Clearances
 
 	private JTabbedPane mJtpMain;
 
 	private JPanel mJpSouth;
 
+
 	private JButton mJbClose;
+
 	private JButton mJbSave;
 
+
 	private MapServerPanel mConnectionPanelMapServer;
+
 	private DataServicePanel mConnectionPanelDataService;
 
+
 	private GuiController mGuiController;
+
 
 	public static void main(String[] args) {
 		ConnectionDialog temp = new ConnectionDialog();
@@ -91,11 +88,6 @@ public class ConnectionDialog extends JDialog{
 	public ConnectionDialog() {
 		mJTextAreaAppander = new JTextAreaAppander();
 		log.addAppender(mJTextAreaAppander);
-
-		// Hilfsobjekte, damit alle Abstaende harmonisch sind.
-		mNullInsets= new Insets(0,0,0,0); // keine Abstaende
-		mLblInsets= new Insets(2,5,2,2); // Label-Abstaende
-		mXinsets= new Insets(0,10,0,10); // Eingabkomponenten-Abstaende
 
 		createDialog();
 		createPanels();
@@ -155,8 +147,8 @@ public class ConnectionDialog extends JDialog{
 		mJtpMain.add("Dataservice Connections", mConnectionPanelDataService);
 
 		//			 x  y  w  h  wx   wy
-		addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJtpMain, mLblInsets);
-		addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, mLblInsets);
+		addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJtpMain, lblInsets);
+		addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, lblInsets);
 	}
 
 	/**
@@ -187,21 +179,6 @@ public class ConnectionDialog extends JDialog{
 		cont.remove(compToRemove);
 		addComponent(x, y, width, height, weightx, weighty, cont, compToAdd, insets);
 		cont.updateUI();
-	}
-
-	public static List<DataserviceConnection> getDataserviceConnectionsFromProperties(){
-		ArrayList<DataserviceConnection> dataserviceList = new ArrayList<DataserviceConnection>();
-		int connectionCount = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
-
-		for(int i=0; i<connectionCount; i++){
-			String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), "localhost");
-			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), "http://localhost:8000");
-			boolean rawXml = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), "true").toLowerCase());
-
-			dataserviceList.add(new DataserviceConnection(name, url, rawXml));
-		}
-
-		return dataserviceList;
 	}
 
 	private abstract class TabPanel extends JPanel{
@@ -282,7 +259,7 @@ public class ConnectionDialog extends JDialog{
 			mJspContent.setLeftComponent(mJpLeftSplitPane);
 			mJspContent.setRightComponent(mJpRightSplitPane);
 
-			mJtaLogWindows = new JTextArea(5, 40);
+			mJtaLogWindows = new JTextArea(5, 70);
 			mJtaLogWindows.setEditable(false);
 			// for append logging messages
 			mJTextAreaAppander.addJTextArea(mJtaLogWindows);
@@ -290,18 +267,18 @@ public class ConnectionDialog extends JDialog{
 			mJspLogWindows = new JScrollPane(mJtaLogWindows);
 
 			//			 x  y  w  h  wx   wy
-			addComponent(0, 2, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpAddDeleteCopy, mNullInsets);
-			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJspContent, mLblInsets);
-			addComponent(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, mLblInsets);
-			addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRightSplitPane, mJpConnectionParameter, mLblInsets);
-			addComponent(0, 0, 1, 1, 0.0, 0.0, mJpLog, mJspLogWindows, mLblInsets);
-			addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRightSplitPane, mJpLog, mLblInsets);
+			addComponent(0, 2, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpAddDeleteCopy, nullInsets);
+			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJspContent, lblInsets);
+			addComponent(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, lblInsets);
+			addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRightSplitPane, mJpConnectionParameter, lblInsets);
+			addComponent(0, 0, 1, 1, 1.0, 0.0, mJpLog, mJspLogWindows, lblInsets);
+			addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRightSplitPane, mJpLog, lblInsets);
 			//			addComponent(0, 3, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpSouth, mNullInsets);
 		}
 
 		private void addConnectionList() {
 			//			 x  y  w  h  wx   wy
-			addComponent(0, 1, 1, 1, 1.0, 1.0, mJpLeftSplitPane, getConnectionList(), mLblInsets);
+			addComponent(0, 1, 1, 1, 1.0, 1.0, mJpLeftSplitPane, getConnectionList(), lblInsets);
 		}
 
 		protected abstract JPanel getParameterPanel();
@@ -327,7 +304,9 @@ public class ConnectionDialog extends JDialog{
 		public void updateDataserviceComboBox(){
 			mJcbDataServiceConnection.removeAllItems();
 
-			for(DataserviceConnection dc: getDataserviceConnectionsFromProperties()){
+			List<DataserviceConnection> dataserviceList = DataserviceConnectionFactory.getDataserviceConnectionsFromProperties();
+
+			for(DataserviceConnection dc: dataserviceList){
 				mJcbDataServiceConnection.addItem(dc);
 			}
 		}
@@ -349,12 +328,14 @@ public class ConnectionDialog extends JDialog{
 			mJpDataserviceComboBox.add(mJlDataservice);
 			mJpDataserviceComboBox.add(mJcbDataServiceConnection);
 
-			addComponent(0, 0, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpDataserviceComboBox, mNullInsets);
+			addComponent(0, 0, 1, 1, 0.0, 0.0, mJpLeftSplitPane, mJpDataserviceComboBox, nullInsets);
 
 			addListeners();
 
 			DataserviceConnection dConnection = (DataserviceConnection) mJcbDataServiceConnection.getSelectedItem();
-			updateRestConnectionsList(dConnection);
+			if(dConnection != null){
+				updateRestConnectionsList(dConnection);
+			}
 
 			if (!mListModelMapServer.isEmpty()) {
 				mJlMapServerConnections.setSelectedIndex(0);
@@ -366,28 +347,16 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
 					RESTConnection param = mJlMapServerConnections.getSelectedValue();
-					if (param == null) {
-						return;
+					if (param != null) {
+						if(mPreviousConnection != null){
+							updateRestConnection(mPreviousConnection);
+						}
+
+						mParameterPanel.updatePanel(param);
+						mPreviousConnection = param;
+
+						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 					}
-
-					if(mPreviousConnection != null){
-						mPreviousConnection.update(mParameterPanel.mJtfName.getText().trim(), mParameterPanel.mJtfUrl.getText().trim(), mParameterPanel.mJcbDump.isSelected());
-						mPreviousConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
-						mPreviousConnection.setPassword(new String(mParameterPanel.mJtfPassword.getPassword()).trim());
-						mPreviousConnection.setConnectAtStartUp(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
-					}
-
-					mParameterPanel.mJtfName.setText(param.getName());
-					mParameterPanel.mJtfUrl.setText(param.getUrl());
-					mParameterPanel.mJcbDump.setSelected(param.isDumping());
-					mParameterPanel.mJtfUsername.setText(param.getUsername());
-					mParameterPanel.mJtfPassword.setText(param.getPassword());
-					mParameterPanel.mJcbBasicAuthentication.setSelected(param.isBasicAuthentication());
-					mParameterPanel.mJcbConnectingAtStartUp.setSelected(param.isConnectAtStartUp());
-
-					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
-
-					mPreviousConnection = param;
 				}
 			});
 
@@ -395,13 +364,13 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String name = "NewConnection" + (mListModelMapServer.getSize() + 1);
-					String url = "https://localhost:8443";
-					RESTConnection param = new RESTConnection((DataserviceConnection) mJcbDataServiceConnection.getSelectedItem(), name, url, false);
+
+					RESTConnection param = new RESTConnection((DataserviceConnection) mJcbDataServiceConnection.getSelectedItem(), name);
 					param.setBasicAuthentication(true);
 
 					mListModelMapServer.add(mListModelMapServer.getSize(), param);
 
-					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 
 					mJlMapServerConnections.setSelectedIndex(mListModelMapServer.getSize() - 1);
 
@@ -418,7 +387,7 @@ public class ConnectionDialog extends JDialog{
 							index = (index == 0) ? 0 : index - 1;
 							mJlMapServerConnections.setSelectedIndex(index);
 						} else {
-							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), mLblInsets);
+							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), lblInsets);
 						}
 					}
 				}
@@ -433,76 +402,25 @@ public class ConnectionDialog extends JDialog{
 				}
 			});
 
-
 			mJbSave.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(mJtpMain.getSelectedComponent() == mConnectionPanelMapServer){
-						DataserviceConnection tmpCon = mJlMapServerConnections.getSelectedValue().getDataserviceConnection();
+						RESTConnection tmpCon = mJlMapServerConnections.getSelectedValue();
 
-						ClientConfig config = new DefaultClientConfig();
-						Client client = Client.create(config);
+						updateRestConnection(tmpCon);
 
-						URI uri_connect = UriBuilder.fromUri(tmpCon.getUrl()).build();
-						WebResource temp1 = client.resource(uri_connect);
+						tmpCon.saveInDataservice();
 
-						JSONObject jObj = new JSONObject();
-						try {
-
-							jObj.put("url", mParameterPanel.mJtfUrl.getText().trim());
-							jObj.put("user", mParameterPanel.mJtfUsername.getText().trim());
-							jObj.put("userPass", new String(mParameterPanel.mJtfPassword.getPassword()).trim());
-							jObj.put("connectAtStartUp", mParameterPanel.mJcbConnectingAtStartUp.isSelected());
-							jObj.put("basicAuthentication", mParameterPanel.mJcbBasicAuthentication.isSelected());
-
-						} catch (JSONException e1) {
-							e1.printStackTrace();
-						}
-
-						String response = temp1.path(mJlMapServerConnections.getSelectedValue().getName()).type(MediaType.APPLICATION_JSON).put(String.class, jObj);
-						System.out.println(response);
-
-						GraphContainer connection = new GraphContainer(mJlMapServerConnections.getSelectedValue().getName(), mJlMapServerConnections.getSelectedValue());
+						GraphContainer connection = new GraphContainer(mJlMapServerConnections.getSelectedValue().getName(), tmpCon);
 						mGuiController.addConnection(connection);
 
 						log.info("new Map-Server connection is stored in " + tmpCon.getName());
-
-						//										Connection vConnection = FactoryConnection.getConnection(ConnectionType.REST, mJlMapServerConnections.getSelectedValue());
-						//										Calculator vCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
-						//
-						//										FacadeNetwork vNetwork = new FacadeNetwork(vConnection);
-						//										FacadeLogic vLogic = new FacadeLogic(vNetwork, vCalculator);
-						//										GraphConnection connController = new GraphConnection(vLogic);
-						//
-						//										mGuiController.addConnection(mJlMapServerConnections.getSelectedValue().getName(), connController, mJlMapServerConnections.getSelectedValue());
-						//
-						//										Thread vThreadNetwork = new Thread(vNetwork);
-						//										Thread vThreadLogic = new Thread(vLogic);
-						//
-						//										vThreadNetwork.start();
-						//										vThreadLogic.start();
 					}
 				}
 
 			});
-
-			//			mJcbDataServiceConnection.addPropertyChangeListener(new PropertyChangeListener() {
-			//
-			//				@Override
-			//				public void propertyChange(PropertyChangeEvent arg0) {
-			//					System.out.println("propertyChange " + arg0);
-			//					if(arg0.getOldValue() == null && arg0.getNewValue() == ){
-			//						System.out.println("propertyChange != null " + arg0);
-			//						DataserviceConnection dConnection = (DataserviceConnection) mJcbDataServiceConnection.getSelectedItem();
-			//						updateRestConnectionsList(dConnection);
-			//
-			//						if (!mListModelMapServer.isEmpty()) {
-			//							mJlMapServerConnections.setSelectedIndex(0);
-			//						}
-			//					}
-			//				}
-			//			});
 
 			mJcbDataServiceConnection.addItemListener(new ItemListener(){
 
@@ -526,32 +444,21 @@ public class ConnectionDialog extends JDialog{
 			log.info("Update connection list from Dataservice(" + dConnection.getName() + ")");
 			mListModelMapServer.removeAllElements();
 
-			ClientConfig config = new DefaultClientConfig();
-			Client client = Client.create(config);
+			List<RESTConnection> connectionList = RestConnectionFactory.getAllConnectionsFrom(dConnection);
 
-			URI uri_connect = UriBuilder.fromUri(dConnection.getUrl()).build();
-			WebResource temp1 = client.resource(uri_connect);
-			JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-			System.out.println(jsonResponse);
-
-			Iterator<String> ii = jsonResponse.keys();
-			while(ii.hasNext()){
-				String jKey = ii.next();
-				JSONObject jsonConnection;
-				try {
-					jsonConnection = jsonResponse.getJSONObject(jKey);
-					RESTConnection restConn = new RESTConnection(dConnection, jKey, jsonConnection.getString("URL"), false);
-					restConn.setBasicAuthentication(jsonConnection.optBoolean("BasicAuthentication", true));
-					restConn.setUsername(jsonConnection.getString("Username"));
-					restConn.setPassword(jsonConnection.getString("Password"));
-					restConn.setConnectAtStartUp(jsonConnection.optBoolean("connectAtStartUp", false));
-					restConn.setDumping(jsonConnection.optBoolean("Dumping", false));
-					restConn.setMaxPollResultSize(jsonConnection.optString("MaxPollResultSize"));
-					mListModelMapServer.addElement(restConn);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+			for(RESTConnection rConnection: connectionList){
+				mListModelMapServer.addElement(rConnection);
 			}
+		}
+
+		private void updateRestConnection(RESTConnection restConnection){
+			restConnection.setName(mParameterPanel.mJtfName.getText().trim());
+			restConnection.setUrl(mParameterPanel.mJtfUrl.getText().trim());
+			restConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
+			restConnection.setPassword(new String(mParameterPanel.mJtfPassword.getPassword()).trim());
+			restConnection.setConnectAtStartUp(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
+			restConnection.setBasicAuthentication(mParameterPanel.mJcbBasicAuthentication.isSelected());
+			restConnection.setMaxPollResultSize(mParameterPanel.mJtfMaxPollResultSize.getText().trim());
 		}
 
 		@Override
@@ -606,21 +513,16 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
 					DataserviceConnection param = mJlDataServiceConnections.getSelectedValue();
-					if (param == null) {
-						return;
+					if (param != null) {
+						if(mPreviousConnection != null){
+							updateDataserviceConnection(mPreviousConnection);
+						}
+
+						mParameterPanel.updatePanel(param);
+						mPreviousConnection = param;
+
+						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 					}
-
-					if(mPreviousConnection != null){
-						mPreviousConnection.update(mParameterPanel.mJtfName.getText().trim(), mParameterPanel.mJtfUrl.getText().trim(), mParameterPanel.mJcbRawXML.isSelected());
-					}
-
-					mParameterPanel.mJtfName.setText(param.getName());
-					mParameterPanel.mJtfUrl.setText(param.getUrl());
-					mParameterPanel.mJcbRawXML.setSelected(param.isRawXml());
-
-					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
-
-					mPreviousConnection = param;
 				}
 			});
 
@@ -630,12 +532,13 @@ public class ConnectionDialog extends JDialog{
 					String name = "New Connection (" + (mListModelDataService.getSize() + 1) + ")";
 					String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_DEFAULT_URL, "http://localhost:8000");
 					DataserviceConnection param = new DataserviceConnection(name, url, true);
+					param.saveInProperty();
 
 					mListModelDataService.add(mListModelDataService.getSize(), param);
-
-					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, mLblInsets);
-
 					mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
+					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
+
+
 
 				}
 			});
@@ -645,12 +548,13 @@ public class ConnectionDialog extends JDialog{
 				public void actionPerformed(ActionEvent arg0) {
 					int index = mJlDataServiceConnections.getSelectedIndex();
 					if (index >= 0) {
+						mJlDataServiceConnections.getSelectedValue().deleteFromProperty();
 						mListModelDataService.remove(index);
 						if (!mListModelDataService.isEmpty()) {
 							index = (index == 0) ? 0 : index - 1;
 							mJlDataServiceConnections.setSelectedIndex(index);
 						} else {
-							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), mLblInsets);
+							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), lblInsets);
 						}
 					}
 				}
@@ -660,6 +564,7 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					DataserviceConnection param =  mJlDataServiceConnections.getSelectedValue().clone();
+					param.saveInProperty();
 					mListModelDataService.add(mListModelDataService.getSize(), param);
 					mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
 				}
@@ -670,52 +575,33 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(mJtpMain.getSelectedComponent() == mConnectionPanelDataService){
-						persistDataServiceConnections();
+						if(mPreviousConnection != null){
+							updateDataserviceConnection(mPreviousConnection);
+						}
+						mJlDataServiceConnections.getSelectedValue().saveInProperty();
 						mContext.mConnectionPanelMapServer.updateDataserviceComboBox();
+
 						log.info("DataService Connections was persist");
 					}
-
 				}
-
 			});
-
-		}
-
-		private void persistDataServiceConnections(){
-			int propertyCount = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
-			for(int i=0; i<propertyCount; i++){
-				removeDataServiceConnection(i);
-			}
-
-			if(mPreviousConnection != null){
-				mPreviousConnection.update(mParameterPanel.mJtfName.getText().trim(), mParameterPanel.mJtfUrl.getText().trim(), mParameterPanel.mJcbRawXML.isSelected());
-			}
-
-			int count = mListModelDataService.size();
-			PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, String.valueOf(count));
-
-			for(int i=0; i<count; i++){
-				PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), mListModelDataService.get(i).getName());
-				PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), mListModelDataService.get(i).getUrl());
-				PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), String.valueOf(mListModelDataService.get(i).isRawXml()));
-			}
-		}
-
-		private void removeDataServiceConnection(int index){
-			PropertiesManager.removeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(index));
-			PropertiesManager.removeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(index));
-			PropertiesManager.removeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(index));
-
 		}
 
 		private void readProperties(){
-			for(DataserviceConnection dc: getDataserviceConnectionsFromProperties()){
+			List<DataserviceConnection> dataserviceList = DataserviceConnectionFactory.getDataserviceConnectionsFromProperties();
+			for(DataserviceConnection dc: dataserviceList){
 				addDataserviceConnection(dc);
 			}
 		}
 
 		private void addDataserviceConnection(DataserviceConnection con){
 			mListModelDataService.add(mListModelDataService.getSize(), con);
+		}
+
+		private void updateDataserviceConnection(DataserviceConnection dataConnection){
+			dataConnection.setName(mParameterPanel.mJtfName.getText().trim());
+			dataConnection.setUrl(mParameterPanel.mJtfUrl.getText().trim());
+			dataConnection.setRawXml(mParameterPanel.mJcbRawXML.isSelected());
 		}
 
 		@Override
@@ -822,26 +708,36 @@ public class ConnectionDialog extends JDialog{
 
 
 			//			 x  y  w  h  wx   wy
-			addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, mLblInsets);
-			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, mLblInsets);
-			addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlBasicAuthentication, mLblInsets);
-			addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlUsername, mLblInsets);
-			addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, mLblInsets);
-			addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, mLblInsets);
-			addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, mLblInsets);
-			addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlDump, mLblInsets);
-			addComponent(0, 8, 2, 1, 1.0, 1.0, this, mJlDumpDescription, mNullInsets);
-			addComponent(0, 9, 2, 1, 1.0, 1.0, this, mJlDumpDescription2, mNullInsets);
-			addComponent(0, 10, 2, 1, 1.0, 1.0, this, mJlDumpDescription3, mNullInsets);
+			addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, lblInsets);
+			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, lblInsets);
+			addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlBasicAuthentication, lblInsets);
+			addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlUsername, lblInsets);
+			addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, lblInsets);
+			addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, lblInsets);
+			addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, lblInsets);
+			addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlDump, lblInsets);
+			addComponent(0, 8, 2, 1, 1.0, 1.0, this, mJlDumpDescription, nullInsets);
+			addComponent(0, 9, 2, 1, 1.0, 1.0, this, mJlDumpDescription2, nullInsets);
+			addComponent(0, 10, 2, 1, 1.0, 1.0, this, mJlDumpDescription3, nullInsets);
 
-			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, mLblInsets);
-			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, mLblInsets);
-			addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbBasicAuthentication, mLblInsets);
-			addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfUsername, mLblInsets);
-			addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, mLblInsets);
-			addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, mLblInsets);
-			addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, mLblInsets);
-			addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJcbDump, mLblInsets);
+			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, lblInsets);
+			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, lblInsets);
+			addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbBasicAuthentication, lblInsets);
+			addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfUsername, lblInsets);
+			addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, lblInsets);
+			addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, lblInsets);
+			addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, lblInsets);
+			addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJcbDump, lblInsets);
+		}
+
+		private void updatePanel(RESTConnection restConnection){
+			mJtfName.setText(restConnection.getName());
+			mJtfUrl.setText(restConnection.getUrl());
+			mJtfUsername.setText(restConnection.getUsername());
+			mJtfPassword.setText(restConnection.getPassword());
+			mJcbBasicAuthentication.setSelected(restConnection.isBasicAuthentication());
+			mJcbConnectingAtStartUp.setSelected(restConnection.isConnectAtStartUp());
+			mJcbDump.setSelected(restConnection.isDumping());
 		}
 	}
 
@@ -876,12 +772,18 @@ public class ConnectionDialog extends JDialog{
 			mJcbRawXML = new JCheckBox();
 
 			//			 x  y  w  h  wx   wy
-			addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, mLblInsets);
-			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, mLblInsets);
-			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, mLblInsets);
-			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, mLblInsets);
-			addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlRawXml, mLblInsets);
-			addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, mLblInsets);
+			addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, lblInsets);
+			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, lblInsets);
+			addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, lblInsets);
+			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, lblInsets);
+			addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlRawXml, lblInsets);
+			addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, lblInsets);
+		}
+
+		private void updatePanel(DataserviceConnection dataConnection){
+			mJtfName.setText(dataConnection.getName());
+			mJtfUrl.setText(dataConnection.getUrl());
+			mJcbRawXML.setSelected(dataConnection.isRawXml());
 		}
 	}
 }

@@ -52,21 +52,21 @@ public class GraphContainer {
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
-		
+
 		mRestConnection = loadRESTConnections(dc);
-		
+
 		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
 		mGraphConnection = new GraphConnection(this);
-		
+
 		new Thread(mFacadeNetwork).start();
 		new Thread(mFacadeLogic).start();
 		new Thread(mTimeManagerCreation).start();
 		new Thread(mTimeManagerDeletion).start();
 	}
-	
+
 	public GraphContainer(String name, RESTConnection restConn) {
 		mName = name;
 		mTimeHolder = new TimeHolder(this);
@@ -74,15 +74,15 @@ public class GraphContainer {
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
-		
+
 		mRestConnection = restConn;
-		
+
 		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
 		mGraphConnection = new GraphConnection(this);
-		
+
 		new Thread(mFacadeNetwork).start();
 		new Thread(mFacadeLogic).start();
 		new Thread(mTimeManagerCreation).start();
@@ -108,11 +108,11 @@ public class GraphContainer {
 	public SettingManager getSettingManager() {
 		return mSettingManager;
 	}
-	
+
 	public String getName() {
 		return mName;
 	}
-	
+
 	public GraphConnection getGraphConnection() {
 		return mGraphConnection;
 	}
@@ -128,51 +128,56 @@ public class GraphContainer {
 	public FacadeLogic getFacadeLogic() {
 		return mFacadeLogic;
 	}
-	
+
 	public Connection getConnection() {
 		return mConnection;
 	}
-	
+
 	public RESTConnection getRestConnection() {
 		return mRestConnection;
 	}
-	
+
 	private static RESTConnection loadRESTConnections(DataserviceConnection dc){
-			ClientConfig config = new DefaultClientConfig();
-			Client client = Client.create(config);
+		ClientConfig config = new DefaultClientConfig();
+		Client client = Client.create(config);
 
-			URI uri_connect = UriBuilder.fromUri(dc.getUrl()).build();
-			WebResource temp1 = client.resource(uri_connect);
-			JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
+		URI uri_connect = UriBuilder.fromUri(dc.getUrl()).build();
+		WebResource temp1 = client.resource(uri_connect);
+		JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
 
-			Iterator<String> i = jsonResponse.keys();
-			RESTConnection restConn = null;
-			while(i.hasNext()){
-				String jKey = i.next();
-				JSONObject jsonConnection;
-				try {
-					jsonConnection = jsonResponse.getJSONObject(jKey);
-					restConn = new RESTConnection(dc, jKey, jsonConnection.getString("URL"), false);
-					restConn.setBasicAuthentication(true);
-					restConn.setUsername(jsonConnection.getString("Username"));
-					restConn.setPassword(jsonConnection.getString("Password"));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+		Iterator<String> i = jsonResponse.keys();
+		RESTConnection restConn = null;
+		while(i.hasNext()){
+			String jKey = i.next();
+			JSONObject jsonConnection;
+			try {
+				jsonConnection = jsonResponse.getJSONObject(jKey);
+				restConn = new RESTConnection(dc, jKey);
+				restConn.setBasicAuthentication(true);
+				restConn.setUrl(jsonConnection.optString("URL"));
+				restConn.setUsername(jsonConnection.optString("Username"));
+				restConn.setPassword(jsonConnection.optString("Password"));
+				restConn.setBasicAuthentication(jsonConnection.optBoolean("BasicAuthentication", true));
+				restConn.setConnectAtStartUp(jsonConnection.optBoolean("ConnectAtStartUp", false));
+				restConn.setDumping(jsonConnection.optBoolean("Dumping", false));
+				restConn.setMaxPollResultSize(jsonConnection.optString("MaxPollResultSize"));
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-			return restConn;
+		}
+		return restConn;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return mName.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if(o == null || !(o instanceof GraphContainer))
 			return false;
 		return mName.equals((((GraphContainer) o).mName));
 	}
-	
+
 }

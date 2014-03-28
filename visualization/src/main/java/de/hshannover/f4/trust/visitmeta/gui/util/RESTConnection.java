@@ -1,18 +1,13 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
-import java.net.URI;
-
-import javax.ws.rs.core.UriBuilder;
-
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-
+import de.hshannover.f4.trust.visitmeta.network.RestConnectionFactory;
 
 
 public class RESTConnection {
+
+	private static final String DEFAULT_URL = "https://localhost:8443";
 
 	private String mName;
 	private String mUrl;
@@ -25,85 +20,70 @@ public class RESTConnection {
 
 	private DataserviceConnection mDataserviceConnection;
 
-	public RESTConnection(String name, String url, boolean dumping){
-		this(null, name, url, dumping);
-	}
 
-	public RESTConnection(DataserviceConnection dataConnection, String name, String url, boolean dumping){
+	public RESTConnection(DataserviceConnection dataConnection, String name){
 		setName(name);
-		setUrl(url);
-		setDumping(dumping);
 		setDataserviceConnection(dataConnection);
 	}
 
 	public void startDump(){
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
-
-		URI uri_start_dump = UriBuilder.fromUri(mDataserviceConnection.getUrl()).build();
-		WebResource temp2 = client.resource(uri_start_dump);
-		System.out.println("Dataservice: " + temp2.path(mName).path("dump/start").put(String.class));
+		RestConnectionFactory.startDump(this);
 	}
 
 	public void stopDump(){
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
-
-		URI uri_start_dump = UriBuilder.fromUri(mDataserviceConnection.getUrl()).build();
-		WebResource temp2 = client.resource(uri_start_dump);
-		System.out.println("Dataservice: " + temp2.path(mName).path("dump/stop").put(String.class));
+		RestConnectionFactory.stopDump(this);
 	}
 
 	public void connect(){
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
-
-		URI uri_start_dump = UriBuilder.fromUri(mDataserviceConnection.getUrl()).build();
-		WebResource temp2 = client.resource(uri_start_dump);
-		System.out.println("Dataservice: " + temp2.path(mName).path("connect").put(String.class));
+		RestConnectionFactory.connect(this);
 	}
 
 	public void disconnect(){
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
-
-		URI uri_start_dump = UriBuilder.fromUri(mDataserviceConnection.getUrl()).build();
-		WebResource temp2 = client.resource(uri_start_dump);
-		System.out.println("Dataservice: " + temp2.path(mName).path("disconnect").put(String.class));
+		RestConnectionFactory.disconnect(this);
 	}
 
 	public WebResource getGraphResource(){
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
+		return RestConnectionFactory.getGraphResource(this);
+	}
 
-		URI uri = UriBuilder.fromUri(mDataserviceConnection.getUrl() + "/" + mName + "/graph").build(); // FIXME HotFix for new Rest Interface
-		return client.resource(uri);
+	public void saveInDataservice(){
+		RestConnectionFactory.saveInDataservice(this);
 	}
 
 	@Override
 	public RESTConnection clone() {
-		RESTConnection tmp = new RESTConnection(mDataserviceConnection, mName + "(clone)", mUrl, mDumping);
+		RESTConnection tmp = new RESTConnection(mDataserviceConnection, mName + "(clone)");
 		tmp.setBasicAuthentication(mBasicAuthentication);
-		tmp.setUsername(mUsername);
-		tmp.setPassword(mPassword);
+		tmp.setUrl(getUrl());
+		tmp.setDumping(isDumping());
+		tmp.setUsername(getUsername());
+		tmp.setPassword(getPassword());
 		return tmp;
 	}
 
 	public String getName() {
 		return mName;
 	}
+
 	public void setName(String name) {
 		mName = name;
 	}
 	public String getUrl() {
-		return mUrl;
+		if(mUrl != null){
+			return mUrl;
+		}else{
+			return DEFAULT_URL;
+		}
 	}
+
 	public void setUrl(String endpoint) {
 		mUrl = endpoint;
 	}
+
 	public boolean isDumping() {
 		return mDumping;
 	}
+
 	public void setDumping(boolean dumping) {
 		mDumping = dumping;
 	}
@@ -111,12 +91,6 @@ public class RESTConnection {
 	@Override
 	public String toString(){
 		return mName;
-	}
-
-	public void update(String name, String url, boolean dumping) {
-		setName(name);
-		setUrl(url);
-		setDumping(dumping);
 	}
 
 	public DataserviceConnection getDataserviceConnection() {

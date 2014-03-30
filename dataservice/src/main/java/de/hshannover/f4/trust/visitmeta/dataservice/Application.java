@@ -46,9 +46,16 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
@@ -93,24 +100,58 @@ public abstract class Application {
 
 		startRestService();
 
-		saveDefaultConnection();
+		try {
+			initDefaultConnection();
+		} catch (ConnectionException e) {
+			log.error("Error by initDefaultConnection() at startup", e);
+		}
 
 		log.info("Dataservice started successfully");
 
 	}
 
-	private static void saveDefaultConnection() {
-		log.trace("save default connection...");
+	private static void initDefaultConnection() throws ConnectionException {
+		log.trace("init default connection...");
 
 		String TRUSTSTORE_PATH = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
 		String TRUSTSTORE_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
 		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
 		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
 		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
+		int IFMAP_MAX_SIZE = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
-		ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS);
+		Connection defaultConnection = ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS, IFMAP_MAX_SIZE);
 
-		log.info("Default-Connection was saved!");
+		if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_CONNECT))){
+			log.debug("connecting at startup");
+			defaultConnection.connect();
+
+			if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_DUMP))){
+				log.debug("start dump at startup");
+				defaultConnection.startDumpingService();
+
+			}else{
+				log.debug("send Subscribe-Update at startup");
+
+				String subscribeName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
+				String identifierType = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
+				String identifier = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
+				int maxDepth = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
+				int maxSize = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+
+				SubscribeRequest request = Requests.createSubscribeReq();
+				SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
+
+				subscribe.setName(subscribeName);
+				subscribe.setMaxDepth(maxDepth);
+				subscribe.setMaxSize(maxSize);
+				subscribe.setStartIdentifier(createStartIdentifier(identifierType, identifier));
+
+				request.addSubscribeElement(subscribe);
+
+				defaultConnection.subscribe(request);
+			}
+		}
 	}
 
 	private static void startRestService() {
@@ -135,6 +176,32 @@ public abstract class Application {
 			throw new RuntimeException(msg, e);
 		}
 
+	}
+
+	private static Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
+		switch (sIdentifierType) {
+		case "device":
+			return Identifiers.createDev(sIdentifier);
+		case "access-request":
+			return Identifiers.createAr(sIdentifier);
+		case "ip-address":
+			String[] split = sIdentifier.split(",");
+			switch (split[0]) {
+			case "IPv4":
+				return Identifiers.createIp4(split[1]);
+			case "IPv6":
+				return Identifiers.createIp6(split[1]);
+			default:
+				throw new RuntimeException("unknown IP address type '"+split[0]+"'");
+			}
+		case "mac-address":
+			return Identifiers.createMac(sIdentifier);
+
+			// TODO identity and extended identifiers
+
+		default:
+			throw new RuntimeException("unknown identifier type '"+sIdentifierType+"'");
+		}
 	}
 
 	public static MessageDigest loadHashAlgorithm() {

@@ -37,4 +37,66 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice.xml;
 
+import java.io.StringReader;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import static org.junit.Assert.*;
+
+public class SimpleKeyValueExtractorTest {
+
+	private Document mDocument;
+	private SimpleKeyValueExtractor mExtractor;
+
+	@Before
+	public void buildXML() throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		String xml = "<meta:role "+
+						"ifmap-cardinality=\"multiValue\" "+
+						"ifmap-publisher-id=\"client-343rdq3r3\" " +
+						"ifmap-timestamp=\"2010-04-20T12:00:05Z\" "+
+						"xmlns:meta=\"http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2\">"+
+							"<administrative-domain>111:33</administrative-domain>"+
+							"<name>admin</name>"+
+					 "</meta:role>";
+		InputSource input = new InputSource(new StringReader(xml));
+		mDocument = builder.parse(input);
+
+		mExtractor = new SimpleKeyValueExtractor();
+	}
+
+	@Test
+	public void testResultSizeShouldMatch() {
+		Map<String, String> result = mExtractor.extractToKeyValuePairs(mDocument);
+		assertEquals(6, result.size());
+	}
+
+	@Test
+	public void testResultContainsXmlAttributes() {
+		Map<String, String> result = mExtractor.extractToKeyValuePairs(mDocument);
+		assertEquals("multiValue", result.get("/meta:role[@ifmap-cardinality]"));
+		assertEquals("client-343rdq3r3", result.get("/meta:role[@ifmap-publisher-id]"));
+		assertEquals("2010-04-20T12:00:05Z", result.get("/meta:role[@ifmap-timestamp]"));
+		assertEquals("http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2", result.get("/meta:role[@xmlns:meta]"));
+	}
+
+	@Test
+	public void testResultContainsXmlElements() {
+		Map<String, String> result = mExtractor.extractToKeyValuePairs(mDocument);
+		assertEquals("111:33", result.get("/meta:role/administrative-domain"));
+		assertEquals("admin", result.get("/meta:role/name"));
+	}
+
+}

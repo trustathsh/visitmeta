@@ -37,4 +37,38 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+
+public class ConfigTest {
+
+	@Before
+	public void setUp() {
+
+	}
+
+	@Test(expected=IOException.class)
+	public void testFileNotFound() throws IOException {
+		File f = new File("src/test/resources/test.properties");
+		if(f.exists())
+			f.delete();
+		PropertiesReaderWriter config = new PropertiesReaderWriter("src/test/resources/test.properties", false);
+	}
+
+	@Test
+	public void testConfig() throws IOException {
+		PropertiesReaderWriter config = new PropertiesReaderWriter("src/test/resources/test.properties", true);
+		config.storeProperty("test.def.456", "kablamo");
+		config = new PropertiesReaderWriter("src/test/resources/test.properties", false);
+		assertEquals("kablamo", config.getProperty("test.def.456"));
+	}
+}

@@ -60,18 +60,19 @@ public class ConnectionManager {
 
 	private static final String TRUSTSTORE_PATH = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
 	private static final String TRUSTSTORE_PASS = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+	private static final int MAX_SIZE = Integer.parseInt(Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
 	private static Map<String, Connection> conPool = new HashMap<String,Connection>();
 
 
 	public static Connection newConnection(String name, String url, String user, String userPass){
-		return newConnection(name, url, user, userPass, TRUSTSTORE_PATH, TRUSTSTORE_PASS);
+		return newConnection(name, url, user, userPass, TRUSTSTORE_PATH, TRUSTSTORE_PASS, MAX_SIZE);
 	}
 
-	public static Connection newConnection(String name, String url, String user, String userPass, String truststore, String truststorePass){
+	public static Connection newConnection(String name, String url, String user, String userPass, String truststore, String truststorePass, int maxSize) {
 		log.trace("new connection " + name + "...");
 
-		Connection newConnection = new Connection(name, url, user, userPass, truststore, truststorePass);
+		Connection newConnection = new Connection(name, url, user, userPass, truststore, truststorePass, maxSize);
 		conPool.put(name, newConnection);
 
 		log.info("connection " + name + " is saved");

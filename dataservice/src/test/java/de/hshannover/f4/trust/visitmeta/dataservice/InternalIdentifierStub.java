@@ -37,4 +37,93 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+
+public class InternalIdentifierStub extends InternalIdentifier {
+
+	public String typename = "";
+	public List<InternalLink> links = new ArrayList<>();
+	public List<InternalMetadata> metadata = new ArrayList<>();
+	public Map<String, String> properties = new HashMap<String, String>();
+
+	@Override
+	public List<InternalLink> getLinks() {
+		return links;
+	}
+
+	@Override
+	public List<InternalMetadata> getMetadata() {
+		return metadata;
+	}
+
+	@Override
+	public List<String> getProperties() {
+		return new ArrayList<String>(properties.keySet());
+	}
+
+	@Override
+	public boolean hasProperty(String p) {
+		return properties.containsKey(p);
+	}
+
+	@Override
+	public String valueFor(String p) {
+		return properties.get(p);
+	}
+
+	@Override
+	public String getTypeName() {
+		return typename;
+	}
+
+	@Override
+	public void addMetadata(InternalMetadata meta) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void clearMetadata() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void removeMetadata(InternalMetadata meta) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean hasMetadata(InternalMetadata meta) {
+		return metadata.contains(meta);
+	}
+
+	@Override
+	public void clearLinks() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addProperty(String name, String value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void removeLink(InternalLink link) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getRawData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

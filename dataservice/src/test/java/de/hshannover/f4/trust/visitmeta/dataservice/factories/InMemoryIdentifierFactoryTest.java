@@ -37,4 +37,79 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice.factories;
 
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+
+import static org.junit.Assert.*;
+
+public class InMemoryIdentifierFactoryTest {
+
+	private DocumentBuilder mBuilder;
+
+	@Before
+	public void setup() throws Exception {
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+		f.setNamespaceAware(true);
+		mBuilder = f.newDocumentBuilder();
+	}
+
+	@Test
+	public void theFactoryShouldCreateIdentifierWithTypenameFromDocuments() {
+		InternalIdentifierFactory factory = new InMemoryIdentifierFactory();
+		Document document = createIpv4AddressDocument("10.1.1.1");
+
+		InternalIdentifier id = factory.createIdentifier(document);
+		assertEquals("ip-address", id.getTypeName());
+	}
+
+	@Test
+	public void theFactoryShouldCreateIdentifierWithRightNumberOfPropertiesFromDocuments() {
+		InternalIdentifierFactory factory = new InMemoryIdentifierFactory();
+		Document document = createIpv4AddressDocument("10.1.1.1");
+
+		InternalIdentifier id = factory.createIdentifier(document);
+		assertEquals(2, id.getProperties().size());
+	}
+
+	@Test
+	public void theFactoryShouldCreateIdentifierWithRightPropertiesFromDocuments() {
+		InternalIdentifierFactory factory = new InMemoryIdentifierFactory();
+		Document document = createIpv4AddressDocument("10.1.1.1");
+
+		InternalIdentifier id = factory.createIdentifier(document);
+		List<String> properties = id.getProperties();
+		assertTrue(properties.contains("/ip-address[@value]"));
+		assertTrue(properties.contains("/ip-address[@type]"));
+	}
+
+	@Test
+	public void theFactoryShouldCreateIdentifierWithRightValuesFromDocuments() {
+		InternalIdentifierFactory factory = new InMemoryIdentifierFactory();
+		Document document = createIpv4AddressDocument("10.1.1.1");
+
+		InternalIdentifier id = factory.createIdentifier(document);
+		assertEquals(id.valueFor("/ip-address[@value]"), "10.1.1.1");
+		assertEquals(id.valueFor("/ip-address[@type]"), "IPv4");
+	}
+
+	private Document createIpv4AddressDocument(String value) {
+		de.hshannover.f4.trust.ifmapj.identifier.Identifier id = Identifiers.createIp4("10.1.1.1");
+		Document document = mBuilder.newDocument();
+		Element element = Identifiers.tryToElement(id, document);
+		document.appendChild(element);
+		return document;
+	}
+
+}

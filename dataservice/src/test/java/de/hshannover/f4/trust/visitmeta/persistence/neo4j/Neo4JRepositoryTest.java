@@ -37,4 +37,78 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
+import java.security.MessageDigest;
+
+import org.junit.Test;
+
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
+
+import static org.junit.Assert.*;
+
+public class Neo4JRepositoryTest {
+
+	@Test
+	public void samePropablesShouldHaveSameHash() throws Exception {
+		Neo4JRepository repo = new Neo4JRepository(null, MessageDigest.getInstance("MD5"));
+
+		InternalIdentifier p1 = new InMemoryIdentifier("ip-address");
+		InternalIdentifier p2 = new InMemoryIdentifier("ip-address");
+		p1.addProperty("key1", "value1");
+		p1.addProperty("key2", "value2");
+		p2.addProperty("key1", "value1");
+		p2.addProperty("key2", "value2");
+
+		assertEquals(repo.calcHash(p1), repo.calcHash(p2));
+	}
+
+	@Test
+	public void differentPropablesShouldHaveDifferentHash() throws Exception {
+		Neo4JRepository repo = new Neo4JRepository(null, MessageDigest.getInstance("MD5"));
+
+		InternalIdentifier p1 = new InMemoryIdentifier("ip-address");
+		InternalIdentifier p2 = new InMemoryIdentifier("ip-address");
+		p1.addProperty("key1", "value1");
+		p1.addProperty("key2", "value2");
+		p2.addProperty("abc", "xyz");
+		p2.addProperty("42", "42");
+
+		assertNotSame(repo.calcHash(p1), repo.calcHash(p2));
+	}
+
+	@Test
+	public void differentTypesWithSamePropertiesShouldHaveDifferentHash()
+			throws Exception {
+		Neo4JRepository repo = new Neo4JRepository(null, MessageDigest.getInstance("MD5"));
+
+		InternalIdentifier p1 = new InMemoryIdentifier("ip-address");
+		InternalMetadata p2 = new InMemoryMetadata("ip-address", true, 42);
+		p1.addProperty("key1", "value1");
+		p1.addProperty("key2", "value2");
+		p2.addProperty("key1", "value1");
+		p2.addProperty("key2", "value2");
+
+		assertNotSame(repo.calcHash(p1), repo.calcHash(p2));
+	}
+
+	@Test
+	public void hashStringsShouldHaveTheCorrectHexLength() throws Exception {
+		int md5HexLength  = 32;
+		int sha1HexLength = 40;
+
+		Neo4JRepository repoMd5  = new Neo4JRepository(null, MessageDigest.getInstance("MD5"));
+		Neo4JRepository repoSha1 = new Neo4JRepository(null, MessageDigest.getInstance("SHA1"));
+
+		InternalIdentifier p1 = new InMemoryIdentifier("ip-address");
+		p1.addProperty("key1", "value1");
+		p1.addProperty("key2", "value2");
+
+		assertEquals(md5HexLength, repoMd5.calcHash(p1).length());
+		assertEquals(sha1HexLength, repoSha1.calcHash(p1).length());
+	}
+
+}

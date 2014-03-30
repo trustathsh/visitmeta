@@ -37,4 +37,63 @@
  * #L%
  */
 
+package de.hshannover.f4.trust.visitmeta.dataservice;
 
+import static org.junit.Assert.assertEquals;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
+import de.hshannover.f4.trust.ifmapj.identifier.Identity;
+import de.hshannover.f4.trust.ifmapj.identifier.IdentityType;
+import de.hshannover.f4.trust.ifmapj.identifier.IpAddress;
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
+
+public class InMemoryIdentifierFactoryTest {
+
+	private InMemoryIdentifierFactory mIdentifierFactory;
+	private IpAddress mIpAddress;
+	private Document mIpAddressDocument;
+
+	private Identity mIdentity;
+	private Document mIdentityDocument;
+
+	@Before
+	public void setup() throws Exception {
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+		f.setNamespaceAware(true);
+		DocumentBuilder builder = f.newDocumentBuilder();
+		mIdentifierFactory = new InMemoryIdentifierFactory();
+
+		mIpAddress = Identifiers.createIp4("10.1.1.1");
+		mIpAddressDocument = builder.newDocument();
+		Element e1 = Identifiers.tryToElement(mIpAddress, mIpAddressDocument);
+		mIpAddressDocument.appendChild(e1);
+
+		mIdentity = Identifiers.createIdentity(
+				IdentityType.other, "smartphone.os.android", "smartphone:01", "32939:category");
+		mIdentityDocument = builder.newDocument();
+		Element e2 = Identifiers.tryToElement(mIdentity, mIdentityDocument);
+		mIdentityDocument.appendChild(e2);
+	}
+
+	@Test
+	public void testCreateIpIdentifierFromDocument() {
+		InternalIdentifier ip = mIdentifierFactory.createIdentifier(mIpAddressDocument);
+		assertEquals("ip-address", ip.getTypeName());
+	}
+
+	@Test
+	public void testCreateIdentityIdentifierFromDocument() {
+		InternalIdentifier id = mIdentifierFactory.createIdentifier(mIdentityDocument);
+		assertEquals("identity", id.getTypeName());
+	}
+
+}

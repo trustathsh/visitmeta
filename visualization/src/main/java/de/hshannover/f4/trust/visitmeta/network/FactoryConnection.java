@@ -94,14 +94,6 @@ public abstract class FactoryConnection {
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
 
-			URI uri_connect = UriBuilder.fromUri(url + "/default/connect").build(); // FIXME HotFix for new Rest Interface
-			WebResource temp1 = client.resource(uri_connect);
-			LOGGER.info("Dataservice: " + temp1.put(String.class));
-
-			URI uri_start_dump = UriBuilder.fromUri(url + "/default/dump/start").build(); // FIXME HotFix for new Rest Interface
-			WebResource temp2 = client.resource(uri_start_dump);
-			LOGGER.info("Dataservice: " + temp2.put(String.class));
-
 			URI uri = UriBuilder.fromUri(url + "/default/graph").build(); // FIXME HotFix for new Rest Interface
 			WebResource service = client.resource(uri);
 

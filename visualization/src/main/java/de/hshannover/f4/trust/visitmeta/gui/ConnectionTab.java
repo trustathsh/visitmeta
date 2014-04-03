@@ -43,7 +43,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -58,8 +57,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 public class ConnectionTab extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(ConnectionTab.class);
-
-	private static ImageIcon[] connectionStatusIcon;
 
 	private String mName;
 	private boolean mConnected;
@@ -87,16 +84,11 @@ public class ConnectionTab extends JPanel {
 	 * @param connection
 	 *            Panel Object that represents the Connection
 	 */
-	public ConnectionTab(String name, GraphContainer connection, JFrame window) {
+	public ConnectionTab(GraphContainer connection, JFrame window) {
 		super();
-		LOGGER.trace("Init ConnectionTab for the Connection " + name);
-		if (connectionStatusIcon == null) {
-			connectionStatusIcon = new ImageIcon[2];
-			connectionStatusIcon[0] = new ImageIcon(getClass().getClassLoader().getResource("ball_green_small.png"));
-			connectionStatusIcon[1] = new ImageIcon(getClass().getClassLoader().getResource("ball_red_small.png"));
-		}
+		LOGGER.trace("Init ConnectionTab for the Connection " + connection.getName());
 
-		mName = name;
+		mName = connection.getName();
 		mConnected = true;
 		mConnection = connection;
 		mRestConnection = mConnection.getRestConnection();
@@ -165,18 +157,6 @@ public class ConnectionTab extends JPanel {
 				mWindowNodeProperties.setVisible(false);
 			}
 		});
-	}
-
-	/**
-	 * Returns an ImageIcon object related with its status
-	 * 
-	 * @return ImageIcon object with the image related to the status
-	 */
-	public ImageIcon getStatusImage() {
-		if (mConnected) {
-			return connectionStatusIcon[0];
-		}
-		return connectionStatusIcon[1];
 	}
 
 	/**

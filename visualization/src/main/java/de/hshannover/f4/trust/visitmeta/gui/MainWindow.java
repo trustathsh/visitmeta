@@ -50,25 +50,24 @@ import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -78,9 +77,10 @@ public class MainWindow extends JFrame {
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
 	private JTabbedPane mTabbedConnectionPane = null;
-	private DefaultTableModel mTableModel = null;
-	private JTable mConnectionTable = null;
 	private JScrollPane mConnectionScrollPane = null;
+	private JTree mConnectionTree = null;
+	private DefaultMutableTreeNode mTreeRoot = null;
+	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
 
 	/**
@@ -103,11 +103,8 @@ public class MainWindow extends JFrame {
 				alreadyOpen = true;
 			}
 		}
-			if (!alreadyOpen) {
-			Object[] tmpTab = new Object[1];
-			tmpTab[0] = connection;
-			this.mTableModel.addRow(tmpTab);
-			this.mTableModel.fireTableDataChanged();
+		if (!alreadyOpen) {
+			((DefaultMutableTreeNode) mTreeRoot.getChildAt(0)).add(new DefaultMutableTreeNode(connection));
 		}
 	}
 
@@ -117,7 +114,7 @@ public class MainWindow extends JFrame {
 	 * @param graphPanel
 	 */
 	public void addConnection(GraphContainer connection) {
-		this.addConnection(new ConnectionTab(connection.getName(), connection, this));
+		this.addConnection(new ConnectionTab(connection, this));
 	}
 
 	/**
@@ -127,23 +124,7 @@ public class MainWindow extends JFrame {
 	 *            the should be removed
 	 */
 	public void removeConnection(ConnectionTab connection) {
-		for (int i = 0; i < mTableModel.getRowCount(); i++) {
-			if (mTableModel.getValueAt(i, 0).equals(connection)) {
-				mTableModel.removeRow(i);
-				this.mTableModel.fireTableDataChanged();
-				break;
-			}
-		}
-	}
-
-	/**
-	 * Removes a given connection
-	 * 
-	 * @param name
-	 *            of the connection that should be removed
-	 */
-	public void removeConnection(String name) {
-		this.removeConnection(new ConnectionTab(name, null, null));
+		// TODO implement
 	}
 
 	/**
@@ -171,95 +152,66 @@ public class MainWindow extends JFrame {
 	 * Initializes the left hand side of the main panel
 	 */
 	private void initLeftHandSide() {
-		mTableModel = new DefaultTableModel() {
-			private static final long serialVersionUID = 1L;
+		mTreeRenderer = new ConnectionTreeCellRenderer();
+		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
+		// FIXME
+		DefaultMutableTreeNode localhost = new DefaultMutableTreeNode(new DataserviceConnection("localhost", null,
+				false));
+		mTreeRoot.add(localhost);
 
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
+		mConnectionTree = new JTree(mTreeRoot);
+		mConnectionTree.addMouseListener(new MouseListener() {
 
-		mTableModel.addColumn("Connections");
-		mConnectionTable = new JTable(mTableModel);
-		mConnectionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-		DefaultTableCellRenderer iconCellRenderer = new DefaultTableCellRenderer() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setValue(Object value) {
-				if (value instanceof ConnectionTab) {
-					ConnectionTab tmpTab = ((ConnectionTab) value);
-					setText(tmpTab.toString());
-					setIcon(tmpTab.getStatusImage());
-				} else {
-					super.setValue(value);
-				}
-			}
-		};
-
-		iconCellRenderer.setHorizontalAlignment(JLabel.LEFT);
-
-		mConnectionTable.setDefaultRenderer(Object.class, iconCellRenderer);
-
-		mConnectionTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				ConnectionTab tab = (ConnectionTab) mConnectionTable.getValueAt(mConnectionTable.getSelectedRow(), 0);
-				boolean alreadyOpen = false;
-				for (Component t : mTabbedConnectionPane.getComponents()) {
-					if (t.equals(tab)) {
-						alreadyOpen = true;
-					}
-				}
-				if (!alreadyOpen) {
-					mTabbedConnectionPane.add(tab.getConnName(), tab);
-				} else {
-					mTabbedConnectionPane.setSelectedComponent(tab);
-				}
-			}
-		});
-
-		mConnectionTable.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				try {
-					int r = mConnectionTable.rowAtPoint(e.getPoint());
-					if (r >= 0 && r < mConnectionTable.getRowCount()) {
-						mConnectionTable.setRowSelectionInterval(r, r);
-					} else {
-						mConnectionTable.clearSelection();
+				mConnectionTree.setSelectionRow(mConnectionTree.getClosestRowForLocation(e.getX(), e.getY()));
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
+							.getClosestPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
+					if (tmp instanceof ConnectionTab) {
+						new ConnectionTabListMenu((ConnectionTab) tmp).show(mConnectionTree, e.getX(), e.getY());
 					}
-					if (e.getButton() == MouseEvent.BUTTON3) {
-						new ConnectionTabListMenu((ConnectionTab) mConnectionTable.getValueAt(r, 0)).show(
-								mConnectionTable, e.getX(), e.getY());
-					}
-				} catch (ArrayIndexOutOfBoundsException ae) {
-					System.out.print("");
 				}
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseExited(MouseEvent e) {
+			public void mouseExited(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent e) {
+			public void mouseEntered(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
+		mConnectionTree.addTreeSelectionListener(new TreeSelectionListener() {
 
-		mConnectionScrollPane = new JScrollPane(mConnectionTable);
-		mConnectionScrollPane.setPreferredSize(new Dimension(120, 0));
-		mTableModel.fireTableDataChanged();
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent()).getUserObject();
+				if (tmp instanceof ConnectionTab) {
+					ConnectionTab tmpTab = (ConnectionTab) tmp;
+					boolean alreadyOpen = false;
+					for (Component t : mTabbedConnectionPane.getComponents()) {
+						if (t.equals(tmpTab)) {
+							alreadyOpen = true;
+						}
+					}
+					if (!alreadyOpen) {
+						mTabbedConnectionPane.add(tmpTab.getConnName(), tmpTab);
+					}
+				}
+
+			}
+		});
+		mConnectionTree.setCellRenderer(mTreeRenderer);
+		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();
 		mLeftMainPanel.setLayout(new GridLayout());
@@ -308,7 +260,6 @@ public class MainWindow extends JFrame {
 		});
 	}
 
-
 	static class SupportedLaF {
 		JCheckBoxMenuItem menuItem;
 		String name;
@@ -335,8 +286,9 @@ public class MainWindow extends JFrame {
 		UIManager.LookAndFeelInfo[] installedLafs = UIManager.getInstalledLookAndFeels();
 		for (UIManager.LookAndFeelInfo lafInfo : installedLafs) {
 			try {
+				@SuppressWarnings("rawtypes")
 				Class lnfClass = Class.forName(lafInfo.getClassName());
-				LookAndFeel laf = (LookAndFeel)(lnfClass.newInstance());
+				LookAndFeel laf = (LookAndFeel) (lnfClass.newInstance());
 				if (laf.isSupportedLookAndFeel()) {
 					String name = lafInfo.getName();
 					supportedLaFs.add(new SupportedLaF(name, laf));
@@ -349,7 +301,7 @@ public class MainWindow extends JFrame {
 		}
 
 		for (SupportedLaF lAf : supportedLaFs) {
-			if(lAf.name.equals("Windows")){
+			if (lAf.name.equals("Windows")) {
 				LookAndFeel laf = lAf.laf;
 				try {
 					UIManager.setLookAndFeel(laf);

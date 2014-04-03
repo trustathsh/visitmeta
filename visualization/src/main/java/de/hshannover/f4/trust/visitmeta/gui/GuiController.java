@@ -43,7 +43,6 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
 
 public class GuiController {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
@@ -90,20 +89,10 @@ public class GuiController {
 	 *            ConnectionController object
 	 */
 	public void addConnection(GraphContainer connection) {
-		ConnectionTab tmp = new ConnectionTab(connection.getName(), connection, mMainWindow);
+		ConnectionTab tmp = new ConnectionTab( connection, mMainWindow);
 		this.setSelectedConnectionTab(tmp);
 		mMainWindow.addConnection(tmp);
 		mConnections.add(tmp);
-	}
-
-	/**
-	 * Removes a connection
-	 * 
-	 * @param name
-	 *            of the connection that needs to be removed
-	 */
-	public void removeConnection(String name) {
-		mConnections.remove(new ConnectionTab(name, null, null));
 	}
 
 	/**

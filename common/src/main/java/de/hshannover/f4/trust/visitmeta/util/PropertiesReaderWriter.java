@@ -90,8 +90,8 @@ public class PropertiesReaderWriter {
 					new FileWriter(mFilename).close();
 					fileReader = new FileReader(mFilename);
 				} catch (IOException e1) {
-				throw new IOException("Could not create " + mFilename + ": " +
-						e.getMessage());
+					throw new IOException("Could not create " + mFilename + ": " +
+							e.getMessage());
 				}
 			} else {
 				throw new IOException("Could not open " + mFilename + ": " +
@@ -144,7 +144,7 @@ public class PropertiesReaderWriter {
 		fileWriter.close();
 	}
 
-	public void removePr(String key){
+	public void removeProperty(String key){
 		NullCheck.check(key, "key is null");
 		mProperties.remove(key);
 	}

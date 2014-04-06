@@ -43,6 +43,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -53,6 +54,8 @@ import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionData;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionsReaderWriter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
@@ -81,6 +84,10 @@ public abstract class Application {
 	 * Configuration class for the dataservice.
 	 */
 	private static PropertiesReaderWriter mDSConfig;
+	/**
+	 * Configuration class for persistent IF-MAPS Connections.
+	 */
+	private static ConnectionsReaderWriter mConnectionsConfig;
 
 	private static RestService restService;
 
@@ -91,36 +98,59 @@ public abstract class Application {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-
-		log.info("Application started");
+		log.info("application started");
 
 		initComponents();
-
-		log.info("Components initialized");
-
 		startRestService();
+		loadPersistentConnections();
 
 		try {
-			initDefaultConnection();
+			startupConnect();
 		} catch (ConnectionException e) {
-			log.error("Error by initDefaultConnection() at startup", e);
+			log.error("startupConnect error", e);
 		}
 
-		log.info("Dataservice started successfully");
+		try {
+			startupDump();
+		} catch (ConnectionException e) {
+			log.error("startupDump error", e);
+		}
 
+		log.info("dataservice started successfully");
+	}
+
+	private static void startupDump() throws ConnectionException {
+		log.debug("startupDump...");
+		ConnectionManager.startupDump();
+	}
+
+	private static void startupConnect() throws ConnectionException {
+		log.debug("startupConnect...");
+		ConnectionManager.startupConnect();
+	}
+
+	private static void loadPersistentConnections() {
+		log.info("load persistent connections");
+		List<ConnectionData> connectionList = mConnectionsConfig.getConnectionsData();
+
+		for(ConnectionData c: connectionList){
+			try {
+				ConnectionManager.add(new Connection(c));
+			} catch (ConnectionException e) {
+				log.error("error while adding connection to the connection pool", e);
+			}
+		}
 	}
 
 	private static void initDefaultConnection() throws ConnectionException {
 		log.trace("init default connection...");
 
-		String TRUSTSTORE_PATH = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
-		String TRUSTSTORE_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
-		String IFMAP_BASIC_AUTH_URL = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
-		String IFMAP_USER = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
-		String IFMAP_PASS = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
-		int IFMAP_MAX_SIZE = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+		String url = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
+		String userName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
+		String userPass = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
 
-		Connection defaultConnection = ConnectionManager.newConnection("default", IFMAP_BASIC_AUTH_URL, IFMAP_USER, IFMAP_PASS, TRUSTSTORE_PATH, TRUSTSTORE_PASS, IFMAP_MAX_SIZE);
+		Connection defaultConnection = new Connection("default3", url, userName, userPass);
+		ConnectionManager.add(defaultConnection);
 
 		if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_CONNECT))){
 			log.debug("connecting at startup");
@@ -155,6 +185,7 @@ public abstract class Application {
 	}
 
 	private static void startRestService() {
+		log.info("start RestService");
 		restService = new RestService();
 		restServiceThread = new Thread(restService, "RestService-Thread");
 
@@ -162,20 +193,24 @@ public abstract class Application {
 	}
 
 	private static void initComponents() {
-
 		try {
+
 			String dbConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
 			String ifmapConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
 			String dsConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
+			String connections = Application.class.getClassLoader().getResource("connections.properties").getPath();
 			mDBConfig = new PropertiesReaderWriter(dbConfig, false);
 			mIFMAPConfig = new PropertiesReaderWriter(ifmapConfig, false);
 			mDSConfig = new PropertiesReaderWriter(dsConfig, false);
+			mConnectionsConfig = new ConnectionsReaderWriter(connections, true);
+
+			log.info("components initialized");
+
 		} catch (IOException e) {
 			String msg = "Error while reading the config files";
 			log.fatal(msg);
 			throw new RuntimeException(msg, e);
 		}
-
 	}
 
 	private static Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
@@ -245,6 +280,17 @@ public abstract class Application {
 					"DSConfig has not been initialized. This is not good!");
 		}
 		return mDSConfig;
+	}
+
+	/**
+	 * @return
+	 */
+	public static ConnectionsReaderWriter getConnectionsConfig() {
+		if (mConnectionsConfig == null) {
+			throw new RuntimeException(
+					"ConnectionsConfig has not been initialized. This is not good!");
+		}
+		return mConnectionsConfig;
 	}
 
 }

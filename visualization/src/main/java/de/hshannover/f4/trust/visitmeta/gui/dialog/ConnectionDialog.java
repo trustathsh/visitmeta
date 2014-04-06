@@ -139,8 +139,8 @@ public class ConnectionDialog extends JDialog{
 		mJpSouth.add(mJbClose);
 		mJpSouth.add(mJbSave);
 
-		mConnectionPanelMapServer = new MapServerPanel(this);
-		mConnectionPanelDataService = new DataServicePanel(this);
+		mConnectionPanelMapServer = new MapServerPanel();
+		mConnectionPanelDataService = new DataServicePanel();
 
 		mJtpMain = new JTabbedPane();
 		mJtpMain.add("Map Server Connections", mConnectionPanelMapServer);
@@ -185,9 +185,6 @@ public class ConnectionDialog extends JDialog{
 
 		private static final long serialVersionUID = -1419963248354632788L;
 
-
-		protected ConnectionDialog mContext;
-
 		protected JSplitPane mJspContent;
 		protected JPanel mJpLeftSplitPane;
 		protected JPanel mJpRightSplitPane;
@@ -208,8 +205,7 @@ public class ConnectionDialog extends JDialog{
 
 		private DefaultListModel<DataserviceConnection> mListModelDataService;
 
-		private TabPanel(ConnectionDialog context){
-			mContext = context;
+		private TabPanel(){
 			createPanels();
 			addConnectionList();
 
@@ -311,9 +307,7 @@ public class ConnectionDialog extends JDialog{
 			}
 		}
 
-		public MapServerPanel(ConnectionDialog context) {
-			super(context);
-
+		public MapServerPanel() {
 			mParameterPanel = new MapServerParameterPanel();
 
 			mJcbDataServiceConnection = new JComboBox<DataserviceConnection>();
@@ -366,7 +360,7 @@ public class ConnectionDialog extends JDialog{
 					String name = "NewConnection" + (mListModelMapServer.getSize() + 1);
 
 					RESTConnection param = new RESTConnection((DataserviceConnection) mJcbDataServiceConnection.getSelectedItem(), name);
-					param.setBasicAuthentication(true);
+					param.setAuthenticationBasic(true);
 
 					mListModelMapServer.add(mListModelMapServer.getSize(), param);
 
@@ -413,10 +407,10 @@ public class ConnectionDialog extends JDialog{
 
 						tmpCon.saveInDataservice();
 
-						GraphContainer connection = new GraphContainer(mJlMapServerConnections.getSelectedValue().getName(), tmpCon);
+						GraphContainer connection = new GraphContainer(tmpCon.getConnectionName(), tmpCon.getDataserviceConnection());
 						mGuiController.addConnection(connection);
 
-						log.info("new Map-Server connection is stored in " + tmpCon.getName());
+						log.info("new Map-Server connection is stored");
 					}
 				}
 
@@ -452,12 +446,15 @@ public class ConnectionDialog extends JDialog{
 		}
 
 		private void updateRestConnection(RESTConnection restConnection){
-			restConnection.setName(mParameterPanel.mJtfName.getText().trim());
+			restConnection.setConnectionName(mParameterPanel.mJtfName.getText().trim());
 			restConnection.setUrl(mParameterPanel.mJtfUrl.getText().trim());
 			restConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
 			restConnection.setPassword(new String(mParameterPanel.mJtfPassword.getPassword()).trim());
-			restConnection.setConnectAtStartUp(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
-			restConnection.setBasicAuthentication(mParameterPanel.mJcbBasicAuthentication.isSelected());
+			restConnection.setAuthenticationBasic(mParameterPanel.mJcbBasicAuthentication.isSelected());
+			// TODO TRUSTSTORE_PATH
+			// TODO TRUSTSTORE_PASS
+			restConnection.setStartupConnect(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
+			restConnection.setStartupDump(mParameterPanel.mJcbDump.isSelected());
 			restConnection.setMaxPollResultSize(mParameterPanel.mJtfMaxPollResultSize.getText().trim());
 		}
 
@@ -495,9 +492,7 @@ public class ConnectionDialog extends JDialog{
 
 		private DataserviceConnection mPreviousConnection;
 
-		private DataServicePanel(ConnectionDialog context){
-			super(context);
-
+		private DataServicePanel(){
 			mParameterPanel = new DataServiceParameterPanel();
 
 			readProperties();
@@ -579,7 +574,7 @@ public class ConnectionDialog extends JDialog{
 							updateDataserviceConnection(mPreviousConnection);
 						}
 						mJlDataServiceConnections.getSelectedValue().saveInProperty();
-						mContext.mConnectionPanelMapServer.updateDataserviceComboBox();
+						mConnectionPanelMapServer.updateDataserviceComboBox();
 
 						log.info("DataService Connections was persist");
 					}
@@ -731,13 +726,16 @@ public class ConnectionDialog extends JDialog{
 		}
 
 		private void updatePanel(RESTConnection restConnection){
-			mJtfName.setText(restConnection.getName());
+			mJtfName.setText(restConnection.getConnectionName());
 			mJtfUrl.setText(restConnection.getUrl());
 			mJtfUsername.setText(restConnection.getUsername());
 			mJtfPassword.setText(restConnection.getPassword());
-			mJcbBasicAuthentication.setSelected(restConnection.isBasicAuthentication());
-			mJcbConnectingAtStartUp.setSelected(restConnection.isConnectAtStartUp());
-			mJcbDump.setSelected(restConnection.isDumping());
+			mJcbBasicAuthentication.setSelected(restConnection.isAuthenticationBasic());
+			// TODO TRUSTSTORE_PATH
+			// TODO TRUSTSTORE_PASS
+			mJcbConnectingAtStartUp.setSelected(restConnection.isStartupConnect());
+			mJcbDump.setSelected(restConnection.isStartupDump());
+			mJtfMaxPollResultSize.setText(restConnection.getMaxPollResultSize());
 		}
 	}
 

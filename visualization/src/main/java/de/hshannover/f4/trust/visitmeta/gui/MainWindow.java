@@ -104,8 +104,32 @@ public class MainWindow extends JFrame {
 			}
 		}
 		if (!alreadyOpen) {
-			((DefaultMutableTreeNode) mTreeRoot.getChildAt(0)).add(new DefaultMutableTreeNode(connection));
+			addConnectionTabTreeNode(connection);
 		}
+	}
+
+	private void addConnectionTabTreeNode(ConnectionTab connection){
+		String dataserviceName = connection.getRestConnection().getDataserviceConnection().getName();
+
+		for(int i=0; i<mTreeRoot.getChildCount(); i++){
+			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot.getChildAt(i);
+			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode.getUserObject();
+			if(tmpDataserviceConnection.getName().equals(dataserviceName)){
+				tmpNode.add(new DefaultMutableTreeNode(connection));
+				mConnectionTree.updateUI();
+				return;
+			}
+		}
+		// no DataserviceConnection found
+		addDataserviceTreeNode(connection);
+	}
+
+	private void addDataserviceTreeNode(ConnectionTab connection){
+		DataserviceConnection dc = connection.getRestConnection().getDataserviceConnection();
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(dc);
+		mTreeRoot.add(newNode);
+		newNode.add(new DefaultMutableTreeNode(connection));
+		mConnectionTree.updateUI();
 	}
 
 	/**
@@ -154,10 +178,6 @@ public class MainWindow extends JFrame {
 	private void initLeftHandSide() {
 		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
-		// FIXME
-		DefaultMutableTreeNode localhost = new DefaultMutableTreeNode(new DataserviceConnection("localhost", null,
-				false));
-		mTreeRoot.add(localhost);
 
 		mConnectionTree = new JTree(mTreeRoot);
 		mConnectionTree.addMouseListener(new MouseListener() {

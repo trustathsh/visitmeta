@@ -88,7 +88,7 @@ public class ConnectionTab extends JPanel {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + connection.getName());
 
-		mName = connection.getName();
+		mName = connection.getRestConnection().getConnectionName();
 		mConnected = true;
 		mConnection = connection;
 		mRestConnection = mConnection.getRestConnection();
@@ -256,5 +256,9 @@ public class ConnectionTab extends JPanel {
 		mTimerPropertiesShow.stop();
 		mTimerPropertiesHide.stop();
 		mWindowNodeProperties.setVisible(false);
+	}
+
+	public RESTConnection getRestConnection(){
+		return mRestConnection;
 	}
 }

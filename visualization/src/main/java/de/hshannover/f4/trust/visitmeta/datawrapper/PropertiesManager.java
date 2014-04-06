@@ -120,7 +120,7 @@ public class PropertiesManager {
 				mPropertyFiles.put(pFileName, vReaderWriter);
 			}
 			/* Remove Properties */
-			vReaderWriter.removePr(pKey);
+			vReaderWriter.removeProperty(pKey);
 		} catch (IOException | NullPointerException e) {
 			LOGGER.warn("Couldn't remove property in file \"" + pFileName + ".properties\".");
 		}

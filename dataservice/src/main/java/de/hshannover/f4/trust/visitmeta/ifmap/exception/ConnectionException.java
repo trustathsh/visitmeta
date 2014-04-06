@@ -40,12 +40,24 @@ package de.hshannover.f4.trust.visitmeta.ifmap.exception;
 
 public class ConnectionException extends Exception {
 
-
 	private static final long serialVersionUID = 685270918564136642L;
 
+	private String mMsg;
+
+	public ConnectionException(){
+
+	}
+
+	public ConnectionException(String msg){
+		mMsg = msg;
+	}
 
 	@Override
 	public String toString() {
-		return "Error: " + this.getClass().getSimpleName();
+		if(mMsg != null){
+			return "Error: " + this.getClass().getSimpleName() + "(" + mMsg + ")";
+		}else {
+			return "Error: " + this.getClass().getSimpleName();
+		}
 	}
 }

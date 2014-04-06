@@ -91,7 +91,7 @@ public class Neo4JDatabase {
 	}
 
 	private void initNeo4JConnection(String connectionName) {
-		neo4jDb = new Neo4JConnection(neo4JdbPath + "/" + connectionName);
+		neo4jDb = new Neo4JConnection(neo4JdbPath + "/connection/" + connectionName);
 
 		if(clearDatabase){
 

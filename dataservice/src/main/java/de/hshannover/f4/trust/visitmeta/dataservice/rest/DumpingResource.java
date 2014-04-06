@@ -45,6 +45,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
@@ -54,6 +56,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException
 @Path("{connectionName}/dump")
 public class DumpingResource {
 
+	private static final Logger log = Logger.getLogger(DumpingResource.class);
 
 	/**
 	 * Start the Dumping-Service.
@@ -71,8 +74,10 @@ public class DumpingResource {
 			ConnectionManager.startDumpingServiceFromConnection(name);
 
 		} catch (ActiveDumpingException e){
+			log.error("error while startDump from " + name, e);
 			return Response.ok().entity("INFO: Dumping allready started").build();
 		} catch (ConnectionException e) {
+			log.error("error while startDump from " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
@@ -94,8 +99,10 @@ public class DumpingResource {
 			ConnectionManager.stopDumpingServiceFromConnection(name);
 
 		} catch (NoActiveDumpingException e){
+			log.error("error while stopDump from " + name, e);
 			return Response.ok().entity("INFO: Dumping allready stoped").build();
 		} catch (ConnectionException e) {
+			log.error("error while stopDump from " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		};
 

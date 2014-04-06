@@ -112,13 +112,14 @@ public class SubscribeResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getActiveSubscriptions(@PathParam("connectionName") String connectionName) {
+	public Object getActiveSubscriptions(@PathParam("connectionName") String name) {
 		JSONArray activeSubscriptions;
 		try {
 
-			activeSubscriptions = new JSONArray(ConnectionManager.getActiveSubscriptionsFromConnection(connectionName));
+			activeSubscriptions = new JSONArray(ConnectionManager.getActiveSubscriptionsFromConnection(name));
 
 		} catch (ConnectionException e) {
+			log.error("error at getActiveSubscriptions from " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
@@ -170,6 +171,7 @@ public class SubscribeResource {
 					subscribeUpdate(name, moreSubscribes);
 
 				} catch (ConnectionException e) {
+					log.error("error while multiple subscribeUpdate from " + name, e);
 					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
@@ -180,6 +182,7 @@ public class SubscribeResource {
 				subscribeUpdate(name, jObj);
 
 			} catch (ConnectionException ee) {
+				log.error("error while single subscribeUpdate from " + name, e);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}
 		}
@@ -303,6 +306,7 @@ public class SubscribeResource {
 				ConnectionManager.deleteSubscriptionsFromConnection(name);
 
 			} catch (ConnectionException e) {
+				log.error("error while delete all subscriptions from " + name, e);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 			}
 
@@ -325,6 +329,7 @@ public class SubscribeResource {
 			ConnectionManager.deleteSubscribeFromConnection(name, subscriptionName);
 
 		} catch (ConnectionException e) {
+			log.error("error while delete " + subscriptionName + " from " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 

@@ -41,7 +41,6 @@ package de.hshannover.f4.trust.visitmeta;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
@@ -86,9 +85,8 @@ public final class Main {
 				GraphContainer tmpCon = new GraphContainer(dc.getName(), dc);
 				gui.addConnection(tmpCon);
 			}
-		gui.show();
+			gui.show();
 		}
-
 	}
 
 	private static void loadDataserviceConnections(){

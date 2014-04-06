@@ -124,7 +124,7 @@ public abstract class FactoryConnection {
 
 			RESTConnection restConn = connection.getRestConnection();
 			String url = restConn.getDataserviceConnection().getUrl();
-			boolean dumping = restConn.isDumping();
+			boolean dumping = restConn.isStartupDump();
 			boolean includeRawXML = restConn.getDataserviceConnection().isRawXml();
 
 			ClientConfig config = new DefaultClientConfig();

@@ -41,23 +41,6 @@ public class DataserviceConnectionFactory {
 		PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(protertyIndex), String.valueOf(dataService.isRawXml()));
 	}
 
-	//das zum löschen umschreiben
-	public static void persistDataServiceConnections(List<DataserviceConnection> listModelDataService){
-		int propertyCount = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
-		for(int i=0; i<propertyCount; i++){
-			removeDataServiceConnection(i);
-		}
-
-		int count = listModelDataService.size();
-		PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, String.valueOf(count));
-
-		for(int i=0; i<count; i++){
-			PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), listModelDataService.get(i).getName());
-			PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), listModelDataService.get(i).getUrl());
-			PropertiesManager.storeProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), String.valueOf(listModelDataService.get(i).isRawXml()));
-		}
-	}
-
 	public static void removeDataServiceConnection(int index){
 		int currentCountFromProperty = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
 		if(index == currentCountFromProperty){

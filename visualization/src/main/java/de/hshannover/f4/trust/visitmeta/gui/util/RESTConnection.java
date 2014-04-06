@@ -9,20 +9,22 @@ public class RESTConnection {
 
 	private static final String DEFAULT_URL = "https://localhost:8443";
 
-	private String mName;
+	private String mConnectionName;
 	private String mUrl;
-	private boolean mDumping;
-	private boolean mConnectAtStartUp;
-	private boolean mBasicAuthentication;
-	private String mUsername ;
-	private String mPassword;
+	private String mUserName ;
+	private String mUserPass;
+	private String mTruststorePath;
+	private String mTruststorePass;
 	private String mMaxPollResultSize;
+	private boolean mAuthenticationBasic;
+	private boolean mStartupConnect;
+	private boolean mStartupDump;
 
 	private DataserviceConnection mDataserviceConnection;
 
 
 	public RESTConnection(DataserviceConnection dataConnection, String name){
-		setName(name);
+		setConnectionName(name);
 		setDataserviceConnection(dataConnection);
 	}
 
@@ -52,21 +54,26 @@ public class RESTConnection {
 
 	@Override
 	public RESTConnection clone() {
-		RESTConnection tmp = new RESTConnection(mDataserviceConnection, mName + "(clone)");
-		tmp.setBasicAuthentication(mBasicAuthentication);
+		RESTConnection tmp = new RESTConnection(mDataserviceConnection, getConnectionName() + "(clone)");
 		tmp.setUrl(getUrl());
-		tmp.setDumping(isDumping());
 		tmp.setUsername(getUsername());
 		tmp.setPassword(getPassword());
+		tmp.setTruststorePath(getTruststorePath());
+		tmp.setTruststorePass(getTruststorePass());
+		tmp.setMaxPollResultSize(getMaxPollResultSize());
+		tmp.setAuthenticationBasic(isAuthenticationBasic());
+		tmp.setStartupConnect(isStartupConnect());
+		tmp.setStartupDump(isStartupDump());
+
 		return tmp;
 	}
 
-	public String getName() {
-		return mName;
+	public String getConnectionName() {
+		return mConnectionName;
 	}
 
-	public void setName(String name) {
-		mName = name;
+	public void setConnectionName(String connectionName) {
+		mConnectionName = connectionName;
 	}
 	public String getUrl() {
 		if(mUrl != null){
@@ -80,17 +87,17 @@ public class RESTConnection {
 		mUrl = endpoint;
 	}
 
-	public boolean isDumping() {
-		return mDumping;
+	public boolean isStartupDump() {
+		return mStartupDump;
 	}
 
-	public void setDumping(boolean dumping) {
-		mDumping = dumping;
+	public void setStartupDump(boolean dumping) {
+		mStartupDump = dumping;
 	}
 
 	@Override
 	public String toString(){
-		return mName;
+		return mConnectionName;
 	}
 
 	public DataserviceConnection getDataserviceConnection() {
@@ -101,28 +108,28 @@ public class RESTConnection {
 		mDataserviceConnection = dataConnection;
 	}
 
-	public boolean isBasicAuthentication() {
-		return mBasicAuthentication;
+	public boolean isAuthenticationBasic() {
+		return mAuthenticationBasic;
 	}
 
-	public void setBasicAuthentication(boolean basicAuthentication) {
-		mBasicAuthentication = basicAuthentication;
+	public void setAuthenticationBasic(boolean authenticationBasic) {
+		mAuthenticationBasic = authenticationBasic;
 	}
 
 	public String getUsername() {
-		return mUsername;
+		return mUserName;
 	}
 
 	public void setUsername(String username) {
-		mUsername = username;
+		mUserName = username;
 	}
 
 	public String getPassword() {
-		return mPassword;
+		return mUserPass;
 	}
 
 	public void setPassword(String password) {
-		mPassword = password;
+		mUserPass = password;
 	}
 
 	public String getMaxPollResultSize() {
@@ -133,12 +140,28 @@ public class RESTConnection {
 		mMaxPollResultSize = maxPollResultSize;
 	}
 
-	public void setConnectAtStartUp(boolean connectAtStartUp) {
-		mConnectAtStartUp = connectAtStartUp;
+	public void setStartupConnect(boolean startupConnect) {
+		mStartupConnect = startupConnect;
 	}
 
-	public boolean isConnectAtStartUp() {
-		return mConnectAtStartUp;
+	public boolean isStartupConnect() {
+		return mStartupConnect;
+	}
+
+	public String getTruststorePath() {
+		return mTruststorePath;
+	}
+
+	public void setTruststorePath(String truststorePath) {
+		mTruststorePath = truststorePath;
+	}
+
+	public String getTruststorePass() {
+		return mTruststorePass;
+	}
+
+	public void setTruststorePass(String truststorePass) {
+		mTruststorePass = truststorePass;
 	}
 
 }

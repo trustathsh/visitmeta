@@ -47,8 +47,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -58,25 +56,50 @@ public class ConnectionManager {
 
 	private static Logger log = Logger.getLogger(ConnectionManager.class);
 
-	private static final String TRUSTSTORE_PATH = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
-	private static final String TRUSTSTORE_PASS = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
-	private static final int MAX_SIZE = Integer.parseInt(Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
-
-	private static Map<String, Connection> conPool = new HashMap<String,Connection>();
+	private static Map<String, Connection> connectionPool = new HashMap<String,Connection>();
 
 
-	public static Connection newConnection(String name, String url, String user, String userPass){
-		return newConnection(name, url, user, userPass, TRUSTSTORE_PATH, TRUSTSTORE_PASS, MAX_SIZE);
+	/**
+	 * Add a new connection to the connection pool.
+	 * 
+	 * @param connection
+	 * @throws ConnectionException
+	 */
+	public static void add(Connection connection) throws ConnectionException {
+		if(!existsConnectionName(connection.getConnectionName())){
+			connectionPool.put(connection.getConnectionName(), connection);
+			log.debug(connection.getConnectionName() + " added to connection pool");
+		}else{
+			throw new ConnectionException(connection.getConnectionName() + " connection name already exists, adding canceled");
+		}
 	}
 
-	public static Connection newConnection(String name, String url, String user, String userPass, String truststore, String truststorePass, int maxSize) {
-		log.trace("new connection " + name + "...");
+	/**
+	 * Connected to the Map-Server of all connections at the connection pool.
+	 * StartupConnect must be set true.
+	 * 
+	 * @throws ConnectionException
+	 */
+	public static void startupConnect() throws ConnectionException{
+		for(Connection c: connectionPool.values()){
+			if(c.isStartupConnect()){
+				connectTo(c.getConnectionName());
+			}
+		}
+	}
 
-		Connection newConnection = new Connection(name, url, user, userPass, truststore, truststorePass, maxSize);
-		conPool.put(name, newConnection);
-
-		log.info("connection " + name + " is saved");
-		return newConnection;
+	/**
+	 * Start dumping of all connections at the connection pool.
+	 * StartupDump must be set true.
+	 * 
+	 * @throws ConnectionException
+	 */
+	public static void startupDump() throws ConnectionException{
+		for(Connection c: connectionPool.values()){
+			if(c.isStartupDump()){
+				startDumpingServiceFromConnection(c.getConnectionName());
+			}
+		}
 	}
 
 	/**
@@ -120,8 +143,8 @@ public class ConnectionManager {
 	/**
 	 * @return All saved connections.
 	 */
-	public static Map<String, Connection> getSavedConnectionMap(){
-		return conPool;
+	public static Map<String, Connection> getConnectionPool(){
+		return connectionPool;
 	}
 
 	/**
@@ -132,7 +155,7 @@ public class ConnectionManager {
 
 		StringBuilder sb = new StringBuilder();
 
-		for(Connection c: conPool.values()){
+		for(Connection c: connectionPool.values()){
 			sb.append(c).append("\n");
 		}
 
@@ -148,7 +171,7 @@ public class ConnectionManager {
 
 		StringBuilder sb = new StringBuilder();
 
-		for(Connection c: conPool.values()){
+		for(Connection c: connectionPool.values()){
 			if(c.isConnected()){
 				sb.append(c).append("\n");
 			}
@@ -239,8 +262,8 @@ public class ConnectionManager {
 	}
 
 	private static Connection getConnection(String connectionName) throws NoSavedConnectionException{
-		if(conPool.containsKey(connectionName)){
-			return conPool.get(connectionName);
+		if(connectionPool.containsKey(connectionName)){
+			return connectionPool.get(connectionName);
 		}
 
 		NoSavedConnectionException e = new NoSavedConnectionException();
@@ -255,5 +278,12 @@ public class ConnectionManager {
 	 */
 	public static GraphService getGraphServiceFromConnection(String name) throws ConnectionException {
 		return getConnection(name).getGraphService();
+	}
+
+	public static boolean existsConnectionName(String connectionName) {
+		if(connectionPool.containsKey(connectionName)){
+			return true;
+		}
+		return false;
 	}
 }

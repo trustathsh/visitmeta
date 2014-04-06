@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,9 +59,12 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionData;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
@@ -72,7 +76,20 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 
 public class Connection {
 
-	private Logger log = Logger.getLogger(Connection.class);
+	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
+
+	public static final String DEFAULT_TRUSTSTORE_PATH = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+
+	public static final String DEFAULT_TRUSTSTORE_PASS = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+
+	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = Integer.parseInt(Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+
+	public static final boolean DEFAULT_STARTUP_CONNECT = false;
+
+	public static final boolean DEFAULT_STARTUP_DUMP = false;
+
+	private static final Logger log = Logger.getLogger(Connection.class);
+
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
@@ -84,44 +101,77 @@ public class Connection {
 	private ThreadSafeSsrc mSsrc;
 
 	private boolean connected = false;
-
-	private String mConnectionName;
-	private String mUrl;
-	private String mUser;
-	private String mUserPass;
-	private String mTruststore;
-	private String mTruststorePass;
-	private int mMaxSize;
-
 	private Set<String> activeSubscriptions;
 
+	// connection data
+	private String mConnectionName;
+	private String mUrl;
+	private String mUserName;
+	private String mUserPass;
+	private String mTruststorePath;
+	private String mTruststorePass;
+	private int mMaxPollResultSize;
+	private boolean mAuthenticationBasic;
+	private boolean mStartupConnect;
+	private boolean mStartupDump;
 
-	public Connection(String name, String url, String user, String userPass, String truststore, String truststorePass, int maxSize) {
+	/**
+	 * Represents an IF-MAP connection to a MAP server.
+	 * If not changed by yourself, following default values ​​are set:
+	 * <ul>
+	 * 	<li>AuthenticationBasic = true</li>
+	 * 	<li>TruststorePath = see config.property(ifmap.truststore.path)</li>
+	 * 	<li>TruststorePass = see config.property(ifmap.truststore.pw)</li>
+	 * 	<li>MaxPollResultSize = see config.property(ifmap.maxsize)</li>
+	 * 	<li>StartupConnect = false</li>
+	 * 	<li>StartupDump = false</li>
+	 * </ul>
+	 * @throws ConnectionException
+	 */
+	public Connection(String name, String url, String userName, String userPass) throws ConnectionException {
 		log.trace("new Connection() ...");
 
-		mConnectionName = name;
-		setUrl(url);
-		setUser(user);
-		setUserPass(userPass);
-		mTruststore = truststore;
-		mTruststorePass = truststorePass;
-		mMaxSize = maxSize;
+		if(ConnectionManager.existsConnectionName(name)){
+			throw new ConnectionException(name + " connection already exists");
+		}
 
-		mNeo4JDb = new Neo4JDatabase(name);
+		setConnectionName(name);
+		setUrl(url);
+		setUserName(userName);
+		setUserPass(userPass);
+		setAuthenticationBasic(DEFAULT_AUTHENTICATION_BASIC);
+		setTruststorePath(DEFAULT_TRUSTSTORE_PATH);
+		setTruststorePass(DEFAULT_TRUSTSTORE_PASS);
+		setMaxPollResultSize(DEFAULT_MAX_POLL_RESULT_SIZE);
+		setStartupConnect(DEFAULT_STARTUP_CONNECT);
+		setStartupDump(DEFAULT_STARTUP_DUMP);
+
+		mNeo4JDb = new Neo4JDatabase(mConnectionName);
 		activeSubscriptions = new HashSet<String>();
 
 		log.trace("... new Connection() OK");
 	}
 
+	public Connection(ConnectionData data) throws ConnectionException {
+		this(data.mConnectionName, data.mUrl, data.mUserName, data.mUserPass);
+		setAuthenticationBasic(data.mAuthenticationBasic);
+		setTruststorePath(data.mTruststorePath);
+		setTruststorePass(data.mTruststorePass);
+		setMaxPollResultSize(data.mMaxPollResultSize);
+		setStartupConnect(data.mStartupConnect);
+		setStartupDump(data.mStartupDump);
+	}
+
 	/**
 	 * Connect to the MAP-Server.
+	 * 
 	 * 
 	 * @throws ConnectionException
 	 */
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 
-		initSsrc(getUrl(), getUser(), getUserPass(), mTruststore, mTruststorePass);
+		initSsrc(getUrl(), getUserName(), getUserPass(), mTruststorePath, mTruststorePass);
 		initSession();
 	}
 
@@ -134,10 +184,8 @@ public class Connection {
 			mSsrc = new ThreadSafeSsrc(url, user, userPass, tms);
 
 		} catch (InitializationException e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
 			resetConnection();
-			throw ee;
+			throw new IfmapConnectionException(e);
 		}
 
 		log.debug("init SSRC OK");
@@ -148,20 +196,16 @@ public class Connection {
 
 		try {
 
-			mSsrc.newSession(mMaxSize);
+			mSsrc.newSession(mMaxPollResultSize);
 			setConnected(true);
 
 		} catch (IfmapErrorResult e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
 			resetConnection();
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		} catch (IfmapException e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
 			resetConnection();
-			throw ee;
+			throw new IfmapConnectionException(e);
 		}
 
 		log.debug("new SSRC session OK");
@@ -186,19 +230,13 @@ public class Connection {
 			log.debug("closeTcpConnection() OK");
 
 		} catch (IfmapErrorResult e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		} catch (CommunicationException e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		} catch (IfmapException e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		}finally{
 			resetConnection();
@@ -269,15 +307,10 @@ public class Connection {
 				mSsrc.subscribe(request);
 
 			} catch (IfmapErrorResult e) {
-				IfmapConnectionException ee = new IfmapConnectionException(e);
-				log.error(ee.toString(), ee);
-				throw ee;
+				throw new IfmapConnectionException(e);
 
 			} catch (IfmapException e) {
-				IfmapConnectionException ee = new IfmapConnectionException(e);
-				log.error(ee.toString(), ee);
-				throw ee;
-
+				throw new IfmapConnectionException(e);
 			}
 
 			for(SubscribeElement r: request.getSubscribeElements()){
@@ -302,18 +335,13 @@ public class Connection {
 			return mSsrc.getArc().poll();
 
 		} catch (IfmapErrorResult e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		} catch (EndSessionException e) {
-			//	Nothing to log while disconnecting from MAP-Server
 			throw new ConnectionCloseException();
 
 		} catch (IfmapException e) {
-			IfmapConnectionException ee = new IfmapConnectionException(e);
-			log.error(ee.toString(), ee);
-			throw ee;
+			throw new IfmapConnectionException(e);
 
 		}
 	}
@@ -352,12 +380,20 @@ public class Connection {
 		activeSubscriptions.clear();
 	}
 
+	public void persistToProperty() throws IOException{
+		Application.getConnectionsConfig().persistConnection(this);
+	}
+
+	public void deleteFromProprty() throws IOException{
+		Application.getConnectionsConfig().deleteConnection(this);
+	}
+
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Connection: ").append(mConnectionName).append(" | URL: ");
-		sb.append(getUrl()).append(" | User: ").append(getUser());
+		sb.append(getUrl()).append(" | User: ").append(getUserName());
 
 		return sb.toString();
 	}
@@ -462,12 +498,12 @@ public class Connection {
 		mUrl = url;
 	}
 
-	public String getUser() {
-		return mUser;
+	public String getUserName() {
+		return mUserName;
 	}
 
-	public void setUser(String user) {
-		this.mUser = user;
+	public void setUserName(String userName) {
+		mUserName = userName;
 	}
 
 	public String getUserPass() {
@@ -475,7 +511,64 @@ public class Connection {
 	}
 
 	public void setUserPass(String userPass) {
-		this.mUserPass = userPass;
+		mUserPass = userPass;
+	}
+
+	public String getConnectionName() {
+		return mConnectionName;
+	}
+
+	public void setConnectionName(String connectionName) {
+		mConnectionName = connectionName;
+	}
+
+	public String getTruststorePath() {
+		return mTruststorePath;
+	}
+
+	public void setTruststorePath(String truststorePath) {
+		mTruststorePath = truststorePath;
+	}
+
+	public String getTruststorePass() {
+		return mTruststorePass;
+	}
+
+	public void setTruststorePass(String truststorePass) {
+		mTruststorePass = truststorePass;
+	}
+
+	public int getMaxPollResultSize() {
+		return mMaxPollResultSize;
+	}
+
+	public void setMaxPollResultSize(int maxPollResultSize) {
+		mMaxPollResultSize = maxPollResultSize;
+	}
+
+	public void setAuthenticationBasic(boolean authenticationBasic) {
+		mAuthenticationBasic = authenticationBasic;
+	}
+
+	public boolean isAuthenticationBasic() {
+		return mAuthenticationBasic;
+	}
+
+	public void setStartupConnect(boolean startupConnect) {
+		mStartupConnect = startupConnect;
+	}
+
+	public boolean isStartupConnect() {
+		return mStartupConnect;
+	}
+
+	public void setStartupDump(boolean startupDump) {
+		mStartupDump = startupDump;
+
+	}
+
+	public boolean isStartupDump() {
+		return mStartupDump;
 	}
 }
 

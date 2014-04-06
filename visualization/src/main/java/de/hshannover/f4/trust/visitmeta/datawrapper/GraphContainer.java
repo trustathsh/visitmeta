@@ -25,6 +25,7 @@ import de.hshannover.f4.trust.visitmeta.network.Connection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
+import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 /**
  * 
@@ -67,27 +68,27 @@ public class GraphContainer {
 		new Thread(mTimeManagerDeletion).start();
 	}
 
-	public GraphContainer(String name, RESTConnection restConn) {
-		mName = name;
-		mTimeHolder = new TimeHolder(this);
-		mTimeSelector = new TimeSelector(this);
-		mSettingManager = new SettingManager(this);
-		mTimeManagerCreation = new TimeManagerCreation(this);
-		mTimeManagerDeletion = new TimeManagerDeletion(this);
-
-		mRestConnection = restConn;
-
-		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
-		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
-		mFacadeNetwork = new FacadeNetwork(this);
-		mFacadeLogic = new FacadeLogic(this);
-		mGraphConnection = new GraphConnection(this);
-
-		new Thread(mFacadeNetwork).start();
-		new Thread(mFacadeLogic).start();
-		new Thread(mTimeManagerCreation).start();
-		new Thread(mTimeManagerDeletion).start();
-	}
+	//	public GraphContainer(String name, RESTConnection restConn) {
+	//		mName = name;
+	//		mTimeHolder = new TimeHolder(this);
+	//		mTimeSelector = new TimeSelector(this);
+	//		mSettingManager = new SettingManager(this);
+	//		mTimeManagerCreation = new TimeManagerCreation(this);
+	//		mTimeManagerDeletion = new TimeManagerDeletion(this);
+	//
+	//		mRestConnection = restConn;
+	//
+	//		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
+	//		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
+	//		mFacadeNetwork = new FacadeNetwork(this);
+	//		mFacadeLogic = new FacadeLogic(this);
+	//		mGraphConnection = new GraphConnection(this);
+	//
+	//		new Thread(mFacadeNetwork).start();
+	//		new Thread(mFacadeLogic).start();
+	//		new Thread(mTimeManagerCreation).start();
+	//		new Thread(mTimeManagerDeletion).start();
+	//	}
 
 	public TimeHolder getTimeHolder() {
 		return mTimeHolder;
@@ -143,7 +144,7 @@ public class GraphContainer {
 
 		URI uri_connect = UriBuilder.fromUri(dc.getUrl()).build();
 		WebResource temp1 = client.resource(uri_connect);
-		JSONObject jsonResponse = temp1.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
+		JSONObject jsonResponse = temp1.path("/").queryParam("connectionData", String.valueOf(true)).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
 
 		Iterator<String> i = jsonResponse.keys();
 		RESTConnection restConn = null;
@@ -151,16 +152,19 @@ public class GraphContainer {
 			String jKey = i.next();
 			JSONObject jsonConnection;
 			try {
+
 				jsonConnection = jsonResponse.getJSONObject(jKey);
 				restConn = new RESTConnection(dc, jKey);
-				restConn.setBasicAuthentication(true);
-				restConn.setUrl(jsonConnection.optString("URL"));
-				restConn.setUsername(jsonConnection.optString("Username"));
-				restConn.setPassword(jsonConnection.optString("Password"));
-				restConn.setBasicAuthentication(jsonConnection.optBoolean("BasicAuthentication", true));
-				restConn.setConnectAtStartUp(jsonConnection.optBoolean("ConnectAtStartUp", false));
-				restConn.setDumping(jsonConnection.optBoolean("Dumping", false));
-				restConn.setMaxPollResultSize(jsonConnection.optString("MaxPollResultSize"));
+
+				restConn.setUrl(jsonConnection.getString(ConnectionKey.URL));
+				restConn.setUsername(jsonConnection.getString(ConnectionKey.USER_NAME));
+				restConn.setPassword(jsonConnection.getString(ConnectionKey.USER_PASSWORD));
+				restConn.setAuthenticationBasic(jsonConnection.getBoolean(ConnectionKey.AUTHENTICATION_BASIC));
+				restConn.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
+				restConn.setTruststorePass(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASS));
+				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.STARTUP_CONNECT));
+				restConn.setStartupDump(jsonConnection.getBoolean(ConnectionKey.STARTUP_DUMP));
+				restConn.setMaxPollResultSize(jsonConnection.getString(ConnectionKey.MAX_POLL_RESULT_SIZE));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

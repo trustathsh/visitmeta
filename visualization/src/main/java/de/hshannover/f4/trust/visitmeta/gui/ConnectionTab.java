@@ -51,7 +51,7 @@ import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class ConnectionTab extends JPanel {
@@ -74,7 +74,7 @@ public class ConnectionTab extends JPanel {
 	private Timer mTimerPropertiesShow;
 	private Timer mTimerPropertiesHide;
 
-	private RESTConnection mRestConnection;
+	private RestConnection mRestConnection;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -258,7 +258,7 @@ public class ConnectionTab extends JPanel {
 		mWindowNodeProperties.setVisible(false);
 	}
 
-	public RESTConnection getRestConnection(){
+	public RestConnection getRestConnection(){
 		return mRestConnection;
 	}
 }

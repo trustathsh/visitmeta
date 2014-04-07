@@ -1,11 +1,26 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import java.net.URI;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+
+import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-import de.hshannover.f4.trust.visitmeta.network.RestConnectionFactory;
+import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 
-public class RESTConnection {
+public class RestConnection {
+
+	private static final Logger log = Logger.getLogger(RestConnection.class);
 
 	private static final String DEFAULT_URL = "https://localhost:8443";
 
@@ -23,38 +38,77 @@ public class RESTConnection {
 	private DataserviceConnection mDataserviceConnection;
 
 
-	public RESTConnection(DataserviceConnection dataConnection, String name){
+	public RestConnection(DataserviceConnection dataConnection, String name){
 		setConnectionName(name);
 		setDataserviceConnection(dataConnection);
 	}
 
 	public void startDump(){
-		RestConnectionFactory.startDump(this);
+		log.trace("send startDump request...");
+		String response = buildWebResource().path(getConnectionName()).path("dump/start").put(String.class);
+		log.info("startDump response: " + response);
 	}
 
 	public void stopDump(){
-		RestConnectionFactory.stopDump(this);
+		log.trace("send stopDump request...");
+		String response = buildWebResource().path(getConnectionName()).path("dump/stop").put(String.class);
+		log.info("stopDump response: " + response);
 	}
 
 	public void connect(){
-		RestConnectionFactory.connect(this);
+		log.trace("send connect request...");
+		String response = buildWebResource().path(getConnectionName()).path("connect").put(String.class);
+		log.info("connect response: " + response);
 	}
 
 	public void disconnect(){
-		RestConnectionFactory.disconnect(this);
+		log.trace("send disconnect request...");
+		String response = buildWebResource().path(getConnectionName()).path("disconnect").put(String.class);
+		log.info("disconnect response: " + response);
 	}
 
 	public WebResource getGraphResource(){
-		return RestConnectionFactory.getGraphResource(this);
+		return buildWebResource().path(getConnectionName()).path("graph");
 	}
 
 	public void saveInDataservice(){
-		RestConnectionFactory.saveInDataservice(this);
+		JSONObject jObj = new JSONObject();
+		try {
+
+			jObj.put(ConnectionKey.NAME, getConnectionName());
+			jObj.put(ConnectionKey.URL, getUrl());
+			jObj.put(ConnectionKey.USER_NAME, getUsername());
+			jObj.put(ConnectionKey.USER_PASSWORD, getPassword());
+			jObj.put(ConnectionKey.AUTHENTICATION_BASIC, isAuthenticationBasic());
+			jObj.put(ConnectionKey.TRUSTSTORE_PATH, getTruststorePath());
+			jObj.put(ConnectionKey.TRUSTSTORE_PASS, getTruststorePass());
+			jObj.put(ConnectionKey.STARTUP_CONNECT, isStartupConnect());
+			jObj.put(ConnectionKey.STARTUP_DUMP, isStartupDump());
+			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, getMaxPollResultSize());
+
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+		try{
+			buildWebResource().type(MediaType.APPLICATION_JSON).put(jObj);
+		}catch (UniformInterfaceException e){
+			log.error("error while saveInDataservice()", e);
+		}
+	}
+
+	private WebResource buildWebResource() {
+		ClientConfig config = new DefaultClientConfig();
+		Client client = Client.create(config);
+
+		URI uri_connect = UriBuilder.fromUri(getDataserviceConnection().getUrl()).build();
+		WebResource resource = client.resource(uri_connect);
+		return resource;
 	}
 
 	@Override
-	public RESTConnection clone() {
-		RESTConnection tmp = new RESTConnection(mDataserviceConnection, getConnectionName() + "(clone)");
+	public RestConnection clone() {
+		RestConnection tmp = new RestConnection(getDataserviceConnection(), getConnectionName() + "(clone)");
 		tmp.setUrl(getUrl());
 		tmp.setUsername(getUsername());
 		tmp.setPassword(getPassword());

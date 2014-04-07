@@ -45,9 +45,8 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.network.DataserviceConnectionFactory;
-import de.hshannover.f4.trust.visitmeta.network.RestConnectionFactory;
 
 public class ConnectionDialog extends JDialog{
 
@@ -286,12 +285,12 @@ public class ConnectionDialog extends JDialog{
 
 		private static final long serialVersionUID = -7620433767757449461L;
 
-		private JList<RESTConnection> mJlMapServerConnections;
-		private DefaultListModel<RESTConnection> mListModelMapServer;
+		private JList<RestConnection> mJlMapServerConnections;
+		private DefaultListModel<RestConnection> mListModelMapServer;
 
 		private MapServerParameterPanel mParameterPanel;
 
-		private RESTConnection mPreviousConnection;
+		private RestConnection mPreviousConnection;
 
 		private JComboBox<DataserviceConnection> mJcbDataServiceConnection;
 		private JLabel mJlDataservice;
@@ -340,7 +339,7 @@ public class ConnectionDialog extends JDialog{
 			mJlMapServerConnections.addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
-					RESTConnection param = mJlMapServerConnections.getSelectedValue();
+					RestConnection param = mJlMapServerConnections.getSelectedValue();
 					if (param != null) {
 						if(mPreviousConnection != null){
 							updateRestConnection(mPreviousConnection);
@@ -359,7 +358,7 @@ public class ConnectionDialog extends JDialog{
 				public void actionPerformed(ActionEvent arg0) {
 					String name = "NewConnection" + (mListModelMapServer.getSize() + 1);
 
-					RESTConnection param = new RESTConnection((DataserviceConnection) mJcbDataServiceConnection.getSelectedItem(), name);
+					RestConnection param = new RestConnection((DataserviceConnection) mJcbDataServiceConnection.getSelectedItem(), name);
 					param.setAuthenticationBasic(true);
 
 					mListModelMapServer.add(mListModelMapServer.getSize(), param);
@@ -390,7 +389,7 @@ public class ConnectionDialog extends JDialog{
 			mJbCopy.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					RESTConnection param =  mJlMapServerConnections.getSelectedValue().clone();
+					RestConnection param =  mJlMapServerConnections.getSelectedValue().clone();
 					mListModelMapServer.add(mListModelMapServer.getSize(), param);
 					mJlMapServerConnections.setSelectedIndex(mListModelMapServer.getSize() - 1);
 				}
@@ -401,13 +400,13 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(mJtpMain.getSelectedComponent() == mConnectionPanelMapServer){
-						RESTConnection tmpCon = mJlMapServerConnections.getSelectedValue();
+						RestConnection tmpCon = mJlMapServerConnections.getSelectedValue();
 
 						updateRestConnection(tmpCon);
 
 						tmpCon.saveInDataservice();
 
-						GraphContainer connection = new GraphContainer(tmpCon.getConnectionName(), tmpCon.getDataserviceConnection());
+						GraphContainer connection = new GraphContainer(tmpCon.getConnectionName(), tmpCon);
 						mGuiController.addConnection(connection);
 
 						log.info("new Map-Server connection is stored");
@@ -438,14 +437,14 @@ public class ConnectionDialog extends JDialog{
 			log.info("Update connection list from Dataservice(" + dConnection.getName() + ")");
 			mListModelMapServer.removeAllElements();
 
-			List<RESTConnection> connectionList = RestConnectionFactory.getAllConnectionsFrom(dConnection);
+			List<RestConnection> connectionList = dConnection.loadRestConnections();
 
-			for(RESTConnection rConnection: connectionList){
+			for(RestConnection rConnection: connectionList){
 				mListModelMapServer.addElement(rConnection);
 			}
 		}
 
-		private void updateRestConnection(RESTConnection restConnection){
+		private void updateRestConnection(RestConnection restConnection){
 			restConnection.setConnectionName(mParameterPanel.mJtfName.getText().trim());
 			restConnection.setUrl(mParameterPanel.mJtfUrl.getText().trim());
 			restConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
@@ -469,9 +468,9 @@ public class ConnectionDialog extends JDialog{
 		@Override
 		protected JList<?> getConnectionList() {
 			if(mJlMapServerConnections == null){
-				mListModelMapServer = new DefaultListModel<RESTConnection>();
+				mListModelMapServer = new DefaultListModel<RestConnection>();
 
-				mJlMapServerConnections = new JList<RESTConnection>();
+				mJlMapServerConnections = new JList<RestConnection>();
 				mJlMapServerConnections.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				mJlMapServerConnections.setBorder(new LineBorder(SystemColor.activeCaptionBorder));
 				mJlMapServerConnections.setModel(mListModelMapServer);
@@ -725,7 +724,7 @@ public class ConnectionDialog extends JDialog{
 			addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJcbDump, lblInsets);
 		}
 
-		private void updatePanel(RESTConnection restConnection){
+		private void updatePanel(RestConnection restConnection){
 			mJtfName.setText(restConnection.getConnectionName());
 			mJtfUrl.setText(restConnection.getUrl());
 			mJtfUsername.setText(restConnection.getUsername());

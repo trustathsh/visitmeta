@@ -48,6 +48,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 
 /**
@@ -82,8 +83,10 @@ public final class Main {
 
 		if(vConnectionType == ConnectionType.REST){
 			for(DataserviceConnection dc : mDataserviceConnections) {
-				GraphContainer tmpCon = new GraphContainer(dc.getName(), dc);
-				gui.addConnection(tmpCon);
+				for(RestConnection rest: dc.loadRestConnections()){
+					GraphContainer tmpCon = new GraphContainer(rest.getConnectionName(), rest);
+					gui.addConnection(tmpCon);
+				}
 			}
 			gui.show();
 		}
@@ -93,10 +96,10 @@ public final class Main {
 		mDataserviceConnections = new ArrayList<DataserviceConnection>();
 
 		int count = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
-		for(int i=0; i<count; i++){
-			String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), "localhost");
-			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), "http://localhost:8000");
-			boolean rawXml = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), "true").toLowerCase());
+		for(int i=1; i<=count; i++){
+			String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), null);
+			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), null);
+			boolean rawXml = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), null).toLowerCase());
 
 			DataserviceConnection tmpConnection = new DataserviceConnection(name, url, rawXml);
 			mDataserviceConnections.add(tmpConnection);

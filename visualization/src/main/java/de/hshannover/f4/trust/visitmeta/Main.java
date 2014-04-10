@@ -84,7 +84,7 @@ public final class Main {
 		if(vConnectionType == ConnectionType.REST){
 			for(DataserviceConnection dc : mDataserviceConnections) {
 				for(RestConnection rest: dc.loadRestConnections()){
-					GraphContainer tmpCon = new GraphContainer(rest.getConnectionName(), rest);
+					GraphContainer tmpCon = new GraphContainer(rest);
 					gui.addConnection(tmpCon);
 				}
 			}

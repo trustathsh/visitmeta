@@ -225,6 +225,8 @@ public class MainWindow extends JFrame {
 					}
 					if (!alreadyOpen) {
 						mTabbedConnectionPane.add(tmpTab.getConnName(), tmpTab);
+					} else {
+						mTabbedConnectionPane.setSelectedComponent(tmpTab);
 					}
 				}
 

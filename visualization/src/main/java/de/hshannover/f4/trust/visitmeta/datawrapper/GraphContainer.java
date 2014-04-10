@@ -30,8 +30,8 @@ public class GraphContainer {
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
 
-	public GraphContainer(String name, RestConnection restConnection) {
-		mName = name;
+	public GraphContainer(RestConnection restConnection) {
+		mName = restConnection.getDataserviceConnection().getName() + ":" + restConnection.getConnectionName();
 		mTimeHolder = new TimeHolder(this);
 		mTimeSelector = new TimeSelector(this);
 		mSettingManager = new SettingManager(this);

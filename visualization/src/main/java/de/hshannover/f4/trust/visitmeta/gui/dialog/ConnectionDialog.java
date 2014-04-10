@@ -406,7 +406,7 @@ public class ConnectionDialog extends JDialog{
 
 						tmpCon.saveInDataservice();
 
-						GraphContainer connection = new GraphContainer(tmpCon.getConnectionName(), tmpCon);
+						GraphContainer connection = new GraphContainer(tmpCon);
 						mGuiController.addConnection(connection);
 
 						log.info("new Map-Server connection is stored");

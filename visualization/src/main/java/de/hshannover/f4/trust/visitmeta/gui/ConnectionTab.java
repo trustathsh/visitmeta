@@ -88,7 +88,7 @@ public class ConnectionTab extends JPanel {
 		super();
 		LOGGER.trace("Init ConnectionTab for the Connection " + connection.getName());
 
-		mName = connection.getRestConnection().getConnectionName();
+		mName = connection.getName();
 		mConnected = true;
 		mConnection = connection;
 		mRestConnection = mConnection.getRestConnection();

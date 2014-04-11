@@ -104,7 +104,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	private Color mColorEdge             = null;
 	private Color mColorNewNode          = null;
 	private Color mColorDeleteNode       = null;
-	private Color mTransparency          = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+//	private Color mTransparency          = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	private List<String> mPublisher      = new ArrayList<>();
 /* Constructors ***************************************************************/
@@ -347,25 +347,25 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * @param pNodeFirst the node where the edge starts.
 	 * @param pNodeSecond the node where the edge ends.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	private void addEdge(NodeMetadata pKey, Position pNodeFirst, Position pNodeSecond) {
 		LOGGER.trace("Method addEdge(" + pKey + ", " + pNodeFirst + ", " + pNodeSecond + ") called.");
 		PPath      vEdge       = new PPath();
 		PComposite vNodeFirst  = mMapNode.get(pNodeFirst);
 		PComposite vNodeSecond = mMapNode.get(pNodeSecond);
 		/* Add Edge to Node. */
-		((ArrayList)vNodeFirst.getAttribute("edges")).add(vEdge);
-		((ArrayList)vNodeSecond.getAttribute("edges")).add(vEdge);
+		((ArrayList<PPath>)vNodeFirst.getAttribute("edges")).add(vEdge);
+		((ArrayList<PPath>)vNodeSecond.getAttribute("edges")).add(vEdge);
 		/* Add Node to Edge. */
 		vEdge.addAttribute("nodes", new ArrayList<PComposite>());
-		((ArrayList)vEdge.getAttribute("nodes")).add(vNodeFirst);
-		((ArrayList)vEdge.getAttribute("nodes")).add(vNodeSecond);
+		((ArrayList<PComposite>)vEdge.getAttribute("nodes")).add(vNodeFirst);
+		((ArrayList<PComposite>)vEdge.getAttribute("nodes")).add(vNodeSecond);
 		/* Add edge to layer. */
 		mLayerEdge.addChild(vEdge);
 		/* Add edge to HashMap. */
 		ArrayList<PPath> vEdges = mMapEdge.get(pKey);
 		if(vEdges == null) { // Is fist entry?
-			vEdges = new ArrayList<>();
+			vEdges = new ArrayList<PPath>();
 			mMapEdge.put(pKey, vEdges);
 		}
 		vEdges.add(vEdge);
@@ -397,7 +397,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * The the position of a node and its edges.
 	 * @param pNode the node in the graph.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void updatePosition(final Position pNode) {
 		LOGGER.trace("Method updatePosition(" + pNode + ") called.");
 		if(!pNode.isInUse()) {
@@ -437,7 +437,7 @@ public class Piccolo2DPanel implements GraphPanel {
 								/* Set position of the node. */
 								super.activityStep(time);
 								/* Redraw edges. */
-								ArrayList<PPath> vEdges = (ArrayList) vNode.getAttribute("edges");
+								ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
 								for(PPath vEdge : vEdges) {
 									updateEdge(vEdge);
 								}
@@ -449,7 +449,7 @@ public class Piccolo2DPanel implements GraphPanel {
 					} else {
 						final PComposite vNode =  mMapNode.get(pNode);
 						vNode.setOffset(vX, vY);
-						ArrayList<PPath> vEdges = (ArrayList) vNode.getAttribute("edges");
+						ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
 						for(PPath vEdge : vEdges) {
 							updateEdge(vEdge);
 						}
@@ -462,12 +462,12 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * Redraw a edge with the new position on the panel.
 	 * @param pEdge the edge to redraw.
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public void updateEdge(PPath pEdge) {
 		LOGGER.trace("Method updateEdge(" + pEdge + ") called.");
 		synchronized (pEdge) {
-			PNode       vNode1  = (PComposite) ((ArrayList)pEdge.getAttribute("nodes")).get(0);
-			PNode       vNode2  = (PComposite) ((ArrayList)pEdge.getAttribute("nodes")).get(1);
+			PNode       vNode1  = (PComposite) ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(0);
+			PNode       vNode2  = (PComposite) ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(1);
 			Point2D     vStart  = vNode1.getFullBoundsReference().getCenter2D();
 			Point2D     vEnd    = vNode2.getFullBoundsReference().getCenter2D();
 			pEdge.reset();
@@ -583,7 +583,7 @@ public class Piccolo2DPanel implements GraphPanel {
 		vShadow.setPaint(createGradientColor(
 				vShadow,
 				pHighlight,
-				mColorBackground // TODO Transparency dosn't work.
+				mColorBackground // TODO mTransparency dosn't work.
 		));
 		vShadow.setTransparency(0.0f);
 		synchronized (pNode) {

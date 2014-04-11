@@ -40,7 +40,10 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -48,8 +51,11 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -82,6 +88,7 @@ public class MainWindow extends JFrame {
 	private DefaultMutableTreeNode mTreeRoot = null;
 	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
+	private ImageIcon[] mCancelIcon = null;
 
 	/**
 	 * 
@@ -108,13 +115,13 @@ public class MainWindow extends JFrame {
 		}
 	}
 
-	private void addConnectionTabTreeNode(ConnectionTab connection){
+	private void addConnectionTabTreeNode(ConnectionTab connection) {
 		String dataserviceName = connection.getRestConnection().getDataserviceConnection().getName();
 
-		for(int i=0; i<mTreeRoot.getChildCount(); i++){
+		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
 			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot.getChildAt(i);
 			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode.getUserObject();
-			if(tmpDataserviceConnection.getName().equals(dataserviceName)){
+			if (tmpDataserviceConnection.getName().equals(dataserviceName)) {
 				tmpNode.add(new DefaultMutableTreeNode(connection));
 				mConnectionTree.updateUI();
 				return;
@@ -124,7 +131,7 @@ public class MainWindow extends JFrame {
 		addDataserviceTreeNode(connection);
 	}
 
-	private void addDataserviceTreeNode(ConnectionTab connection){
+	private void addDataserviceTreeNode(ConnectionTab connection) {
 		DataserviceConnection dc = connection.getRestConnection().getDataserviceConnection();
 		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(dc);
 		mTreeRoot.add(newNode);
@@ -224,7 +231,7 @@ public class MainWindow extends JFrame {
 						}
 					}
 					if (!alreadyOpen) {
-						mTabbedConnectionPane.add(tmpTab.getConnName(), tmpTab);
+						addClosableTab(tmpTab);
 					} else {
 						mTabbedConnectionPane.setSelectedComponent(tmpTab);
 					}
@@ -238,6 +245,53 @@ public class MainWindow extends JFrame {
 		mLeftMainPanel = new JPanel();
 		mLeftMainPanel.setLayout(new GridLayout());
 		mLeftMainPanel.add(mConnectionScrollPane);
+	}
+
+	/**
+	 * Adds a component to a JTabbedPane with a little "close tab" button on the
+	 * right side of the tab.
+	 * 
+	 * @param cTab
+	 *            the ConnectionTab that should be added
+	 */
+	private void addClosableTab(final ConnectionTab cTab) {
+		if (mCancelIcon == null) {
+			mCancelIcon = new ImageIcon[2];
+			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader().getResource("close.png").getPath());
+			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader().getResource("closeHover.png").getPath());
+		}
+		mTabbedConnectionPane.addTab(null, cTab);
+		int pos = mTabbedConnectionPane.indexOfComponent(cTab);
+
+		FlowLayout f = new FlowLayout(FlowLayout.CENTER, 5, 0);
+
+		JPanel pnlTab = new JPanel(f);
+		pnlTab.setOpaque(false);
+
+		JButton btnClose = new JButton();
+		btnClose.setOpaque(false);
+
+		btnClose.setRolloverIcon(mCancelIcon[1]);
+		btnClose.setRolloverEnabled(true);
+		btnClose.setIcon(mCancelIcon[0]);
+
+		btnClose.setBorder(null);
+		btnClose.setFocusable(false);
+
+		pnlTab.add(new JLabel(cTab.getConnName()));
+		pnlTab.add(btnClose);
+
+		mTabbedConnectionPane.setTabComponentAt(pos, pnlTab);
+
+		ActionListener listener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mTabbedConnectionPane.remove(cTab);
+			}
+		};
+		btnClose.addActionListener(listener);
+
+		mTabbedConnectionPane.setSelectedComponent(cTab);
 	}
 
 	/**

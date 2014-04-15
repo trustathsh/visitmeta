@@ -60,7 +60,6 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 public class WindowSettings extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(WindowSettings.class);
 	@SuppressWarnings("unused")
 	private GuiController  mController                   = null;
@@ -160,6 +159,7 @@ public class WindowSettings extends JFrame {
 				}
 				/* Save changes and notify observers */
 				if(hasChanged) {
+					LOGGER.debug("Save changed window settings.");
 					if(vNetworkInterval > 0) {
 						mSettingManager.setNetworkInterval(vNetworkInterval);
 						mNetworkInterval = mInputNetworkInterval.getText();

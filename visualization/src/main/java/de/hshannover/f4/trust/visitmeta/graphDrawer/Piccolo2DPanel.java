@@ -288,13 +288,13 @@ public class Piccolo2DPanel implements GraphPanel {
 	private void addMetadata(NodeMetadata pNode) {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if(!mMapNode.containsKey(pNode)) {
-			String vType = pNode.getMetadata().getMetadata().getTypeName();
-			final String vPublisher = pNode.getMetadata().getMetadata().valueFor("/meta:" + vType + "[@ifmap-publisher-id]");
+			String vType = pNode.getMetadata().getTypeName();
+			final String vPublisher = pNode.getMetadata().valueFor("/meta:" + vType + "[@ifmap-publisher-id]");
 			if(!mPublisher.contains(vPublisher)) {
 				mPublisher.add(vPublisher);
 			}
 			/* Text */
-			PText vText = new PText(pNode.getMetadata().getMetadata().getTypeName());
+			PText vText = new PText(pNode.getMetadata().getTypeName());
 			vText.setTextPaint(getColorText(vPublisher));
 			/* Rectangle */
 			final PPath vNode = PPath.createRectangle(

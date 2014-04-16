@@ -55,6 +55,9 @@ public class Edge2D{
 
 	// ///////////////////////////////////////////////////////////////////////////////////// MEMBERS
 
+	protected static int        idCount = 0;
+	protected int               mId;
+
 	private Node2D              mStart;
 	private Node2D              mEnd;
 	private int                 mLength;
@@ -64,6 +67,7 @@ public class Edge2D{
 	// //////////////////////////////////////////////////////////////////////////////// CONSTRUCTORS
 
 	public Edge2D(Node2D start, Node2D end){
+		mId = ++idCount;
 		mStart = start;
 		mEnd = end;
 		mLength = 0;
@@ -71,6 +75,7 @@ public class Edge2D{
 
 
 	public Edge2D(Node2D start, Node2D end, int length){
+		mId = ++idCount;
 		mStart = start;
 		mEnd = end;
 		mLength = length;
@@ -125,6 +130,14 @@ public class Edge2D{
 	public void setLength(int length){
 		LOGGER.trace("Method getLength(" + length + ") called.");
 		mLength = length;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////////// SUPER
+
+	@Override
+	public String toString(){
+		LOGGER.trace("Method toString() called.");
+		return "E" + mId;
 	}
 
 }

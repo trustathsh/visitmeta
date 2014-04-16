@@ -49,7 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
@@ -176,6 +178,7 @@ public class Graph2D{
 		mLayout2D.reset();
 
 		adjustAllNodes(mIterations, false, true);
+//		adjustAllNodes(mIterations, false, false);	// TODO <VA>: Don't pin picked nodes (not working)
 	}
 
 
@@ -314,6 +317,7 @@ public class Graph2D{
 		}
 
 		adjustAllNodes(iterations, false, true);
+//		adjustAllNodes(mIterations, false, false);	// TODO <VA>: Don't pin picked nodes (not working)
 
 		mLayout2D.reset();
 	}
@@ -1043,6 +1047,21 @@ public class Graph2D{
 		return edges;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////////////////// SUPER
+
+	@Override
+	public String toString(){
+		LOGGER.trace("Method toString() called.");
+		String result = "\n* Vertices:  ";
+		for (Node2D vertex : mGraph.getVertices()) {
+			result += "  " + vertex;
+		}
+		result += "\n* Edges:  ";
+		for (Edge2D edge : mGraph.getEdges()) {
+			result += "  " + edge + "(" + edge.getStart() + "," + edge.getEnd() +")";
+		}
+		return result;
+	}
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
 }

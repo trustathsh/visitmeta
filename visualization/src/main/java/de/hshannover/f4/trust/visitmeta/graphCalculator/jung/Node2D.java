@@ -56,6 +56,9 @@ public abstract class Node2D{
 	// ///////////////////////////////////////////////////////////////////////////////////// MEMBERS
 
 
+	protected static int        idCount = 0;
+	protected int               mId;
+
 	private Position            mPiccoloPosition;
 	protected Layout2D          mLayout2D;
 
@@ -72,6 +75,7 @@ public abstract class Node2D{
 	// //////////////////////////////////////////////////////////////////////////////// CONSTRUCTORS
 
 	public Node2D(Position piccoloPosition, Layout2D layout2D){
+		mId = ++idCount;
 		mPiccoloPosition = piccoloPosition;
 		mLayout2D        = layout2D;
 		mEdge2DIn        = null;

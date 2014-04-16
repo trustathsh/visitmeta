@@ -138,6 +138,9 @@ public class JungCalculator implements Calculator {
 		/* Add data to jung */
 		mGraph2D.addRemoveNodesLinksMetadatas(uc);
 		//mGraph2D.adjustNewNodes(100);
+		LOGGER.debug("Resulting Graph2D (node maps): " + mGraph2D.getAllNodesCount() + " nodes, "
+				+ mGraph2D.getAllEdges().size() + " edges");
+		LOGGER.debug("Resulting Graph2D (JUNG graph): " + mGraph2D);
 	}
 
 	@Override

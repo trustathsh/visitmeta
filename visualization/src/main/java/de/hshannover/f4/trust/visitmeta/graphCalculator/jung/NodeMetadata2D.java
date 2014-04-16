@@ -103,12 +103,10 @@ public class NodeMetadata2D extends Node2D{
 		return mNodeMetadata;
 	}
 
-
-
 	@Override
 	public String toString(){
 		LOGGER.trace("Method toString() called.");
-		return mNodeMetadata.getMetadata().getTypeName();
+		return "Vm" + mId + "|" + mNodeMetadata.getMetadata().getTypeName();
 	}
 
 	@Override

@@ -47,7 +47,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
-import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 
 /**
  * Pool class that contains a mapping of all Metadata to NodeMetadata in the current layout.
@@ -57,7 +57,7 @@ public class PoolNodeMetadata {
 
 	private static final Logger LOGGER = Logger.getLogger(PoolNodeMetadata.class);
 
-	private static HashMap<Metadata,NodeMetadata> mPoolMetadataActive  = new HashMap<Metadata,NodeMetadata>();
+	private static HashMap<RichMetadata,NodeMetadata> mPoolMetadataActive  = new HashMap<RichMetadata,NodeMetadata>();
 //	private static HashMap<Metadata,NodeMetadata> mPoolMetadataSuspend = new HashMap<Metadata,NodeMetadata>();
 
 	/**
@@ -66,7 +66,7 @@ public class PoolNodeMetadata {
 	 * @return the NodeMetadata (active) or
 	 *         Null if the NodeMetadta doesn't exist.
 	 */
-	public static NodeMetadata getActive(Metadata metadata) {
+	public static NodeMetadata getActive(RichMetadata metadata) {
 		LOGGER.trace("Method getActive(" + metadata + ") called.");
 		return mPoolMetadataActive.get(metadata);
 	}
@@ -86,7 +86,7 @@ public class PoolNodeMetadata {
 //		return result;
 //	}
 
-	public static HashMap<Metadata,NodeMetadata> get() {
+	public static HashMap<RichMetadata,NodeMetadata> get() {
 		LOGGER.trace("Method get() called.");
 		return mPoolMetadataActive;
 	}
@@ -95,7 +95,7 @@ public class PoolNodeMetadata {
 	 * Suspend a NodeMetadata.
 	 * @param metadata the Metadata that reference the NodeMetadata.
 	 */
-	public static void release(Metadata metadata) {
+	public static void release(RichMetadata metadata) {
 		LOGGER.trace("Method release(" + metadata + ") called.");
 //		mPoolMetadataSuspend.put(metadata, mPoolMetadataActive.get(metadata));
 		mPoolMetadataActive.remove(metadata);
@@ -115,9 +115,10 @@ public class PoolNodeMetadata {
 	 * @param metadata the Metadata for the NodeMetadata.
 	 * @return the new NodeMetadata or null if the NodeMetadata already existed.
 	 */
-	public static NodeMetadata create(Metadata metadata) {
-		LOGGER.trace("Method create(" + metadata + ") called.");
+	public static NodeMetadata create(RichMetadata metadata) {
+		LOGGER.debug("Method create(" + metadata + ") called.");
 		if(mPoolMetadataActive.containsKey(metadata)) {
+			LOGGER.debug("Found existing metadata in create(metadata).");
 			return null;
 		} else {
 			LOGGER.debug("Create new metadata.");
@@ -158,10 +159,10 @@ public class PoolNodeMetadata {
 	 * @return the new NodeMetadata or the already existing NodeMetadata (active).
 	 *         Null if the NodeMetadata is suspend.
 	 */
-	public static NodeMetadata createOrGet(Metadata metadata) {
-		LOGGER.trace("Method createOrGet(" + metadata + ") called.");
+	public static NodeMetadata createOrGet(RichMetadata metadata) {
+		LOGGER.debug("Method createOrGet(" + metadata + ") called.");
 		if(mPoolMetadataActive.containsKey(metadata)) {
-			LOGGER.debug("Found existing metadata.");
+			LOGGER.debug("Found existing metadata in createOrGet(metadata).");
 			return getActive(metadata);
 		} else {
 			LOGGER.debug("Create new metadata.");

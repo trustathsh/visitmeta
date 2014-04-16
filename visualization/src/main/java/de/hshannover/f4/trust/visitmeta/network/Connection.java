@@ -52,6 +52,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
@@ -116,12 +117,12 @@ public class Connection {
 			}
 			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataIdentifier().values()) {
 				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getMetadata());
+					PoolNodeMetadata.release(vMetadata.getRichMetadata());
 				}
 			}
 			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataLinks().values()) {
 				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getMetadata());
+					PoolNodeMetadata.release(vMetadata.getRichMetadata());
 				}
 			}
 		}
@@ -282,7 +283,7 @@ public class Connection {
 					}
 					/* Add new Metadata */
 					for(Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.create(metadata);
+						NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, identifier));
 						if(tmpMetadata != null) {
 							LOGGER.debug("New metadata of an identifier.");
 							listMetadata.add(tmpMetadata);
@@ -312,7 +313,7 @@ public class Connection {
 						}
 						/* Add new Metadata */
 						for(Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.create(metadata);
+							NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, link));
 							if(tmpMetadata != null) {
 								LOGGER.debug("New metadata of an link.");
 								listMetadata.add(tmpMetadata);
@@ -356,7 +357,7 @@ public class Connection {
 					}
 					/* Add old Metadata */
 					for(Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(metadata);
+						NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, identifier));
 						if(tmpMetadata != null) {
 							LOGGER.debug("Delete metadata of an identifer.");
 							listMetadata.add(tmpMetadata);
@@ -385,7 +386,7 @@ public class Connection {
 						}
 						/* Add old Metadata */
 						for(Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(metadata);
+							NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, link));
 							if(tmpMetadata != null && !listMetadata.contains(tmpMetadata)) {
 								LOGGER.debug("Delete metadata of a link.");
 								listMetadata.add(tmpMetadata);

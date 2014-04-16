@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
@@ -127,7 +128,7 @@ public class PoolExpandedLink {
 			LOGGER.debug("Create new link.");
 			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
 			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(metadata);
+				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
 				metaList.add(nodeMetadata);
 			}
 			ExpandedLink expandedLink = new ExpandedLink(
@@ -191,7 +192,7 @@ public class PoolExpandedLink {
 			LOGGER.debug("Create new link.");
 			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
 			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(metadata);
+				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
 				metaList.add(nodeMetadata);
 			}
 			ExpandedLink expandedLink = new ExpandedLink(

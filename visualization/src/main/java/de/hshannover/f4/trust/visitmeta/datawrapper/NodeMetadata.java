@@ -53,20 +53,40 @@ public class NodeMetadata extends Position {
 
 	private static final Logger LOGGER = Logger.getLogger(NodeMetadata.class);
 
-	private Metadata mMetadata;
+	private RichMetadata mMetadata;
 
-	public NodeMetadata(Metadata metadata) {
+	public NodeMetadata(RichMetadata metadata) {
 		super();
 		mMetadata = metadata;
 	}
 
 	public Metadata getMetadata() {
 		LOGGER.trace("Method getMetadata() called.");
+		return mMetadata.getMetadata();
+	}
+
+	/**
+	 * Deprecated, use setRichMetadata instead.
+	 */
+	@Deprecated
+	public void setMetadata(Metadata metadata) {
+		LOGGER.trace("Method setMetadata(" + metadata + ") called.");
+		mMetadata = new RichMetadata(metadata);
+		setChanged();
+		notifyObservers();
+	}
+
+	public RichMetadata getRichMetadata() {
+		LOGGER.trace("Method getRichMetadata() called.");
 		return mMetadata;
 	}
 
-	public void setMetadata(Metadata metadata) {
-		LOGGER.trace("Method setMetadata(" + metadata + ") called.");
+	/**
+	 * Set metadata as RichMetadata, i.e., metadata with corresponding identifier or link
+	 * (depending on metadata type)
+	 */
+	public void setRichMetadata(RichMetadata metadata) {
+		LOGGER.trace("Method setRichMetadata(" + metadata + ") called.");
 		mMetadata = metadata;
 		setChanged();
 		notifyObservers();

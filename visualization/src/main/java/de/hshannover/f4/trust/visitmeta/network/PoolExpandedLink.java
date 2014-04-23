@@ -97,8 +97,8 @@ public class PoolExpandedLink {
 	}
 
 	/**
-	 * Suspend a NodeIdentifier.
-	 * @param link the Identifier that reference the NodeIdentifier.
+	 * Suspend an ExpandedLink.
+	 * @param link the Link that references the ExpandedLink.
 	 */
 	public static void release(Link link) {
 		LOGGER.trace("Method release(" + link + ") called.");
@@ -107,7 +107,7 @@ public class PoolExpandedLink {
 	}
 
 	/**
-	 * Suspend all NodeIdentifier.
+	 * Suspend all ExpandedLinks.
 	 */
 	public static void clear() {
 		LOGGER.trace("Method clear() called.");

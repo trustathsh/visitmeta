@@ -116,7 +116,7 @@ public class PoolNodeMetadata {
 	 * @return the new NodeMetadata or null if the NodeMetadata already existed.
 	 */
 	public static NodeMetadata create(RichMetadata metadata) {
-		LOGGER.debug("Method create(" + metadata + ") called.");
+		LOGGER.trace("Method create(" + metadata + ") called.");
 		if(mPoolMetadataActive.containsKey(metadata)) {
 			LOGGER.debug("Found existing metadata in create(metadata).");
 			return null;
@@ -154,13 +154,13 @@ public class PoolNodeMetadata {
 //	}
 
 	/**
-	 * Create or get a Nodemetadata.
+	 * Create or get a NodeMetadata.
 	 * @param metadata the Metadata for the NodeMetadata.
 	 * @return the new NodeMetadata or the already existing NodeMetadata (active).
 	 *         Null if the NodeMetadata is suspend.
 	 */
 	public static NodeMetadata createOrGet(RichMetadata metadata) {
-		LOGGER.debug("Method createOrGet(" + metadata + ") called.");
+		LOGGER.trace("Method createOrGet(" + metadata + ") called.");
 		if(mPoolMetadataActive.containsKey(metadata)) {
 			LOGGER.debug("Found existing metadata in createOrGet(metadata).");
 			return getActive(metadata);

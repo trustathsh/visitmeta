@@ -279,29 +279,30 @@ public class ProxyGraphService implements GraphService {
 			// two identifiers -> link
 			if (identifiers.isArray()) {
 				log.trace("JsonNode contains two identifiers");
+
 				Iterator<JsonNode> ids = identifiers.getElements();
-				IdentifierImpl identifier = null;
 				List<IdentifierImpl> identifierList = new ArrayList<IdentifierImpl>();
 				while (ids.hasNext()) {
 					JsonNode currentIdentifier = ids.next();
-					identifier = (IdentifierImpl) buildIdentifierFromJson(currentIdentifier);
+					IdentifierImpl identifier = (IdentifierImpl) buildIdentifierFromJson(currentIdentifier);
 					identifierList.add(identifier);
 				}
 
-				List<Metadata> metadataList = extractMetadata(metadata);
-
-				IdentifierImpl identifierFound = null;
-				for (IdentifierImpl i : identifierList) {
-					identifierFound = graph.findIdentifier(i);
+				for (IdentifierImpl identifier : identifierList) {
+					IdentifierImpl identifierFound = graph.findIdentifier(identifier);
 					if (identifierFound == null) {
-						log.trace("Identifier not found in graph, inserting: " + i);
-						graph.insert(i);
+						log.trace("Identifier not found in graph, inserting: " + identifier);
+						graph.insert(identifier);
+					}
+					else {
+						identifierList.set(identifierList.indexOf(identifier), identifierFound);
 					}
 				}
 
 				LinkImpl linkImpl = graph.connect(identifierList.get(0), identifierList.get(1));
-				
+
 				log.trace("Adding metadata to link'" + linkImpl + "'");
+				List<Metadata> metadataList = extractMetadata(metadata);
 				for (Metadata m : metadataList) {
 					linkImpl.addMetadata(m);
 				}
@@ -311,25 +312,29 @@ public class ProxyGraphService implements GraphService {
 			// one identifier
 			} else {
 				log.trace("JsonNode contains one identifier");
+
 				// convert Identifier to IdentifierImpl
 				IdentifierImpl identifier = (IdentifierImpl) buildIdentifierFromJson(identifiers);
-				
+
 				// FIXME InternalIdentifier on the client side? bah?!
-				
+				// TODO <VA> Who wrote the above FIXME comment and what shall it mean? Is it already fixed?
+
 				// insert identifier into graph
 				IdentifierImpl identifierFound = graph.findIdentifier(identifier);
 				if (identifierFound == null) {
-//					JsonNode metadata = jsonLink.get(METADATA);
-					List<Metadata> metadataList = extractMetadata(metadata);
-	
-					log.trace("Adding metadata to identifier '" + identifier + "'");
-					for (Metadata m : metadataList) {
-						identifier.addMetadata(m);
-					}
-					
 					log.trace("Identifier not found, inserting: " + identifier);
 					graph.insert(identifier);
 				}
+				else {
+					identifier = identifierFound;
+				}
+
+				log.trace("Adding metadata to identifier '" + identifier + "'");
+				List<Metadata> metadataList = extractMetadata(metadata);
+				for (Metadata m : metadataList) {
+					identifier.addMetadata(m);
+				}
+
 			}
 		}
 	}
@@ -452,6 +457,12 @@ public class ProxyGraphService implements GraphService {
 		log.trace("Method parseJson(...) called.");
 		log.trace("Parameter 'json': " + json);
 		try {
+			// TODO <VA>: debug only, remove later?
+			ObjectMapper mapper = new ObjectMapper();
+			Object jsonObject = mapper.readValue(json, Object.class);
+			String jsonFormatted = mapper.defaultPrettyPrintingWriter().writeValueAsString(jsonObject);
+			log.debug("Parameter 'json' (formatted) in parseJson():\n" + jsonFormatted);
+
 			return mObjectMapper.readTree(json);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("could not parse '"+json+"' as JSON: " + e.getMessage(), e);

@@ -322,7 +322,7 @@ public class Connection {
 							}
 						}
 					} else {
-						/* Identifier is new */
+						/* link is new */
 						LOGGER.debug("New link.");
 						mUpdateContainer.getListAddLinks().add(tmpLink);
 						vResult = true;
@@ -396,6 +396,7 @@ public class Connection {
 						}
 						/* Add empty link to delete list */
 						if(!tmpLink.hasMetadata()) {
+							LOGGER.debug("Delete link.");
 							mUpdateContainer.getListDeleteLinks().add(tmpLink);
 							NodeIdentifier first = tmpLink.getFirst();
 							NodeIdentifier second = tmpLink.getSecond();
@@ -403,7 +404,7 @@ public class Connection {
 							if(first != null) {
 								tmpLink.deleteIdentifier(first);
 								if(!first.hasLinks() && !first.hasMetadata()) {
-									LOGGER.debug("Delete identifier.");
+									LOGGER.debug("Delete first identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(first);
 									vResult = true;
 								}
@@ -411,7 +412,7 @@ public class Connection {
 							if(second != null) {
 								tmpLink.deleteIdentifier(second);
 								if(!second.hasLinks() && !second.hasMetadata()) {
-									LOGGER.debug("Delete identifier.");
+									LOGGER.debug("Delete second identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(second);
 									vResult = true;
 								}
@@ -427,20 +428,32 @@ public class Connection {
 	
 	protected void debugGraphContent(String pGraphType, List<IdentifierGraph> pGraphs) {
 		if(Logger.getRootLogger().getLevel().toInt() < Level.INFO.toInt()) {
+			int vNumberOfGraph      = 0;
 			int vNumberOfIdentifier = 0;
 			int vNumberOfMetadata   = 0;
 			int vNumberOfLinks      = 0;
 			LOGGER.debug("Count content of " + pGraphType +" graph:");
 			/* Count Content */
 			for(IdentifierGraph vGraph : pGraphs) {
+				++vNumberOfGraph;
+				String logResult = "Graph " + vNumberOfGraph;
 				for(Identifier vIdentifier : vGraph.getIdentifiers()) {
 					++vNumberOfIdentifier;
+					logResult += "\n* " + vIdentifier.getTypeName() + " |";
 					vNumberOfMetadata += vIdentifier.getMetadata().size();
+					for (Metadata vMetadata : vIdentifier.getMetadata()) {
+						logResult += " " + vMetadata.getTypeName();
+					}
 					for(Link vLink : vIdentifier.getLinks()) {
 						++vNumberOfLinks;
+						logResult += "\n    link |";
 						vNumberOfMetadata += vLink.getMetadata().size();
+						for (Metadata vMetadata : vLink.getMetadata()) {
+							logResult += " " + vMetadata.getTypeName();
+						}
 					}
 				}
+				LOGGER.debug(logResult);
 			}
 			/* Logging */
 			LOGGER.debug("Graph has " + vNumberOfIdentifier + " references to identifier.");

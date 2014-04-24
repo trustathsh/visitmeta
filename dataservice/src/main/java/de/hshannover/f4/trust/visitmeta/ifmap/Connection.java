@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +63,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifier
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionData;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
@@ -73,6 +71,8 @@ import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
+import de.hshannover.f4.trust.visitmeta.yaml.YamlPersist.OPTIONAL;
+import de.hshannover.f4.trust.visitmeta.yaml.YamlPersist.REQUIRED;
 
 public class Connection {
 
@@ -104,15 +104,34 @@ public class Connection {
 	private Set<String> activeSubscriptions;
 
 	// connection data
+	@REQUIRED
 	private String mConnectionName;
+
+	@REQUIRED
 	private String mUrl;
+
+	@REQUIRED
 	private String mUserName;
+
+	@REQUIRED
 	private String mUserPass;
-	private String mTruststorePath;
-	private String mTruststorePass;
-	private int mMaxPollResultSize;
+
+	@OPTIONAL("DEFAULT_AUTHENTICATION_BASIC")
 	private boolean mAuthenticationBasic;
+
+	@OPTIONAL("DEFAULT_TRUSTSTORE_PATH")
+	private String mTruststorePath;
+
+	@OPTIONAL("DEFAULT_TRUSTSTORE_PASS")
+	private String mTruststorePass;
+
+	@OPTIONAL("DEFAULT_MAX_POLL_RESULT_SIZE")
+	private int mMaxPollResultSize;
+
+	@OPTIONAL("DEFAULT_STARTUP_CONNECT")
 	private boolean mStartupConnect;
+
+	@OPTIONAL("DEFAULT_STARTUP_DUMP")
 	private boolean mStartupDump;
 
 	/**
@@ -150,16 +169,6 @@ public class Connection {
 		activeSubscriptions = new HashSet<String>();
 
 		log.trace("... new Connection() OK");
-	}
-
-	public Connection(ConnectionData data) throws ConnectionException {
-		this(data.mConnectionName, data.mUrl, data.mUserName, data.mUserPass);
-		setAuthenticationBasic(data.mAuthenticationBasic);
-		setTruststorePath(data.mTruststorePath);
-		setTruststorePass(data.mTruststorePass);
-		setMaxPollResultSize(data.mMaxPollResultSize);
-		setStartupConnect(data.mStartupConnect);
-		setStartupDump(data.mStartupDump);
 	}
 
 	/**
@@ -378,14 +387,6 @@ public class Connection {
 		subscribe(request);
 
 		activeSubscriptions.clear();
-	}
-
-	public void persistToProperty() throws IOException{
-		Application.getConnectionsConfig().persistConnection(this);
-	}
-
-	public void deleteFromProprty() throws IOException{
-		Application.getConnectionsConfig().deleteConnection(this);
 	}
 
 	@Override

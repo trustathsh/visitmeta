@@ -40,26 +40,23 @@ package de.hshannover.f4.trust.visitmeta.dataservice;
 
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
-import de.hshannover.f4.trust.ifmapj.messages.Requests;
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionData;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConnectionsReaderWriter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.yaml.ConnectionPersister;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:
@@ -87,7 +84,7 @@ public abstract class Application {
 	/**
 	 * Configuration class for persistent IF-MAPS Connections.
 	 */
-	private static ConnectionsReaderWriter mConnectionsConfig;
+	private static ConnectionPersister mConnectionPersister;
 
 	private static RestService restService;
 
@@ -102,18 +99,23 @@ public abstract class Application {
 
 		initComponents();
 		startRestService();
-		loadPersistentConnections();
+
+		try {
+			loadPersistentConnections();
+		} catch (FileNotFoundException e) {
+			log.error("error while load persistent connections", e);
+		}
 
 		try {
 			startupConnect();
 		} catch (ConnectionException e) {
-			log.error("startupConnect error", e);
+			log.error("error while startupConnect", e);
 		}
 
 		try {
 			startupDump();
 		} catch (ConnectionException e) {
-			log.error("startupDump error", e);
+			log.error("error while startupDump", e);
 		}
 
 		log.info("dataservice started successfully");
@@ -129,57 +131,15 @@ public abstract class Application {
 		ConnectionManager.startupConnect();
 	}
 
-	private static void loadPersistentConnections() {
+	private static void loadPersistentConnections() throws FileNotFoundException {
 		log.info("load persistent connections");
-		List<ConnectionData> connectionList = mConnectionsConfig.getConnectionsData();
+		Map<String, Connection> connectionList = mConnectionPersister.load();
 
-		for(ConnectionData c: connectionList){
+		for(Connection c: connectionList.values()){
 			try {
-				ConnectionManager.add(new Connection(c));
+				ConnectionManager.add(c);
 			} catch (ConnectionException e) {
 				log.error("error while adding connection to the connection pool", e);
-			}
-		}
-	}
-
-	private static void initDefaultConnection() throws ConnectionException {
-		log.trace("init default connection...");
-
-		String url = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_BASIC_AUTH_URL);
-		String userName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_USER);
-		String userPass = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_PASS);
-
-		Connection defaultConnection = new Connection("default3", url, userName, userPass);
-		ConnectionManager.add(defaultConnection);
-
-		if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_CONNECT))){
-			log.debug("connecting at startup");
-			defaultConnection.connect();
-
-			if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_DUMP))){
-				log.debug("start dump at startup");
-				defaultConnection.startDumpingService();
-
-			}else{
-				log.debug("send Subscribe-Update at startup");
-
-				String subscribeName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
-				String identifierType = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
-				String identifier = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
-				int maxDepth = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-				int maxSize = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
-
-				SubscribeRequest request = Requests.createSubscribeReq();
-				SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
-
-				subscribe.setName(subscribeName);
-				subscribe.setMaxDepth(maxDepth);
-				subscribe.setMaxSize(maxSize);
-				subscribe.setStartIdentifier(createStartIdentifier(identifierType, identifier));
-
-				request.addSubscribeElement(subscribe);
-
-				defaultConnection.subscribe(request);
 			}
 		}
 	}
@@ -198,11 +158,11 @@ public abstract class Application {
 			String dbConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
 			String ifmapConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
 			String dsConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
-			String connections = Application.class.getClassLoader().getResource("connections.properties").getPath();
+			String connections = Application.class.getClassLoader().getResource("connections.yml").getPath();
 			mDBConfig = new PropertiesReaderWriter(dbConfig, false);
 			mIFMAPConfig = new PropertiesReaderWriter(ifmapConfig, false);
 			mDSConfig = new PropertiesReaderWriter(dsConfig, false);
-			mConnectionsConfig = new ConnectionsReaderWriter(connections, true);
+			mConnectionPersister = new ConnectionPersister(connections);
 
 			log.info("components initialized");
 
@@ -285,12 +245,12 @@ public abstract class Application {
 	/**
 	 * @return
 	 */
-	public static ConnectionsReaderWriter getConnectionsConfig() {
-		if (mConnectionsConfig == null) {
+	public static ConnectionPersister getConnectionPersister() {
+		if (mConnectionPersister == null) {
 			throw new RuntimeException(
 					"ConnectionsConfig has not been initialized. This is not good!");
 		}
-		return mConnectionsConfig;
+		return mConnectionPersister;
 	}
 
 }

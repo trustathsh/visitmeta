@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -61,6 +61,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
@@ -217,8 +218,8 @@ public class ConnectionResource {
 
 		// persist connection in property
 		try {
-			newConnection.persistToProperty();
-		} catch (IOException e) {
+			Application.getConnectionPersister().persistConnections();
+		} catch (FileNotFoundException e) {
 			log.error("error while connection persist", e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error while connection persist -> " + e.toString()).build();
 		}

@@ -101,11 +101,11 @@ public abstract class InternalMetadata implements Propable{
 			return false;
 		}
 		InternalMetadata other = (InternalMetadata) o;
-		if(this.isSingleValue() != other.isSingleValue()) {
-			return false;
-		}
-		if(this.getTypeName().equals(other.getTypeName())) {
-			return true;
+
+		if(this.isSingleValue() && other.isSingleValue()) {
+			if(this.getTypeName().equals(other.getTypeName())) {
+				return true;
+			}
 		}
 		return this.equals(other);
 	}

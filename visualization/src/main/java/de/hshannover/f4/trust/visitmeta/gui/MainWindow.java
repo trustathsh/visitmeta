@@ -64,8 +64,6 @@ import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
@@ -198,6 +196,22 @@ public class MainWindow extends JFrame {
 					if (tmp instanceof ConnectionTab) {
 						new ConnectionTabListMenu((ConnectionTab) tmp).show(mConnectionTree, e.getX(), e.getY());
 					}
+				} else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
+					Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent()).getUserObject();
+					if (tmp instanceof ConnectionTab) {
+						ConnectionTab tmpTab = (ConnectionTab) tmp;
+						boolean alreadyOpen = false;
+						for (Component t : mTabbedConnectionPane.getComponents()) {
+							if (t.equals(tmpTab)) {
+								alreadyOpen = true;
+							}
+						}
+						if (!alreadyOpen) {
+							addClosableTab(tmpTab);
+						} else {
+							mTabbedConnectionPane.setSelectedComponent(tmpTab);
+						}
+					}
 				}
 			}
 
@@ -215,28 +229,6 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-		mConnectionTree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent()).getUserObject();
-				if (tmp instanceof ConnectionTab) {
-					ConnectionTab tmpTab = (ConnectionTab) tmp;
-					boolean alreadyOpen = false;
-					for (Component t : mTabbedConnectionPane.getComponents()) {
-						if (t.equals(tmpTab)) {
-							alreadyOpen = true;
-						}
-					}
-					if (!alreadyOpen) {
-						addClosableTab(tmpTab);
-					} else {
-						mTabbedConnectionPane.setSelectedComponent(tmpTab);
-					}
-				}
-
 			}
 		});
 		mConnectionTree.setCellRenderer(mTreeRenderer);

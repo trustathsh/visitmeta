@@ -158,8 +158,10 @@ public class SimpleGraphService implements GraphService {
 	public List<IdentifierGraph> getGraphAt(long timestamp) {
 		log.trace("Method getGraphAt(" + timestamp + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
-		for (InternalIdentifierGraph binky : getInternalGraphAt(timestamp)) {
-			graph.add(GraphHelper.internalToExternalGraph(binky));
+		for (InternalIdentifierGraph internalGraph : getInternalGraphAt(timestamp)) {
+			if (internalGraph.getStartIdentifier() != null) {
+				graph.add(GraphHelper.internalToExternalGraph(internalGraph));
+			}
 		}
 		return graph;
 	}
@@ -169,6 +171,7 @@ public class SimpleGraphService implements GraphService {
 		log.trace("Method getGraphAt(" + timestamp + ", " + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
+			// FIXME check if graph at timestamp is empty
 			graph.add(filterGraph(getInternalGraphAt(timestamp), filter));
 		}
 		return graph;

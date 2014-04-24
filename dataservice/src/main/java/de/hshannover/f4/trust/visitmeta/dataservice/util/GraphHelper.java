@@ -55,9 +55,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalId
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
-import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
 import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
-import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
 
 /**
  * Encapsulates graph utility methods, like copying, transforming and more.
@@ -95,7 +93,9 @@ public class GraphHelper {
 		InternalIdentifier start = original.getStartIdentifier();
 		IdentifierGraphImpl copy = new IdentifierGraphImpl(
 				original.getTimestamp());
-		recurse(start, copy, new HashSet<InternalIdentifier>());
+		if (start != null) {
+			recurse(start, copy, new HashSet<InternalIdentifier>());
+		}
 		return copy;
 	}
 	

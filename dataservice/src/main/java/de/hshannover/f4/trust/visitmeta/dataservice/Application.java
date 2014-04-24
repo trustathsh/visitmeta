@@ -48,8 +48,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
-import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
@@ -152,7 +150,7 @@ public abstract class Application {
 		restServiceThread.start();
 	}
 
-	private static void initComponents() {
+	public static void initComponents() {
 		try {
 
 			String dbConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
@@ -170,32 +168,6 @@ public abstract class Application {
 			String msg = "Error while reading the config files";
 			log.fatal(msg);
 			throw new RuntimeException(msg, e);
-		}
-	}
-
-	private static Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
-		switch (sIdentifierType) {
-		case "device":
-			return Identifiers.createDev(sIdentifier);
-		case "access-request":
-			return Identifiers.createAr(sIdentifier);
-		case "ip-address":
-			String[] split = sIdentifier.split(",");
-			switch (split[0]) {
-			case "IPv4":
-				return Identifiers.createIp4(split[1]);
-			case "IPv6":
-				return Identifiers.createIp6(split[1]);
-			default:
-				throw new RuntimeException("unknown IP address type '"+split[0]+"'");
-			}
-		case "mac-address":
-			return Identifiers.createMac(sIdentifier);
-
-			// TODO identity and extended identifiers
-
-		default:
-			throw new RuntimeException("unknown identifier type '"+sIdentifierType+"'");
 		}
 	}
 

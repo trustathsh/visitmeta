@@ -4,3 +4,4 @@ default: !Connection
   userName: visitmeta
   userPass: visitmeta
   url: https://localhost:8443
+  startupConnect: true

@@ -398,11 +398,18 @@ public class Connection {
 	}
 
 	private void checkIsDumpingActive() throws NoActiveDumpingException {
-		if(mDumpingThread == null || !mDumpingThread.isAlive()){
+		if(!isDumpingActive()){
 			NoActiveDumpingException e = new NoActiveDumpingException();
 			log.error(e.toString());
 			throw e;
 		}
+	}
+
+	public boolean isDumpingActive(){
+		if(mDumpingThread == null || !mDumpingThread.isAlive()){
+			return false;
+		}
+		return true;
 	}
 
 	private void checkIsDumpingStopped() throws ActiveDumpingException {

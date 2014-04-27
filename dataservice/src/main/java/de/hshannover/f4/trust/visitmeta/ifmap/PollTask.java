@@ -126,7 +126,7 @@ class PollTask implements Callable<PollResult> {
 			}
 		}
 		log.debug("finish poll request.");
-		return new PollResult(updates, deletes);
+		return new PollResult(updates, deletes, pollResult);
 
 	}
 

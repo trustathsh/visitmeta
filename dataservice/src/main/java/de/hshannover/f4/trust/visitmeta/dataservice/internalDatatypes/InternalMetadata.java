@@ -56,6 +56,7 @@ public abstract class InternalMetadata implements Propable{
 	 * Returns the raw, unparsed XML data used to describe this Metadata. <b>Note: The xml version
 	 * and encoding is included.</b>
 	 */
+	@Override
 	public abstract String getRawData();
 
 	public abstract void addProperty(String name, String value);
@@ -88,9 +89,9 @@ public abstract class InternalMetadata implements Propable{
 
 	/**
 	 * Equals method for metadata contained in a link, where the singleValue field is decision making
-	 *  
+	 * 
 	 * @param o other metadata object
-	 * @return boolean value whether both metadata objects are equal 
+	 * @return boolean value whether both metadata objects are equal
 	 * 
 	 */
 	public boolean equalsForLinks(Object o) {
@@ -101,15 +102,19 @@ public abstract class InternalMetadata implements Propable{
 			return false;
 		}
 		InternalMetadata other = (InternalMetadata) o;
-		if(this.isSingleValue() != other.isSingleValue()) {
+
+		if(other.getDeleteTimestamp() > -1){
 			return false;
 		}
-		if(this.getTypeName().equals(other.getTypeName())) {
-			return true;
+
+		if(this.isSingleValue() && other.isSingleValue()) {
+			if(this.getTypeName().equals(other.getTypeName())) {
+				return true;
+			}
 		}
 		return this.equals(other);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {

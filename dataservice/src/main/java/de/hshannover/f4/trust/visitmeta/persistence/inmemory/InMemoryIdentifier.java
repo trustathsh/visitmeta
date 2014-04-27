@@ -106,11 +106,20 @@ public class InMemoryIdentifier extends InternalIdentifier {
 	}
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
-		mMeta.remove(meta);
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				mMeta.remove(m);
+			}
+		}
 	}
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		return mMeta.contains(meta);
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

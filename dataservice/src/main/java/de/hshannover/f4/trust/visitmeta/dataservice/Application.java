@@ -55,6 +55,8 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
@@ -145,8 +147,14 @@ public abstract class Application {
 				subscribe.setName(subscribeName);
 				subscribe.setMaxDepth(maxDepth);
 				subscribe.setMaxSize(maxSize);
-				subscribe.setStartIdentifier(createStartIdentifier(identifierType, identifier));
 
+				// XXX bugfix
+				Identifier startIdentifier = createStartIdentifier(identifierType, identifier);
+				subscribe.setStartIdentifier(startIdentifier);
+				IdentifierData data = new IdentifierData(startIdentifier);
+				SubscriptionRepository.getInstance().addSubscription(defaultConnection, data);
+				subscribe.setName(SubscriptionRepository.getInstance().getSubscriptionNameByIdentifier(defaultConnection, data));
+				// XXX bugfix
 				request.addSubscribeElement(subscribe);
 
 				defaultConnection.subscribe(request);

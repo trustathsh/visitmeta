@@ -49,10 +49,12 @@ public class PollResult {
 
 	private final List<ResultItem> mUpdates;
 	private final List<ResultItem> mDeletes;
+	private de.hshannover.f4.trust.ifmapj.messages.PollResult mIfmapJPollResult;
 
-	public PollResult(List<ResultItem> updates, List<ResultItem> deletes) {
+	public PollResult(List<ResultItem> updates, List<ResultItem> deletes, de.hshannover.f4.trust.ifmapj.messages.PollResult ifmapJPollResult) {
 		mUpdates = updates;
 		mDeletes = deletes;
+		mIfmapJPollResult = ifmapJPollResult;
 	}
 
 	public List<ResultItem> getDeletes() {
@@ -61,5 +63,14 @@ public class PollResult {
 
 	public List<ResultItem> getUpdates() {
 		return mUpdates;
+	}
+
+	public de.hshannover.f4.trust.ifmapj.messages.PollResult getIfmapJPollResult() {
+		return mIfmapJPollResult;
+	}
+
+	public void setIfmapJPollResult(
+			de.hshannover.f4.trust.ifmapj.messages.PollResult ifmapJPollResult) {
+		mIfmapJPollResult = ifmapJPollResult;
 	}
 }

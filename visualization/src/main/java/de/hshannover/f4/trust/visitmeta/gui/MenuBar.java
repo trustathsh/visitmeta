@@ -65,11 +65,7 @@ public class MenuBar extends JMenuBar {
 	private GuiController mContoller = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
-	private JMenu mMenuLevelOfDetail = null;
 	private JMenu mMenuLayout = null;
-	private JMenuItem mItemLevel0 = null;
-	private JMenuItem mItemLevel1 = null;
-	private JMenuItem mItemLevel2 = null;
 	private JMenuItem mItemStopMotion = null;
 	private JMenuItem mItemRedrawGraph = null;
 	private JMenuItem mItemSetColors = null;

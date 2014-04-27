@@ -40,9 +40,11 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -59,6 +61,8 @@ import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.CryptoUtil;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
@@ -90,6 +94,24 @@ public class DumpingService implements Runnable {
 		log.debug("... new DumpingService");
 	}
 
+	private List<IdentifierData> transformResult(Collection<Identifier> idents) {
+		ArrayList<IdentifierData> l = new ArrayList<IdentifierData>();
+		Iterator<Identifier> itr = idents.iterator();
+		while (itr.hasNext()) {
+			Identifier ident = itr.next();
+			IdentifierData identData = new IdentifierData(ident);
+			String uuid = CryptoUtil
+					.generateMD5BySize(ident.toString(), 16);
+			if (!SubscriptionRepository.getInstance().isAlreadySubscribed(
+					mConnection, identData)) {
+				identData.setSubscriptionName(uuid);
+				l.add(identData);
+			}
+
+		}
+		return l;
+	}
+
 	@Override
 	public void run(){
 		log.debug("run()...");
@@ -118,10 +140,21 @@ public class DumpingService implements Runnable {
 					Collection<Identifier> identifier = dump.getIdentifiers();
 
 					if (identifier != null && !identifier.isEmpty()) {
+						// XXX bugfix
+						List<IdentifierData> result = transformResult(identifier);
+						if (!result.isEmpty()) {
+							Iterator<IdentifierData> itr = result.iterator();
+							while (itr.hasNext()) {
+								IdentifierData id = itr.next();
+								SubscriptionRepository.getInstance().addSubscription(mConnection, id);
+							}
+						}
+						// XXX bugfix
+						
 						Set<String> newUuids;
 						try {
 
-							newUuids = subscribeUpdateForDumping(identifier, 10);
+							newUuids = subscribeUpdateForDumping(identifier, 1);
 
 						} catch (ConnectionException e) {
 							break;
@@ -191,7 +224,7 @@ public class DumpingService implements Runnable {
 				update.setMaxSize(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE)));
 				log.trace("Setting max_size for connection to: " + update.getMaxSize());
 
-				if (depth != null && depth > 0){
+				if (depth != null && depth >= 0){
 					update.setMaxDepth(depth);
 				} else {
 					update.setMaxDepth(Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH)));

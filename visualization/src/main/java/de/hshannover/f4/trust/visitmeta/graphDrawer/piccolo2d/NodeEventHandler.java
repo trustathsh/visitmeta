@@ -78,13 +78,13 @@ public class NodeEventHandler extends PDragEventHandler {
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	protected void drag(PInputEvent e) {
 		LOGGER.trace("Method drag(" + e + ") called.");
 		super.drag(e);
 		PComposite vNode = (PComposite) e.getPickedNode();
 		/* Redraw edges */
-		ArrayList<PPath> vEdges = (ArrayList) vNode.getAttribute("edges");
+		ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
 		for (PPath vEdge : vEdges) {
 			mPanel.updateEdge(vEdge);
 		}

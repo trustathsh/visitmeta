@@ -57,6 +57,7 @@ public class WindowSettings extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowSettings.class);
+	@SuppressWarnings("unused")
 	private SettingManager mSettingManager = null;
 	private JPanel mPanel = null;
 	private SpringLayout mSpringLayout = null;
@@ -202,6 +203,7 @@ public class WindowSettings extends JFrame {
 				}
 
 				if (hasChanged) {
+					LOGGER.debug("Save changed window settings.");
 					if (vNetworkInterval > 0) {
 						mSettingManager.setNetworkInterval(vNetworkInterval);
 						mNetworkInterval = mInputNetworkInterval.getText();

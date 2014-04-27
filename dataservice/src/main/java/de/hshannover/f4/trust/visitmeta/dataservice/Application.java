@@ -52,6 +52,8 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
+import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 import de.hshannover.f4.trust.visitmeta.yaml.ConnectionPersister;

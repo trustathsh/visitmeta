@@ -103,7 +103,7 @@ public abstract class InternalMetadata implements Propable{
 		}
 		InternalMetadata other = (InternalMetadata) o;
 
-		if(other.getDeleteTimestamp() > -1){
+		if(other.getDeleteTimestamp() != this.getDeleteTimestamp()){
 			return false;
 		}
 
@@ -136,11 +136,13 @@ public abstract class InternalMetadata implements Propable{
 		for (String property : getProperties()) {
 			String value = valueFor(property);
 			if (value == null) {
-				if (!(other.valueFor(property) == null))
+				if (!(other.valueFor(property) == null)) {
 					return false;
+				}
 			} else {
-				if (!valueFor(property).equals(other.valueFor(property)))
+				if (!valueFor(property).equals(other.valueFor(property))) {
 					return false;
+				}
 			}
 		}
 		return true;

@@ -66,8 +66,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.ReadableIndex;
 
-import scala.collection.mutable.ArrayBuilder.ofBoolean;
-
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
@@ -322,6 +320,22 @@ public class Neo4JRepository implements Repository {
 		} finally {
 			tx.finish();
 		}
+	}
+	
+	public InternalMetadata updateMetadata(InternalMetadata oldM, InternalMetadata newM) {
+		Transaction tx = beginTx();
+		InternalMetadata newN = null;
+		try {
+			long deleteTimestamp = newM.getPublishTimestamp();
+			
+			Node oldNode = ((Neo4JMetadata) oldM).getNode();
+			oldNode.setProperty(KEY_TIMESTAMP_DELETE, deleteTimestamp);
+			newN = insert(newM);
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+		return newN;
 	}
 
 	public void removeIdentifier(Node n) {

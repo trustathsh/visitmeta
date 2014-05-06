@@ -96,22 +96,38 @@ public class InMemoryIdentifier extends InternalIdentifier {
 	public InMemoryIdentifier clone() {
 		return new InMemoryIdentifier(this);
 	}
-	@Override
-	public void addMetadata(InternalMetadata meta) {
-		mMeta.add(meta);
-	}
+	
 	@Override
 	public void clearMetadata() {
 		mMeta.clear();
 	}
+	
+	@Override
+	public void addMetadata(InternalMetadata meta) {
+		mMeta.add(meta);
+	}
+
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
 		for(InternalMetadata m : mMeta) {
 			if(m.equalsForLinks(meta)) {
 				mMeta.remove(m);
+				break;
 			}
 		}
 	}
+	
+	@Override
+	public void updateMetadata(InternalMetadata meta) {
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				mMeta.remove(m);
+				mMeta.add(meta);
+				break;
+			}
+		}
+	}
+	
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
 		for(InternalMetadata m : mMeta) {

@@ -49,6 +49,7 @@ public abstract class InternalLink {
 	public abstract void addMetadata(InternalMetadata meta);
 	public abstract void clearMetadata();
 	public abstract void removeMetadata(InternalMetadata meta);
+	public abstract void updateMetadata(InternalMetadata meta);
 	public abstract boolean hasMetadata(InternalMetadata meta);
 	public abstract InternalIdentifierPair getIdentifiers();
 	public abstract List<InternalMetadata> getMetadata();

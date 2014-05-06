@@ -50,9 +50,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
  * Internal representation of an IF-MAP identifier.
  */
 public abstract class InternalIdentifier implements Propable{
-
-	public abstract void addMetadata(InternalMetadata meta);
-
 	/**
 	 * Returns the raw, unparsed XML data used to describe this Identifier. <b>Note: The xml version
 	 * and encoding is included.</b>
@@ -64,8 +61,9 @@ public abstract class InternalIdentifier implements Propable{
 	 */
 	public abstract void clearMetadata();
 
+	public abstract void addMetadata(InternalMetadata meta);
 	public abstract void removeMetadata(InternalMetadata meta);
-
+	public abstract void updateMetadata(InternalMetadata meta);
 	public abstract boolean hasMetadata(InternalMetadata meta);
 
 	/**

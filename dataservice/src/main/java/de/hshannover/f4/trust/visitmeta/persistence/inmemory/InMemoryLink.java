@@ -97,22 +97,44 @@ public class InMemoryLink extends InternalLink {
 	public InternalIdentifierPair getIdentifiers() {
 		return new InternalIdentifierPair(mFirstIdentifier, mSecondIdentifier);
 	}
+	
+	public void clearMetadata() {
+		mMeta.clear();
+	}
 
 	@Override
 	public void addMetadata(InternalMetadata meta) {
 		mMeta.add(meta);
 	}
-
-	public void clearMetadata() {
-		mMeta.clear();
+	
+	@Override
+	public void updateMetadata(InternalMetadata meta) {
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				mMeta.remove(m);
+				mMeta.add(meta);
+				break;
+			}
+		}
 	}
 
+	@Override
 	public void removeMetadata(InternalMetadata meta) {
-		mMeta.remove(meta);
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				mMeta.remove(m);
+			}
+		}
 	}
 
+	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		return mMeta.contains(meta);
+		for(InternalMetadata m : mMeta) {
+			if(m.equalsForLinks(meta)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

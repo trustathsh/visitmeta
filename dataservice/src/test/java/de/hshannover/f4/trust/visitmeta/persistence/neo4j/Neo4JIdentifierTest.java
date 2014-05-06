@@ -237,6 +237,11 @@ public class Neo4JIdentifierTest {
 		public void removeMetadata(InternalMetadata meta) {
 			throw new UnsupportedOperationException("not implemented in test stub");
 		}
+		
+		@Override
+		public void updateMetadata(InternalMetadata meta) {
+			throw new UnsupportedOperationException("not implemented in test stub");
+		}
 
 		@Override
 		public boolean hasMetadata(InternalMetadata meta) {

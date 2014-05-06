@@ -38,9 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
-
-
-
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
 
 import java.util.ArrayList;
@@ -59,18 +56,21 @@ public class Neo4JLink extends InternalLink {
 
 	private Neo4JRepository mRepo;
 	private Node mMe;
-/**
- * Create a link node in the database.
- * @param n The node in memory.
- * @param graph The graph where to create this node.
- */
+
+	/**
+	 * Create a link node in the database.
+	 * 
+	 * @param n
+	 *            The node in memory.
+	 * @param graph
+	 *            The graph where to create this node.
+	 */
 	public Neo4JLink(Node n, Neo4JRepository graph) {
 		super();
 		if (!n.getProperty(NODE_TYPE_KEY).equals(VALUE_TYPE_NAME_LINK)) {
-			String msg = "Trying to construct a Link with a node of type "
-					+n.getProperty(NODE_TYPE_KEY)+
-					". We clearly disapprove and will die ungracefully now";
-					throw new RuntimeException(msg);
+			String msg = "Trying to construct a Link with a node of type " + n.getProperty(NODE_TYPE_KEY)
+					+ ". We clearly disapprove and will die ungracefully now";
+			throw new RuntimeException(msg);
 		}
 		mMe = n;
 		mRepo = graph;
@@ -95,10 +95,10 @@ public class Neo4JLink extends InternalLink {
 
 	@Override
 	public List<InternalMetadata> getMetadata() {
-		Iterator<Relationship> i = 	mMe.getRelationships(LinkTypes.Meta).iterator();
+		Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Meta).iterator();
 		List<InternalMetadata> lm = new ArrayList<>();
 
-		while(i.hasNext()){
+		while (i.hasNext()) {
 			Relationship r = i.next();
 			InternalMetadata metadata = mRepo.getMetadata(r.getEndNode().getId());
 			lm.add(metadata);
@@ -106,23 +106,24 @@ public class Neo4JLink extends InternalLink {
 		return lm;
 	}
 
-	public String getHash(){
-		return (String)mMe.getProperty(KEY_HASH);
+	public String getHash() {
+		return (String) mMe.getProperty(KEY_HASH);
 	}
 
+	/**
+	 * Adds a given Metadata to the Link
+	 * @param Metadata to add
+	 */
 	@Override
 	public void addMetadata(InternalMetadata m) {
 		Neo4JMetadata metadata = (Neo4JMetadata) mRepo.insert(m);
 		mRepo.connectMeta(this, metadata);
 	}
 
-	@Override
-	public void clearMetadata() {
-		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
-			mRepo.remove(r.getEndNode().getId());
-		}
-	}
-
+	/**
+	 * Removes a given Metadata from the Link
+	 * @param Metadata to remove
+	 */
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
@@ -133,9 +134,26 @@ public class Neo4JLink extends InternalLink {
 			}
 		}
 	}
-/**
- * Check if this link has metadata connected to it.
- */
+	/**
+	 * Updates the Metadata if it is a SingleValue Metadata and if (and only if!) an old node exists in the graph.
+	 * @param SingleValue Metadata that should be updated
+	 */
+	@Override
+	public void updateMetadata(InternalMetadata meta) {
+		for(Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
+			Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
+			if(n4jm.equalsForLinks(meta)) {
+				Neo4JMetadata newM = (Neo4JMetadata) mRepo.updateMetadata(n4jm, meta);
+				mRepo.connectMeta(this, newM);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Check if this link has the given metadata connected to it.
+	 * @param Metadata to check for
+	 */
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
 		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
@@ -146,5 +164,14 @@ public class Neo4JLink extends InternalLink {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Removes every Metadata from the Link
+	 */
+	@Override
+	public void clearMetadata() {
+		for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
+			mRepo.remove(r.getEndNode().getId());
+		}
+	}
 }

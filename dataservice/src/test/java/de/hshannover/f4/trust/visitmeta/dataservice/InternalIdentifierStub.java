@@ -99,6 +99,11 @@ public class InternalIdentifierStub extends InternalIdentifier {
 	public void removeMetadata(InternalMetadata meta) {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public void updateMetadata(InternalMetadata meta) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {

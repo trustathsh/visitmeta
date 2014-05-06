@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,8 +76,7 @@ public abstract class AbstractWriter implements Writer {
 			if (update.getId2() == null)
 				submitUpdate(update.getId1(), update.getMetadata());
 			else
-				submitUpdate(update.getId1(), update.getId2(),
-						update.getMetadata());
+				submitUpdate(update.getId1(), update.getId2(), update.getMetadata());
 		}
 		for (ResultItem delete : pr.getDeletes()) {
 			if (delete.getId1() == null)
@@ -87,14 +84,12 @@ public abstract class AbstractWriter implements Writer {
 			if (delete.getId2() == null)
 				submitDelete(delete.getId1(), delete.getMetadata());
 			else
-				submitDelete(delete.getId1(), delete.getId2(),
-						delete.getMetadata());
+				submitDelete(delete.getId1(), delete.getId2(), delete.getMetadata());
 		}
 		finishTransaction();
 	}
 
-	protected void submitUpdate(InternalIdentifier id,
-			List<InternalMetadata> meta) {
+	protected void submitUpdate(InternalIdentifier id, List<InternalMetadata> meta) {
 		Transaction tx = this.beginSubmit();
 
 		log.debug("Got update for a single identifier");
@@ -113,11 +108,7 @@ public abstract class AbstractWriter implements Writer {
 					unique.add(m);
 				} else {
 					if (m.isSingleValue()) {
-						// remove old metadata (equals just compares typename
-						// for singleValue metadata)
-						in.removeMetadata(m);
-
-						in.addMetadata(m);
+						in.updateMetadata(m);
 						unique.add(m);
 					}
 				}
@@ -129,8 +120,7 @@ public abstract class AbstractWriter implements Writer {
 		this.finishSubmit(tx);
 	}
 
-	protected void submitUpdate(InternalIdentifier id1, InternalIdentifier id2,
-			List<InternalMetadata> meta) {
+	protected void submitUpdate(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
 		Transaction tx = this.beginSubmit();
 
 		log.debug("Persistance got update for two identifiers");
@@ -153,11 +143,7 @@ public abstract class AbstractWriter implements Writer {
 					unique.add(m);
 				} else {
 					if (m.isSingleValue()) {
-						// remove old metadata (equals just compares typename
-						// for singleValue metadata)
-						l.removeMetadata(m);
-
-						l.addMetadata(m);
+						l.updateMetadata(m);
 						unique.add(m);
 					}
 				}
@@ -197,8 +183,7 @@ public abstract class AbstractWriter implements Writer {
 		this.finishSubmit(tx);
 	}
 
-	protected void submitDelete(InternalIdentifier id1, InternalIdentifier id2,
-			List<InternalMetadata> meta) {
+	protected void submitDelete(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
 		Transaction tx = this.beginSubmit();
 
 		log.debug("Persistance got delete for two identifiers");
@@ -207,12 +192,10 @@ public abstract class AbstractWriter implements Writer {
 		InternalLink linkToEdit = null;
 		int n = 0;
 		if (idGraph1 == null) {
-			throw new RuntimeException(
-					"Someone is trying to delete from an non initiated identifier.");
+			throw new RuntimeException("Someone is trying to delete from an non initiated identifier.");
 		}
 		for (InternalLink l : idGraph1.getLinks()) {
-			if (l.getIdentifiers().getFirst().equals(id2)
-					|| l.getIdentifiers().getSecond().equals(id2)) {
+			if (l.getIdentifiers().getFirst().equals(id2) || l.getIdentifiers().getSecond().equals(id2)) {
 				linkToEdit = l;
 				break;
 			}
@@ -227,10 +210,8 @@ public abstract class AbstractWriter implements Writer {
 			}
 			if (linkToEdit.getMetadata().size() == 0) {
 				log.trace("Deleting link " + linkToEdit);
-				idGraph1 = (InternalIdentifier) linkToEdit.getIdentifiers()
-						.getFirst();
-				idGraph2 = (InternalIdentifier) linkToEdit.getIdentifiers()
-						.getSecond();
+				idGraph1 = (InternalIdentifier) linkToEdit.getIdentifiers().getFirst();
+				idGraph2 = (InternalIdentifier) linkToEdit.getIdentifiers().getSecond();
 				mRepo.disconnect(idGraph1, idGraph2);
 			}
 		} else {
@@ -243,8 +224,7 @@ public abstract class AbstractWriter implements Writer {
 		this.finishSubmit(tx);
 	}
 
-	protected void submitDelete(InternalIdentifier id,
-			List<InternalMetadata> meta) {
+	protected void submitDelete(InternalIdentifier id, List<InternalMetadata> meta) {
 		Transaction tx = this.beginSubmit();
 
 		log.debug("Got delete for single identifier");

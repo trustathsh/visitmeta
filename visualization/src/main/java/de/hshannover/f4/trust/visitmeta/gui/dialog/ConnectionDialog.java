@@ -7,7 +7,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.SystemColor;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -93,7 +92,7 @@ public class ConnectionDialog extends JDialog{
 
 		pack();
 
-		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)/2 - getWidth()/2, (Toolkit.getDefaultToolkit().getScreenSize().height)/2 - getHeight()/2);
+		//		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)/2 - getWidth()/2, (Toolkit.getDefaultToolkit().getScreenSize().height)/2 - getHeight()/2);
 	}
 
 	public ConnectionDialog(GuiController guiController) {
@@ -309,6 +308,8 @@ public class ConnectionDialog extends JDialog{
 		public MapServerPanel() {
 			mParameterPanel = new MapServerParameterPanel();
 
+			super.mJbDelete.setEnabled(false); // TODO Rest connection delete functionality
+
 			mJcbDataServiceConnection = new JComboBox<DataserviceConnection>();
 
 			updateDataserviceComboBox();
@@ -348,6 +349,8 @@ public class ConnectionDialog extends JDialog{
 						mParameterPanel.updatePanel(param);
 						mPreviousConnection = param;
 
+						mParameterPanel.mJtfName.setEditable(false);
+
 						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 					}
 				}
@@ -366,6 +369,8 @@ public class ConnectionDialog extends JDialog{
 					switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 
 					mJlMapServerConnections.setSelectedIndex(mListModelMapServer.getSize() - 1);
+
+					mParameterPanel.mJtfName.setEditable(true);
 
 				}
 			});
@@ -408,6 +413,8 @@ public class ConnectionDialog extends JDialog{
 
 						GraphContainer connection = new GraphContainer(tmpCon);
 						mGuiController.addConnection(connection);
+
+						mParameterPanel.mJtfName.setEditable(false);
 
 						log.info("new Map-Server connection is stored");
 					}
@@ -691,13 +698,14 @@ public class ConnectionDialog extends JDialog{
 			mJlDumpDescription3.setEnabled(false);
 
 			mJtfName = new JTextField();
+			mJtfName.setEditable(false);
 			mJtfUrl = new JTextField();
 			mJcbBasicAuthentication = new JCheckBox();
 			mJcbBasicAuthentication.setEnabled(false);
 			mJcbConnectingAtStartUp = new JCheckBox();
 			mJtfUsername = new JTextField();
 			mJtfPassword = new JPasswordField();
-			mJtfMaxPollResultSize = new JTextField();
+			mJtfMaxPollResultSize = new HintTextField("Optional");
 			mJcbDump = new JCheckBox();
 
 

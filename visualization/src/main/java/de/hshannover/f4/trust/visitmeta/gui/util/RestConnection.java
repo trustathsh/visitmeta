@@ -72,24 +72,54 @@ public class RestConnection {
 	}
 
 	public void saveInDataservice(){
+		// get required values
+		String connectionName = getConnectionName();
+		String url = getUrl();
+		String userName = getUsername();
+		String userPassword = getPassword();
+
+		// get optional values
+		boolean authenticationBasic = isAuthenticationBasic();
+		String truststorePath = getTruststorePath();
+		String truststorePass = getTruststorePass();
+		boolean startupConnect = isStartupConnect();
+		boolean startupDump = isStartupDump();
+		String maxPollResultSize = getMaxPollResultSize();
+
 		JSONObject jObj = new JSONObject();
 		try {
 
-			jObj.put(ConnectionKey.NAME, getConnectionName());
-			jObj.put(ConnectionKey.URL, getUrl());
-			jObj.put(ConnectionKey.USER_NAME, getUsername());
-			jObj.put(ConnectionKey.USER_PASSWORD, getPassword());
-			jObj.put(ConnectionKey.AUTHENTICATION_BASIC, isAuthenticationBasic());
-			jObj.put(ConnectionKey.TRUSTSTORE_PATH, getTruststorePath());
-			jObj.put(ConnectionKey.TRUSTSTORE_PASS, getTruststorePass());
-			jObj.put(ConnectionKey.STARTUP_CONNECT, isStartupConnect());
-			jObj.put(ConnectionKey.STARTUP_DUMP, isStartupDump());
-			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, getMaxPollResultSize());
+			// save required values in JSONObject
+			jObj.put(ConnectionKey.NAME, connectionName);
+			jObj.put(ConnectionKey.URL, url);
+			jObj.put(ConnectionKey.USER_NAME, userName);
+			jObj.put(ConnectionKey.USER_PASSWORD, userPassword);
+
+			// save optional values in JSONObject
+			if(authenticationBasic){
+				jObj.put(ConnectionKey.AUTHENTICATION_BASIC, authenticationBasic);
+			}
+			if(truststorePath != null && truststorePath.isEmpty()){
+				jObj.put(ConnectionKey.TRUSTSTORE_PATH, truststorePath);
+			}
+			if(truststorePass != null && !truststorePass.isEmpty()){
+				jObj.put(ConnectionKey.TRUSTSTORE_PASS, truststorePass);
+			}
+			if(startupConnect){
+				jObj.put(ConnectionKey.STARTUP_CONNECT, startupConnect);
+			}
+			if(startupDump){
+				jObj.put(ConnectionKey.STARTUP_DUMP, startupDump);
+			}
+			if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
+				jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);
+			}
 
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
 
+		// build and send request
 		try{
 			buildWebResource().type(MediaType.APPLICATION_JSON).put(jObj);
 		}catch (UniformInterfaceException e){

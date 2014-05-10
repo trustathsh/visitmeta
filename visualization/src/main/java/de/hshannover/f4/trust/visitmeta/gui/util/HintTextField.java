@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.gui.dialog;
+package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.awt.Color;
 import java.awt.Graphics;

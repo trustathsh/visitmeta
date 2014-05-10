@@ -44,6 +44,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.network.DataserviceConnectionFactory;
 

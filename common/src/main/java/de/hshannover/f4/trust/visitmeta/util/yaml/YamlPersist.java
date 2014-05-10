@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.yaml;
+package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

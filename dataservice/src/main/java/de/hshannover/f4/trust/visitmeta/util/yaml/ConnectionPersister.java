@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.yaml;
+package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.DumperOptions;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersister;
 
 public class ConnectionPersister extends YamlPersister {
 

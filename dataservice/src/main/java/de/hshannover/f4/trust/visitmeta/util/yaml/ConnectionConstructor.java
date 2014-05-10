@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.yaml;
+package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.yaml.YamlPersist.OPTIONAL;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 
 public class ConnectionConstructor extends Constructor {
 

@@ -56,7 +56,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
 import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
-import de.hshannover.f4.trust.visitmeta.yaml.ConnectionPersister;
+import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:

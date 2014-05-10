@@ -71,8 +71,8 @@ import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
-import de.hshannover.f4.trust.visitmeta.yaml.YamlPersist.OPTIONAL;
-import de.hshannover.f4.trust.visitmeta.yaml.YamlPersist.REQUIRED;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 
 public class Connection {
 

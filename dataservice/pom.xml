@@ -119,10 +119,5 @@
 			<artifactId>grizzly-servlet-webserver</artifactId>
 			<version>1.9.18-i</version>
 		</dependency>
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.13</version>
-		</dependency>
 	</dependencies>
 </project>

@@ -8,8 +8,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,6 +97,16 @@ public class YamlPersister {
 	@SuppressWarnings("unchecked")
 	public static Set<Object> loadSet(String fileName) throws FileNotFoundException {
 		return loadAs(fileName, HashSet.class, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Object> loadList(String fileName, BaseConstructor constructor) throws FileNotFoundException {
+		return loadAs(fileName, ArrayList.class, constructor);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Object> loadList(String fileName) throws FileNotFoundException {
+		return loadAs(fileName, ArrayList.class, null);
 	}
 
 	private static Yaml getYaml(BaseConstructor constructor, Representer representer, DumperOptions options){

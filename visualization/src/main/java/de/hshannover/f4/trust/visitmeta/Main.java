@@ -38,18 +38,16 @@
  */
 package de.hshannover.f4.trust.visitmeta;
 
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
+import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 /**
  * Class with main-method.
@@ -57,7 +55,7 @@ import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType
 public final class Main {
 	private static final Logger LOGGER = Logger.getLogger(Main.class);
 
-	private static List<DataserviceConnection> mDataserviceConnections;
+	private static DataservicePersister mDataservicePersister;
 
 	/**
 	 * Wegen der Sicherheit!
@@ -74,35 +72,45 @@ public final class Main {
 	public static void main(String[] args) {
 		LOGGER.trace("Method main(" + args + ") called.");
 
-		loadDataserviceConnections();
+		initComponents();
+
+		List<DataserviceConnection> dataserviceConnections = null;
+		try {
+			dataserviceConnections = getDataservicePersister().load();
+		} catch (FileNotFoundException e) {
+			LOGGER.error("error while load persistent dataservices", e);
+		}
 
 		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype", "local").toUpperCase();
 		ConnectionType vConnectionType = ConnectionType.valueOf(vConnectionTypeString);
 
 		GuiController gui = new GuiController();
 
-		if(vConnectionType == ConnectionType.REST){
-			for(DataserviceConnection dc : mDataserviceConnections) {
-				for(RestConnection rest: dc.loadRestConnections()){
-					GraphContainer tmpCon = new GraphContainer(rest);
-					gui.addConnection(tmpCon);
-				}
+		if(vConnectionType == ConnectionType.REST && dataserviceConnections != null){
+			for(DataserviceConnection dc : dataserviceConnections) {
+				gui.addDataserviceConnection(dc);
 			}
 			gui.show();
 		}
 	}
 
-	private static void loadDataserviceConnections(){
-		mDataserviceConnections = new ArrayList<DataserviceConnection>();
+	public static void initComponents() {
 
-		int count = Integer.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT, "0"));
-		for(int i=1; i<=count; i++){
-			String name = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_NAME(i), null);
-			String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_URL(i), null);
-			boolean rawXml = Boolean.valueOf(PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_USER_CONNECTION_DATASERVICE_COUNT_RAWXML(i), null).toLowerCase());
+		String dataservicePath = Main.class.getClassLoader().getResource("dataservices.yml").getPath();
+		mDataservicePersister = new DataservicePersister(dataservicePath);
 
-			DataserviceConnection tmpConnection = new DataserviceConnection(name, url, rawXml);
-			mDataserviceConnections.add(tmpConnection);
+		LOGGER.info("components initialized");
+
+	}
+
+	/**
+	 * @return
+	 */
+	public static DataservicePersister getDataservicePersister() {
+		if (mDataservicePersister == null) {
+			throw new RuntimeException(
+					"Dataservice's has not been initialized. This is not good!");
 		}
+		return mDataservicePersister;
 	}
 }

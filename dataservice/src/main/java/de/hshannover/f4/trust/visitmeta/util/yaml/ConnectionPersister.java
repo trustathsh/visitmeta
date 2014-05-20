@@ -10,7 +10,6 @@ import org.yaml.snakeyaml.DumperOptions;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersister;
 
 public class ConnectionPersister extends YamlPersister {
 
@@ -40,7 +39,7 @@ public class ConnectionPersister extends YamlPersister {
 	 * @param append
 	 */
 	public ConnectionPersister(String fileName){
-		log.trace("new ConnectionPersisterPersister()...");
+		log.trace("new ConnectionPersister()...");
 		mFileName = fileName;
 		mAppend = false;
 		mMinimalOutput = true;
@@ -66,8 +65,10 @@ public class ConnectionPersister extends YamlPersister {
 		mConnectionConstructor.setConnectionAsMap(false);
 		Map<String, Connection> newMap = new HashMap<String, Connection>();
 		Map<String, Object> map = loadMap(mFileName, mConnectionConstructor);
-		for(Entry<String, Object> e: map.entrySet()){
-			newMap.put(e.getKey(), (Connection) e.getValue());
+		if(map != null){
+			for(Entry<String, Object> e: map.entrySet()){
+				newMap.put(e.getKey(), (Connection) e.getValue());
+			}
 		}
 		return newMap;
 	}
@@ -77,8 +78,10 @@ public class ConnectionPersister extends YamlPersister {
 		mConnectionConstructor.setConnectionAsMap(true);
 		Map<String, Map<String, String>> newMap = new HashMap<String, Map<String, String>>();
 		Map<String, Object> map = loadMap(mFileName, mConnectionConstructor);
-		for(Entry<String, Object> e: map.entrySet()){
-			newMap.put(e.getKey(), (Map<String, String>) e.getValue());
+		if(map != null){
+			for(Entry<String, Object> e: map.entrySet()){
+				newMap.put(e.getKey(), (Map<String, String>) e.getValue());
+			}
 		}
 		return newMap;
 	}

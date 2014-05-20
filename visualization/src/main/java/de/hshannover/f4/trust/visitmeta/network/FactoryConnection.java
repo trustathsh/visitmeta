@@ -41,7 +41,7 @@ package de.hshannover.f4.trust.visitmeta.network;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 /**
@@ -71,17 +71,15 @@ public abstract class FactoryConnection {
 			LOGGER.error("Created a new local connection to dataservice");
 			throw new UnsupportedOperationException("Local connection not implemented.");
 		case REST:
-			RestConnection restConn = connection.getRestConnection();
-			boolean includeRawXML = restConn.getDataserviceConnection().isRawXml();
-			graphService = new ProxyGraphService(restConn.getGraphResource(), includeRawXML);
+			DataserviceConnection dataservice = connection.getDataserviceConnection();
+			boolean includeRawXML = dataservice.isRawXml();
+			graphService = new ProxyGraphService(dataservice.getGraphResource(connection.getRestConnectionName()), includeRawXML);
 
-			LOGGER.info("Create a new REST connection to dataservice with URI: " + restConn.getGraphResource().getURI());
+			LOGGER.info("Create a new REST connection to dataservice with URI: " + dataservice.getGraphResource(connection.getRestConnectionName()).getURI());
 			return new Connection(graphService, connection);
-
 
 		default:
 			throw new RuntimeException("Error creating connection to dataservice; tried with type '" + type.name() + "'");
 		}
 	}
-
 }

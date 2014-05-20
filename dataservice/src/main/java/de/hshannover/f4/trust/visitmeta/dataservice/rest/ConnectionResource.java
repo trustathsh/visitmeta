@@ -80,9 +80,9 @@ public class ConnectionResource {
 	@DefaultValue("false")
 	private boolean mOnlyActive = false;
 
-	@QueryParam("connectionData")
+	@QueryParam("allValues")
 	@DefaultValue("false")
-	private boolean mConnectionData = false;
+	private boolean mWithAllValues = false;
 
 	/**
 	 * Delete a saved connection.
@@ -287,7 +287,7 @@ public class ConnectionResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getConnections() {
-		if(mConnectionData){
+		if(mWithAllValues){
 			JSONObject jsonO = new JSONObject();
 			for(Connection c: ConnectionManager.getConnectionPool().values()){
 				Map<String,String> connectionMap = new HashMap<String,String>();

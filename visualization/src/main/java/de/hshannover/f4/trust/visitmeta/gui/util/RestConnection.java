@@ -43,35 +43,7 @@ public class RestConnection {
 		setDataserviceConnection(dataConnection);
 	}
 
-	public void startDump(){
-		log.trace("send startDump request...");
-		String response = buildWebResource().path(getConnectionName()).path("dump/start").put(String.class);
-		log.info("startDump response: " + response);
-	}
-
-	public void stopDump(){
-		log.trace("send stopDump request...");
-		String response = buildWebResource().path(getConnectionName()).path("dump/stop").put(String.class);
-		log.info("stopDump response: " + response);
-	}
-
-	public void connect(){
-		log.trace("send connect request...");
-		String response = buildWebResource().path(getConnectionName()).path("connect").put(String.class);
-		log.info("connect response: " + response);
-	}
-
-	public void disconnect(){
-		log.trace("send disconnect request...");
-		String response = buildWebResource().path(getConnectionName()).path("disconnect").put(String.class);
-		log.info("disconnect response: " + response);
-	}
-
-	public WebResource getGraphResource(){
-		return buildWebResource().path(getConnectionName()).path("graph");
-	}
-
-	public void saveInDataservice(){
+	public void saveInDataservice() throws UniformInterfaceException, JSONException{
 		// get required values
 		String connectionName = getConnectionName();
 		String url = getUrl();
@@ -87,44 +59,35 @@ public class RestConnection {
 		String maxPollResultSize = getMaxPollResultSize();
 
 		JSONObject jObj = new JSONObject();
-		try {
 
-			// save required values in JSONObject
-			jObj.put(ConnectionKey.NAME, connectionName);
-			jObj.put(ConnectionKey.URL, url);
-			jObj.put(ConnectionKey.USER_NAME, userName);
-			jObj.put(ConnectionKey.USER_PASSWORD, userPassword);
+		// save required values in JSONObject
+		jObj.put(ConnectionKey.NAME, connectionName);
+		jObj.put(ConnectionKey.URL, url);
+		jObj.put(ConnectionKey.USER_NAME, userName);
+		jObj.put(ConnectionKey.USER_PASSWORD, userPassword);
 
-			// save optional values in JSONObject
-			if(authenticationBasic){
-				jObj.put(ConnectionKey.AUTHENTICATION_BASIC, authenticationBasic);
-			}
-			if(truststorePath != null && truststorePath.isEmpty()){
-				jObj.put(ConnectionKey.TRUSTSTORE_PATH, truststorePath);
-			}
-			if(truststorePass != null && !truststorePass.isEmpty()){
-				jObj.put(ConnectionKey.TRUSTSTORE_PASS, truststorePass);
-			}
-			if(startupConnect){
-				jObj.put(ConnectionKey.STARTUP_CONNECT, startupConnect);
-			}
-			if(startupDump){
-				jObj.put(ConnectionKey.STARTUP_DUMP, startupDump);
-			}
-			if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
-				jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);
-			}
-
-		} catch (JSONException e1) {
-			e1.printStackTrace();
+		// save optional values in JSONObject
+		if(authenticationBasic){
+			jObj.put(ConnectionKey.AUTHENTICATION_BASIC, authenticationBasic);
+		}
+		if(truststorePath != null && truststorePath.isEmpty()){
+			jObj.put(ConnectionKey.TRUSTSTORE_PATH, truststorePath);
+		}
+		if(truststorePass != null && !truststorePass.isEmpty()){
+			jObj.put(ConnectionKey.TRUSTSTORE_PASS, truststorePass);
+		}
+		if(startupConnect){
+			jObj.put(ConnectionKey.STARTUP_CONNECT, startupConnect);
+		}
+		if(startupDump){
+			jObj.put(ConnectionKey.STARTUP_DUMP, startupDump);
+		}
+		if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
+			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);
 		}
 
 		// build and send request
-		try{
-			buildWebResource().type(MediaType.APPLICATION_JSON).put(jObj);
-		}catch (UniformInterfaceException e){
-			log.error("error while saveInDataservice()", e);
-		}
+		buildWebResource().type(MediaType.APPLICATION_JSON).put(jObj);
 	}
 
 	private WebResource buildWebResource() {
@@ -138,7 +101,14 @@ public class RestConnection {
 
 	@Override
 	public RestConnection clone() {
-		RestConnection tmp = new RestConnection(getDataserviceConnection(), getConnectionName() + "(clone)");
+		RestConnection tmp = copy();
+		String tmpName = tmp.getConnectionName();
+		tmp.setConnectionName(tmpName + "(clone)");
+		return tmp;
+	}
+
+	public RestConnection copy() {
+		RestConnection tmp = new RestConnection(getDataserviceConnection(), getConnectionName());
 		tmp.setUrl(getUrl());
 		tmp.setUsername(getUsername());
 		tmp.setPassword(getPassword());
@@ -150,6 +120,19 @@ public class RestConnection {
 		tmp.setStartupDump(isStartupDump());
 
 		return tmp;
+	}
+
+	public void update(RestConnection restConnection) {
+		mConnectionName = restConnection.getConnectionName();
+		mUrl = restConnection.getUrl();
+		mUserName = restConnection.getUsername();
+		mUserPass = restConnection.getPassword();
+		mTruststorePath = restConnection.getTruststorePath();
+		mTruststorePass = restConnection.getTruststorePass();
+		mMaxPollResultSize = restConnection.getMaxPollResultSize();
+		mAuthenticationBasic = restConnection.isAuthenticationBasic();
+		mStartupConnect = restConnection.isStartupConnect();
+		mStartupDump = restConnection.isStartupDump();
 	}
 
 	public String getConnectionName() {

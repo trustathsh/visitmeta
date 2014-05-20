@@ -27,20 +27,24 @@ public class JTextAreaAppander implements Appender {
 
 	private boolean mClosed;
 
-	private List<JTextArea> mJtaMain;
+	private static List<JTextArea> mJtaMain;
 
 	public JTextAreaAppander(){
 		timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.GERMANY);
 		mJtaMain = new ArrayList<JTextArea>();
-
 	}
 
-	public void addJTextArea(JTextArea textArea){
+	public static void addJTextArea(JTextArea textArea){
 		mJtaMain.add(textArea);
+		textArea.setText(mJtaMain.get(0).getText());
 	}
 
 	public void removeJTextArea(JTextArea textArea){
 		mJtaMain.remove(textArea);
+	}
+
+	public static void clearJTextAreas(){
+		mJtaMain.clear();
 	}
 
 	@Override
@@ -66,14 +70,14 @@ public class JTextAreaAppander implements Appender {
 				throwable = event.getThrowableInformation().getThrowable();
 			}
 
-			String test = toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline;
-
 			for(JTextArea textArea: mJtaMain){
 
 				switch (event.getLevel().toInt()) {
-				case Level.INFO_INT: textArea.append(test);
+				case Level.INFO_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
 				break;
 				case Level.ERROR_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
+				break;
+				case Level.WARN_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
 				break;
 
 				default:

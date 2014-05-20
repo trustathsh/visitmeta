@@ -5,7 +5,7 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator.CalculatorType;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.network.Connection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection;
@@ -18,9 +18,10 @@ import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType
  */
 public class GraphContainer {
 	private String mName = null;
+	private String mRestConnectionName;
 	private Connection mConnection = null;
 	private Calculator mCalculator = null;
-	private RestConnection mRestConnection = null;
+	private DataserviceConnection mDataserviceConnection = null;
 	private FacadeNetwork mFacadeNetwork = null;
 	private FacadeLogic mFacadeLogic = null;
 	private GraphConnection mGraphConnection = null;
@@ -30,15 +31,16 @@ public class GraphContainer {
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
 
-	public GraphContainer(RestConnection restConnection) {
-		mName = restConnection.getDataserviceConnection().getName() + ":" + restConnection.getConnectionName();
+	public GraphContainer(String restConnectionName, DataserviceConnection dataserviceConnection) {
+		mName = dataserviceConnection.getName() + ":" + restConnectionName;
+		mRestConnectionName = restConnectionName;
 		mTimeHolder = new TimeHolder(this);
 		mTimeSelector = new TimeSelector(this);
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
 
-		mRestConnection = restConnection;
+		mDataserviceConnection = dataserviceConnection;
 
 		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
@@ -76,6 +78,10 @@ public class GraphContainer {
 		return mName;
 	}
 
+	public String getRestConnectionName() {
+		return mRestConnectionName;
+	}
+
 	public GraphConnection getGraphConnection() {
 		return mGraphConnection;
 	}
@@ -96,8 +102,8 @@ public class GraphContainer {
 		return mConnection;
 	}
 
-	public RestConnection getRestConnection() {
-		return mRestConnection;
+	public DataserviceConnection getDataserviceConnection() {
+		return mDataserviceConnection;
 	}
 
 	@Override

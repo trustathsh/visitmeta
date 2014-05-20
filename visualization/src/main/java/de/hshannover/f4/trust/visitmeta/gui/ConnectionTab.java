@@ -51,7 +51,7 @@ import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class ConnectionTab extends JPanel {
@@ -74,7 +74,7 @@ public class ConnectionTab extends JPanel {
 	private Timer mTimerPropertiesShow;
 	private Timer mTimerPropertiesHide;
 
-	private RestConnection mRestConnection;
+	private DataserviceConnection mDataserviceConnection;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -91,7 +91,7 @@ public class ConnectionTab extends JPanel {
 		mName = connection.getName();
 		mConnected = true;
 		mConnection = connection;
-		mRestConnection = mConnection.getRestConnection();
+		mDataserviceConnection = mConnection.getDataserviceConnection();
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
 		mTimeLine = new PanelTimeLine(mConnection.getTimeSelector());
@@ -173,22 +173,22 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public void connect() {
-		mRestConnection.connect();
+		mDataserviceConnection.connect(mConnection.getRestConnectionName());
 		setConnectionStatus(true);
 	}
 
 	public void startDump() {
-		mRestConnection.startDump();
+		mDataserviceConnection.startDump(mConnection.getRestConnectionName());
 
 	}
 
 	public void stopDump() {
-		mRestConnection.stopDump();
+		mDataserviceConnection.stopDump(mConnection.getRestConnectionName());
 
 	}
 
 	public void disconnect() {
-		mRestConnection.disconnect();
+		mDataserviceConnection.disconnect(mConnection.getRestConnectionName());
 		setConnectionStatus(false);
 	}
 
@@ -258,7 +258,7 @@ public class ConnectionTab extends JPanel {
 		mWindowNodeProperties.setVisible(false);
 	}
 
-	public RestConnection getRestConnection(){
-		return mRestConnection;
+	public DataserviceConnection getDataserviceConnection(){
+		return mDataserviceConnection;
 	}
 }

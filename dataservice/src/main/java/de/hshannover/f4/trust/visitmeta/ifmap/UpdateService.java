@@ -272,8 +272,10 @@ public class UpdateService implements Runnable {
 
 		for(MetadataEntry metaEntry: document.getChilds()){
 			metadata.addProperty("/" + document.getName() + "[@" + metaEntry.getName() + "]", metaEntry.getValue());
-			for (Entry<String, String> ee : metaEntry.getAttributes().entrySet()) {
-				metadata.addProperty("/" + document.getName() + "/" + metaEntry.getName() + "[@" + ee.getKey() + "]", ee.getValue());
+			if(metaEntry.getAttributes() != null){
+				for (Entry<String, String> ee : metaEntry.getAttributes().entrySet()) {
+					metadata.addProperty("/" + document.getName() + "/" + metaEntry.getName() + "[@" + ee.getKey() + "]", ee.getValue());
+				}
 			}
 		}
 

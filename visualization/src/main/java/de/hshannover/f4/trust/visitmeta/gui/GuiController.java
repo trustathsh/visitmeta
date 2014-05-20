@@ -38,21 +38,21 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import java.util.HashSet;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 
 public class GuiController {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private MainWindow mMainWindow = null;
 	private ConnectionTab mSelectedConnection = null;
-	private HashSet<ConnectionTab> mConnections = null;
 
 	public GuiController() {
 		initMainWindow();
-		initConnections();
 	}
 
 	/**
@@ -61,12 +61,22 @@ public class GuiController {
 	private void initMainWindow() {
 		mMainWindow = new MainWindow();
 		mMainWindow.setJMenuBar(new MenuBar(this));
+
+		mMainWindow.getConnectionTree().addTreeSelectionListener(new TreeSelectionListener() {
+
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+				if (node.getUserObject() instanceof ConnectionTab) {
+					setSelectedConnectionTab((ConnectionTab)node.getUserObject());
+				}
+			}
+		});
 	}
 
-	private void initConnections() {
-		mConnections = new HashSet<ConnectionTab>();
+	public void updateRestConnections() {
+		mMainWindow.updateRestConnections();
 	}
-
 
 	public GraphConnection getSelectedConnection() {
 		return mSelectedConnection.getConnection();
@@ -88,11 +98,8 @@ public class GuiController {
 	 * @param connection
 	 *            ConnectionController object
 	 */
-	public void addConnection(GraphContainer connection) {
-		ConnectionTab tmp = new ConnectionTab( connection, mMainWindow);
-		this.setSelectedConnectionTab(tmp);
-		mMainWindow.addConnection(tmp);
-		mConnections.add(tmp);
+	public void addDataserviceConnection(DataserviceConnection dataservice) {
+		mMainWindow.addDataserviceConnection(dataservice);
 	}
 
 	/**

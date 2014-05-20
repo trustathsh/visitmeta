@@ -54,7 +54,6 @@ public final class ConfigParameter {
 	public static final String IFMAP_SUBSCRIPTION_NAME = "ifmap.subscription.name";
 	public static final String IFMAP_SUBSCRIPTION_DUMPING_SLEEPTIME = "ifmap.subscription.dumping.sleeptime";
 	public static final String IFMAP_START_CONNECT = "ifmap.start.connect";
-	public static final String IFMAP_START_DUMP = "ifmap.start.dump";
 
 	public static final String IFMAP_MAX_RETRY = "ifmap.connection.maxretry";
 	public static final String IFMAP_RETRY_INTERVAL = "ifmap.connection.retryinterval";

@@ -152,34 +152,6 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * Start a Dumping-Service.
-	 * 
-	 * @param name Is the connection name.
-	 * @throws ConnectionException
-	 */
-	public static void startDumpingServiceFromConnection(String name) throws ConnectionException {
-		log.trace("start dumping from connection " + name + " ...");
-
-		getConnection(name).startDumpingService();
-
-		log.info("dumping for connection " + name + " started");
-	}
-
-	/**
-	 * Stopped a active Dumping-Service.
-	 * 
-	 * @param name Is the connection name.
-	 * @throws ConnectionException
-	 */
-	public static void stopDumpingServiceFromConnection(String name) throws ConnectionException {
-		log.trace("stop dumping from connection " + name + " ...");
-
-		getConnection(name).stopDumpingService();
-
-		log.info("dumping for connection " + name + " stopped");
-	}
-
-	/**
 	 * @return A Set<String> with the active subscriptions.
 	 * @throws ConnectionException
 	 */

@@ -55,8 +55,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
@@ -128,37 +126,27 @@ public abstract class Application {
 			log.debug("connecting at startup");
 			defaultConnection.connect();
 
-			if(Boolean.valueOf(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_DUMP))){
-				log.debug("start dump at startup");
-				defaultConnection.startDumpingService();
+			log.debug("send Subscribe-Update at startup");
 
-			}else{
-				log.debug("send Subscribe-Update at startup");
+			String subscribeName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
+			String identifierType = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
+			String identifier = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
+			int maxDepth = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
+			int maxSize = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
-				String subscribeName = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_SUBSCRIPTION_NAME);
-				String identifierType = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER_TYPE);
-				String identifier = getIFMAPConfig().getProperty(ConfigParameter.IFMAP_START_IDENTIFIER);
-				int maxDepth = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-				int maxSize = Integer.parseInt(getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+			SubscribeRequest request = Requests.createSubscribeReq();
+			SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
 
-				SubscribeRequest request = Requests.createSubscribeReq();
-				SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
+			subscribe.setName(subscribeName);
+			subscribe.setMaxDepth(maxDepth);
+			subscribe.setMaxSize(maxSize);
 
-				subscribe.setName(subscribeName);
-				subscribe.setMaxDepth(maxDepth);
-				subscribe.setMaxSize(maxSize);
+			Identifier startIdentifier = createStartIdentifier(identifierType, identifier);
+			subscribe.setStartIdentifier(startIdentifier);
+			request.addSubscribeElement(subscribe);
 
-				// XXX bugfix
-				Identifier startIdentifier = createStartIdentifier(identifierType, identifier);
-				subscribe.setStartIdentifier(startIdentifier);
-				IdentifierData data = new IdentifierData(startIdentifier);
-				SubscriptionRepository.getInstance().addSubscription(defaultConnection, data);
-				subscribe.setName(SubscriptionRepository.getInstance().getSubscriptionNameByIdentifier(defaultConnection, data));
-				// XXX bugfix
-				request.addSubscribeElement(subscribe);
+			defaultConnection.subscribe(request);
 
-				defaultConnection.subscribe(request);
-			}
 		}
 	}
 

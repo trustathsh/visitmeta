@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
@@ -96,8 +97,8 @@ public class PoolExpandedLink {
 	}
 
 	/**
-	 * Suspend a NodeIdentifier.
-	 * @param link the Identifier that reference the NodeIdentifier.
+	 * Suspend an ExpandedLink.
+	 * @param link the Link that references the ExpandedLink.
 	 */
 	public static void release(Link link) {
 		LOGGER.trace("Method release(" + link + ") called.");
@@ -106,7 +107,7 @@ public class PoolExpandedLink {
 	}
 
 	/**
-	 * Suspend all NodeIdentifier.
+	 * Suspend all ExpandedLinks.
 	 */
 	public static void clear() {
 		LOGGER.trace("Method clear() called.");
@@ -127,7 +128,7 @@ public class PoolExpandedLink {
 			LOGGER.debug("Create new link.");
 			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
 			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(metadata);
+				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
 				metaList.add(nodeMetadata);
 			}
 			ExpandedLink expandedLink = new ExpandedLink(
@@ -191,7 +192,7 @@ public class PoolExpandedLink {
 			LOGGER.debug("Create new link.");
 			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
 			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(metadata);
+				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
 				metaList.add(nodeMetadata);
 			}
 			ExpandedLink expandedLink = new ExpandedLink(

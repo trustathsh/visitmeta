@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
@@ -112,12 +113,12 @@ public class Connection {
 			}
 			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataIdentifier().values()) {
 				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getMetadata());
+					PoolNodeMetadata.release(vMetadata.getRichMetadata());
 				}
 			}
 			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataLinks().values()) {
 				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getMetadata());
+					PoolNodeMetadata.release(vMetadata.getRichMetadata());
 				}
 			}
 		}
@@ -277,7 +278,7 @@ public class Connection {
 					}
 					/* Add new Metadata */
 					for (Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.create(metadata);
+						NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, identifier));
 						if (tmpMetadata != null) {
 							LOGGER.debug("New metadata of an identifier.");
 							listMetadata.add(tmpMetadata);
@@ -307,7 +308,7 @@ public class Connection {
 						}
 						/* Add new Metadata */
 						for (Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.create(metadata);
+							NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, link));
 							if (tmpMetadata != null) {
 								LOGGER.debug("New metadata of an link.");
 								listMetadata.add(tmpMetadata);
@@ -316,7 +317,7 @@ public class Connection {
 							}
 						}
 					} else {
-						/* Identifier is new */
+						/* link is new */
 						LOGGER.debug("New link.");
 						mUpdateContainer.getListAddLinks().add(tmpLink);
 						vResult = true;
@@ -353,7 +354,7 @@ public class Connection {
 					}
 					/* Add old Metadata */
 					for (Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(metadata);
+						NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, identifier));
 						if (tmpMetadata != null) {
 							LOGGER.debug("Delete metadata of an identifer.");
 							listMetadata.add(tmpMetadata);
@@ -382,7 +383,7 @@ public class Connection {
 						}
 						/* Add old Metadata */
 						for (Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(metadata);
+							NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, link));
 							if (tmpMetadata != null && !listMetadata.contains(tmpMetadata)) {
 								LOGGER.debug("Delete metadata of a link.");
 								listMetadata.add(tmpMetadata);
@@ -391,7 +392,8 @@ public class Connection {
 							}
 						}
 						/* Add empty link to delete list */
-						if (!tmpLink.hasMetadata()) {
+						if(!tmpLink.hasMetadata()) {
+							LOGGER.debug("Delete link.");
 							mUpdateContainer.getListDeleteLinks().add(tmpLink);
 							NodeIdentifier first = tmpLink.getFirst();
 							NodeIdentifier second = tmpLink.getSecond();
@@ -399,7 +401,7 @@ public class Connection {
 							if (first != null) {
 								tmpLink.deleteIdentifier(first);
 								if (!first.hasLinks() && !first.hasMetadata()) {
-									LOGGER.debug("Delete identifier.");
+									LOGGER.debug("Delete first identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(first);
 									vResult = true;
 								}
@@ -407,7 +409,7 @@ public class Connection {
 							if (second != null) {
 								tmpLink.deleteIdentifier(second);
 								if (!second.hasLinks() && !second.hasMetadata()) {
-									LOGGER.debug("Delete identifier.");
+									LOGGER.debug("Delete second identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(second);
 									vResult = true;
 								}
@@ -422,21 +424,33 @@ public class Connection {
 	}
 
 	protected void debugGraphContent(String pGraphType, List<IdentifierGraph> pGraphs) {
-		if (Logger.getRootLogger().getLevel().toInt() < Level.INFO.toInt()) {
+		if(Logger.getRootLogger().getLevel().toInt() < Level.INFO.toInt()) {
+			int vNumberOfGraph      = 0;
 			int vNumberOfIdentifier = 0;
 			int vNumberOfMetadata = 0;
 			int vNumberOfLinks = 0;
 			LOGGER.debug("Count content of " + pGraphType + " graph:");
 			/* Count Content */
-			for (IdentifierGraph vGraph : pGraphs) {
-				for (Identifier vIdentifier : vGraph.getIdentifiers()) {
+			for(IdentifierGraph vGraph : pGraphs) {
+				++vNumberOfGraph;
+				String logResult = "Graph " + vNumberOfGraph;
+				for(Identifier vIdentifier : vGraph.getIdentifiers()) {
 					++vNumberOfIdentifier;
+					logResult += "\n* " + vIdentifier.getTypeName() + " |";
 					vNumberOfMetadata += vIdentifier.getMetadata().size();
-					for (Link vLink : vIdentifier.getLinks()) {
+					for (Metadata vMetadata : vIdentifier.getMetadata()) {
+						logResult += " " + vMetadata.getTypeName();
+					}
+					for(Link vLink : vIdentifier.getLinks()) {
 						++vNumberOfLinks;
+						logResult += "\n    link |";
 						vNumberOfMetadata += vLink.getMetadata().size();
+						for (Metadata vMetadata : vLink.getMetadata()) {
+							logResult += " " + vMetadata.getTypeName();
+						}
 					}
 				}
+				LOGGER.debug(logResult);
 			}
 			/* Logging */
 			LOGGER.debug("Graph has " + vNumberOfIdentifier + " references to identifier.");

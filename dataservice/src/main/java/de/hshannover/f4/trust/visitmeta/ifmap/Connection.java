@@ -93,7 +93,6 @@ public class Connection {
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
-	private DumpingService mDumpingService;
 
 	private Thread mUpdateThread;
 	private Thread mDumpingThread;
@@ -267,36 +266,6 @@ public class Connection {
 
 			log.debug("UpdateService for connection " + mConnectionName + " started");
 		}
-	}
-
-	/**
-	 * Start a Dumping-Service.
-	 * 
-	 * @throws ConnectionException
-	 */
-	public void startDumpingService() throws ConnectionException{
-		checkIsConnectionEstablished();
-		checkIsDumpingStopped();
-		startUpdateService();
-
-		if(mDumpingThread == null || !mDumpingThread.isAlive()){
-			mDumpingService = new DumpingService(this, mSsrc);
-			mDumpingThread = new Thread(mDumpingService, "DumpingThread-" + mConnectionName);
-			mDumpingThread.start();
-		}
-	}
-
-	/**
-	 * Stopped a active Dumping-Service.
-	 * 
-	 * @throws ConnectionException
-	 */
-	public void stopDumpingService() throws ConnectionException{
-		checkIsConnectionEstablished();
-		checkIsDumpingActive();
-
-		mDumpingThread.interrupt();
-		mDumpingThread = null;
 	}
 
 	/**

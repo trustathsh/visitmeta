@@ -100,8 +100,8 @@ public abstract class InternalMetadata implements Propable{
 		if (!this.getTypeName().equals(other.getTypeName())) {
 			return false;
 		}
-		if(this.isSingleValue()) {
-			return true;
+		if(this.isSingleValue() != other.isSingleValue()) {
+			return false;
 		}
 		if (getProperties().size() != other.getProperties().size()) {
 			return false;

@@ -52,8 +52,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.SubscriptionRepository;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
@@ -112,18 +110,7 @@ public abstract class Application {
 			log.error("error while startupConnect", e);
 		}
 
-		try {
-			startupDump();
-		} catch (ConnectionException e) {
-			log.error("error while startupDump", e);
-		}
-
 		log.info("dataservice started successfully");
-	}
-
-	private static void startupDump() throws ConnectionException {
-		log.debug("startupDump...");
-		ConnectionManager.startupDump();
 	}
 
 	private static void startupConnect() throws ConnectionException {

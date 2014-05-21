@@ -89,20 +89,6 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * Start dumping of all connections at the connection pool.
-	 * StartupDump must be set true.
-	 * 
-	 * @throws ConnectionException
-	 */
-	public static void startupDump() throws ConnectionException{
-		for(Connection c: connectionPool.values()){
-			if(c.isStartupDump()){
-				startDumpingServiceFromConnection(c.getConnectionName());
-			}
-		}
-	}
-
-	/**
 	 * Delete a saved connection.
 	 * 
 	 * @param name Is the connection name.
@@ -179,34 +165,6 @@ public class ConnectionManager {
 
 		log.trace("Active-Connections: \n" + sb.toString());
 		return sb.toString();
-	}
-
-	/**
-	 * Start a Dumping-Service.
-	 * 
-	 * @param name Is the connection name.
-	 * @throws ConnectionException
-	 */
-	public static void startDumpingServiceFromConnection(String name) throws ConnectionException {
-		log.trace("start dumping from connection " + name + " ...");
-
-		getConnection(name).startDumpingService();
-
-		log.info("dumping for connection " + name + " started");
-	}
-
-	/**
-	 * Stopped a active Dumping-Service.
-	 * 
-	 * @param name Is the connection name.
-	 * @throws ConnectionException
-	 */
-	public static void stopDumpingServiceFromConnection(String name) throws ConnectionException {
-		log.trace("stop dumping from connection " + name + " ...");
-
-		getConnection(name).stopDumpingService();
-
-		log.info("dumping for connection " + name + " stopped");
 	}
 
 	/**

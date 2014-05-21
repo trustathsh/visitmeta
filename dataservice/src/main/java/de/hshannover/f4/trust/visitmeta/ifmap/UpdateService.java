@@ -40,38 +40,16 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.channel.ARC;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.dataservice.xml.DomHelper;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IdentifierData;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IfmapDataType;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.IfmapMarshaller;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.Link;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.LinkConstructionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.Metadata;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.MetadataEntry;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.NoValidIdentifierTypeException;
-import de.hshannover.f4.trust.visitmeta.ifmap.dumpData.PollResultContainer;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryMetadata;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 /**
@@ -165,23 +143,7 @@ public class UpdateService implements Runnable {
 			try {
 
 				PollResult pollResult = task.call();
-
-				PollResultContainer poll = null;
-				try {
-					poll = IfmapMarshaller.marshallPollResult(pollResult.getIfmapJPollResult());
-				} catch (RemoteException e) {
-					log.error("error while marshallPollResult", e);
-				} catch (NoValidIdentifierTypeException e) {
-					log.error("error while marshallPollResult", e);
-				} catch (LinkConstructionException e) {
-					log.error("error while marshallPollResult", e);
-				}
-				poll = IfmapMarshaller.filterPollResult(mConnection, poll);
-
-
-				PollResult newTransformPollResult = transformPollResultContainer(poll);
-
-				mWriter.submitPollResult(newTransformPollResult);
+				mWriter.submitPollResult(pollResult);
 
 			} catch (ConnectionCloseException e) {
 				log.debug("Stop polling while: " + e.toString());
@@ -197,88 +159,5 @@ public class UpdateService implements Runnable {
 			}
 		}
 		log.debug("... run()");
-	}
-
-	private PollResult transformPollResultContainer(PollResultContainer poll) {
-		List<ResultItem> updates = new ArrayList<>();
-		List<ResultItem> deletes = new ArrayList<>();
-		for (IfmapDataType ifmapDataType : poll.getNew()) {
-			ResultItem resultItem = transformResultItem(ifmapDataType);
-			if (resultItem.getMetadata().size() > 0) {
-				updates.add(resultItem);
-			}
-		}
-		for (IfmapDataType ifmapDataType : poll.getUpdate()) {
-			ResultItem resultItem = transformResultItem(ifmapDataType);
-			if (resultItem.getMetadata().size() > 0) {
-				updates.add(resultItem);
-			}
-		}
-		for (IfmapDataType ifmapDataType : poll.getDelete()) {
-			ResultItem resultItem = transformResultItem(ifmapDataType);
-			if (resultItem.getMetadata().size() > 0) {
-				deletes.add(resultItem);
-			}
-		}
-		return new PollResult(updates, deletes, null);
-	}
-
-	/**
-	 * Transforms a ifmapj {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem}
-	 * into a internal {@link ResultItem}.
-	 */
-	ResultItem transformResultItem(IfmapDataType ifmapDataType) {
-		List<Metadata> metadataDocuments = ifmapDataType.getMetadata();
-
-		List<InternalMetadata> metadata = new ArrayList<>(metadataDocuments.size());
-		for (Metadata d : metadataDocuments) {
-			InternalMetadata m = createMetadata(d);
-			metadata.add(m);
-		}
-
-		if (ifmapDataType instanceof Link) {
-			InternalIdentifier id1 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(((Link)ifmapDataType).getIdentifier1().getRequestObject());
-			InternalIdentifier id2 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(((Link)ifmapDataType).getIdentifier2().getRequestObject());
-			return new ResultItem(id1, id2, metadata);
-		} else {
-			InternalIdentifier id = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(((IdentifierData)ifmapDataType).getRequestObject());
-			return new ResultItem(id, null, metadata);
-		}
-	}
-
-	public InternalMetadata createMetadata(Metadata document) {
-		log.trace("creating metadata from XML");
-
-		// extract metadata object attributes
-		String typename = document.getDocument().getDocumentElement().getLocalName();
-		boolean isSingleValueMetadata = document.getCardinality().equals("singleValue");
-		Calendar cal = DatatypeConverter.parseDateTime(document.getTimestamp());
-		long timestamp = cal.getTime().getTime();
-
-		// recursively collect all information under the top-level element
-		Map<String, String> properties = document.getAttributes();
-
-		// create a internal metadata object
-		InMemoryMetadata metadata = new InMemoryMetadata(typename, isSingleValueMetadata, timestamp);
-		metadata.setRawData(DomHelper.documentToString(document.getDocument()));
-
-		metadata.addProperty("/" + document.getName() + "[@ifmap-publisher-id]", document.getPublisher());
-		metadata.addProperty("/" + document.getName() + "[@ifmap-timestamp]", document.getTimestamp());
-		metadata.addProperty("/" + document.getName() + "[@ifmap-cardinality]", document.getCardinality());
-
-		for (Entry<String, String> e : properties.entrySet()) {
-			metadata.addProperty("/" + document.getName() + "[@" + e.getKey() + "]", e.getValue());
-		}
-
-		for(MetadataEntry metaEntry: document.getChilds()){
-			metadata.addProperty("/" + document.getName() + "[@" + metaEntry.getName() + "]", metaEntry.getValue());
-			if(metaEntry.getAttributes() != null){
-				for (Entry<String, String> ee : metaEntry.getAttributes().entrySet()) {
-					metadata.addProperty("/" + document.getName() + "/" + metaEntry.getName() + "[@" + ee.getKey() + "]", ee.getValue());
-				}
-			}
-		}
-
-		return metadata;
 	}
 }

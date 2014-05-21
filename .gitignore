@@ -9,3 +9,6 @@ src/license/dummy/Dummy.java
 visitmeta-distribution/.checkstyle
 visualization/.checkstyle
 
+test.properties
+bin/
+.metadata

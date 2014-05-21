@@ -46,7 +46,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import edu.uci.ics.jung.graph.Graph;
@@ -237,6 +239,11 @@ public class NodeIdentifier2D extends Node2D{
 
 	// /////////////////////////////////////////////////////////////////////////////////////// SUPER
 
+	@Override
+	public String toString(){
+		LOGGER.trace("Method toString() called.");
+		return "Vi" + mId + "|" + mNodeIdentifier.getIdentifier().getTypeName();
+	}
 
 	@Override
 	public String getContent(){

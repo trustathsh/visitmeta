@@ -47,6 +47,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
+import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 /**
@@ -123,7 +124,7 @@ public class PoolNodeIdentifier {
 			LOGGER.debug("Create new identifier.");
 			NodeIdentifier nodeIdentifier = new NodeIdentifier(identifier);
 			for(Metadata metadata : identifier.getMetadata()) {
-				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(metadata));
+				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(new RichMetadata(metadata, identifier)));
 			}
 			mPoolIdentifierActive.put(identifier, nodeIdentifier);
 			return nodeIdentifier;
@@ -173,7 +174,7 @@ public class PoolNodeIdentifier {
 			LOGGER.debug("Create new identifier.");
 			NodeIdentifier nodeIdentifier = new NodeIdentifier(identifier);
 			for(Metadata metadata : identifier.getMetadata()) {
-				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(metadata));
+				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(new RichMetadata(metadata, identifier)));
 			}
 			mPoolIdentifierActive.put(identifier, nodeIdentifier);
 			return nodeIdentifier;

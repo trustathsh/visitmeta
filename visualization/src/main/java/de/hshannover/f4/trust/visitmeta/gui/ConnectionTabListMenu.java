@@ -51,8 +51,6 @@ public class ConnectionTabListMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
 	private JMenuItem mConnect = null;
 	private JMenuItem mDisconnect = null;
-	private JMenuItem mStartDump = null;
-	private JMenuItem mStopDump = null;
 	private JMenuItem mDelete = null;
 	private ConnectionTab mConnection = null;
 
@@ -70,14 +68,10 @@ public class ConnectionTabListMenu extends JPopupMenu {
 		initConnectButton();
 		initDisconnectButton();
 		initDeleteButton();
-		initStartDumpButton();
-		initStopDumpButton();
 
 		this.add(mConnect);
 		this.add(mDisconnect);
 		this.add(mDelete);
-		this.add(mStartDump);
-		this.add(mStopDump);
 	}
 
 	/**
@@ -117,26 +111,6 @@ public class ConnectionTabListMenu extends JPopupMenu {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO delete the Connection
-			}
-		});
-	}
-
-	private void initStartDumpButton() {
-		mStartDump = new JMenuItem("Start Dump");
-		mStartDump.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mConnection.startDump();
-			}
-		});
-	}
-
-	private void initStopDumpButton() {
-		mStopDump = new JMenuItem("Stop Dump");
-		mStopDump.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mConnection.stopDump();
 			}
 		});
 	}

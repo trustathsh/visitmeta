@@ -90,7 +90,6 @@ public class DataserviceConnection {
 				restConn.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
 				restConn.setTruststorePass(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASS));
 				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.STARTUP_CONNECT));
-				restConn.setStartupDump(jsonConnection.getBoolean(ConnectionKey.STARTUP_DUMP));
 				restConn.setMaxPollResultSize(jsonConnection.getString(ConnectionKey.MAX_POLL_RESULT_SIZE));
 
 				connections.add(restConn);
@@ -109,18 +108,6 @@ public class DataserviceConnection {
 		URI uri_connect = UriBuilder.fromUri(getUrl()).build();
 		WebResource resource = client.resource(uri_connect);
 		return resource;
-	}
-
-	public void startDump(String restConnectionName){
-		log.trace("send startDump request...");
-		String response = buildWebResource().path(restConnectionName).path("dump/start").put(String.class);
-		log.info("startDump response: " + response);
-	}
-
-	public void stopDump(String restConnectionName){
-		log.trace("send stopDump request...");
-		String response = buildWebResource().path(restConnectionName).path("dump/stop").put(String.class);
-		log.info("stopDump response: " + response);
 	}
 
 	public void connect(String restConnectionName){

@@ -33,7 +33,6 @@ public class RestConnection {
 	private String mMaxPollResultSize;
 	private boolean mAuthenticationBasic;
 	private boolean mStartupConnect;
-	private boolean mStartupDump;
 
 	private DataserviceConnection mDataserviceConnection;
 
@@ -55,7 +54,6 @@ public class RestConnection {
 		String truststorePath = getTruststorePath();
 		String truststorePass = getTruststorePass();
 		boolean startupConnect = isStartupConnect();
-		boolean startupDump = isStartupDump();
 		String maxPollResultSize = getMaxPollResultSize();
 
 		JSONObject jObj = new JSONObject();
@@ -78,9 +76,6 @@ public class RestConnection {
 		}
 		if(startupConnect){
 			jObj.put(ConnectionKey.STARTUP_CONNECT, startupConnect);
-		}
-		if(startupDump){
-			jObj.put(ConnectionKey.STARTUP_DUMP, startupDump);
 		}
 		if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
 			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);
@@ -117,7 +112,6 @@ public class RestConnection {
 		tmp.setMaxPollResultSize(getMaxPollResultSize());
 		tmp.setAuthenticationBasic(isAuthenticationBasic());
 		tmp.setStartupConnect(isStartupConnect());
-		tmp.setStartupDump(isStartupDump());
 
 		return tmp;
 	}
@@ -132,7 +126,6 @@ public class RestConnection {
 		mMaxPollResultSize = restConnection.getMaxPollResultSize();
 		mAuthenticationBasic = restConnection.isAuthenticationBasic();
 		mStartupConnect = restConnection.isStartupConnect();
-		mStartupDump = restConnection.isStartupDump();
 	}
 
 	public String getConnectionName() {
@@ -152,14 +145,6 @@ public class RestConnection {
 
 	public void setUrl(String endpoint) {
 		mUrl = endpoint;
-	}
-
-	public boolean isStartupDump() {
-		return mStartupDump;
-	}
-
-	public void setStartupDump(boolean dumping) {
-		mStartupDump = dumping;
 	}
 
 	@Override

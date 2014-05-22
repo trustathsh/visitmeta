@@ -25,7 +25,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -547,16 +546,6 @@ public class ConnectionDialog extends JDialog{
 					}
 				}
 			});
-
-			mParameterPanel.mJcbDump.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if(mParameterPanel.mJcbDump.hasFocus()){
-						setChanges(true);
-					}
-				}
-			});
 		}
 
 		private void updateRestConnectionsList(DataserviceConnection dConnection){
@@ -584,7 +573,6 @@ public class ConnectionDialog extends JDialog{
 			// TODO TRUSTSTORE_PATH
 			// TODO TRUSTSTORE_PASS
 			restConnection.setStartupConnect(mParameterPanel.mJcbConnectingAtStartUp.isSelected());
-			restConnection.setStartupDump(mParameterPanel.mJcbDump.isSelected());
 			restConnection.setMaxPollResultSize(mParameterPanel.mJtfMaxPollResultSize.getText().trim());
 		}
 
@@ -843,10 +831,6 @@ public class ConnectionDialog extends JDialog{
 
 		private JLabel mJlName;
 		private JLabel mJlUrl ;
-		private JLabel mJlDump;
-		private JLabel mJlDumpDescription;
-		private JLabel mJlDumpDescription2;
-		private JLabel mJlDumpDescription3;
 		private JLabel mJlBasicAuthentication;
 		private JLabel mJlUsername ;
 		private JLabel mJlPassword;
@@ -860,29 +844,14 @@ public class ConnectionDialog extends JDialog{
 
 		private JPasswordField mJtfPassword;
 
-		private JCheckBox mJcbDump;
 		private JCheckBox mJcbBasicAuthentication;
 		private JCheckBox mJcbConnectingAtStartUp;
 
 
 		private MapServerParameterPanel(){
 			createPanels();
-			addListeners();
 		}
 
-		private void addListeners(){
-			final Component lThis = this;
-			mJcbDump.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					if (mJcbDump.isSelected()) {
-						JOptionPane.showMessageDialog(lThis,
-								"Dumping is NOT IF-MAP 2.0 compliant and can only be used with irond.",
-								"Warning", JOptionPane.WARNING_MESSAGE);
-					}
-				}
-			});
-		}
 
 		private void createPanels() {
 			setLayout(new GridBagLayout());
@@ -895,16 +864,6 @@ public class ConnectionDialog extends JDialog{
 			mJlPassword = new JLabel("Password");
 			mJlMaxPollResultSize = new JLabel("max-poll-result-size");
 			mJlConnectingAtStartUp = new JLabel("Connecting at start-up");
-			mJlDump = new JLabel("Dump");
-			mJlDumpDescription = new JLabel("Dumping is NOT IF-MAP 2.0 compliant!");
-			mJlDumpDescription.setHorizontalAlignment(SwingConstants.CENTER);
-			mJlDumpDescription.setEnabled(false);
-			mJlDumpDescription2 = new JLabel("That is currently only supported by irond.");
-			mJlDumpDescription2.setHorizontalAlignment(SwingConstants.CENTER);
-			mJlDumpDescription2.setEnabled(false);
-			mJlDumpDescription3 = new JLabel("The dump is used to bootstrap the visualization process.");
-			mJlDumpDescription3.setHorizontalAlignment(SwingConstants.CENTER);
-			mJlDumpDescription3.setEnabled(false);
 
 			mJtfName = new JTextField();
 			mJtfName.setEditable(false);
@@ -915,7 +874,6 @@ public class ConnectionDialog extends JDialog{
 			mJtfUsername = new JTextField();
 			mJtfPassword = new JPasswordField();
 			mJtfMaxPollResultSize = new HintTextField("Optional");
-			mJcbDump = new JCheckBox();
 
 
 			//			 x  y  w  h  wx   wy
@@ -926,11 +884,6 @@ public class ConnectionDialog extends JDialog{
 			addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, lblInsets);
 			addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, lblInsets);
 			addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, lblInsets);
-			addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlDump, lblInsets);
-			addComponent(0, 8, 2, 1, 1.0, 1.0, this, mJlDumpDescription, nullInsets);
-			addComponent(0, 9, 2, 1, 1.0, 1.0, this, mJlDumpDescription2, nullInsets);
-			addComponent(0, 10, 2, 1, 1.0, 1.0, this, mJlDumpDescription3, nullInsets);
-
 			addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, lblInsets);
 			addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, lblInsets);
 			addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbBasicAuthentication, lblInsets);
@@ -938,7 +891,6 @@ public class ConnectionDialog extends JDialog{
 			addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, lblInsets);
 			addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, lblInsets);
 			addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, lblInsets);
-			addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJcbDump, lblInsets);
 		}
 
 		private void updatePanel(RestConnection restConnection){
@@ -950,7 +902,6 @@ public class ConnectionDialog extends JDialog{
 			// TODO TRUSTSTORE_PATH
 			// TODO TRUSTSTORE_PASS
 			mJcbConnectingAtStartUp.setSelected(restConnection.isStartupConnect());
-			mJcbDump.setSelected(restConnection.isStartupDump());
 			mJtfMaxPollResultSize.setText(restConnection.getMaxPollResultSize());
 		}
 	}

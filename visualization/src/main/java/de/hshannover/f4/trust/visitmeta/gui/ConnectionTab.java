@@ -177,16 +177,6 @@ public class ConnectionTab extends JPanel {
 		setConnectionStatus(true);
 	}
 
-	public void startDump() {
-		mDataserviceConnection.startDump(mConnection.getRestConnectionName());
-
-	}
-
-	public void stopDump() {
-		mDataserviceConnection.stopDump(mConnection.getRestConnectionName());
-
-	}
-
 	public void disconnect() {
 		mDataserviceConnection.disconnect(mConnection.getRestConnectionName());
 		setConnectionStatus(false);

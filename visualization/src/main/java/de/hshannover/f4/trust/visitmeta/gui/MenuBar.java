@@ -65,7 +65,7 @@ public class MenuBar extends JMenuBar {
 	private GuiController mContoller = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
-	private JMenu mMenuLayout = null;
+	private JMenu mMenuTheme   = null;
 	private JMenuItem mItemStopMotion = null;
 	private JMenuItem mItemRedrawGraph = null;
 	private JMenuItem mItemSetColors = null;
@@ -189,14 +189,14 @@ public class MenuBar extends JMenuBar {
 		});
 		mnSettings.add(mItemTimings);
 
-		mMenuLayout = new JMenu("Layout");
-		mnSettings.add(mMenuLayout);
+		mMenuTheme = new JMenu("Theme");
+		mnSettings.add(mMenuTheme);
 
 		final List<SupportedLaF> supportedLaFs = guiController.getMainWindow().getSupportedLaFs();
 		final MainWindow mainWindow = guiController.getMainWindow();
 
 		for (final SupportedLaF lAf: supportedLaFs){
-			mMenuLayout.add(lAf.menuItem);
+			mMenuTheme.add(lAf.menuItem);
 			lAf.menuItem.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent event) {

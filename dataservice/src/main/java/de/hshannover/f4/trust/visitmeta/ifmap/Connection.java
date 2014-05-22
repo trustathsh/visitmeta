@@ -53,6 +53,8 @@ import de.hshannover.f4.trust.ifmapj.exception.EndSessionException;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
 import de.hshannover.f4.trust.ifmapj.exception.InitializationException;
+import de.hshannover.f4.trust.ifmapj.identifier.Device;
+import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
@@ -181,6 +183,28 @@ public class Connection {
 
 		initSsrc(getUrl(), getUserName(), getUserPass(), mTruststorePath, mTruststorePass);
 		initSession();
+		executeInitialSubscription();
+	}
+
+	/* FIXME: change this to something that gets all saved subscriptions from "connections.yml"
+	 * and execute these subscriptions on startup.
+	 * In addition: add an initial subscription which *always* subscribe for the IF-MAP 2.2 defined
+	 * MAP server identifier.
+	 */
+	private void executeInitialSubscription() throws ConnectionException {
+		Device pdp = Identifiers.createDev("pdp");
+
+		SubscribeRequest subscribeReq = Requests.createSubscribeReq();
+		SubscribeElement subscribeElem = Requests.createSubscribeUpdate(
+				"dummy-subscription",
+				null,
+				Integer.MAX_VALUE,
+				null,
+				null,
+				null,
+				pdp);
+		subscribeReq.addSubscribeElement(subscribeElem);
+		subscribe(subscribeReq);
 	}
 
 	private void initSsrc(String url, String user, String userPass, String truststore, String truststorePass) throws IfmapConnectionException {

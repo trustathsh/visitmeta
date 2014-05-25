@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
@@ -58,6 +60,7 @@ public class ConnectionPersister extends YamlPersister {
 	public void persistConnections() throws FileNotFoundException {
 		Map<String, Connection> connectionMap = ConnectionManager.getConnectionPool();
 		mConnectionRepresenter.setMinoutput(mMinimalOutput);
+		mConnectionRepresenter.addClassTag(JSONObject.class, Tag.MAP);
 		persist(mFileName, connectionMap, mAppend, mConnectionRepresenter, mOptions);
 	}
 

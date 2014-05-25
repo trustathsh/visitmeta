@@ -40,12 +40,15 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.IfmapJHelper;
 import de.hshannover.f4.trust.ifmapj.exception.CommunicationException;
@@ -135,6 +138,8 @@ public class Connection {
 	@OPTIONAL("DEFAULT_STARTUP_DUMP")
 	private boolean mStartupDump;
 
+	private List<JSONObject> mSubscribeList;
+
 	/**
 	 * Represents an IF-MAP connection to a MAP server.
 	 * If not changed by yourself, following default values ​​are set:
@@ -165,6 +170,7 @@ public class Connection {
 		setMaxPollResultSize(DEFAULT_MAX_POLL_RESULT_SIZE);
 		setStartupConnect(DEFAULT_STARTUP_CONNECT);
 		setStartupDump(DEFAULT_STARTUP_DUMP);
+		mSubscribeList = new ArrayList<JSONObject>();
 
 		mNeo4JDb = new Neo4JDatabase(mConnectionName);
 		activeSubscriptions = new HashSet<String>();
@@ -565,11 +571,18 @@ public class Connection {
 
 	public void setStartupDump(boolean startupDump) {
 		mStartupDump = startupDump;
+	}
 
+	public List<JSONObject> getSubscribeList() {
+		return mSubscribeList;
 	}
 
 	public boolean isStartupDump() {
 		return mStartupDump;
+	}
+
+	public void addSubscribe(JSONObject jObj) {
+		mSubscribeList.add(jObj);
 	}
 }
 

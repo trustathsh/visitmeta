@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 
 import javax.ws.rs.Consumes;
@@ -169,8 +170,9 @@ public class SubscribeResource {
 				try{
 
 					subscribeUpdate(name, moreSubscribes);
+					ConnectionManager.persistSubscribeToConnection(name, jObj);
 
-				} catch (ConnectionException e) {
+				} catch (ConnectionException | FileNotFoundException e) {
 					log.error("error while multiple subscribeUpdate from " + name, e);
 					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
@@ -180,8 +182,9 @@ public class SubscribeResource {
 			try{
 
 				subscribeUpdate(name, jObj);
+				ConnectionManager.persistSubscribeToConnection(name, jObj);
 
-			} catch (ConnectionException ee) {
+			} catch (ConnectionException | FileNotFoundException ee) {
 				log.error("error while single subscribeUpdate from " + name, e);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}

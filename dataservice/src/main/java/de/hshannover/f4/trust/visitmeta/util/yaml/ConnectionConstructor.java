@@ -2,10 +2,12 @@ package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -80,11 +82,12 @@ public class ConnectionConstructor extends Constructor {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		private Connection constructConnection(Map<String, Object> connectionDataMap){
-			String connectionName = (String) connectionDataMap.get("mConnectionName");	// TODO not good, is the field name at the connection class
-			String url = (String) connectionDataMap.get("mUrl");						// TODO not good, is the field name at the connection class
-			String userName = (String) connectionDataMap.get("mUserName");				// TODO not good, is the field name at the connection class
-			String userPass = (String) connectionDataMap.get("mUserPass");				// TODO not good, is the field name at the connection class
+			String connectionName = (String) connectionDataMap.get("mConnectionName");
+			String url = (String) connectionDataMap.get("mUrl");
+			String userName = (String) connectionDataMap.get("mUserName");
+			String userPass = (String) connectionDataMap.get("mUserPass");
 
 			Connection c = null;
 			try {
@@ -108,6 +111,19 @@ public class ConnectionConstructor extends Constructor {
 					log.error("Error while set the optional fields in the Connection object.", e);
 				}
 			}
+
+			Object o = connectionDataMap.get("mSubscribeList");
+			if(o instanceof List){
+				List<Object> subscribeList = (List<Object>)o;
+				for(Object listObject: subscribeList){
+					if(listObject instanceof Map){
+						JSONObject json = new JSONObject((Map)listObject);
+						c.addSubscribe(json);
+					}
+				}
+
+			}
+
 			return c;
 		}
 

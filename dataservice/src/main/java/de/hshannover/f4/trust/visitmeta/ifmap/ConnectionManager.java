@@ -40,13 +40,16 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -56,7 +59,7 @@ public class ConnectionManager {
 
 	private static Logger log = Logger.getLogger(ConnectionManager.class);
 
-	private static Map<String, Connection> connectionPool = new HashMap<String,Connection>();
+	private static Map<String, Connection> mConnectionPool = new HashMap<String,Connection>();
 
 
 	/**
@@ -67,7 +70,7 @@ public class ConnectionManager {
 	 */
 	public static void add(Connection connection) throws ConnectionException {
 		if(!existsConnectionName(connection.getConnectionName())){
-			connectionPool.put(connection.getConnectionName(), connection);
+			mConnectionPool.put(connection.getConnectionName(), connection);
 			log.debug(connection.getConnectionName() + " added to connection pool");
 		}else{
 			throw new ConnectionException(connection.getConnectionName() + " connection name already exists, adding canceled");
@@ -81,7 +84,7 @@ public class ConnectionManager {
 	 * @throws ConnectionException
 	 */
 	public static void startupConnect() throws ConnectionException{
-		for(Connection c: connectionPool.values()){
+		for(Connection c: mConnectionPool.values()){
 			if(c.isStartupConnect()){
 				connectTo(c.getConnectionName());
 			}
@@ -130,7 +133,7 @@ public class ConnectionManager {
 	 * @return All saved connections.
 	 */
 	public static Map<String, Connection> getConnectionPool(){
-		return connectionPool;
+		return mConnectionPool;
 	}
 
 	/**
@@ -141,7 +144,7 @@ public class ConnectionManager {
 
 		StringBuilder sb = new StringBuilder();
 
-		for(Connection c: connectionPool.values()){
+		for(Connection c: mConnectionPool.values()){
 			sb.append(c).append("\n");
 		}
 
@@ -157,7 +160,7 @@ public class ConnectionManager {
 
 		StringBuilder sb = new StringBuilder();
 
-		for(Connection c: connectionPool.values()){
+		for(Connection c: mConnectionPool.values()){
 			if(c.isConnected()){
 				sb.append(c).append("\n");
 			}
@@ -220,8 +223,8 @@ public class ConnectionManager {
 	}
 
 	private static Connection getConnection(String connectionName) throws NoSavedConnectionException{
-		if(connectionPool.containsKey(connectionName)){
-			return connectionPool.get(connectionName);
+		if(mConnectionPool.containsKey(connectionName)){
+			return mConnectionPool.get(connectionName);
 		}
 
 		NoSavedConnectionException e = new NoSavedConnectionException();
@@ -239,9 +242,14 @@ public class ConnectionManager {
 	}
 
 	public static boolean existsConnectionName(String connectionName) {
-		if(connectionPool.containsKey(connectionName)){
+		if(mConnectionPool.containsKey(connectionName)){
 			return true;
 		}
 		return false;
+	}
+
+	public static void persistSubscribeToConnection(String connectionName, JSONObject jObj) throws FileNotFoundException {
+		mConnectionPool.get(connectionName).addSubscribe(jObj);
+		Application.getConnectionPersister().persistConnections();
 	}
 }

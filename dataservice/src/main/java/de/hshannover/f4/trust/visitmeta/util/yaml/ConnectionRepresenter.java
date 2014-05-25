@@ -1,10 +1,15 @@
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
@@ -98,6 +103,20 @@ public class ConnectionRepresenter extends Representer {
 						}
 					}
 				}
+
+				// save subscribes
+				List<JSONObject> jsonList = connection.getSubscribeList();
+				List<Map<String, Object>> subscribeList = new ArrayList<Map<String,Object>>();
+				for(JSONObject json: jsonList){
+					Map<String,Object> subscribeMap = new TreeMap<String,Object>();
+					Iterator<String> i = json.keys();
+					while(i.hasNext()){
+						String jKey = i.next();
+						subscribeMap.put(jKey, json.opt(jKey));
+					}
+					subscribeList.add(subscribeMap);
+				}
+				dataMap.put("subscribeList", subscribeList);
 			}
 
 			Node nodeMap = representMapping(new Tag(ConnectionPersister.CONNECTION_TAG), dataMap, false);

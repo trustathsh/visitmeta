@@ -87,6 +87,7 @@ public class ConnectionManager {
 		for(Connection c: mConnectionPool.values()){
 			if(c.isStartupConnect()){
 				connectTo(c.getConnectionName());
+				c.executeInitialSubscription();
 			}
 		}
 	}

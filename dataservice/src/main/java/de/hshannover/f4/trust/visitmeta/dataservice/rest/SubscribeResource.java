@@ -60,14 +60,11 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
-import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
-import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
@@ -169,7 +166,8 @@ public class SubscribeResource {
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
 				try{
 
-					subscribeUpdate(name, moreSubscribes);
+					SubscribeRequest request = SubscriptionHelper.buildRequest(moreSubscribes);
+					ConnectionManager.subscribeFromConnection(name, request);
 					ConnectionManager.persistSubscribeToConnection(name, jObj);
 
 				} catch (ConnectionException | FileNotFoundException e) {
@@ -177,11 +175,11 @@ public class SubscribeResource {
 					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
-
 		} catch (JSONException e) {
 			try{
 
-				subscribeUpdate(name, jObj);
+				SubscribeRequest request = SubscriptionHelper.buildRequest(jObj);
+				ConnectionManager.subscribeFromConnection(name, request);
 				ConnectionManager.persistSubscribeToConnection(name, jObj);
 
 			} catch (ConnectionException | FileNotFoundException ee) {
@@ -190,108 +188,6 @@ public class SubscribeResource {
 			}
 		}
 		return Response.ok().entity("INFO: subscribe successfully").build();
-	}
-
-	private void subscribeUpdate(String connectionName, JSONObject jObj) throws ConnectionException {
-		String subscribeName = null;
-		String identifierType = null;
-		String identifier = null;
-		int maxDepth = MAX_DEPTH;
-		int maxSize = MAX_SIZE;
-
-		String linksFilter = null;
-		String resultFilter = null;
-		String terminalIdentifierTypes = null;
-
-		try {
-
-			Iterator<String> i = jObj.keys();
-
-			while (i.hasNext()) {
-				String jKey = i.next();
-
-				switch (jKey) {
-				case JSON_KEY_SUBSCRIBE_NAME:
-					subscribeName = jObj.getString(jKey);
-					break;
-
-				case JSON_KEY_IDENTIFIER_TYPE:
-					identifierType = jObj.getString(jKey);
-					break;
-
-				case JSON_KEY_IDENTIFIER:
-					identifier = jObj.getString(jKey);
-					break;
-
-				case JSON_KEY_MAX_DEPTH:
-					maxDepth = jObj.getInt(jKey);
-					break;
-
-				case JSON_KEY_MAX_SIZE:
-					maxSize = jObj.getInt(jKey);
-					break;
-
-				case JSON_KEY_LINKS_FILTER:
-					linksFilter = jObj.getString(jKey);
-					break;
-
-				case JSON_KEY_RESULT_FILTER:
-					resultFilter = jObj.getString(jKey);
-					break;
-
-				case JSON_KEY_TERMINAL_IDENTIFIER_TYPES:
-					terminalIdentifierTypes = jObj.getString(jKey);
-					break;
-
-				default:
-					log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions.");
-					break;
-				}
-			}
-		} catch (JSONException e) {
-			log.error(e.getMessage(), e);
-		}
-
-		SubscribeRequest request = Requests.createSubscribeReq();
-		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
-
-		subscribe.setName(subscribeName);
-		subscribe.setMaxDepth(maxDepth);
-		subscribe.setMaxSize(maxSize);
-		subscribe.setMatchLinksFilter(linksFilter);
-		subscribe.setResultFilter(resultFilter);
-		subscribe.setTerminalIdentifierTypes(terminalIdentifierTypes);
-		subscribe.setStartIdentifier(createStartIdentifier(identifierType, identifier));
-
-		request.addSubscribeElement(subscribe);
-
-		ConnectionManager.subscribeFromConnection(connectionName, request);
-	}
-
-	private Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {
-		switch (sIdentifierType) {
-		case "device":
-			return Identifiers.createDev(sIdentifier);
-		case "access-request":
-			return Identifiers.createAr(sIdentifier);
-		case "ip-address":
-			String[] split = sIdentifier.split(",");
-			switch (split[0]) {
-			case "IPv4":
-				return Identifiers.createIp4(split[1]);
-			case "IPv6":
-				return Identifiers.createIp6(split[1]);
-			default:
-				throw new RuntimeException("unknown IP address type '"+split[0]+"'");
-			}
-		case "mac-address":
-			return Identifiers.createMac(sIdentifier);
-
-			// TODO identity and extended identifiers
-
-		default:
-			throw new RuntimeException("unknown identifier type '"+sIdentifierType+"'");
-		}
 	}
 
 	/**

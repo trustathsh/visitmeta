@@ -47,6 +47,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yaml.snakeyaml.constructor.ConstructorException;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
@@ -101,6 +102,8 @@ public abstract class Application {
 		try {
 			loadPersistentConnections();
 		} catch (FileNotFoundException e) {
+			log.error("error while load persistent connections", e);
+		} catch (ConstructorException e) {
 			log.error("error while load persistent connections", e);
 		}
 

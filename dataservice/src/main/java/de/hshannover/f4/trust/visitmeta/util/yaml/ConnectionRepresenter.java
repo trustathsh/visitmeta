@@ -92,7 +92,8 @@ public class ConnectionRepresenter extends Representer {
 								field.setAccessible(true);
 								OPTIONAL optionalAnnotation = (OPTIONAL) field.getAnnotations()[i];
 								Object fieldValue = field.get(connection);
-								if(!same(fieldValue, Connection.class.getField(optionalAnnotation.value()).get(connection)) || !mMinOutput){
+								Object oTmp = Connection.class.getField(optionalAnnotation.value()).get(connection);
+								if(!same(fieldValue, oTmp) || !mMinOutput){
 									dataMap.put(transformKey(field.getName()), fieldValue);
 								}
 

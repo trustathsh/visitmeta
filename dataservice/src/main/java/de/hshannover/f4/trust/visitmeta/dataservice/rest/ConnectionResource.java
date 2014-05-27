@@ -125,7 +125,6 @@ public class ConnectionResource {
 	 * 		<li>truststore.path</li>
 	 * 		<li>truststore.pw</li>
 	 * 		<li>startup.connect</li>
-	 * 		<li>startup.dump</li>
 	 * 		<li>maxPollResultSize</li>
 	 * 	</ul>
 	 * 	</li>
@@ -161,7 +160,6 @@ public class ConnectionResource {
 		String truststorePath = jObj.optString(ConnectionKey.TRUSTSTORE_PATH);
 		String truststorePass = jObj.optString(ConnectionKey.TRUSTSTORE_PASS);
 		boolean startupConnect = jObj.optBoolean(ConnectionKey.STARTUP_CONNECT);
-		boolean startupDump = jObj.optBoolean(ConnectionKey.STARTUP_DUMP);
 		int maxPollResultSize = jObj.optInt(ConnectionKey.MAX_POLL_RESULT_SIZE);
 
 		// build new Connection
@@ -194,9 +192,6 @@ public class ConnectionResource {
 			break;
 
 			case ConnectionKey.STARTUP_CONNECT: newConnection.setStartupConnect(startupConnect);
-			break;
-
-			case ConnectionKey.STARTUP_DUMP: newConnection.setStartupDump(startupDump);
 			break;
 
 			case ConnectionKey.MAX_POLL_RESULT_SIZE: newConnection.setMaxPollResultSize(maxPollResultSize);
@@ -299,7 +294,6 @@ public class ConnectionResource {
 				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH, c.getTruststorePath());
 				connectionMap.put(ConnectionKey.TRUSTSTORE_PASS, c.getTruststorePass());
 				connectionMap.put(ConnectionKey.STARTUP_CONNECT, String.valueOf(c.isStartupConnect()));
-				connectionMap.put(ConnectionKey.STARTUP_DUMP, String.valueOf(c.isStartupDump()));
 				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE, String.valueOf(c.getMaxPollResultSize()));
 
 				JSONObject jsonConnection = new JSONObject(connectionMap);

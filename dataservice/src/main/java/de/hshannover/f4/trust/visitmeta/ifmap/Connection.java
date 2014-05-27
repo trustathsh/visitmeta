@@ -66,12 +66,10 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifier
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoActiveDumpingException;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
@@ -89,8 +87,6 @@ public class Connection {
 
 	public static final boolean DEFAULT_STARTUP_CONNECT = false;
 
-	public static final boolean DEFAULT_STARTUP_DUMP = false;
-
 	private static final Logger log = Logger.getLogger(Connection.class);
 
 
@@ -98,7 +94,6 @@ public class Connection {
 	private UpdateService mUpdateService;
 
 	private Thread mUpdateThread;
-	private Thread mDumpingThread;
 
 	private ThreadSafeSsrc mSsrc;
 
@@ -133,9 +128,6 @@ public class Connection {
 	@OPTIONAL("DEFAULT_STARTUP_CONNECT")
 	private boolean mStartupConnect;
 
-	@OPTIONAL("DEFAULT_STARTUP_DUMP")
-	private boolean mStartupDump;
-
 	private List<JSONObject> mSubscribeList;
 
 	/**
@@ -147,7 +139,6 @@ public class Connection {
 	 * 	<li>TruststorePass = see config.property(ifmap.truststore.pw)</li>
 	 * 	<li>MaxPollResultSize = see config.property(ifmap.maxsize)</li>
 	 * 	<li>StartupConnect = false</li>
-	 * 	<li>StartupDump = false</li>
 	 * </ul>
 	 * @throws ConnectionException
 	 */
@@ -167,7 +158,6 @@ public class Connection {
 		setTruststorePass(DEFAULT_TRUSTSTORE_PASS);
 		setMaxPollResultSize(DEFAULT_MAX_POLL_RESULT_SIZE);
 		setStartupConnect(DEFAULT_STARTUP_CONNECT);
-		setStartupDump(DEFAULT_STARTUP_DUMP);
 		mSubscribeList = new ArrayList<JSONObject>();
 
 		mNeo4JDb = new Neo4JDatabase(mConnectionName);
@@ -282,7 +272,6 @@ public class Connection {
 	 */
 	public void subscribe(SubscribeRequest request) throws ConnectionException {
 		checkIsConnectionEstablished();
-		checkIsDumpingStopped();
 		startUpdateService();
 
 		if(request == null || !request.getSubscribeElements().isEmpty()){
@@ -409,36 +398,12 @@ public class Connection {
 		}
 	}
 
-	private void checkIsDumpingActive() throws NoActiveDumpingException {
-		if(!isDumpingActive()){
-			NoActiveDumpingException e = new NoActiveDumpingException();
-			log.error(e.toString());
-			throw e;
-		}
-	}
-
-	public boolean isDumpingActive(){
-		if(mDumpingThread == null || !mDumpingThread.isAlive()){
-			return false;
-		}
-		return true;
-	}
-
-	private void checkIsDumpingStopped() throws ActiveDumpingException {
-		if(mDumpingThread != null && mDumpingThread.isAlive()){
-			ActiveDumpingException e = new ActiveDumpingException();
-			log.error(e.toString());
-			throw e;
-		}
-	}
-
 	/**
 	 * @return A Set<String> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
 	public Set<String> getActiveSubscriptions() throws ConnectionException {
 		checkIsConnectionEstablished();
-		checkIsDumpingStopped();
 		HashSet<String> temp = new HashSet<String>(activeSubscriptions);
 
 		log.trace("getActiveSubscriptions(): " + temp);
@@ -545,16 +510,8 @@ public class Connection {
 		return mStartupConnect;
 	}
 
-	public void setStartupDump(boolean startupDump) {
-		mStartupDump = startupDump;
-	}
-
 	public List<JSONObject> getSubscribeList() {
 		return mSubscribeList;
-	}
-
-	public boolean isStartupDump() {
-		return mStartupDump;
 	}
 
 	public void addSubscribe(JSONObject jObj) {

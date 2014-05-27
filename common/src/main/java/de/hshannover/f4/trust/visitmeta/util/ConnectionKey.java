@@ -11,7 +11,6 @@ public class ConnectionKey {
 	public static final String TRUSTSTORE_PATH = "truststore.path";
 	public static final String TRUSTSTORE_PASS = "truststore.pw";
 	public static final String STARTUP_CONNECT = "startup.connect";
-	public static final String STARTUP_DUMP = "startup.dump";
 	public static final String MAX_POLL_RESULT_SIZE = "maxPollResultSize";
 
 }

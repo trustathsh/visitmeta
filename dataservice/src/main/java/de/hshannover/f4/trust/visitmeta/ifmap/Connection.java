@@ -189,19 +189,6 @@ public class Connection {
 		initSession();
 	}
 
-	/* FIXME: change this to something that gets all saved subscriptions from "connections.yml"
-	 * and execute these subscriptions on startup.
-	 * In addition: add an initial subscription which *always* subscribe for the IF-MAP 2.2 defined
-	 * MAP server identifier.
-	 */
-	public void executeInitialSubscription() throws ConnectionException {
-		log.debug("initial subscription for connection("+ mConnectionName +")...");
-		for(JSONObject json: mSubscribeList){
-			SubscribeRequest request = SubscriptionHelper.buildRequest(json);
-			ConnectionManager.subscribeFromConnection(mConnectionName, request);
-		}
-	}
-
 	private void initSsrc(String url, String user, String userPass, String truststore, String truststorePass) throws IfmapConnectionException {
 		log.trace("init SSRC ...");
 

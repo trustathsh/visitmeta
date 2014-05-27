@@ -87,8 +87,21 @@ public class ConnectionManager {
 		for(Connection c: mConnectionPool.values()){
 			if(c.isStartupConnect()){
 				connectTo(c.getConnectionName());
-				c.executeInitialSubscription();
+				executeInitialSubscription(c);
 			}
+		}
+	}
+
+	/* FIXME: change this to something that gets all saved subscriptions from "connections.yml"
+	 * and execute these subscriptions on startup.
+	 * In addition: add an initial subscription which *always* subscribe for the IF-MAP 2.2 defined
+	 * MAP server identifier.
+	 */
+	private static void executeInitialSubscription(Connection connection) throws ConnectionException {
+		log.debug("initial subscription for connection("+ connection.getConnectionName() +")...");
+		for(JSONObject json: connection.getSubscribeList()){
+			SubscribeRequest request = SubscriptionHelper.buildRequest(json);
+			subscribeFromConnection(connection.getConnectionName(), request);
 		}
 	}
 

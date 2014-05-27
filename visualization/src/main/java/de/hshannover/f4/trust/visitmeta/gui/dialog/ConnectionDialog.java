@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -116,18 +117,16 @@ public class ConnectionDialog extends JDialog{
 
 		addWindowListener(new WindowListener() {
 			@Override public void windowClosing(WindowEvent arg0) {
-				System.out.println("windowClosing");
 				dispose();
 			}
-			@Override public void windowClosed(WindowEvent arg0) {System.out.println("windowClosed");}
-			@Override public void windowActivated(WindowEvent arg0) {System.out.println("windowActivated");}
+			@Override public void windowClosed(WindowEvent arg0) {}
+			@Override public void windowActivated(WindowEvent arg0) {}
 			@Override public void windowDeactivated(WindowEvent arg0) {
-				System.out.println("windowDeactivated");
 				JTextAreaAppander.clearJTextAreas();
 			}
-			@Override public void windowDeiconified(WindowEvent arg0) {System.out.println("windowDeiconified");}
-			@Override public void windowIconified(WindowEvent arg0) {System.out.println("windowIconified");}
-			@Override public void windowOpened(WindowEvent arg0) {System.out.println("windowOpened");}
+			@Override public void windowDeiconified(WindowEvent arg0) {}
+			@Override public void windowIconified(WindowEvent arg0) {}
+			@Override public void windowOpened(WindowEvent arg0) {}
 		});
 	}
 
@@ -190,10 +189,8 @@ public class ConnectionDialog extends JDialog{
 		mJbSave.setEnabled(false);
 		mConnectionPanelMapServer.mParameterPanel.mJtfName.setEditable(false);
 		if(mJtpMain.getSelectedComponent() == mConnectionPanelMapServer){
-			System.out.println("mJtpMain.getSelectedComponent() == mConnectionPanelMapServer");
 			mGuiController.updateRestConnections();
 		}else if(mJtpMain.getSelectedComponent() == mConnectionPanelDataService){
-			System.out.println("mJtpMain.getSelectedComponent() == mConnectionPanelDataService");
 			mGuiController.addDataserviceConnection(mConnectionPanelDataService.mPreviousConnection);
 		}
 	}
@@ -352,17 +349,16 @@ public class ConnectionDialog extends JDialog{
 		private JPanel mJpDataserviceComboBox;
 
 		public void updateDataserviceComboBox(){
-			System.out.println("updateDataserviceComboBox");
 			mJcbDataServiceConnection.removeAllItems();
 
-			List<DataserviceConnection> dataserviceList = null;
+			Map<String, DataserviceConnection> dataserviceList = null;
 			try {
 				dataserviceList = mDataservicePersister.load();
 			} catch (FileNotFoundException e) {
 				log.error("Error while update Dataservice-Combo-Box", e);
 			}
 
-			for(DataserviceConnection dc: dataserviceList){
+			for(DataserviceConnection dc: dataserviceList.values()){
 				mJcbDataServiceConnection.addItem(dc);
 			}
 		}
@@ -623,6 +619,8 @@ public class ConnectionDialog extends JDialog{
 
 
 		private DataServicePanel(){
+			mJbDelete.setEnabled(false);
+
 			mParameterPanel = new DataServiceParameterPanel();
 
 			loadDataserviceConnections();
@@ -664,6 +662,7 @@ public class ConnectionDialog extends JDialog{
 						mDataservicePersister.add(param);
 						mListModelDataService.add(mListModelDataService.getSize(), param);
 						mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
+						setChanges(true);
 						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 
 					} catch (FileNotFoundException e) {
@@ -698,15 +697,20 @@ public class ConnectionDialog extends JDialog{
 			mJbCopy.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					DataserviceConnection param =  mJlDataServiceConnections.getSelectedValue().clone();
-					try {
-						mDataservicePersister.add(param);
-						mListModelDataService.add(mListModelDataService.getSize(), param);
-						mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
-					} catch (FileNotFoundException e) {
-						log.error("Error while copy new Dataservice-Connection", e);
-					} catch (DataservicePersisterException e) {
-						log.warn(e.toString());
+					int index = mJlDataServiceConnections.getSelectedIndex();
+					if (index >= 0) {
+						DataserviceConnection param =  mJlDataServiceConnections.getSelectedValue().clone();
+
+						try {
+							mDataservicePersister.add(param);
+							mListModelDataService.add(mListModelDataService.getSize(), param);
+							mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
+							setChanges(true);
+						} catch (FileNotFoundException e) {
+							log.error("Error while copy new Dataservice-Connection", e);
+						} catch (DataservicePersisterException e) {
+							log.warn(e.toString());
+						}
 					}
 				}
 			});
@@ -767,13 +771,13 @@ public class ConnectionDialog extends JDialog{
 		}
 
 		private void loadDataserviceConnections(){
-			List<DataserviceConnection> dataserviceSet = null;
+			Map<String, DataserviceConnection> dataserviceSet = null;
 			try {
 				dataserviceSet = mDataservicePersister.load();
 			} catch (FileNotFoundException e) {
 				log.error("Error while load persisted Dataservice-Connections", e);
 			}
-			for(DataserviceConnection dc: dataserviceSet){
+			for(DataserviceConnection dc: dataserviceSet.values()){
 				addDataserviceConnection(dc);
 			}
 		}

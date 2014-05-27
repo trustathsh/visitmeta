@@ -39,7 +39,7 @@
 package de.hshannover.f4.trust.visitmeta;
 
 import java.io.FileNotFoundException;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -74,7 +74,7 @@ public final class Main {
 
 		initComponents();
 
-		List<DataserviceConnection> dataserviceConnections = null;
+		Map<String, DataserviceConnection> dataserviceConnections = null;
 		try {
 			dataserviceConnections = getDataservicePersister().load();
 		} catch (FileNotFoundException e) {
@@ -87,7 +87,7 @@ public final class Main {
 		GuiController gui = new GuiController();
 
 		if(vConnectionType == ConnectionType.REST && dataserviceConnections != null){
-			for(DataserviceConnection dc : dataserviceConnections) {
+			for(DataserviceConnection dc : dataserviceConnections.values()) {
 				gui.addDataserviceConnection(dc);
 			}
 			gui.show();

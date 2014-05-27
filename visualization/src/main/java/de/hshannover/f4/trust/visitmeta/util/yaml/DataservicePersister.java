@@ -1,8 +1,9 @@
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
@@ -33,34 +34,6 @@ public class DataservicePersister extends YamlPersister {
 
 	private Constructor mConstructor;
 
-	public static void main(String[] args) throws FileNotFoundException {
-		String file = DataservicePersister.class.getClassLoader().getResource("dataservices.yml").getPath();
-		DataservicePersister persister = new DataservicePersister(file);
-		List<DataserviceConnection> test = persister.load();
-		System.out.println(test);
-
-		if(test == null){
-
-		}
-
-		DataserviceConnection con = new DataserviceConnection("testCon", "TEstURL", true);
-
-		try {
-			persister.add(con);
-		} catch (DataservicePersisterException e) {
-			log.error(e.toString(), e);
-		}
-
-		List<DataserviceConnection> test2 = persister.load();
-		System.out.println(test2);
-
-		//		persister.remove(con.getName());
-
-		List<DataserviceConnection> test3 = persister.load();
-		System.out.println(test3);
-	}
-
-
 	/**
 	 * Create a JyamlPersister for Dataservices with default minimalOutput = true
 	 *
@@ -87,61 +60,53 @@ public class DataservicePersister extends YamlPersister {
 	}
 
 	public void add(DataserviceConnection connection) throws FileNotFoundException, DataservicePersisterException {
-		List<DataserviceConnection> dataserviceList = load();
-		checkContains(connection, dataserviceList);
-		dataserviceList.add(connection);
-		persist(mFileName, dataserviceList, mAppend, mRepresenter, mOptions);
+		Map<String, DataserviceConnection> dataserviceMap = load();
+		checkContains(connection, dataserviceMap);
+		dataserviceMap.put(connection.getName(), connection);
+		persist(mFileName, dataserviceMap, mAppend, mRepresenter, mOptions);
 	}
 
 	public void update(String oldDataserviceConnectionName, DataserviceConnection dataservice) throws FileNotFoundException, DataservicePersisterException {
-		List<DataserviceConnection> dataserviceList = load();
-		if(!oldDataserviceConnectionName.equals(dataservice.getName())){
-			checkContains(dataservice, dataserviceList);
+		Map<String, DataserviceConnection> dataserviceMap = load();
+		DataserviceConnection oldDataservice = search(oldDataserviceConnectionName, dataserviceMap);
+		dataserviceMap.remove(oldDataserviceConnectionName);
+		if(oldDataservice != null){
+			oldDataservice.update(dataservice);
+			dataserviceMap.put(dataservice.getName(), dataservice);
+			persist(mFileName, dataserviceMap, mAppend, mRepresenter, mOptions);
 		}
-		find(oldDataserviceConnectionName, dataserviceList).update(dataservice);
-		persist(mFileName, dataserviceList, mAppend, mRepresenter, mOptions);
 	}
 
-	private DataserviceConnection find(String dataserviceName, List<DataserviceConnection> dataserviceList){
-		for(DataserviceConnection data: dataserviceList){
-			if(data.getName().equals(dataserviceName)){
-				return data;
-			}
+	private DataserviceConnection search(String dataserviceName, Map<String, DataserviceConnection> dataserviceMap){
+		DataserviceConnection dataservice = dataserviceMap.get(dataserviceName);
+		if(dataservice != null){
+			return dataservice;
+		}else{
+			log.warn("Warn by search DataserviceConnection, is null.");
 		}
 		return null;
 	}
 
 	public void remove(String dataserviceName) throws FileNotFoundException{
-		List<DataserviceConnection> dataserviceList = load();
-		dataserviceList.remove(find(dataserviceName, dataserviceList));
+		Map<String, DataserviceConnection> dataserviceList = load();
+		dataserviceList.remove(search(dataserviceName, dataserviceList));
 		persist(mFileName, dataserviceList, mAppend, mRepresenter, mOptions);
 	}
 
-	public List<DataserviceConnection> load() throws FileNotFoundException {
-		List<DataserviceConnection> newList = new ArrayList<DataserviceConnection>();
-		List<Object> map = loadList(mFileName, mConstructor);
+	public Map<String, DataserviceConnection> load() throws FileNotFoundException {
+		Map<String, DataserviceConnection> newMap = new HashMap<String, DataserviceConnection>();
+		Map<String, Object> map = loadMap(mFileName, mConstructor);
 		if(map != null){
-			for(Object e: map){
-				if(e instanceof DataserviceConnection){
-					newList.add((DataserviceConnection) e);
+			for(Entry<String, Object> entry: map.entrySet()){
+				if(entry.getValue() instanceof DataserviceConnection){
+					newMap.put(entry.getKey(), (DataserviceConnection) entry.getValue());
 				}else{
 					log.warn("Warn by load DataserviceConnection Set. Object is not a DataserviceConnection.");
 				}
 			}
 		}
-		return newList;
+		return newMap;
 	}
-
-	//	@SuppressWarnings("unchecked")
-	//	public Map<String, Map<String, String>> loadAsMap() throws FileNotFoundException {
-	//		mConnectionConstructor.setConnectionAsMap(true);
-	//		Map<String, Map<String, String>> newMap = new HashMap<String, Map<String, String>>();
-	//		Map<String, Object> map = loadMap(mFileName, mConnectionConstructor);
-	//		for(Entry<String, Object> e: map.entrySet()){
-	//			newMap.put(e.getKey(), (Map<String, String>) e.getValue());
-	//		}
-	//		return newMap;
-	//	}
 
 	public void setMinimalOutput(boolean minimalOutput){
 		mMinimalOutput = minimalOutput;
@@ -151,8 +116,8 @@ public class DataservicePersister extends YamlPersister {
 		return mMinimalOutput;
 	}
 
-	private void checkContains(DataserviceConnection connection, List<DataserviceConnection> dataserviceList) throws DataservicePersisterException {
-		for(DataserviceConnection data: dataserviceList){
+	private void checkContains(DataserviceConnection connection, Map<String, DataserviceConnection> dataserviceMap) throws DataservicePersisterException {
+		for(DataserviceConnection data: dataserviceMap.values()){
 			if(data.equals(connection)){
 				throw new DataservicePersisterException("No duplicate Data service Connections allowed");
 			}

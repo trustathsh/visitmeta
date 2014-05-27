@@ -98,10 +98,14 @@ public class ConnectionManager {
 	 * MAP server identifier.
 	 */
 	private static void executeInitialSubscription(Connection connection) throws ConnectionException {
-		log.debug("initial subscription for connection("+ connection.getConnectionName() +")...");
 		for(JSONObject json: connection.getSubscribeList()){
-			SubscribeRequest request = SubscriptionHelper.buildRequest(json);
-			subscribeFromConnection(connection.getConnectionName(), request);
+			// TODO [MR] NEXT RELEASE add startupSubscribe to SubscribeKey
+			if(json.optBoolean("startupSubscribe")){
+				// TODO [MR] NEXT RELEASE use SubscribeKey's
+				log.debug("initial subscription("+ json.optString("subscribeName") +") for connection("+ connection.getConnectionName() +")...");
+				SubscribeRequest request = SubscriptionHelper.buildRequest(json);
+				subscribeFromConnection(connection.getConnectionName(), request);
+			}
 		}
 	}
 

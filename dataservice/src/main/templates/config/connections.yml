@@ -8,4 +8,5 @@ default: !Connection
   - identifier: pdp
     identifierType: device
     subscribeName: default
+    startupSubscribe: true
   url: https://localhost:8443

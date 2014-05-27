@@ -29,6 +29,7 @@ public class SubscriptionHelper {
 	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
 	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
 	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
+	public static final String JSON_KEY_STARTUPSUBSCRIBE = "startupSubscribe";
 
 	public static SubscribeRequest buildRequest(JSONObject jObj) {
 		String subscribeName = null;
@@ -45,6 +46,7 @@ public class SubscriptionHelper {
 			String jKey = i.next();
 
 			switch (jKey) {
+			// TODO [MR] NEXT RELEASE use SubscribeKey's
 			case JSON_KEY_SUBSCRIBE_NAME: subscribeName = jObj.optString(jKey); break;
 			case JSON_KEY_IDENTIFIER_TYPE: identifierType = jObj.optString(jKey); break;
 			case JSON_KEY_IDENTIFIER: identifier = jObj.optString(jKey); break;
@@ -53,6 +55,7 @@ public class SubscriptionHelper {
 			case JSON_KEY_LINKS_FILTER: linksFilter = jObj.optString(jKey); break;
 			case JSON_KEY_RESULT_FILTER: resultFilter = jObj.optString(jKey); break;
 			case JSON_KEY_TERMINAL_IDENTIFIER_TYPES: terminalIdentifierTypes = jObj.optString(jKey); break;
+			case JSON_KEY_STARTUPSUBSCRIBE: break; // nothing to do
 			default: log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions."); break;
 			}
 		}

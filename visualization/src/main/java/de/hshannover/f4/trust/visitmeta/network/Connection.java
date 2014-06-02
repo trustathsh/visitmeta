@@ -205,9 +205,12 @@ public class Connection {
 		LOGGER.trace("Method updateGraph() called.");
 		boolean vUpdate = false;
 		boolean vDelete = false;
-		while (!mTimeSelector.getTimeHolder().hasChangeMap()) {
+		
+		boolean newChangesMapFlag = true;
+		while (newChangesMapFlag) {
 			List<IdentifierGraph> vGraphs = mGraphService.getCurrentGraph();
 			if (vGraphs != null && vGraphs.size() > 0) {
+				System.out.println("graph unleer");
 				LOGGER.info("Load initial graph.");
 				debugGraphContent("initial", vGraphs);
 				vUpdate = deltaUpdate(vGraphs);
@@ -217,6 +220,7 @@ public class Connection {
 					mTimeSelector.getTimeHolder().setTimeEnd(vGraphs.get(0).getTimestamp(), false);
 				}
 				mTimeSelector.getTimeHolder().notifyObservers();
+				newChangesMapFlag = false;
 			} else {
 				// FIXME refactoring needed; wait for network-interval
 				LOGGER.info("No initial data found; retrying in " + mInterval + " milliseconds.");

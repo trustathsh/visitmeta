@@ -238,7 +238,7 @@ public class ConnectionResource {
 			ConnectionManager.connectTo(name);
 
 		} catch (ConnectionEstablishedException e){
-			log.error("error while connecting to " + name, e);
+			log.warn(e.toString());
 			return Response.ok().entity("INFO: connection allready aktive").build();
 		} catch (ConnectionException e) {
 			log.error("error while connecting to " + name, e);

@@ -392,9 +392,7 @@ public class Connection {
 
 	private void checkIsConnectionDisconnected() throws ConnectionEstablishedException {
 		if(mSsrc != null && isConnected() && mSsrc.getSessionId() != null){
-			ConnectionEstablishedException e = new ConnectionEstablishedException();
-			log.error(e.toString());
-			throw e;
+			throw new ConnectionEstablishedException();
 		}
 	}
 

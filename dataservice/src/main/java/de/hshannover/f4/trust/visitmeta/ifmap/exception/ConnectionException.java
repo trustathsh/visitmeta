@@ -55,9 +55,9 @@ public class ConnectionException extends Exception {
 	@Override
 	public String toString() {
 		if(mMsg != null){
-			return "Error: " + this.getClass().getSimpleName() + "(" + mMsg + ")";
+			return this.getClass().getSimpleName() + "(" + mMsg + ")";
 		}else {
-			return "Error: " + this.getClass().getSimpleName();
+			return this.getClass().getSimpleName();
 		}
 	}
 }

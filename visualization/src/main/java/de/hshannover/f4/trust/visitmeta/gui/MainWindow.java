@@ -65,6 +65,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
@@ -109,6 +110,7 @@ public class MainWindow extends JFrame {
 		if(!existsDataservice(dataservice)){
 			addDataserviceTreeNode(dataservice);
 			updateRestConnections();
+			mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
 		}
 	}
 
@@ -187,8 +189,8 @@ public class MainWindow extends JFrame {
 	private void initLeftHandSide() {
 		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
-
-		mConnectionTree = new JTree(mTreeRoot);
+		
+		mConnectionTree = new JTree(mTreeRoot);		
 		mConnectionTree.addMouseListener(new MouseListener() {
 
 			@Override

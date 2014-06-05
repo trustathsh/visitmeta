@@ -51,10 +51,9 @@ public class TimeHolder extends Observable {
 	private SortedMap<Long, Long> mChangesMap = null;
 	private long mTimeStart = 0L;
 	private long mTimeEnd = 0L;
-	private GraphContainer mConnection = null;
+	private boolean mIsInitialized = false;
 
 	public TimeHolder(GraphContainer connection) {
-		mConnection = connection;
 	}
 
 	/**
@@ -88,6 +87,14 @@ public class TimeHolder extends Observable {
 		}
 		return 0L;
 	}
+	
+	/**
+	 * States whether the TimeHolder is initialized or not
+	 * @return true if TimeHolder is initialized
+	 */
+	public synchronized boolean isInitialized() {
+		return mIsInitialized;
+	}
 
 	public synchronized long getTimeStart() {
 		LOGGER.trace("Method getTimeStart() called.");
@@ -111,6 +118,7 @@ public class TimeHolder extends Observable {
 	public synchronized void setChangesMap(SortedMap<Long, Long> pMap, boolean pNotify) {
 		LOGGER.trace("Method setChangesMap(" + pMap + ", " + pNotify + ") called.");
 		mChangesMap = pMap;
+		setTimeEnd(mChangesMap.get(mChangesMap.lastKey()));
 		setChanged();
 		if (pNotify) {
 			notifyObservers();
@@ -132,6 +140,7 @@ public class TimeHolder extends Observable {
 				}
 			}
 		}
+		mIsInitialized = true;
 	}
 
 	public synchronized void setTimeEnd(long pTime) {
@@ -149,5 +158,6 @@ public class TimeHolder extends Observable {
 				}
 			}
 		}
+		mIsInitialized = true;
 	}
 }

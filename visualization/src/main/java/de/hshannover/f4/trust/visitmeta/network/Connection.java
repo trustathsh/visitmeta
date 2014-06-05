@@ -129,13 +129,13 @@ public class Connection {
 	 */
 	public synchronized void loadChangesMap() {
 		LOGGER.trace("Method loadChangesMap() called.");
-		if (!mTimeSelector.getTimeHolder().hasChangeMap()) {
+		if (mTimeSelector.getTimeHolder().isInitialized()) {
 			mChangesMap = mGraphService.getChangesMap();
 			if (mChangesMap != null && 0 < mChangesMap.size()) {
 				LOGGER.debug("Server has " + mChangesMap.size() + " changes.");
 				mTimeSelector.getTimeHolder().setChangesMap(mChangesMap);
 			} else {
-				LOGGER.warn("Server has no map of changes.");
+				LOGGER.info("Server has no map of changes.");
 			}
 		}
 	}
@@ -206,11 +206,9 @@ public class Connection {
 		boolean vUpdate = false;
 		boolean vDelete = false;
 		
-		boolean newChangesMapFlag = true;
-		while (newChangesMapFlag) {
+		while (!mTimeSelector.getTimeHolder().isInitialized()) {
 			List<IdentifierGraph> vGraphs = mGraphService.getCurrentGraph();
 			if (vGraphs != null && vGraphs.size() > 0) {
-				System.out.println("graph unleer");
 				LOGGER.info("Load initial graph.");
 				debugGraphContent("initial", vGraphs);
 				vUpdate = deltaUpdate(vGraphs);
@@ -220,7 +218,6 @@ public class Connection {
 					mTimeSelector.getTimeHolder().setTimeEnd(vGraphs.get(0).getTimestamp(), false);
 				}
 				mTimeSelector.getTimeHolder().notifyObservers();
-				newChangesMapFlag = false;
 			} else {
 				// FIXME refactoring needed; wait for network-interval
 				LOGGER.info("No initial data found; retrying in " + mInterval + " milliseconds.");

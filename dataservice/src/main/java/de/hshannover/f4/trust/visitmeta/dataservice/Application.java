@@ -145,10 +145,10 @@ public abstract class Application {
 	public static void initComponents() {
 		try {
 
-			String dbConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
-			String ifmapConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
-			String dsConfig = Application.class.getClassLoader().getResource("config.properties").getPath();
-			String connections = Application.class.getClassLoader().getResource("connections.yml").getPath();
+			String dbConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
+			String ifmapConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
+			String dsConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
+			String connections = Application.class.getClassLoader().getResource("dataservice_connections.yml").getPath();
 			mDBConfig = new PropertiesReaderWriter(dbConfig, false);
 			mIFMAPConfig = new PropertiesReaderWriter(ifmapConfig, false);
 			mDSConfig = new PropertiesReaderWriter(dsConfig, false);

@@ -53,6 +53,9 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
  * Class with main-method.
  */
 public final class Main {
+
+	public static final String VISUALIZATION_VERSION = "${project.version}";
+
 	private static final Logger LOGGER = Logger.getLogger(Main.class);
 
 	private static DataservicePersister mDataservicePersister;
@@ -71,6 +74,7 @@ public final class Main {
 	 */
 	public static void main(String[] args) {
 		LOGGER.trace("Method main(" + args + ") called.");
+		LOGGER.info("VisITMeta visualization application v" + VISUALIZATION_VERSION + " started.");
 
 		initComponents();
 

@@ -66,6 +66,8 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
  */
 public abstract class Application {
 
+	public static final String DATASERVICE_VERSION = "${project.version}";
+
 	private static final Logger log = Logger.getLogger(Application.class);
 
 	/**
@@ -94,7 +96,7 @@ public abstract class Application {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		log.info("application started");
+		log.info("VisITMeta dataservice application v" + DATASERVICE_VERSION + " started.");
 
 		initComponents();
 		startRestService();

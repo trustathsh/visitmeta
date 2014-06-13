@@ -73,6 +73,7 @@ import org.codehaus.jettison.json.JSONException;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
@@ -98,7 +99,7 @@ public class MainWindow extends JFrame {
 	 * @param guiController
 	 */
 	public MainWindow() {
-		super("VisITmeta");
+		super("VisITMeta GUI v" + Main.VISUALIZATION_VERSION);
 		init();
 	}
 
@@ -189,8 +190,8 @@ public class MainWindow extends JFrame {
 	private void initLeftHandSide() {
 		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
-		
-		mConnectionTree = new JTree(mTreeRoot);		
+
+		mConnectionTree = new JTree(mTreeRoot);
 		mConnectionTree.addMouseListener(new MouseListener() {
 
 			@Override
@@ -308,7 +309,6 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setTitle(PropertiesManager.getProperty("window", "title", "VisITMeta"));
 		setLocation(Integer.parseInt(PropertiesManager.getProperty("window", "position.x", "0")),
 				Integer.parseInt(PropertiesManager.getProperty("window", "position.y", "0")));
 		setPreferredSize(new Dimension(Integer.parseInt(PropertiesManager.getProperty("window", "width", "700")),

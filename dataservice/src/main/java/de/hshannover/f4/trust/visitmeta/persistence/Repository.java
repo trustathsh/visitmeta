@@ -58,7 +58,7 @@ public interface Repository {
 	public InternalIdentifier getIdentifier(long id);
 
 	public InternalIdentifier getStartIdentifier();
-	public List<InternalIdentifier> getAllIdentifier();
+	public List<? extends InternalIdentifier> getAllIdentifier();
 
 	public InternalIdentifier insert(InternalIdentifier id);
 	public InternalMetadata insert(InternalMetadata meta);

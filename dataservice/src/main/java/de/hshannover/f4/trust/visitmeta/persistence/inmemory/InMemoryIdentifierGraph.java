@@ -40,13 +40,14 @@ package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import scala.actors.threadpool.Arrays;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
@@ -84,14 +85,14 @@ public class InMemoryIdentifierGraph implements InternalIdentifierGraph, Reposit
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<InternalIdentifier> getAllIdentifier(){
-		return Arrays.asList(mIdentifiers.values().toArray());
+	public List<? extends InternalIdentifier> getAllIdentifier(){
+		return new ArrayList<>(mIdentifiers.values());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<InternalIdentifier> getIdentifiers() {
-		return Arrays.asList(mIdentifiers.values().toArray());
+	public List<? extends InternalIdentifier> getIdentifiers() {
+		return new ArrayList<>(mIdentifiers.values());
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public interface InternalIdentifierGraph {
 	 * @return
 	 * All Identifiers in the graph.
 	 */
-	public List<InternalIdentifier> getIdentifiers();
+	public List<? extends InternalIdentifier> getIdentifiers();
 	/**
 	 * @return
 	 * Unix epoch at when this graph was changed last.

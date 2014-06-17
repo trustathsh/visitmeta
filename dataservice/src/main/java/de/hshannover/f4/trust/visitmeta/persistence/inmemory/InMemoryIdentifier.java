@@ -109,22 +109,30 @@ public class InMemoryIdentifier extends InternalIdentifier {
 
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
+		InternalMetadata toRemove = null;
 		for(InternalMetadata m : mMeta) {
 			if(m.equalsForLinks(meta)) {
-				mMeta.remove(m);
+				toRemove = m;
 				break;
 			}
+		}
+		if(toRemove != null) {
+			mMeta.remove(toRemove);
 		}
 	}
 	
 	@Override
 	public void updateMetadata(InternalMetadata meta) {
+		InternalMetadata toUpdate = null;
 		for(InternalMetadata m : mMeta) {
 			if(m.equalsForLinks(meta)) {
-				mMeta.remove(m);
-				mMeta.add(meta);
+				toUpdate = m;
 				break;
 			}
+		}
+		if(toUpdate != null) {
+			mMeta.remove(toUpdate);
+			mMeta.add(meta);
 		}
 	}
 	

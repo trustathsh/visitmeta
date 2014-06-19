@@ -5,12 +5,12 @@
 	<parent>
 		<artifactId>visitmeta</artifactId>
 		<groupId>de.hshannover.f4.trust</groupId>
-		<version>0.0.5</version>
+		<version>0.0.6</version>
 	</parent>
 
     <groupId>de.hshannover.f4.trust.visitmeta</groupId>
     <artifactId>visualization</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
     <name>visualization</name>
 

@@ -85,8 +85,9 @@ public class Neo4JMetadataTest {
 		Transaction tx = mGraphDb.beginTx();
 		mRoleNode = mGraphDb.createNode();
 
-		mRoleNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		mRoleNode.addLabel(Neo4JTypeLabels.METADATA);
 		mRoleNode.setProperty(KEY_TYPE_NAME, "role");
+		mRoleNode.setProperty(KEY_META_CARDINALITY, "multiValue");
 		mRoleNode.setProperty("/role/name", "admin");
 		mRoleNode.setProperty("/role[@ifmap-timestamp]", "2010-04-20T12:00:05Z");
 		mRoleNode.setProperty("/role[@ifmap-publisher-id]", "42");
@@ -130,8 +131,9 @@ public class Neo4JMetadataTest {
 	public void testEqualsFalseForNeo4jOnly() {
 		Transaction tx = mGraphDb.beginTx();
 		Node node = mGraphDb.createNode();
-		node.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		node.addLabel(Neo4JTypeLabels.METADATA);
 		node.setProperty(KEY_TYPE_NAME, "role");
+		node.setProperty(KEY_META_CARDINALITY, "multiValue");
 		node.setProperty("/role/name", "chef");
 		node.setProperty("/role[@ifmap-cardinality]", "multiValue");
 		tx.success();

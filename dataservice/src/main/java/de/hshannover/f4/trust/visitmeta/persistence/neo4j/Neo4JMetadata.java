@@ -38,17 +38,13 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
-
-
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.HIDDEN_PROPERTIES_KEY_PREFIX;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_META_CARDINALITY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_SINGLE;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_METADATA;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +56,6 @@ import org.neo4j.graphdb.Transaction;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 
-
 public class Neo4JMetadata extends InternalMetadata {
 
 	private static final Logger log = Logger.getLogger(Neo4JMetadata.class);
@@ -68,71 +63,103 @@ public class Neo4JMetadata extends InternalMetadata {
 	private Neo4JRepository mRepo;
 	private Node mMe;
 
-	public Neo4JMetadata(Node n, Neo4JRepository graph){
+	public Neo4JMetadata(Node n, Neo4JRepository graph) {
 		super();
-		if (!n.getProperty(NODE_TYPE_KEY).equals(VALUE_TYPE_NAME_METADATA)) {
-			String msg = "Trying to construct Metadata with a node of type "
-					+n.getProperty(NODE_TYPE_KEY)+
-					". We clearly disapprove and will die ungracefully now";
-					throw new RuntimeException(msg);
+		Transaction tx = graph.beginTx();
+		try {
+			if (!n.hasLabel(Neo4JTypeLabels.METADATA)) {
+				String msg = "Trying to construct Metadata without METADATA Label"
+						+ ". We clearly disapprove and will die ungracefully now";
+				throw new RuntimeException(msg);
+			}
+			tx.success();
+		} finally {
+			tx.finish();
 		}
 		mMe = n;
 		mRepo = graph;
 	}
 
-	public Node getNode(){
+	public Node getNode() {
 		return mMe;
 	}
 
 	@Override
 	public List<String> getProperties() {
+		Transaction tx = mRepo.beginTx();
 		List<String> l = new ArrayList<>();
-		for (String s: mMe.getPropertyKeys()) {
-			if (!s.startsWith(HIDDEN_PROPERTIES_KEY_PREFIX)) {
-				l.add(s);
+		try {
+			for (String s : mMe.getPropertyKeys()) {
+				if (!s.startsWith(HIDDEN_PROPERTIES_KEY_PREFIX)) {
+					l.add(s);
+				}
 			}
+			tx.success();
+		} finally {
+			tx.finish();
 		}
 		return l;
 	}
 
 	@Override
 	public boolean hasProperty(String p) {
-		return mMe.hasProperty(p);
+		Transaction tx = mRepo.beginTx();
+		boolean result = false;
+		try {
+			result = mMe.hasProperty(p);
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+		return result;
 	}
 
 	@Override
 	public String valueFor(String p) {
+		Transaction tx = mRepo.beginTx();
 		String value = "";
 		try {
 			value = (String) mMe.getProperty(p);
-		} catch(NotFoundException e) {
+			tx.success();
+		} catch (NotFoundException e) {
 			log.warn("Property " + p + " does not exist in Metadata " + this);
+		} finally {
+			tx.finish();
 		}
 		return value;
 	}
 
 	@Override
 	public String getTypeName() {
-		//TODO handle false Metadata
+		Transaction tx = mRepo.beginTx();
+		// TODO handle false Metadata
 		String type = "";
 		try {
 			type = (String) mMe.getProperty(KEY_TYPE_NAME);
-		} catch(NotFoundException e) {
+			tx.success();
+		} catch (NotFoundException e) {
 			log.warn("This Metadata does not has a Type declared! " + this);
+		} finally {
+			tx.finish();
 		}
 		return type;
 	}
 
 	@Override
 	public boolean isSingleValue() {
-		//TODO handle false Metadata
+		Transaction tx = mRepo.beginTx();
+		// TODO handle false Metadata
 		String value = "";
 		try {
-		value = (String) mMe.getProperty(KEY_META_CARDINALITY);
-		} catch(NotFoundException e) {
-			log.warn("This Metadata does not has the Cardinality-Property set! " + this);
+			value = (String) mMe.getProperty(KEY_META_CARDINALITY);
+			tx.success();
+		} catch (NotFoundException e) {
+			log.warn("This Metadata does not has the Cardinality-Property set! "
+					+ this);
+		} finally {
+			tx.finish();
 		}
-		if(value.equals(VALUE_META_CARDINALITY_SINGLE)) {
+		if (value.equals(VALUE_META_CARDINALITY_SINGLE)) {
 			return true;
 		}
 		return false;
@@ -140,12 +167,13 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public void addProperty(String name, String value) {
-		//TODO this write operation should be moved to the graph as well
-		if (mMe.hasProperty(name)) {
-			log.warn("property '"+name+"' already exists, overwriting with '"+value+"'");
-		}
 		Transaction tx = mRepo.beginTx();
 		try {
+			// TODO this write operation should be moved to the graph as well
+			if (mMe.hasProperty(name)) {
+				log.warn("property '" + name
+						+ "' already exists, overwriting with '" + value + "'");
+			}
 			mMe.setProperty(name, value);
 			tx.success();
 		} finally {
@@ -156,24 +184,35 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public long getPublishTimestamp() {
-		//TODO handle false Metadata
+		Transaction tx = mRepo.beginTx();
+		// TODO handle false Metadata
 		String value = "";
 		try {
 			value = mMe.getProperty(KEY_TIMESTAMP_PUBLISH).toString();
-		} catch(NotFoundException e) {
-			log.warn("This Metadata does not has a PublishTimestamp set! " + this);
+			tx.success();
+		} catch (NotFoundException e) {
+			log.warn("This Metadata does not has a PublishTimestamp set! "
+					+ this);
+		} finally {
+			tx.finish();
 		}
 		return Long.parseLong(value);
 	}
 
 	@Override
 	public long getDeleteTimestamp() {
-		//TODO handle false Metadata
+		Transaction tx = mRepo.beginTx();
+		// TODO handle false Metadata
 		String value = "";
 		try {
-			value = mMe.getProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP+"").toString();
-		} catch(NotFoundException e) {
+			value = mMe.getProperty(KEY_TIMESTAMP_DELETE,
+					InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + "")
+					.toString();
+			tx.success();
+		} catch (NotFoundException e) {
 			log.warn("This Metadata does not has a DeleteTimestamp! " + this);
+		} finally {
+			tx.finish();
 		}
 		return Long.parseLong(value);
 	}
@@ -191,11 +230,16 @@ public class Neo4JMetadata extends InternalMetadata {
 
 	@Override
 	public String getRawData() {
+		Transaction tx = mRepo.beginTx();
+		String result = "";
 		try {
-		return (String)mMe.getProperty(KEY_RAW_DATA, "");
-		} catch(NotFoundException e) {
+			result = (String) mMe.getProperty(KEY_RAW_DATA, "");
+			tx.success();
+		} catch (NotFoundException e) {
 			log.warn("This Metadata does not has Raw Data! " + this);
+		} finally {
+			tx.finish();
 		}
-		return "";
+		return result;
 	}
 }

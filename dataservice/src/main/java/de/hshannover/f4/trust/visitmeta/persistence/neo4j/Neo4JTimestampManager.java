@@ -45,10 +45,12 @@ import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyCo
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 
 public class Neo4JTimestampManager {
@@ -68,17 +70,17 @@ public class Neo4JTimestampManager {
 		Transaction tx = mConnection.getConnection().beginTx();
 		try {
 			Node changeNode = null;
-			Iterator<Relationship> change = mConnection.getConnection()
-					.getReferenceNode().getRelationships(LinkTypes.Change)
-					.iterator();
+			Iterator<Node> change = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.CHANGE).iterator();
+//			Iterator<Relationship> change = mConnection.getConnection()
+//					.getReferenceNode().getRelationships(LinkTypes.Change)
+//					.iterator();
 			if (!change.hasNext()) {
 				changeNode = mConnection.getConnection().createNode();
-				changeNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_TIME_MAP);
-				mConnection.getConnection().getReferenceNode()
-						.createRelationshipTo(changeNode, LinkTypes.Change);
+				changeNode.addLabel(Neo4JTypeLabels.CHANGE);
+//				mConnection.getConnection().getReferenceNode()
+//						.createRelationshipTo(changeNode, LinkTypes.Change);
 			} else {
-				Relationship r = change.next();
-				changeNode = r.getEndNode();
+				changeNode = change.next();
 			}
 			if (!changeNode.hasProperty(timestamp + "")) {
 				changeNode.setProperty(timestamp + "",
@@ -97,20 +99,38 @@ public class Neo4JTimestampManager {
 
 
 	public SortedMap<Long, Long> getChangesMap() {
-		TreeMap<Long, Long> changeMap = new TreeMap<>();
-		Node changeNode = null;
-		Iterator<Relationship> change = mConnection.getConnection().getReferenceNode().
-				getRelationships(LinkTypes.Change).iterator();
-		if(!change.hasNext()) {
+		Transaction tx = mConnection.getConnection().beginTx();
+		try {
+			TreeMap<Long, Long> changeMap = new TreeMap<>();
+			Node changeNode = null;
+			Iterator<Node> change = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.CHANGE).iterator();
+			if(!change.hasNext()) {
+				return changeMap;
+			}
+			changeNode = change.next();
+			
+			for (String s : changeNode.getPropertyKeys()) {
+				if (!s.contains(HIDDEN_PROPERTIES_KEY_PREFIX))
+					changeMap.put(Long.valueOf(s), (Long)changeNode.getProperty(s));
+			}
+			tx.success();
 			return changeMap;
+		} finally {
+			tx.finish();
 		}
-		Relationship r = change.next();
-		changeNode = r.getEndNode();
-		for (String s : changeNode.getPropertyKeys()) {
-			if (!s.contains(HIDDEN_PROPERTIES_KEY_PREFIX))
-				changeMap.put(Long.valueOf(s), (Long)changeNode.getProperty(s));
-		}
-		return changeMap;
+		
+//		Iterator<Relationship> change = mConnection.getConnection().getReferenceNode().
+//				getRelationships(LinkTypes.Change).iterator();
+//		if(!change.hasNext()) {
+//			return changeMap;
+//		}
+//		Relationship r = change.next();
+//		changeNode = r.getEndNode();
+//		for (String s : changeNode.getPropertyKeys()) {
+//			if (!s.contains(HIDDEN_PROPERTIES_KEY_PREFIX))
+//				changeMap.put(Long.valueOf(s), (Long)changeNode.getProperty(s));
+//		}
+//		return changeMap;
 	}
 
 

@@ -40,8 +40,6 @@
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_IDENTIFIER;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -84,12 +82,12 @@ public class Neo4JLinkTest {
 		mIpNode = mGraphDb.createNode();
 		mMacNode = mGraphDb.createNode();
 
-		mIpNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
 		mIpNode.setProperty("/ip-address/value", "10.1.1.1");
 		mIpNode.setProperty("/ip-address/type", "IPv4");
 
-		mMacNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		mMacNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		mMacNode.setProperty(KEY_TYPE_NAME, "mac-address");
 		mMacNode.setProperty("/mac-address/value", "ee:ee:ee:ee:ee:ee");
 

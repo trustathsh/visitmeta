@@ -42,16 +42,12 @@ package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_META_CARDINALITY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_MULTI;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_SINGLE;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_IDENTIFIER;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_LINK;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_METADATA;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -65,6 +61,7 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.ReadableIndex;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
@@ -210,13 +207,14 @@ public class Neo4JRepository implements Repository {
 
 		try {
 			Node n = mConnection.getConnection().createNode();
-			n.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+			n.addLabel(Neo4JTypeLabels.IDENTIFIER);
 			n.setProperty(KEY_TYPE_NAME, id.getTypeName());
 			n.setProperty(KEY_HASH, calcHash(id));
 			n.setProperty(KEY_RAW_DATA, id.getRawData());
 
-			mConnection.getConnection().
-				getReferenceNode().createRelationshipTo(n, LinkTypes.Creation);
+			
+//			mConnection.getConnection().
+//				getReferenceNode().createRelationshipTo(n, LinkTypes.Creation);
 
 			Iterator<String> i = id.getProperties().iterator();
 			String keyProp;
@@ -241,7 +239,7 @@ public class Neo4JRepository implements Repository {
 
 		try {
 			Node metaNode = mConnection.getConnection().createNode();
-			metaNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+			metaNode.addLabel(Neo4JTypeLabels.METADATA);
 			metaNode.setProperty(KEY_TYPE_NAME, meta.getTypeName());
 			metaNode.setProperty(KEY_META_CARDINALITY, meta.isSingleValue()?
 					VALUE_META_CARDINALITY_SINGLE : VALUE_META_CARDINALITY_MULTI);
@@ -276,7 +274,7 @@ public class Neo4JRepository implements Repository {
 			Node idGraph2 = ((Neo4JIdentifier) id2).getNode();
 
 			linkNode = mConnection.getConnection().createNode();
-			linkNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_LINK);
+			linkNode.addLabel(Neo4JTypeLabels.LINK);
 
 			idGraph1.createRelationshipTo(linkNode, LinkTypes.Link);
 			idGraph2.createRelationshipTo(linkNode, LinkTypes.Link);
@@ -291,21 +289,15 @@ public class Neo4JRepository implements Repository {
 	public void remove(long id) {
 		log.trace("Removing Node with the id " +id+ " from the database");
 		Node n = getNodeById(id);
-		String type = (String) n.getProperty(NODE_TYPE_KEY);
-
-		switch (type) {
-		case VALUE_TYPE_NAME_METADATA:
+		
+		if(n.hasLabel(Neo4JTypeLabels.METADATA)) {
 			removeMetadata(n);
-			break;
-		case VALUE_TYPE_NAME_IDENTIFIER:
+		} else if (n.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
 			removeIdentifier(n);
-			break;
-		case VALUE_TYPE_NAME_LINK:
+		} else if (n.hasLabel(Neo4JTypeLabels.LINK)) {
 			removeLink(n);
-			break;
-		default:
-			log.warn("Unexpected Node type (" + type + ")  - not removing this node");
-			break;
+		} else {
+			log.warn("Node has got no supported Label  - not removing this node");
 		}
 	}
 
@@ -356,12 +348,12 @@ public class Neo4JRepository implements Repository {
 				removeLink(r.getEndNode());
 			}
 			// Remove all the Creation relationships
-			Iterator<Relationship> creations = n.getRelationships(LinkTypes.Creation)
-					.iterator();
-			while (creations.hasNext()) {
-				Relationship r = creations.next();
-				r.delete();
-			}
+//			Iterator<Relationship> creations = n.getRelationships(LinkTypes.Creation)
+//					.iterator();
+//			while (creations.hasNext()) {
+//				Relationship r = creations.next();
+//				r.delete();
+//			}
 			//Remove the Identifier node itself
 			n.delete();
 			tx.success();
@@ -433,28 +425,55 @@ public class Neo4JRepository implements Repository {
 	@Override
 	public InternalIdentifier getStartIdentifier() {
 		log.trace("Fetching (random) root Identifier from the database");
-		Node ref = mConnection.getConnection().getReferenceNode();
-		for (Relationship r : ref.getRelationships(LinkTypes.Creation)) {
-			return new Neo4JIdentifier(r.getEndNode(), this);
+		Transaction tx = beginTx();
+		InternalIdentifier result = null;
+		try {
+			Iterator<Node> allNodes = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.IDENTIFIER).iterator();
+			if(allNodes.hasNext()) {
+				result =  new Neo4JIdentifier(allNodes.next(), this);
+			}
+			else {
+				log.warn("Seems there is no Identifier in the database that could be used as a root");
+				result =  null;
+			}
+			tx.success();
+		} finally {
+			tx.finish();
 		}
-		log.warn("Seems there is no Identifier in the database that could be used as a root");
-		return null;
+		return result;
+//		Node ref = new IntermConnection.getConnection().getReferenceNode();
+//		for (Relationship r : ref.getRelationships(LinkTypes.Creation)) {
+//			return new Neo4JIdentifier(r.getEndNode(), this);
+//		}
+//		log.warn("Seems there is no Identifier in the database that could be used as a root");
+//		return null;
 	}
 
 	public List<InternalIdentifier> getAllIdentifier(){
 		log.debug("Getting all the Identifier from the database");
-		ArrayList<InternalIdentifier> allId = new ArrayList<>();
-
-		for (Relationship r : getRoot().getRelationships(LinkTypes.Creation)) {
-			allId.add(new Neo4JIdentifier(r.getEndNode(), this));
+		Transaction tx = beginTx();
+		try {
+			ArrayList<InternalIdentifier> allId = new ArrayList<>();
+	
+			Iterator<Node> allNodes = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.IDENTIFIER).iterator();
+			while(allNodes.hasNext()) {
+				allId.add(new Neo4JIdentifier(allNodes.next(), this));
+			}
+			
+			
+	//		for (Relationship r : getRoot().getRelationships(LinkTypes.Creation)) {
+	//			allId.add(new Neo4JIdentifier(r.getEndNode(), this));
+	//		}
+			tx.success();
+			return allId;
+		} finally {
+			tx.finish();
 		}
-
-		return allId;
 	}
 
-	protected Node getRoot() {
-		return mConnection.getConnection().getReferenceNode();
-	}
+//	protected Node getRoot() {
+//		return mConnection.getConnection().getReferenceNode();
+//	}
 
 	@Override
 	public void disconnect(InternalIdentifier id1, InternalIdentifier id2) {

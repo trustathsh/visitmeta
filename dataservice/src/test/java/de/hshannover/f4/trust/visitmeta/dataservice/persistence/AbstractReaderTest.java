@@ -64,8 +64,9 @@ import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
 import de.hshannover.f4.trust.visitmeta.persistence.Repository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.LinkTypes;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JConnection;
+import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JLink;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
-
+import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTypeLabels;
 import static org.junit.Assert.*;
 
 public class AbstractReaderTest {
@@ -114,33 +115,25 @@ public class AbstractReaderTest {
 		Transaction tx = mGraphDb.beginTx();
 
 		Node id1 = mGraphDb.createNode();
-		id1.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		id1.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		id1.setProperty(KEY_TYPE_NAME, "device");
 		id1.setProperty(KEY_HASH, "2f91feecc8e13d631e09b56f2c1d0110");
 		id1.setProperty("/device/name", "device99");
-
-		Relationship r1 = mGraphDb.getReferenceNode().
-				createRelationshipTo(id1, LinkTypes.Creation);
-		r1.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
-
+		
 		Node id2 = mGraphDb.createNode();
-		id2.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		id2.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		id2.setProperty(KEY_TYPE_NAME, "access-request");
 		id2.setProperty(KEY_HASH, "4da768ebd34c7c1103bdcd5c5118b000");
 		id2.setProperty("/access-request[@name]", "111:33");
-
-		Relationship r2 = mGraphDb.getReferenceNode().
-				createRelationshipTo(id1, LinkTypes.Creation);
-		r2.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
-
+		
 		Node link = mGraphDb.createNode();
-		link.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_LINK);
+		link.addLabel(Neo4JTypeLabels.LINK);
 
 		id1.createRelationshipTo(link, LinkTypes.Link);
 		id2.createRelationshipTo(link, LinkTypes.Link);
 
 		Node meta = mGraphDb.createNode();
-		meta.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		meta.addLabel(Neo4JTypeLabels.METADATA);
 		meta.setProperty(KEY_TYPE_NAME, "authenticated-by");
 		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_SINGLE);
 		meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
@@ -164,17 +157,13 @@ public class AbstractReaderTest {
 		Transaction tx = mGraphDb.beginTx();
 
 		Node id = mGraphDb.createNode();
-		id.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		id.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		id.setProperty(KEY_TYPE_NAME, "ip-address");
 		id.setProperty(KEY_HASH, "00000000000000000000000000000000");
 		id.setProperty("/ip-address[@value]", "10.1.1.1");
 
-		Relationship r1 = mGraphDb.getReferenceNode().
-				createRelationshipTo(id, LinkTypes.Creation);
-		r1.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP + 1);
-
 		Node meta = mGraphDb.createNode();
-		meta.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		meta.addLabel(Neo4JTypeLabels.METADATA);
 		meta.setProperty(KEY_TYPE_NAME, "event");
 		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
 		meta.setProperty(KEY_TIMESTAMP_PUBLISH, newTimetamp);
@@ -198,17 +187,14 @@ public class AbstractReaderTest {
 		Transaction tx = mGraphDb.beginTx();
 
 		Node id = mGraphDb.createNode();
-		id.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		id.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		id.setProperty(KEY_TYPE_NAME, "ip-address");
 		id.setProperty(KEY_HASH, "00000000000000000000000000000000");
 		id.setProperty("/ip-address[@value]", "10.1.1.1");
 
-		Relationship r1 = mGraphDb.getReferenceNode().
-				createRelationshipTo(id, LinkTypes.Creation);
-		r1.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
 
 		Node meta = mGraphDb.createNode();
-		meta.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		meta.addLabel(Neo4JTypeLabels.METADATA);
 		meta.setProperty(KEY_TYPE_NAME, "event");
 		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
 		meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);

@@ -39,6 +39,7 @@
 
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -59,8 +60,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
@@ -90,7 +89,7 @@ public class Neo4JIdentifierTest {
 		Transaction tx = mGraphDb.beginTx();
 		mIpNode = mGraphDb.createNode();
 
-		mIpNode.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
 		mIpNode.setProperty("/ip-address/value", "10.1.1.1");
 		mIpNode.setProperty("/ip-address/type", "IPv4");
@@ -161,7 +160,7 @@ public class Neo4JIdentifierTest {
 	public void testEqualsFalseForNeo4jOnly() {
 		Transaction tx = mGraphDb.beginTx();
 		Node node = mGraphDb.createNode();
-		node.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		node.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		node.setProperty(KEY_TYPE_NAME, "ip-address");
 		node.setProperty("/ip-address/value", "10.1.1.99");
 		node.setProperty("/ip-address/type", "IPv4");

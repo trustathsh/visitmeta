@@ -173,9 +173,10 @@ public class Neo4JRemoveTest {
 	@Ignore("fails because of new 'remove semantics'")
 	@Test
 	public void testDeleteIdentifier() {
-		Iterator<Relationship> it = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
-		assertEquals(id2.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
-		assertEquals(id1.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
+//		Iterator<Relationship> it = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
+//		assertEquals(id2.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+//		assertEquals(id1.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
 		mRepo.getIdentifier(id1.getNode().getId());
 		mRepo.getMetadata(m3.getNode().getId());
 		mRepo.getLink(l1.getNode().getId());
@@ -184,14 +185,15 @@ public class Neo4JRemoveTest {
 
 		mRepo.remove(id1.getNode().getId());
 
-		Iterator<Relationship> it2 = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
-		assertEquals(id2.getTypeName(), it2.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
-		try {
-			it2.next();
-			assertFalse(true);
-		} catch(Exception e) {
-			assertEquals(NoSuchElementException.class, e.getClass());
-		}
+//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
+//		Iterator<Relationship> it2 = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
+//		assertEquals(id2.getTypeName(), it2.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+//		try {
+//			it2.next();
+//			assertFalse(true);
+//		} catch(Exception e) {
+//			assertEquals(NoSuchElementException.class, e.getClass());
+//		}
 		try {
 			mRepo.getIdentifier(id1.getNode().getId());
 			assertFalse(true);

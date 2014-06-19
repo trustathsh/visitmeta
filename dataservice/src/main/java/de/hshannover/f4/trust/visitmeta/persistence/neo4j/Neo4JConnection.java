@@ -39,9 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 
-
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +70,7 @@ public class Neo4JConnection {
 		mDbPath = dbPath;
 		mGraphDb = new GraphDatabaseFactory().
 				newEmbeddedDatabaseBuilder(mDbPath).
-				setConfig( GraphDatabaseSettings.node_keys_indexable, NODE_TYPE_KEY +","+ KEY_HASH ).
+				setConfig( GraphDatabaseSettings.node_keys_indexable, KEY_HASH ).
 				setConfig( GraphDatabaseSettings.node_auto_indexing, "true" ).
 				newGraphDatabase();
 		registerShutdownHook(mGraphDb);
@@ -113,7 +111,7 @@ public class Neo4JConnection {
 		log.debug("Reconnecting to database");
 		mGraphDb = new GraphDatabaseFactory().
 				newEmbeddedDatabaseBuilder(mDbPath).
-				setConfig( GraphDatabaseSettings.node_keys_indexable, NODE_TYPE_KEY +","+ KEY_HASH ).
+				setConfig( GraphDatabaseSettings.node_keys_indexable, KEY_HASH ).
 				setConfig( GraphDatabaseSettings.node_auto_indexing, "true" ).
 				newGraphDatabase();
 		registerShutdownHook(mGraphDb);

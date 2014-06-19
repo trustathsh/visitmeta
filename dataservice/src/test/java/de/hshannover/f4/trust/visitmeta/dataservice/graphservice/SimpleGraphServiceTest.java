@@ -43,12 +43,8 @@ import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyCo
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_MULTI;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_SINGLE;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_IDENTIFIER;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_LINK;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_METADATA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -75,6 +71,7 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JConnection;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JReader;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTimestampManager;
+import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTypeLabels;
 
 public class SimpleGraphServiceTest {
 
@@ -154,7 +151,7 @@ public class SimpleGraphServiceTest {
 	private Node insertMetadata(
 			String name, String cardinality, long publishTimestamp, long deleteTimestamp) {
 		Node meta = mGraphDb.createNode();
-		meta.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_METADATA);
+		meta.addLabel(Neo4JTypeLabels.METADATA);
 		meta.setProperty(KEY_TYPE_NAME, name);
 		meta.setProperty(KEY_META_CARDINALITY, cardinality);
 		meta.setProperty(KEY_TIMESTAMP_PUBLISH, publishTimestamp);
@@ -165,16 +162,16 @@ public class SimpleGraphServiceTest {
 
 	private Node insertIdentifier(String name) {
 		Node identifier = mGraphDb.createNode();
-		identifier.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_IDENTIFIER);
+		identifier.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		identifier.setProperty(KEY_TYPE_NAME, name);
 		identifier.setProperty("name", name);
-		mGraphDb.getReferenceNode().createRelationshipTo(identifier, LinkTypes.Creation);
+		identifier.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		return identifier;
 	}
 
 	private Node insertLink(Node id1, Node id2, Node...metadata) {
 		Node link = mGraphDb.createNode();
-		link.setProperty(NODE_TYPE_KEY, VALUE_TYPE_NAME_LINK);
+		link.addLabel(Neo4JTypeLabels.LINK);
 		id1.createRelationshipTo(link, LinkTypes.Link);
 		id2.createRelationshipTo(link, LinkTypes.Link);
 

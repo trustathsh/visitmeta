@@ -46,15 +46,11 @@ import org.neo4j.graphdb.RelationshipType;
  * <ul>
  * 	<li>Link: link between a dummy node and an identifier.</li>
  * 	<li>Meta: link to a metadata.</li>
- * 	<li>Creation: link between the root node and an identifier.</li>
- * 	<li>Change:  link between the root node and the history-node.</li>
  * </ul>
  * @author ben
  *
  */
 public enum LinkTypes implements RelationshipType {
 	Link,
-	Meta,
-	Creation,
-	Change
+	Meta
 }

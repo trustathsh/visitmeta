@@ -43,17 +43,15 @@ import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JComponent;
-
 import org.apache.commons.collections15.map.HashedMap;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
@@ -91,11 +89,11 @@ public class GraphConnection implements Observer {
 		mFacadeLogic.addObserver(this);
 		mTimeSelector.addObserver(this);
 	}
-	
+
 	public SettingManager getSettingManager() {
 		return mSettingManager;
 	}
-	
+
 	public TimeSelector getTimeSelector() {
 		return mTimeSelector;
 	}
@@ -103,17 +101,17 @@ public class GraphConnection implements Observer {
 	public FacadeLogic getLogic() {
 		return mFacadeLogic;
 	}
-	
+
 	public void setParentTab(ConnectionTab parentTab) {
 		this.mParentTab = parentTab;
 	}
-	
+
 	public ConnectionTab getParentTab() {
 		return mParentTab;
 	}
-	
-	public JComponent getGraphPanel() {
-		return mGraphPanel.getPanel();
+
+	public GraphPanel getGraphPanel() {
+		return mGraphPanel;
 	}
 
 	/**

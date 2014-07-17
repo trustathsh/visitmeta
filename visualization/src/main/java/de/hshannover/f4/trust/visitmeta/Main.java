@@ -38,7 +38,9 @@
  */
 package de.hshannover.f4.trust.visitmeta;
 
+
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -46,6 +48,9 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.input.DeviceToGuiConnector;
+import de.hshannover.f4.trust.visitmeta.input.device.Device;
+import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
@@ -88,7 +93,13 @@ public final class Main {
 		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype", "local").toUpperCase();
 		ConnectionType vConnectionType = ConnectionType.valueOf(vConnectionTypeString);
 
-		GuiController gui = new GuiController();
+		/**
+		 * Load and initialize external control devices, if available.
+		 */
+		MotionControllerHandler motionControllerHandler = new MotionControllerHandler();
+		GuiController gui = new GuiController(motionControllerHandler);
+		List<Device> devices = DeviceToGuiConnector.initializeDevices(motionControllerHandler);
+		LOGGER.info(devices.size() + " devices were loaded.");
 
 		if(vConnectionType == ConnectionType.REST && dataserviceConnections != null){
 			for(DataserviceConnection dc : dataserviceConnections.values()) {

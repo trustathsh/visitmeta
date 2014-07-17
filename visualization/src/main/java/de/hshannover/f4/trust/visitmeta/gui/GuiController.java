@@ -45,21 +45,23 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
 public class GuiController {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private MainWindow mMainWindow = null;
 	private ConnectionTab mSelectedConnection = null;
 
-	public GuiController() {
-		initMainWindow();
+	public GuiController(MotionControllerHandler motionController) {
+		initMainWindow(motionController);
 	}
 
 	/**
 	 * Initializes the VisITMeta window
+	 * @param motionController
 	 */
-	private void initMainWindow() {
-		mMainWindow = new MainWindow();
+	private void initMainWindow(MotionControllerHandler motionController) {
+		mMainWindow = new MainWindow(motionController);
 		mMainWindow.setJMenuBar(new MenuBar(this));
 
 		mMainWindow.getConnectionTree().addTreeSelectionListener(new TreeSelectionListener() {

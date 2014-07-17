@@ -51,7 +51,9 @@ import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.input.gui.MotionInformationPane;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class ConnectionTab extends JPanel {
@@ -75,6 +77,8 @@ public class ConnectionTab extends JPanel {
 	private Timer mTimerPropertiesHide;
 
 	private DataserviceConnection mDataserviceConnection;
+	private MotionInformationPane mMotionInformationPane;
+	private GraphPanel mGraphPanel;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -114,7 +118,9 @@ public class ConnectionTab extends JPanel {
 		mUpperPanel.setLayout(new GridLayout());
 		mLowerPanel.setLayout(new GridLayout());
 
-		mUpperPanel.add(mGraphConnection.getGraphPanel());
+		mGraphPanel = mGraphConnection.getGraphPanel();
+		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
+		mUpperPanel.add(mMotionInformationPane);
 		mLowerPanel.add(mTimeLine);
 
 		mSplitPane = new JSplitPane();
@@ -250,5 +256,19 @@ public class ConnectionTab extends JPanel {
 
 	public DataserviceConnection getDataserviceConnection(){
 		return mDataserviceConnection;
+	}
+
+	/**
+	 * @return the {@link GraphPanel} instance of this {@link ConnectionTab}
+	 */
+	public GraphPanel getGraphPanel() {
+		return mGraphPanel;
+	}
+
+	/**
+	 * @return the {@link MotionInformationPane} of this {@link ConnectionTab}
+	 */
+	public MotionInformationPane getMotionInformationPane() {
+		return mMotionInformationPane;
 	}
 }

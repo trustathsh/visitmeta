@@ -64,6 +64,8 @@ import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -78,6 +80,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -93,13 +96,17 @@ public class MainWindow extends JFrame {
 	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
 	private ImageIcon[] mCancelIcon = null;
+	private MotionControllerHandler mMotionControllerHandler = null;
 
 	/**
 	 * 
 	 * @param guiController
 	 */
-	public MainWindow() {
+	public MainWindow(MotionControllerHandler motionControllerHandler) {
 		super("VisITMeta GUI v" + Main.VISUALIZATION_VERSION);
+
+		mMotionControllerHandler = motionControllerHandler;
+
 		init();
 	}
 
@@ -260,7 +267,7 @@ public class MainWindow extends JFrame {
 			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader().getResource("close.png").getPath());
 			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader().getResource("closeHover.png").getPath());
 		}
-		mTabbedConnectionPane.addTab(null, cTab);
+		mTabbedConnectionPane.addTab(cTab.getConnName(), cTab);
 		int pos = mTabbedConnectionPane.indexOfComponent(cTab);
 
 		FlowLayout f = new FlowLayout(FlowLayout.CENTER, 5, 0);
@@ -283,10 +290,15 @@ public class MainWindow extends JFrame {
 
 		mTabbedConnectionPane.setTabComponentAt(pos, pnlTab);
 
+		/**
+		 * Remove the current tab from the tab pane and from the
+		 * MotionController if it is closed in the GUI.
+		 */
 		ActionListener listener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mTabbedConnectionPane.remove(cTab);
+				mMotionControllerHandler.removeConnectionTab(cTab);
 			}
 		};
 		btnClose.addActionListener(listener);
@@ -299,6 +311,22 @@ public class MainWindow extends JFrame {
 	 */
 	private void initRightHandSide() {
 		mTabbedConnectionPane = new JTabbedPane();
+
+		/**
+		 * Whenever the current tab inside the GUI changes,
+		 * the MotionControllerHandler instance is informed.
+		 */
+		mTabbedConnectionPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
+				if (currentTab != null) {
+					mMotionControllerHandler.setCurrentConnectionTab(currentTab);;
+					LOGGER.debug("Tab changed to " + currentTab.getConnName());
+				}
+			}
+		});
 
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());

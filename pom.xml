@@ -115,7 +115,7 @@
 			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>ifmapj</artifactId>
-				<version>1.0.0</version>
+				<version>2.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>

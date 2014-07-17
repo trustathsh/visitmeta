@@ -45,12 +45,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.net.ssl.TrustManager;
-
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.hshannover.f4.trust.ifmapj.IfmapJHelper;
+import de.hshannover.f4.trust.ifmapj.IfmapJ;
+import de.hshannover.f4.trust.ifmapj.channel.SSRC;
+import de.hshannover.f4.trust.ifmapj.config.BasicAuthConfig;
 import de.hshannover.f4.trust.ifmapj.exception.CommunicationException;
 import de.hshannover.f4.trust.ifmapj.exception.EndSessionException;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
@@ -95,7 +95,7 @@ public class Connection {
 
 	private Thread mUpdateThread;
 
-	private ThreadSafeSsrc mSsrc;
+	private SSRC mSsrc;
 
 	private boolean connected = false;
 	private Set<String> activeSubscriptions;
@@ -183,10 +183,8 @@ public class Connection {
 		log.trace("init SSRC ...");
 
 		try {
-
-			TrustManager[] tms = IfmapJHelper.getTrustManagers(UpdateService.class.getResourceAsStream(truststore), truststorePass);
-			mSsrc = new ThreadSafeSsrc(url, user, userPass, tms);
-
+			BasicAuthConfig config = new BasicAuthConfig(url, user, userPass, truststore, truststorePass, true, 120 * 1000);
+			mSsrc = IfmapJ.createSsrc(config);
 		} catch (InitializationException e) {
 			resetConnection();
 			throw new IfmapConnectionException(e);

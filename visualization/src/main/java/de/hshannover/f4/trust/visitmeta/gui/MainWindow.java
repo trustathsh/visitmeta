@@ -42,6 +42,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -49,6 +50,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -78,6 +80,8 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
+import de.hshannover.f4.trust.visitmeta.gui.ConnectionTabListMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
@@ -85,6 +89,11 @@ import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
+
+	private static final String VISITMETA_ICON_16PX = "visitmeta-icon-16px.png";
+	private static final String VISITMETA_ICON_32PX = "visitmeta-icon-32px.png";
+	private static final String VISITMETA_ICON_64PX = "visitmeta-icon-64px.png";
+	private static final String VISITMETA_ICON_128PX = "visitmeta-icon-128px.png";
 
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
@@ -176,6 +185,17 @@ public class MainWindow extends JFrame {
 	private void init() {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
+
+		//		ImageIcon visitmetaIcon = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath());
+		//		this.setIconImage(visitmetaIcon.getImage());
+
+		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath()).getImage();
+		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath()).getImage();
+		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath()).getImage();
+		Image visitMetaIcon128px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath()).getImage();
+
+		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px, visitMetaIcon32px, visitMetaIcon64px, visitMetaIcon128px);
+		this.setIconImages(visitMetaIcons);
 
 		initLeftHandSide();
 		initRightHandSide();

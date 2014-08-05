@@ -167,6 +167,7 @@ public class Piccolo2DPanel implements GraphPanel {
 				RadialGradientPaint.ColorSpaceType.SRGB, vTransformation);
 	}
 
+
 	/**
 	 * Get the color for an identifier node.
 	 * 
@@ -174,13 +175,33 @@ public class Piccolo2DPanel implements GraphPanel {
 	 *            the identifier node.
 	 * @return the color.
 	 */
-	private Paint getColor(PPath pNode) {
-		LOGGER.trace("Method getColor(" + pNode + ") called.");
-		String vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.inside", "0x9999FF");
-		String vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.outside", "0x9999FF");
+	private Paint getColor(PPath vNode, NodeIdentifier pNode) {
+		LOGGER.trace("Method getColor(" + vNode + ", " + pNode + ") called.");
+
+		String vIdentifierInside = "0x9999FF";
+		String vIdentifierOutside = "0x9999FF";
+
+		Identifier identifier = pNode.getIdentifier();
+		String typeName = identifier.getTypeName();
+
+		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+			vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".inside", "0x9999FF");
+			vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".outside", "0x9999FF");
+
+			// Special case: extended identifier
+			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				if (type != null && type.equals("other")) {
+					vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.extended.inside", "0x9999FF");
+					vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.extended.outside", "0x9999FF");
+				}
+			}
+		}
+
 		Color vColorInside = Color.decode(vIdentifierInside);
 		Color vColorOutside = Color.decode(vIdentifierOutside);
-		return createGradientColor(pNode, vColorInside, vColorOutside);
+		return createGradientColor(vNode, vColorInside, vColorOutside);
 	}
 
 	/**
@@ -202,9 +223,26 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * 
 	 * @return the text color.
 	 */
-	private Color getColorIdentifierText() {
+	private Color getColorIdentifierText(NodeIdentifier pNode) {
 		LOGGER.trace("Method getColorIdentifierStroke() called.");
-		String vColor = PropertiesManager.getProperty("color", "color.identifier.text", "0x000000");
+		String vColor = "0x000000";
+
+		Identifier identifier = pNode.getIdentifier();
+		String typeName = identifier.getTypeName();
+
+		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+			vColor = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".text", "0x000000");
+
+			// Special case: extended identifier
+			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				if (type != null && type.equals("other")) {
+					vColor = PropertiesManager.getProperty("color", "color.identifier.extended.text", "0x000000");
+				}
+			}
+		}
+
 		return Color.decode(vColor);
 	}
 
@@ -213,9 +251,26 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * 
 	 * @return the stroke color.
 	 */
-	private Color getColorIdentifierStroke() {
+	private Color getColorIdentifierStroke(NodeIdentifier pNode) {
 		LOGGER.trace("Method getColorIdentifierStroke() called.");
-		String vOutside = PropertiesManager.getProperty("color", "color.identifier.border", "0x000000");
+		String vOutside = "0x000000";
+
+		Identifier identifier = pNode.getIdentifier();
+		String typeName = identifier.getTypeName();
+
+		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+			vOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".border", "0x000000");
+
+			// Special case: extended identifier
+			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				if (type != null && type.equals("other")) {
+					vOutside = PropertiesManager.getProperty("color", "color.identifier.extended.border", "0x000000");
+				}
+			}
+		}
+
 		return Color.decode(vOutside);
 	}
 
@@ -266,7 +321,7 @@ public class Piccolo2DPanel implements GraphPanel {
 		if (!mMapNode.containsKey(pNode)) {
 			PText vText = createIdentifierText(pNode);
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
-			vText.setTextPaint(getColorIdentifierText());
+			vText.setTextPaint(getColorIdentifierText(pNode));
 
 			final PPath vNode = PPath.createRoundRectangle(-5, // x TODO Set
 					// text in
@@ -277,8 +332,8 @@ public class Piccolo2DPanel implements GraphPanel {
 					20.0f, // arcWidth TODO Design variable
 					20.0f // arcHeight TODO Design variable
 					);
-			vNode.setPaint(getColor(vNode));
-			vNode.setStrokePaint(getColorIdentifierStroke());
+			vNode.setPaint(getColor(vNode, pNode));
+			vNode.setStrokePaint(getColorIdentifierStroke(pNode));
 			/* Composite */
 			final PComposite vCom = new PComposite();
 			vCom.addChild(vNode);
@@ -880,7 +935,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	@Override
 	public void repaintNodes(String pType, String pPublisher) {
 		LOGGER.trace("Method repaintNodes(" + pType + ", " + pPublisher + ") called.");
-		for (PComposite vCom : mMapNode.values()) {
+		for (Object key : mMapNode.keySet()) {
+			PComposite vCom = mMapNode.get(key);
 			PPath vNode = (PPath) vCom.getChild(0);
 			PText vText = (PText) vCom.getChild(1);
 			/* Check if node is highlighted */
@@ -888,12 +944,13 @@ public class Piccolo2DPanel implements GraphPanel {
 					|| vNode.getStrokePaint().equals(mColorDeleteNode);
 			if (pType.equals("identifier")) {
 				if (vCom.getAttribute("type").equals(pType)) {
+					NodeIdentifier i = (NodeIdentifier) key;
 					/* Repaint identifier nodes */
-					vNode.setPaint(getColor(vNode));
+					vNode.setPaint(getColor(vNode, i));
 					if (!isHighlighted) {
-						vNode.setStrokePaint(getColorIdentifierStroke());
+						vNode.setStrokePaint(getColorIdentifierStroke(i));
 					}
-					vText.setTextPaint(getColorIdentifierText());
+					vText.setTextPaint(getColorIdentifierText(i));
 				}
 			} else if (pType.equals("metadata")) {
 				if (vCom.getAttribute("type").equals(pType)) {

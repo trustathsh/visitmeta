@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -59,6 +60,8 @@ public class IdentifierHelper {
 	public static final String MAC_ADDRESS_ATTR_VALUE = "value";
 
 	public static final String OTHER_TYPE_EXTENDED_IDENTIFIER = "extended";
+
+	public static final List<String> IDENTIFIER_TYPES = Arrays.asList(ACCESS_REQUEST_EL_NAME, DEVICE_EL_NAME, IDENTITY_EL_NAME, IP_ADDRESS_EL_NAME, MAC_ADDRESS_EL_NAME);
 
 	private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 

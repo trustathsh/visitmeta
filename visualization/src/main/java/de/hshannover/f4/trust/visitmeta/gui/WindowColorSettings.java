@@ -59,6 +59,7 @@ import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
 
@@ -85,7 +86,12 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		setPreferredSize(new Dimension(650, 300));
 
 		mSelectPublisher = new JComboBox<String>(mPublisher.toArray(new String[0]));
-		mSelectPublisher.addItem("identifier");
+		mSelectPublisher.addItem("identifier: access-request");
+		mSelectPublisher.addItem("identifier: device");
+		mSelectPublisher.addItem("identifier: identity");
+		mSelectPublisher.addItem("identifier: ip-address");
+		mSelectPublisher.addItem("identifier: mac-address");
+		mSelectPublisher.addItem("identifier: extended");
 		mSelectPublisher.addItem("default metadata");
 		mSelectPublisher.addActionListener(new ActionListener() {
 			@Override
@@ -105,11 +111,31 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 					String vPublisher = "";
 					String vProperty = "";
 					if (mSelectPublisher.getSelectedIndex() == 0) {
-						/* First item is the default identifier color */
+						/* First item is the identifier color for access-requests */
 						vType = "identifier";
-						vProperty = "color." + vType + "." + vParam;
+						vProperty = "color." + vType + "." + IdentifierHelper.ACCESS_REQUEST_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 1) {
-						/* Second item is the default metadata color */
+						/* Second item is the identifier color for devices */
+						vType = "identifier";
+						vProperty = "color." + vType + "." + IdentifierHelper.DEVICE_EL_NAME + "." + vParam;
+					} else if (mSelectPublisher.getSelectedIndex() == 2) {
+						/* Third item is the identifier color for identities */
+						vType = "identifier";
+						vProperty = "color." + vType + "." + IdentifierHelper.IDENTITY_EL_NAME + "." + vParam;
+					} else if (mSelectPublisher.getSelectedIndex() == 3) {
+						/* Fourth item is the identifier color for ip-addresses */
+						vType = "identifier";
+						vProperty = "color." + vType + "." + IdentifierHelper.IP_ADDRESS_EL_NAME + "." + vParam;
+					} else if (mSelectPublisher.getSelectedIndex() == 4) {
+						/* Fifth item is the identifier color for mac-addresses */
+						vType = "identifier";
+						vProperty = "color." + vType + "." + IdentifierHelper.MAC_ADDRESS_EL_NAME + "." + vParam;
+					} else if (mSelectPublisher.getSelectedIndex() == 5) {
+						/* Sixth item is the identifier color for extended-identifiers */
+						vType = "identifier";
+						vProperty = "color." + vType + ".extended." + vParam;
+					} else if (mSelectPublisher.getSelectedIndex() == 6) {
+						/* Seventh item is the default metadata color */
 						vType = "metadata";
 						vProperty = "color." + vType + "." + vParam;
 					} else {
@@ -189,8 +215,12 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 	public void updateWindow() {
 		LOGGER.trace("Method updateWindow() called.");
 		mSelectPublisher.removeAllItems();
-		mSelectPublisher.addItem("identifier");
-		mSelectPublisher.addItem("default metadata");
+		mSelectPublisher.addItem("identifier: access-request");
+		mSelectPublisher.addItem("identifier: device");
+		mSelectPublisher.addItem("identifier: identity");
+		mSelectPublisher.addItem("identifier: ip-address");
+		mSelectPublisher.addItem("identifier: mac-address");
+		mSelectPublisher.addItem("identifier: extended");
 		for (String s : mPublisher) {
 			mSelectPublisher.addItem(s);
 		}

@@ -176,8 +176,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	 */
 	private Paint getColor(PPath pNode) {
 		LOGGER.trace("Method getColor(" + pNode + ") called.");
-		String vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.inside", "0x79A2CA");
-		String vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.outside", "0x536E8A");
+		String vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.inside", "0x9999FF");
+		String vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.outside", "0x9999FF");
 		Color vColorInside = Color.decode(vIdentifierInside);
 		Color vColorOutside = Color.decode(vIdentifierOutside);
 		return createGradientColor(pNode, vColorInside, vColorOutside);
@@ -192,7 +192,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	 */
 	private Paint getColorText(String pPublisher) {
 		LOGGER.trace("Method getColorText(" + pPublisher + ") called.");
-		String vDefaultText = PropertiesManager.getProperty("color", "color.metadata.text", "0xFFFFFF");
+		String vDefaultText = PropertiesManager.getProperty("color", "color.metadata.text", "0x000000");
 		String vText = PropertiesManager.getProperty("color", "color." + pPublisher + ".text", vDefaultText);
 		return Color.decode(vText);
 	}
@@ -204,7 +204,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	 */
 	private Color getColorIdentifierText() {
 		LOGGER.trace("Method getColorIdentifierStroke() called.");
-		String vColor = PropertiesManager.getProperty("color", "color.identifier.text", "0xFFFFFF");
+		String vColor = PropertiesManager.getProperty("color", "color.identifier.text", "0x000000");
 		return Color.decode(vColor);
 	}
 
@@ -245,8 +245,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	private Paint getColor(String pPublisher, PPath pNode) {
 		LOGGER.trace("Method getColor(" + pPublisher + ", " + pNode + ") called.");
 
-		String vDefaultInside = PropertiesManager.getProperty("color", "color.metadata.inside", "0x79A2CA");
-		String vDefaultOutside = PropertiesManager.getProperty("color", "color.metadata.outside", "0x536E8A");
+		String vDefaultInside = PropertiesManager.getProperty("color", "color.metadata.inside", "0xFF9966");
+		String vDefaultOutside = PropertiesManager.getProperty("color", "color.metadata.outside", "0xFF9966");
 		String vInside = PropertiesManager.getProperty("color", "color." + pPublisher + ".inside", vDefaultInside);
 		String vOutside = PropertiesManager.getProperty("color", "color." + pPublisher + ".outside", vDefaultOutside);
 		Color vColorInside = Color.decode(vInside);

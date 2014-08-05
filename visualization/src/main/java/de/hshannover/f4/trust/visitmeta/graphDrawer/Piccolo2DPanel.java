@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.AffineTransform;
@@ -264,6 +265,7 @@ public class Piccolo2DPanel implements GraphPanel {
 		LOGGER.trace("Method addIdentifier(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
 			PText vText = createIdentifierText(pNode);
+			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorIdentifierText());
 
 			final PPath vNode = PPath.createRoundRectangle(-5, // x TODO Set
@@ -325,58 +327,34 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 		IdentifierWrapper identifierWrapper = IdentifierHelper.identifier(identifier.getRawData());
 
-		System.out.println(identifierWrapper.toFormattedString());
-
 		sb.append(typeName);
 
 		String administrativeDomain = identifierWrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTIFIER_ATTR_ADMIN_DOMAIN);	// administrative-domain
 
+		boolean multiLine = Boolean.parseBoolean(PropertiesManager.getProperty("visualizationConfig", "node.text.multiline", "true"));
+
+		String identifierString = "";
 		switch (typeName) {
 		case IdentifierHelper.ACCESS_REQUEST_EL_NAME:
-			sb.append(": ");
-			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
-
+			identifierString = createIdentifierTextForAccessRequest(identifierWrapper, multiLine);
 			break;
 		case IdentifierHelper.DEVICE_EL_NAME:
-			sb.append(": ");
-			sb.append(identifierWrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
+			identifierString = createIdentifierTextForDevice(identifierWrapper, multiLine);
 			break;
 		case IdentifierHelper.IDENTITY_EL_NAME:
-			String type = identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type");
-
-			if (type.equals("other")) {
-				sb = new StringBuilder();
-				sb.append("extended-identifier");
-				sb.append(": ");
-				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
-				sb.append("\n");
-
-				// TODO try to extract name from canonical XML
-				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
-
-			} else {
-				sb.append(": ");
-				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
-				sb.append(" (");
-				sb.append(type);	// type
-				sb.append(")");
-			}
-
+			identifierString = createIdentifierTextForIdentity(identifierWrapper, multiLine);
 			break;
 		case IdentifierHelper.MAC_ADDRESS_EL_NAME:
-			sb.append(": ");
-			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
+			identifierString = createIdentifierTextForMacAddress(identifierWrapper, multiLine);
 			break;
 		case IdentifierHelper.IP_ADDRESS_EL_NAME:
-			sb.append(": ");
-			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
-			sb.append(" (");
-			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
-			sb.append(")");
+			identifierString = createIdentifierTextForIPAddress(identifierWrapper, multiLine);
 			break;
 		default:
 			break;
 		}
+
+		sb.append(identifierString);
 
 		if (administrativeDomain != null && !administrativeDomain.isEmpty()) {
 			sb.append("\n");
@@ -386,6 +364,127 @@ public class Piccolo2DPanel implements GraphPanel {
 		}
 
 		return new PText(sb.toString());
+	}
+
+	private String createIdentifierTextForAccessRequest(IdentifierWrapper wrapper, boolean multiLine) {
+		StringBuilder sb = new StringBuilder();
+
+		if (multiLine) {
+			sb.append("\n");
+			sb.append("[ name=");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
+			sb.append(" ]");
+		} else {
+			sb.append(": ");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
+		}
+
+		return sb.toString();
+	}
+
+	private String createIdentifierTextForDevice(IdentifierWrapper wrapper, boolean multiLine) {
+		StringBuilder sb = new StringBuilder();
+
+		if (multiLine) {
+			sb.append("\n");
+			sb.append("[ name=");
+			sb.append(wrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
+			sb.append(" ]");
+		} else {
+			sb.append(": ");
+			sb.append(wrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
+		}
+
+		return sb.toString();
+	}
+
+	private String createIdentifierTextForIdentity(IdentifierWrapper wrapper, boolean multiLine) {
+		StringBuilder sb = new StringBuilder();
+		String type = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type");
+
+		if (multiLine) {
+			if (type.equals("other")) {
+				sb = new StringBuilder();
+				sb.append("extended-identifier");
+				sb.append("\n");
+				sb.append("[ name=");
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append(" ]");
+				sb.append("\n");
+
+				// TODO try to extract name from canonical XML
+				sb.append("[ other-type-definition=");
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
+				sb.append(" ]");
+			} else {
+				sb.append("\n");
+				sb.append("[ name=");
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append(" ]");
+				sb.append("\n");
+				sb.append("[ type=");
+				sb.append(type);	// type
+				sb.append(" ]");
+			}
+		} else {
+			if (type.equals("other")) {
+				sb = new StringBuilder();
+				sb.append("extended-identifier: ");
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append("\n");
+
+				// TODO try to extract name from canonical XML
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
+			} else {
+				sb.append(": ");
+				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append(" (");
+				sb.append(type);	// type
+				sb.append(")");
+			}
+
+		}
+
+		return sb.toString();
+	}
+
+	private String createIdentifierTextForIPAddress(IdentifierWrapper wrapper, boolean multiLine) {
+		StringBuilder sb = new StringBuilder();
+
+		if (multiLine) {
+			sb.append("\n");
+			sb.append("[ value=");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
+			sb.append(" ]");
+			sb.append("\n");
+			sb.append("[ type=");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
+			sb.append(" ]");
+		} else {
+			sb.append(": ");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
+			sb.append(" (");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
+			sb.append(")");
+		}
+
+		return sb.toString();
+	}
+
+	private String createIdentifierTextForMacAddress(IdentifierWrapper wrapper, boolean multiLine) {
+		StringBuilder sb = new StringBuilder();
+
+		if (multiLine) {
+			sb.append("\n");
+			sb.append("[ value=");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
+			sb.append(" ]");
+		} else {
+			sb.append(": ");
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
+		}
+
+		return sb.toString();
 	}
 
 	private void addMetadata(NodeMetadata pNode) {

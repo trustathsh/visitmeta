@@ -56,8 +56,16 @@ public enum LayoutType{
 
 	/**
 	 * <p>A Spring-Layout.</p>
-	 * <p>This implementation (LayoutSring2D) uses the functionalities of SpringLayout of JUNG2.
+	 * <p>This implementation (LayoutSpring2D) uses the functionalities of SpringLayout of JUNG2.
 	 * JUNG2 uses a self-implemented Spring-Layout.</p>
 	 */
-	SPRING
+	SPRING,
+	
+	/**
+	 * <p>A Bipartite-Layout adapted to the specific structure of MAP graphs
+	 * (with identifier nodes connected via metadata nodes).</p>
+	 * <p>This implementation (LayoutBipartite2D) uses the class StaticLayout of JUNG2 for consistency.
+	 * The layout algorithm itself has been developed by Trust@HsH group.</p>
+	 */
+	BIPARTITE
 }

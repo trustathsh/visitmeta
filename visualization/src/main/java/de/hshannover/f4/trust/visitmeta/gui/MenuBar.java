@@ -40,8 +40,12 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -52,6 +56,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
+//TODO: Hide JUNG implementation details from Menu, e.g., by providing a method getSuppoprtedLayoutTypes(). <VA> 2014-08-05
+import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
@@ -66,6 +73,7 @@ public class MenuBar extends JMenuBar {
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuTheme   = null;
+	private JMenu mMenuLayout  = null;
 	private JMenuItem mItemStopMotion = null;
 	private JMenuItem mItemRedrawGraph = null;
 	private JMenuItem mItemSetColors = null;
@@ -197,6 +205,9 @@ public class MenuBar extends JMenuBar {
 
 		for (final SupportedLaF lAf: supportedLaFs){
 			mMenuTheme.add(lAf.menuItem);
+			if (lAf.laf.getID() == UIManager.getLookAndFeel().getID()) {
+				lAf.menuItem.setSelected(true);
+			}
 			lAf.menuItem.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent event) {
@@ -241,5 +252,36 @@ public class MenuBar extends JMenuBar {
 		//
 		// JMenuItem mntmAbout = new JMenuItem("About");
 		// mnHelp.add(mntmAbout);
+		
+		mMenuLayout = new JMenu("Layout");
+		mnSettings.add(mMenuLayout);
+		
+		@SuppressWarnings("serial")
+		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(LayoutType.class) {
+			{
+				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem("Force-directed (JUNG2)"));
+				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
+				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));				
+			}
+		};
+
+		for(final Entry<LayoutType, JCheckBoxMenuItem> layout : layoutMap.entrySet()){
+			mMenuLayout.add(layout.getValue());
+			layout.getValue().addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					mContoller.getSelectedConnection().getLogic().setLayoutType(layout.getKey());				
+					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap.entrySet()) {
+						if (otherLayout.getKey() != layout.getKey()) {
+							otherLayout.getValue().setSelected(false);
+						}
+					}
+				}
+			});
+		}
+		
+		// TODO: Initialize layout type from user settings/preferences. <VA> 2014-08-05
+		layoutMap.get(JungCalculator.DEFAULT_LAYOUT_TYPE).setSelected(true);
 	}
+	
 }

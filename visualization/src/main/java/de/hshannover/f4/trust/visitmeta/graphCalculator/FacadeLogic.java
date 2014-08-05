@@ -43,12 +43,14 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
+//TODO: Hide JUNG implementation details from Facade, e.g., by providing a method getSuppoprtedLayoutTypes(). <VA> 2014-08-05
+import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 
 /**
@@ -221,7 +223,10 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 			synchronized (this) {
 				while (!mIsDone) {
 					if (mDoCalculation) {
-						mCalculator.adjustAllNodes(mIterations, true, true);
+ 						mCalculator.adjustAllNodes(mIterations, true, true);
+ 						// TODO: Don't pin picked nodes (working); change also in Graph2D.adjustGraphAnew() and Graph2D.addRemoveNodesLinksMetadatas().
+ 						// TODO: Let user decide when to pin. <VA> 2014-08-05
+//						mCalculator.adjustAllNodes(mIterations, false, false);	
 					}
 					wait(mInterval);
 				}
@@ -231,4 +236,19 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Set the layout type (e.g., force-directed).
+	 */
+	public void setLayoutType(LayoutType layoutType) {
+		mCalculator.setLayoutType(layoutType);
+	}
+
+	/**
+	 * Get the active layout type (e.g., force-directed).
+	 */
+	public LayoutType getLayoutType() {
+		return mCalculator.getLayoutType();
+	}
+	
 }

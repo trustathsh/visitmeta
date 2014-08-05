@@ -178,20 +178,25 @@ public interface Calculator extends Observer {
 	public void setIterations(int iterations);
 
 	/**
-	 * Set layout (force-directed- or spring-layout) with default parameters.
+	 * Set layout type (e.g., force-directed) with default parameters.
 	 * @param layoutType
 	 */
-	public void setLayout(LayoutType layoutType);
+	public void setLayoutType(LayoutType layoutType);
 
 	/**
-	 * Set layout (force-directed) with user selected parameters.
+	 * Get layout type (e.g., force-directed).
+	 */
+	public LayoutType getLayoutType();
+
+	/**
+	 * Set layout type (force-directed) with user selected parameters.
 	 * @param attractionMultiplier How much edges try to keep their nodes together.
 	 * @param repulsionMultiplier How much nodes try to push each other apart.
 	 */
-	public void setLayoutForceDirectd(double attractionMultiplier, double repulsionMultiplier);
+	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier);
 
 	/**
-	 * Set layout (spring).
+	 * Set layout type (spring).
 	 * @param useIndividualEdgeLength true if every edge has to have its individual length
 	 * @param dimensionX Dimension of provided space for graph in x-dimension
 	 * @param dimensionY Dimension of provided space for graph in y-dimension
@@ -202,5 +207,9 @@ public interface Calculator extends Observer {
 	public void setLayoutSpring(boolean useIndividualEdgeLength, int dimensionX,
 			int dimensionY, double stretch, double forceMultiplier, int repulsionRange);
 
+	/**
+	 * Set layout type (bipartite).
+	 */
+	public void setLayoutBipartite();
 
 }

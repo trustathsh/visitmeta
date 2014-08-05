@@ -178,7 +178,9 @@ public class Graph2D{
 		mLayout2D.reset();
 
 		adjustAllNodes(mIterations, false, true);
-//		adjustAllNodes(mIterations, false, false);	// TODO <VA>: Don't pin picked nodes (not working)
+		// TODO: Don't pin picked nodes (working); change also in Graph2D.adjustGraphAnew() and FacadeLogic.run().
+		// TODO: Let user decide when to pin. <VA> 2014-08-05
+//		adjustAllNodes(mIterations, false, false);
 	}
 
 
@@ -196,11 +198,11 @@ public class Graph2D{
 
 
 	/**
-	 * Set layout (force-directed- or spring-layout) with default parameters.
+	 * Set layout type (e.g., force-directed) with default parameters.
 	 * @param layoutType
 	 */
-	public void setLayout(LayoutType layoutType){
-		LOGGER.trace("Method setLayout(" + layoutType + ") called.");
+	public void setLayoutType(LayoutType layoutType){
+		LOGGER.trace("Method setLayoutType(" + layoutType + ") called.");
 		mLayoutType = layoutType;
 		if(layoutType == LayoutType.FORCE_DIRECTED){
 			mLayout2D = new LayoutForceDirected2D(this);
@@ -208,6 +210,23 @@ public class Graph2D{
 		else if(layoutType == LayoutType.SPRING){
 			mLayout2D = new LayoutSpring2D(this);
 		}
+		else if(layoutType == LayoutType.BIPARTITE){
+			mLayout2D = new LayoutBipartite2D(this);
+		}
+		
+		// adjust nodes according to new layout
+		for(Entry<NodeIdentifier, NodeIdentifier2D> id : mNodeIdentifierMap.entrySet()){
+			id.getValue().setLayout(mLayout2D);
+			id.getValue().setAdjustPermission(true);
+			id.getValue().setPicked(false);
+		}
+		for(Entry<NodeMetadata, NodeMetadata2D> meta : mNodeMetadataMap.entrySet()){
+			meta.getValue().setLayout(mLayout2D);
+			meta.getValue().setAdjustPermission(true);
+			meta.getValue().setPicked(false);
+		}
+		mLayout2D.reset();
+		adjustAllNodes(mIterations);
 	}
 
 
@@ -216,7 +235,7 @@ public class Graph2D{
 	 * @param attractionMultiplier How much edges try to keep their nodes together.
 	 * @param repulsionMultiplier How much nodes try to push each other apart.
 	 */
-	public void setLayoutForceDirectd(double attractionMultiplier, double repulsionMultiplier){
+	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier){
 		mLayoutType = LayoutType.FORCE_DIRECTED;
 		mLayout2D = new LayoutForceDirected2D(this, attractionMultiplier, repulsionMultiplier);
 	}
@@ -238,6 +257,15 @@ public class Graph2D{
 				stretch, forceMultiplier, repulsionRange);
 	}
 
+	
+	/**
+	 * Set layout (bipartite).
+	 */
+	public void setLayoutBipartite(){
+		mLayoutType = LayoutType.BIPARTITE;
+		mLayout2D = new LayoutBipartite2D(this);
+	}
+
 
 	/**
 	 * Remove all Elements from graph.
@@ -252,7 +280,7 @@ public class Graph2D{
 		mExpandedLinkMap.clear();
 		mNodeMetadataMap.clear();
 		mNewNodes2D.clear();
-		setLayout(mLayoutType);
+		setLayoutType(mLayoutType);
 	}
 
 
@@ -317,7 +345,9 @@ public class Graph2D{
 		}
 
 		adjustAllNodes(iterations, false, true);
-//		adjustAllNodes(mIterations, false, false);	// TODO <VA>: Don't pin picked nodes (not working)
+		// TODO: Don't pin picked nodes (working); change also in Graph2D.addRemoveNodesLinksMetadatas() and FacadeLogic.run().
+		// TODO: Let user decide when to pin. <VA> 2014-08-05
+//		adjustAllNodes(mIterations, false, false);
 
 		mLayout2D.reset();
 	}
@@ -1047,6 +1077,10 @@ public class Graph2D{
 		return edges;
 	}
 
+	public LayoutType getLayoutType() {
+		return mLayoutType;
+	}
+	
 	// /////////////////////////////////////////////////////////////////////////////////////// SUPER
 
 	@Override

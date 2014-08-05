@@ -60,6 +60,8 @@ public class JungCalculator implements Calculator {
 
 	private static final Logger LOGGER = Logger.getLogger(JungCalculator.class);
 
+	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED;
+	
 	private Graph2D             mGraph2D;
 	private LayoutType          mLayoutType;
 	private MetadataCollocation mExpandedEdgeType;
@@ -67,12 +69,13 @@ public class JungCalculator implements Calculator {
 
 	public JungCalculator() {
 
-		mLayoutType         = LayoutType.FORCE_DIRECTED;
+		// TODO: Initialize layout type (and layout parameters) from user settings/preferences. <VA> 2014-08-05
+		mLayoutType         = DEFAULT_LAYOUT_TYPE;
 		mExpandedEdgeType   = MetadataCollocation.FORK;
 		mIdentifierEdgeType = MetadataCollocation.FORK;
 
 		mGraph2D = new Graph2D(mExpandedEdgeType, mIdentifierEdgeType);
-		mGraph2D.setLayout(mLayoutType);
+		mGraph2D.setLayoutType(mLayoutType);
 	}
 
 	/**
@@ -256,13 +259,20 @@ public class JungCalculator implements Calculator {
 	}
 
 	@Override
-	public void setLayout(LayoutType layoutType){
-		mGraph2D.setLayout(layoutType);
+	public void setLayoutType(LayoutType layoutType){
+		mGraph2D.setLayoutType(layoutType);
+		mLayoutType = layoutType;
 	}
 
 	@Override
-	public void setLayoutForceDirectd(double attractionMultiplier, double repulsionMultiplier){
-		mGraph2D.setLayoutForceDirectd(attractionMultiplier, repulsionMultiplier);
+	public LayoutType getLayoutType() {
+		return mLayoutType;
+	}
+
+	@Override
+	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier){
+		mGraph2D.setLayoutForceDirected(attractionMultiplier, repulsionMultiplier);
+		mLayoutType = LayoutType.FORCE_DIRECTED;
 	}
 
 	@Override
@@ -270,6 +280,13 @@ public class JungCalculator implements Calculator {
 			int dimensionY, double stretch, double forceMultiplier, int repulsionRange){
 		mGraph2D.setLayoutSpring(useIndividualEdgeLength, dimensionX, dimensionY, stretch,
 			forceMultiplier, repulsionRange);
+		mLayoutType = LayoutType.SPRING;
+	}
+
+	@Override
+	public void setLayoutBipartite(){
+		mGraph2D.setLayoutBipartite();
+		mLayoutType = LayoutType.BIPARTITE;
 	}
 
 }

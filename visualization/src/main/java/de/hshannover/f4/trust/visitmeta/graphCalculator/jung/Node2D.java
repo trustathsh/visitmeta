@@ -227,6 +227,12 @@ public abstract class Node2D{
     	mEdge2DForkOut = edge;
     }
 
-
+	public Layout2D getLayout() {
+		return mLayout2D;
+	}
+	
+	public void setLayout(Layout2D layout2D) {
+		mLayout2D = layout2D;
+	}
 
 }

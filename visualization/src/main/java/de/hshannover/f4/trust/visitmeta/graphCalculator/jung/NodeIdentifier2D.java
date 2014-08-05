@@ -66,7 +66,6 @@ public class NodeIdentifier2D extends Node2D{
 	private List<ExpandedLink2D>              mExpandedLinks2D;
 
 	private Graph<Node2D, Edge2D>             mGraph;
-	private Layout2D                          mLayout2D;
 	private MetadataCollocation               mMetadataCollocation;
 
 	private List<NodeMetadata>                mNodesMetadata;

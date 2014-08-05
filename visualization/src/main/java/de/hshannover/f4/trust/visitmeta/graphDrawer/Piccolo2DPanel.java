@@ -61,6 +61,9 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -149,16 +152,16 @@ public class Piccolo2DPanel implements GraphPanel {
 		Point2D zero = new Point2D.Double(0.0, 0.0);
 		Point2D center = pNode.getBounds().getCenter2D();
 		AffineTransform vTransformation = AffineTransform.getScaleInstance(1.0, // x
-																				// scaling
+				// scaling
 				pNode.getHeight() / pNode.getWidth() // y scaling
-		);
+				);
 		vTransformation.translate(center.getX(), // x center
 				center.getY() * (pNode.getWidth() / pNode.getHeight()) // y
-																		// center
-																		// *
-																		// invert
-																		// scaling
-		);
+				// center
+				// *
+				// invert
+				// scaling
+				);
 		return new RadialGradientPaint(zero, radius, zero, dist, colors, RadialGradientPaint.CycleMethod.NO_CYCLE,
 				RadialGradientPaint.ColorSpaceType.SRGB, vTransformation);
 	}
@@ -260,12 +263,12 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void addIdentifier(NodeIdentifier pNode) {
 		LOGGER.trace("Method addIdentifier(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			PText vText = new PText(pNode.getIdentifier().getTypeName());
+			PText vText = createIdentifierText(pNode);
 			vText.setTextPaint(getColorIdentifierText());
 
 			final PPath vNode = PPath.createRoundRectangle(-5, // x TODO Set
-																// text in
-																// center
+					// text in
+					// center
 					-5, // y TODO Set text in center
 					(float) vText.getWidth() + 10, // width TODO Add offset
 					(float) vText.getHeight() + 10, // height TODO Add offset
@@ -281,13 +284,13 @@ public class Piccolo2DPanel implements GraphPanel {
 			vCom.setOffset( // Set position
 					mAreaOffsetX + pNode.getX() * mAreaWidth, // x
 					mAreaOffsetY + pNode.getY() * mAreaHeight // y
-			);
+					);
 			vCom.addAttribute("type", "identifier");
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
-																			// edges
-																			// to
-																			// node
+			// edges
+			// to
+			// node
 			mMapNode.put(pNode, vCom); // Add node to HashMap.
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -296,6 +299,93 @@ public class Piccolo2DPanel implements GraphPanel {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Creates the text written into a Identifier-node,
+	 * based on the information of the identifier itself.
+	 *
+	 * Examples:
+	 * <ul>
+	 * <li> access-request: ar1
+	 * <li> device: switch
+	 * <li> ip-address: 127.0.0.1 (IPv4)
+	 * <li> mac-address: aa:bb:cc:dd:ee:ff
+	 * <li> identity: John Doe (username)
+	 * <li> extended-identifier
+	 * </ul>
+	 *
+	 * @param pNode the {@link NodeIdentifier} for creating the text
+	 * @return a {@link PText} containing the specific information for the given {@link NodeIdentifier}
+	 */
+	private PText createIdentifierText(NodeIdentifier pNode) {
+		StringBuilder sb = new StringBuilder();
+
+		Identifier identifier = pNode.getIdentifier();
+		String typeName = identifier.getTypeName();
+		IdentifierWrapper identifierWrapper = IdentifierHelper.identifier(identifier.getRawData());
+
+		System.out.println(identifierWrapper.toFormattedString());
+
+		sb.append(typeName);
+
+		String administrativeDomain = identifierWrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTIFIER_ATTR_ADMIN_DOMAIN);	// administrative-domain
+
+		switch (typeName) {
+		case IdentifierHelper.ACCESS_REQUEST_EL_NAME:
+			sb.append(": ");
+			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
+
+			break;
+		case IdentifierHelper.DEVICE_EL_NAME:
+			sb.append(": ");
+			sb.append(identifierWrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
+			break;
+		case IdentifierHelper.IDENTITY_EL_NAME:
+			String type = identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type");
+
+			if (type.equals("other")) {
+				sb = new StringBuilder();
+				sb.append("extended-identifier");
+				sb.append(": ");
+				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append("\n");
+
+				// TODO try to extract name from canonical XML
+				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
+
+			} else {
+				sb.append(": ");
+				sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+				sb.append(" (");
+				sb.append(type);	// type
+				sb.append(")");
+			}
+
+			break;
+		case IdentifierHelper.MAC_ADDRESS_EL_NAME:
+			sb.append(": ");
+			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
+			break;
+		case IdentifierHelper.IP_ADDRESS_EL_NAME:
+			sb.append(": ");
+			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
+			sb.append(" (");
+			sb.append(identifierWrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
+			sb.append(")");
+			break;
+		default:
+			break;
+		}
+
+		if (administrativeDomain != null && !administrativeDomain.isEmpty()) {
+			sb.append("\n");
+			sb.append("<");
+			sb.append(administrativeDomain);
+			sb.append(">");
+		}
+
+		return new PText(sb.toString());
 	}
 
 	private void addMetadata(NodeMetadata pNode) {
@@ -311,7 +401,7 @@ public class Piccolo2DPanel implements GraphPanel {
 			vText.setTextPaint(getColorText(vPublisher));
 			/* Rectangle */
 			final PPath vNode = PPath.createRectangle(-5, // x TODO Set text in
-															// center
+					// center
 					-5, // y TODO Set text in center
 					(float) vText.getWidth() + 10, // width TODO Add offset
 					(float) vText.getHeight() + 10 // height TODO Add offset
@@ -327,9 +417,9 @@ public class Piccolo2DPanel implements GraphPanel {
 			vCom.addAttribute("publisher", vPublisher);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
-																			// edges
-																			// to
-																			// node
+			// edges
+			// to
+			// node
 			mMapNode.put(pNode, vCom); // Add node to HashMap.
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -492,8 +582,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void updateEdge(PPath pEdge) {
 		LOGGER.trace("Method updateEdge(" + pEdge + ") called.");
 		synchronized (pEdge) {
-			PNode       vNode1  = (PComposite) ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(0);
-			PNode       vNode2  = (PComposite) ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(1);
+			PNode       vNode1  = ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(0);
+			PNode       vNode2  = ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(1);
 			Point2D     vStart  = vNode1.getFullBoundsReference().getCenter2D();
 			Point2D     vEnd    = vNode2.getFullBoundsReference().getCenter2D();
 			pEdge.reset();
@@ -578,8 +668,8 @@ public class Piccolo2DPanel implements GraphPanel {
 						if (vShadow != null) {
 							vNode.addAttribute("glow", null);
 							PActivity vFading = vShadow.animateToTransparency(0.0f, 500); // TODO
-																							// Use
-																							// SettingManager
+							// Use
+							// SettingManager
 							PActivity vRemove = new PActivity(0) {
 								@Override
 								protected void activityStep(long time) {
@@ -609,13 +699,13 @@ public class Piccolo2DPanel implements GraphPanel {
 				);
 		vShadow.setOffset((float) (vPosition.getX()), // x
 				(float) (vPosition.getY()) // y
-		);
+				);
 		vShadow.setStroke(null);
 		vShadow.setPaint(createGradientColor(
 				vShadow,
 				pHighlight,
 				mColorBackground // TODO mTransparency dosn't work.
-		));
+				));
 		vShadow.setTransparency(0.0f);
 		synchronized (pNode) {
 			mLayerGlow.addChild(vShadow);

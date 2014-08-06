@@ -72,7 +72,6 @@ public class NodeEventHandler extends PDragEventHandler {
 		super.startDrag(e);
 		e.setHandled(true);
 		e.getPickedNode().moveToFront();
-		mConnection.getParentTab().hidePropertiesOfNodeNow();
 		((Position) e.getPickedNode().getAttribute("position")).setInUse(true);
 		((PActivity) e.getPickedNode().getAttribute("activitie")).terminate();
 	}
@@ -133,6 +132,5 @@ public class NodeEventHandler extends PDragEventHandler {
 	public void mouseExited(PInputEvent e) {
 		LOGGER.trace("Method mouseExited(" + e + ") called.");
 		super.mouseExited(e);
-		mConnection.getParentTab().hidePropertiesOfNode();
 	}
 }

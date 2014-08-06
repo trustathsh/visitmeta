@@ -38,15 +38,14 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.Timer;
 
 import org.apache.log4j.Logger;
 
@@ -72,13 +71,11 @@ public class ConnectionTab extends JPanel {
 
 	private WindowColorSettings mWindowColorSettings;
 	private WindowSettings mWindowSettings;
-	private WindowNodeProperties mWindowNodeProperties;
-	private Timer mTimerPropertiesShow;
-	private Timer mTimerPropertiesHide;
 
 	private DataserviceConnection mDataserviceConnection;
 	private MotionInformationPane mMotionInformationPane;
 	private GraphPanel mGraphPanel;
+	private PanelXmlTree mPanelXmlTree;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -103,7 +100,6 @@ public class ConnectionTab extends JPanel {
 
 		initPanels();
 		initSettingsWindows();
-		initNodeSettings(window);
 
 		this.add(mSplitPane);
 	}
@@ -116,17 +112,20 @@ public class ConnectionTab extends JPanel {
 		mLowerPanel = new JPanel();
 
 		mUpperPanel.setLayout(new GridLayout());
-		mLowerPanel.setLayout(new GridLayout());
+		mLowerPanel.setLayout(new BorderLayout());
 
 		mGraphPanel = mGraphConnection.getGraphPanel();
 		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
+		mPanelXmlTree = new PanelXmlTree();
+
 		mUpperPanel.add(mMotionInformationPane);
-		mLowerPanel.add(mTimeLine);
+		mLowerPanel.add(mTimeLine, BorderLayout.NORTH);
+		mLowerPanel.add(mPanelXmlTree, BorderLayout.CENTER);
+		mLowerPanel.setPreferredSize(new Dimension(this.getWidth(), 200));
 
 		mSplitPane = new JSplitPane();
 		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		mSplitPane.setResizeWeight(0.99);
-		mSplitPane.setEnabled(false);
+		mSplitPane.setResizeWeight(1.0);
 		mSplitPane.setLeftComponent(mUpperPanel);
 		mSplitPane.setRightComponent(mLowerPanel);
 	}
@@ -141,28 +140,6 @@ public class ConnectionTab extends JPanel {
 		mWindowColorSettings = new WindowColorSettings(this);
 		mWindowColorSettings.setAlwaysOnTop(true);
 		mWindowColorSettings.setVisible(false);
-	}
-
-	private void initNodeSettings(JFrame window) {
-		mWindowNodeProperties = new WindowNodeProperties(window);
-		mTimerPropertiesShow = new Timer(750, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent pE) {
-				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-				mTimerPropertiesShow.stop();
-				mWindowNodeProperties.setVisible(true);
-			}
-		});
-		mTimerPropertiesHide = new Timer(500, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent pE) {
-				LOGGER.trace("ActionListener actionPerformed(" + pE + ") called.");
-				LOGGER.debug("Stop timer and hide WindowNodeProperties.");
-				mTimerPropertiesHide.stop();
-				mWindowNodeProperties.setVisible(false);
-			}
-		});
 	}
 
 	/**
@@ -236,22 +213,8 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
-		mTimerPropertiesHide.stop();
-		mWindowNodeProperties.fill(pData.getRawData(), mTimerPropertiesHide);
-		mWindowNodeProperties.repaint();
-		mWindowNodeProperties.setLocation(pX + 1, pY + 1);
-		mTimerPropertiesShow.start();
-	}
-
-	public void hidePropertiesOfNode() {
-		mTimerPropertiesShow.stop();
-		mTimerPropertiesHide.start();
-	}
-
-	public void hidePropertiesOfNodeNow() {
-		mTimerPropertiesShow.stop();
-		mTimerPropertiesHide.stop();
-		mWindowNodeProperties.setVisible(false);
+		mPanelXmlTree.fill(pData.getRawData());
+		mPanelXmlTree.repaint();
 	}
 
 	public DataserviceConnection getDataserviceConnection(){

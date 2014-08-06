@@ -38,14 +38,11 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -86,11 +83,9 @@ public class PanelXmlTree extends JScrollPane {
 	 * 
 	 * @param pXml
 	 *            the XML data to show in a tree.
-	 * @param pTimer
-	 *            the timer to hide the window.
 	 */
-	public void fill(String pXml, final Timer pTimer) {
-		LOGGER.trace("Method initTreeRoot(" + pXml + ", " + pTimer + ") called.");
+	public void fill(String pXml) {
+		LOGGER.trace("Method initTreeRoot(" + pXml + ") called.");
 		Document vDocument = null;
 		DefaultMutableTreeNode vRoot = null;
 		try {
@@ -107,22 +102,6 @@ public class PanelXmlTree extends JScrollPane {
 			treeWalk(vRootNode, 0, vRoot);
 		}
 		mTree.setModel(new DefaultTreeModel(vRoot, true));
-		/* Add MouseListener to JTree */
-		mTree.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseExited(MouseEvent pE) {
-				LOGGER.trace("MouseListener mouseExited(" + pE + ") called.");
-				LOGGER.debug("Start timer to hide WindowNodeProperties.");
-				pTimer.start();
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent pE) {
-				LOGGER.trace("MouseListener mouseEntered(" + pE + ") called.");
-				LOGGER.debug("Stop timer to hide WindowNodeProperties.");
-				pTimer.stop();
-			}
-		});
 		repaint();
 	}
 

@@ -202,6 +202,7 @@ public class MainWindow extends JFrame {
 
 		mMainSplitPane = new JSplitPane();
 		mMainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		mMainSplitPane.setResizeWeight(0.125);
 		mMainSplitPane.setRightComponent(mRightMainPanel);
 		mMainSplitPane.setLeftComponent(mLeftMainPanel);
 

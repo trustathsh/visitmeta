@@ -147,13 +147,13 @@ public class JungCalculator implements Calculator {
 	}
 
 	@Override
-	public void updateNode(Position p, double xNew, double yNew, double zNew){
+	public void updateNode(Position p, double xNew, double yNew, double zNew, boolean pinNode){
 		if(p instanceof NodeIdentifier){
-			mGraph2D.updateNodePosition((NodeIdentifier)p, xNew, yNew);
+			mGraph2D.updateNodePosition((NodeIdentifier)p, xNew, yNew, pinNode);
 			//mGraph2D.adjustAfterPickingNode((NodeIdentifier)o, 100);
 		}
 		else if(p instanceof NodeMetadata){
-			mGraph2D.updateNodePosition((NodeMetadata)p, xNew, yNew);
+			mGraph2D.updateNodePosition((NodeMetadata)p, xNew, yNew, pinNode);
 			//mGraph2D.adjustAfterPickingNode((NodeMetadata)o, 100);
 		}
 	}

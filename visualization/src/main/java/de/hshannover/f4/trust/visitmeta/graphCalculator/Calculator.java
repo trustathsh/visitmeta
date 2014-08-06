@@ -92,7 +92,7 @@ public interface Calculator extends Observer {
 	 * @param y the position in y.
 	 * @param z the position in z.
 	 */
-	public void updateNode(Position p, double x, double y, double z);
+	public void updateNode(Position p, double x, double y, double z, boolean pinNode);
 
 	/**
 	 * Adjusts the graph anew.

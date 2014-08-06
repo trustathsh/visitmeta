@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -176,11 +177,7 @@ public class Graph2D{
 		}
 
 		mLayout2D.reset();
-
 		adjustAllNodes(mIterations, false, true);
-		// TODO: Don't pin picked nodes (working); change also in Graph2D.adjustGraphAnew() and FacadeLogic.run().
-		// TODO: Let user decide when to pin. <VA> 2014-08-05
-//		adjustAllNodes(mIterations, false, false);
 	}
 
 
@@ -332,23 +329,26 @@ public class Graph2D{
 		MinBoundingBox2D minBox = new MinBoundingBox2D(this);
 		double xCenter = minBox.getCenterX();
 		double yCenter = minBox.getCenterY();
-
+		
+		Random random = new Random();
+		double deviation = 0.1 * mLayout2D.getDimensionX();
+		
 		for(Entry<NodeIdentifier, NodeIdentifier2D> id : mNodeIdentifierMap.entrySet()){
 			id.getValue().setAdjustPermission(true);
 			id.getValue().setPicked(false);
-			id.getValue().setPositionTriggeredByPiccolo(xCenter, yCenter);
+			id.getValue().setPositionTriggeredByJung(
+					clamp(xCenter + deviation * random.nextGaussian(), 0.0, mLayout2D.getDimensionX()),
+					clamp(yCenter + deviation * random.nextGaussian(), 0.0, mLayout2D.getDimensionY()));					
 		}
 		for(Entry<NodeMetadata, NodeMetadata2D> meta : mNodeMetadataMap.entrySet()){
 			meta.getValue().setAdjustPermission(true);
 			meta.getValue().setPicked(false);
-			meta.getValue().setPositionTriggeredByPiccolo(xCenter, yCenter);
+			meta.getValue().setPositionTriggeredByJung(
+					clamp(xCenter + deviation * random.nextGaussian(), 0.0, mLayout2D.getDimensionX()),
+					clamp(yCenter + deviation * random.nextGaussian(), 0.0, mLayout2D.getDimensionY()));
 		}
 
 		adjustAllNodes(iterations, false, true);
-		// TODO: Don't pin picked nodes (working); change also in Graph2D.addRemoveNodesLinksMetadatas() and FacadeLogic.run().
-		// TODO: Let user decide when to pin. <VA> 2014-08-05
-//		adjustAllNodes(mIterations, false, false);
-
 		mLayout2D.reset();
 	}
 
@@ -707,12 +707,11 @@ public class Graph2D{
 	 *
 	 * @param nodeIdentifier Node which position should be updated in the graph-calculation-layer.
 	 */
-	public void updateNodePosition(NodeIdentifier nodeIdentifier, double xNew, double yNew){
+	public void updateNodePosition(NodeIdentifier nodeIdentifier, double xNew, double yNew, boolean pinNode){
 		LOGGER.debug("Method updateNodePosition("+nodeIdentifier+", "+xNew+", "+xNew+") called.");
 		if(mNodeIdentifierMap.containsKey(nodeIdentifier)){
 			NodeIdentifier2D nodeId2D = mNodeIdentifierMap.get(nodeIdentifier);
-			nodeId2D.setPicked(true);
-			//mLayout2D.lockNode(nodeId2D);
+			nodeId2D.setPicked(pinNode);
 			double xJungPrevious = nodeId2D.getX();
 			double yJungPrevious = nodeId2D.getY();
 			nodeId2D.setPositionTriggeredByPiccolo(xNew, yNew);
@@ -736,12 +735,11 @@ public class Graph2D{
 	 *
 	 * @param nodeIdentifier Node which position should be updated in the graph-calculation-layer.
 	 */
-	public void updateNodePosition(NodeMetadata nodeMetadata, double xNew, double yNew){
+	public void updateNodePosition(NodeMetadata nodeMetadata, double xNew, double yNew, boolean pinNode){
 		LOGGER.debug("Method updateNodePosition("+nodeMetadata+", "+xNew+", "+xNew+") called.");
 		if(mNodeMetadataMap.containsKey(nodeMetadata)){
 			NodeMetadata2D node2D = mNodeMetadataMap.get(nodeMetadata);
-			node2D.setPicked(true);
-			//mLayout2D.lockNode(node2D);
+			node2D.setPicked(pinNode);
 			node2D.setPositionTriggeredByPiccolo(xNew, yNew);
 		}
 	}
@@ -1010,6 +1008,9 @@ public class Graph2D{
 		System.err.println("meta("+metaCount+")");
 	}
 
+	private double clamp(double x, double xMin, double xMax) {
+		return Math.max(xMin, Math.min(xMax, x));
+	}
 
 	// ///////////////////////////////////////////////////////////////////////////// PUBLIC - GETTER
 

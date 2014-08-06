@@ -44,6 +44,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
@@ -129,6 +130,14 @@ public class GuiController {
 		mSelectedConnection.showSettings(mMainWindow);
 	}
 
+	/**
+	 * Set layout type (e.g., force-directed)
+	 * @param layoutType
+	 */
+	public void setLayoutType(LayoutType layoutType) {
+		mSelectedConnection.getConnection().setLayoutType(layoutType);
+	}
+
 	public void redrawGraph() {
 		mSelectedConnection.getConnection().redrawGraph();
 	}
@@ -148,4 +157,5 @@ public class GuiController {
 	public MainWindow getMainWindow() {
 		return mMainWindow;
 	}
+		
 }

@@ -100,10 +100,12 @@ public class NodeEventHandler extends PDragEventHandler {
 		super.endDrag(e);
 		/* Set new position */
 		Point2D vPoint = e.getPickedNode().getOffset();
+		boolean pinNode = e.isControlDown() ? true : false;
 		mConnection.updateNode((Position) e.getPickedNode().getAttribute("position"), // Position-Object
 				(vPoint.getX() / mPanel.getAreaWidth()) + mPanel.getAreaOffsetX(), // x
 				(vPoint.getY() / mPanel.getAreaHeight()) + mPanel.getAreaOffsetY(), // y
-				0.0 // z
+				0.0, // z
+				pinNode
 				);
 		Point vMouse = MouseInfo.getPointerInfo().getLocation();
 		Position vNode = (Position) e.getPickedNode().getAttribute("position");

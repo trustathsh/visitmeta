@@ -62,6 +62,9 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
  * </ul>
  * <p>The graph is traversed using depth-first or breadth-first traversal.</p>
  * 
+ * <p>Note: This approach only works for MetadataCollocation.FORK.
+ * The metadata collocation is therefore altered to FORK at construction.</p>
+ * 
  * @author vahlers
  */
 public class LayoutBipartite2D extends Layout2D {
@@ -100,15 +103,26 @@ public class LayoutBipartite2D extends Layout2D {
 		mYIdentifier = new double[3];
 		mYMetadata = new double[3];
 		mDrawnNodes = new ArrayList<Node2D>();
+
+		// ensure that metadata collocation is set to FORK
+		mGraph.alterMetadataCollocationForEntireGraph(MetadataCollocation.FORK);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////// PUBLIC
 
 	/**
+	 * Get graph traversal method.
+	 * @return true: depth-first, false: breadth-first
+	 */
+	public boolean useDepthFirstTraversal() {
+		return mUseDFS;
+	}
+	
+	/**
 	 * Set graph traversal method.
 	 * @param useDFS true: depth-first, false: breadth-first
 	 */
-	public void setDepthFirstTraversal(boolean useDFS) {
+	public void useDepthFirstTraversal(boolean useDFS) {
 		mUseDFS = useDFS;
 	}
 	
@@ -239,9 +253,11 @@ public class LayoutBipartite2D extends Layout2D {
     	if (nodeMeOld != null) {
     		mYIdentifier[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYIdentifier[colIdx]);
     	}
-		nodeId2D.setPositionTriggeredByJung(
-				(mXCenter + mXDir * mXOffset) * getDimensionX(),
-				 mYIdentifier[colIdx] * getDimensionY());
+    	if (nodeId2D.hasAdjustPermission() && !nodeId2D.wasPicked()) {
+			nodeId2D.setPositionTriggeredByJung(
+					(mXCenter + mXDir * mXOffset) * getDimensionX(),
+					 mYIdentifier[colIdx] * getDimensionY());
+    	}
 		mYIdentifier[colIdx] += mYOffset;
 		mDrawnNodes.add(nodeId2D);
 		
@@ -279,9 +295,11 @@ public class LayoutBipartite2D extends Layout2D {
     	if (nodeMeOld != null) {
     		mYIdentifier[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYIdentifier[colIdx]);
     	}
-		nodeId2D.setPositionTriggeredByJung(
-				(mXCenter + mXDir * mXOffset) * getDimensionX(),
-				 mYIdentifier[colIdx] * getDimensionY());
+    	if (nodeId2D.hasAdjustPermission() && !nodeId2D.wasPicked()) {
+			nodeId2D.setPositionTriggeredByJung(
+					(mXCenter + mXDir * mXOffset) * getDimensionX(),
+					 mYIdentifier[colIdx] * getDimensionY());
+    	}
 		mYIdentifier[colIdx] += mYOffset;
 		mDrawnNodes.add(nodeId2D);
 		
@@ -320,16 +338,20 @@ public class LayoutBipartite2D extends Layout2D {
     	assert nodeMe2D.getExpandedLink2D() != null || nodeMe2D.getNodeIdentifier2D() != null;	// metadata must be attached to either link or identifier
 		if (nodeMe2D.getExpandedLink2D() != null) {			// metadata node attached to link -> column 3
 			mYMetadata[1] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYMetadata[1]);
-			nodeMe2D.setPositionTriggeredByJung(mXCenter * getDimensionX(),	mYMetadata[1] * getDimensionY());
+	    	if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
+	    		nodeMe2D.setPositionTriggeredByJung(mXCenter * getDimensionX(),	mYMetadata[1] * getDimensionY());
+	    	}
 			mYMetadata[1] += mYOffset;
 			mDrawnNodes.add(nodeMe2D);
 		}
 		else if (nodeMe2D.getNodeIdentifier2D() != null) {	// metadata node attached to identifier -> column 1 or 5
 	    	int colIdx = mXDir + 1;
 			mYMetadata[colIdx] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYMetadata[colIdx]);
-			nodeMe2D.setPositionTriggeredByJung(
-					(mXCenter + mXDir * 2 * mXOffset) * getDimensionX(),
-					mYMetadata[colIdx] * getDimensionY());
+	    	if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
+				nodeMe2D.setPositionTriggeredByJung(
+						(mXCenter + mXDir * 2 * mXOffset) * getDimensionX(),
+						mYMetadata[colIdx] * getDimensionY());
+	    	}
 			mYMetadata[colIdx] += mYOffset;
 			mDrawnNodes.add(nodeMe2D);
 		}

@@ -111,9 +111,9 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	 * @param pNewZ
 	 *            the new z coordinate.
 	 */
-	public synchronized void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ) {
+	public synchronized void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
 		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
-		mCalculator.updateNode(pNode, pNewX, pNewY, pNewZ);
+		mCalculator.updateNode(pNode, pNewX, pNewY, pNewZ, pinNode);
 	}
 
 	/**
@@ -188,6 +188,20 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	}
 
 	/**
+	 * Set the layout type (e.g., force-directed).
+	 */
+	public void setLayoutType(LayoutType layoutType) {
+		mCalculator.setLayoutType(layoutType);
+	}
+
+	/**
+	 * Get the active layout type (e.g., force-directed).
+	 */
+	public LayoutType getLayoutType() {
+		return mCalculator.getLayoutType();
+	}
+
+	/**
 	 * Recalculate the position of all nodes.
 	 */
 	public synchronized void recalculateGraph() {
@@ -224,9 +238,6 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 				while (!mIsDone) {
 					if (mDoCalculation) {
  						mCalculator.adjustAllNodes(mIterations, true, true);
- 						// TODO: Don't pin picked nodes (working); change also in Graph2D.adjustGraphAnew() and Graph2D.addRemoveNodesLinksMetadatas().
- 						// TODO: Let user decide when to pin. <VA> 2014-08-05
-//						mCalculator.adjustAllNodes(mIterations, false, false);	
 					}
 					wait(mInterval);
 				}
@@ -235,20 +246,6 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	/**
-	 * Set the layout type (e.g., force-directed).
-	 */
-	public void setLayoutType(LayoutType layoutType) {
-		mCalculator.setLayoutType(layoutType);
-	}
-
-	/**
-	 * Get the active layout type (e.g., force-directed).
-	 */
-	public LayoutType getLayoutType() {
-		return mCalculator.getLayoutType();
 	}
 	
 }

@@ -270,7 +270,7 @@ public class MenuBar extends JMenuBar {
 			layout.getValue().addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					mContoller.getSelectedConnection().getLogic().setLayoutType(layout.getKey());				
+					mContoller.setLayoutType(layout.getKey());				
 					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap.entrySet()) {
 						if (otherLayout.getKey() != layout.getKey()) {
 							otherLayout.getValue().setSelected(false);

@@ -57,6 +57,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 
@@ -240,10 +241,11 @@ public class GraphConnection implements Observer {
 	 *            the new y coordinate.
 	 * @param pNewZ
 	 *            the new z coordinate.
+	 * @param pinNode TODO
 	 */
-	public void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ) {
+	public void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
 		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
-		mFacadeLogic.updateNode(pNode, pNewX, pNewY, pNewZ);
+		mFacadeLogic.updateNode(pNode, pNewX, pNewY, pNewZ, pinNode);
 	}
 
 	/**
@@ -294,6 +296,14 @@ public class GraphConnection implements Observer {
 	public boolean isGraphMotion() {
 		LOGGER.trace("Method isGraphMotion() called.");
 		return mFacadeLogic.isCalculationRunning();
+	}
+
+	/**
+	 * Set layout type (e.g., force-directed)
+	 * @param layoutType
+	 */
+	public void setLayoutType(LayoutType layoutType) {
+		mFacadeLogic.setLayoutType(layoutType);
 	}
 
 	/**
@@ -411,4 +421,5 @@ public class GraphConnection implements Observer {
 			mGraphPanel.setNodeTranslationDuration(mSettingManager.getNodeTranslationDuration());
 		}
 	}
+	
 }

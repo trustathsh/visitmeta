@@ -54,11 +54,11 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
  * <p>This implementation uses the class StaticLayout of JUNG2 for consistency.
  * The layout algorithm itself has been developed by Trust@HsH group.</p>
  * 
- * <p>Layout approach: Extended bipartite layout with 5 columns (numbered 1 to 5 from left to right) with</p>
+ * <p>Layout approach: Extended bipartite layout with 5 columns (numbered 0 to 4 from left to right) with</p>
  * <ul>
- *   <li>identifier nodes in columns 2 and 4,</li>
- * 	 <li>metadata nodes attached to links in column 3 (center), and</li>
- *   <li>metadata nodes attached to identifiers in columns 1 and 5.</li>
+ *   <li>identifier nodes in columns 1 and 3,</li>
+ * 	 <li>metadata nodes attached to links in column 2 (center), and</li>
+ *   <li>metadata nodes attached to identifiers in columns 0 and 4.</li>
  * </ul>
  * <p>The graph is traversed using depth-first or breadth-first traversal.</p>
  * 
@@ -77,12 +77,10 @@ public class LayoutBipartite2D extends Layout2D {
 
 	private boolean mUseDFS;			// true: depth-first traversal (default), false: breadth-first traversal
 	
-	private double mXCenter;			// position of center column
-	private double mXOffset;			// horizontal offset between columns
 	private int mXDir;					// current horizontal layout direction (-1: left, +1: right)
 	private double mYOffset;			// vertical offset between rows
-	private double mYIdentifier[];		// vertical position of next identifier node in column (0: column 2/left, 1: unused, 2: column 4/right)
-	private double mYMetadata[];		// vertical position of next metadata node in column (0: column 1/left, 1: column 3/center, 2: column 5/right)
+	private double[] mXPositions;		// horizontal positions of node columns
+	private double[] mYPositions;		// vertical positions of next nodes in columns
 	private List<Node2D> mDrawnNodes;	// list of nodes that have already been drawn
 
 	// //////////////////////////////////////////////////////////////////////////////// CONSTRUCTORS
@@ -97,11 +95,9 @@ public class LayoutBipartite2D extends Layout2D {
 		
 		mUseDFS = true;
 		
-		mXCenter = 0.8;
-		mXOffset = 0.3;
 		mYOffset = 0.06;
-		mYIdentifier = new double[3];
-		mYMetadata = new double[3];
+		mXPositions = new double[] { 0.2, 0.4, 0.8, 1.2, 1.4 };
+		mYPositions = new double[5];
 		mDrawnNodes = new ArrayList<Node2D>();
 
 		// ensure that metadata collocation is set to FORK
@@ -136,15 +132,17 @@ public class LayoutBipartite2D extends Layout2D {
 	public void adjust(int iterations) {
     	LOGGER.trace("Method adjust(" + iterations + ") called.");
     	mXDir = -1;
-    	Arrays.fill(mYIdentifier, mYOffset);
-    	Arrays.fill(mYMetadata, mYOffset);
+    	Arrays.fill(mYPositions, mYOffset);
 		mDrawnNodes.clear();
 		
 		Collection<Node2D> nodes = mGraph.getGraph().getVertices();
 		for (Node2D node2D : nodes) {
     		if (node2D instanceof NodeIdentifier2D) {
     			drawNodeIdentifier((NodeIdentifier2D) node2D, null);
-    			mYIdentifier[mXDir + 1] += mYOffset;	// new graph component
+    			
+    			// start next graph component in column 1 (left)
+    			mXDir = -1;
+    			mYPositions[1] += mYOffset;
     		}
 		}
 
@@ -249,16 +247,14 @@ public class LayoutBipartite2D extends Layout2D {
     	}
     	
     	// draw identifier node
-    	int colIdx = mXDir + 1;
+    	int colIdx = 2 + mXDir; 	// column 1 (left) or column 3 (right)
     	if (nodeMeOld != null) {
-    		mYIdentifier[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYIdentifier[colIdx]);
+    		mYPositions[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYPositions[colIdx]);
     	}
     	if (nodeId2D.hasAdjustPermission() && !nodeId2D.wasPicked()) {
-			nodeId2D.setPositionTriggeredByJung(
-					(mXCenter + mXDir * mXOffset) * getDimensionX(),
-					 mYIdentifier[colIdx] * getDimensionY());
+			nodeId2D.setPositionTriggeredByJung(mXPositions[colIdx] * getDimensionX(), mYPositions[colIdx] * getDimensionY());
     	}
-		mYIdentifier[colIdx] += mYOffset;
+		mYPositions[colIdx] += mYOffset;
 		mDrawnNodes.add(nodeId2D);
 		
 		// first draw metadata nodes which are directly attached to identifier
@@ -291,16 +287,14 @@ public class LayoutBipartite2D extends Layout2D {
     	}
 
     	// draw identifier node
-    	int colIdx = mXDir + 1;
+    	int colIdx = 2 + mXDir; 	// column 1 (left) or column 3  (right)
     	if (nodeMeOld != null) {
-    		mYIdentifier[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYIdentifier[colIdx]);
+    		mYPositions[colIdx] = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), mYPositions[colIdx]);
     	}
     	if (nodeId2D.hasAdjustPermission() && !nodeId2D.wasPicked()) {
-			nodeId2D.setPositionTriggeredByJung(
-					(mXCenter + mXDir * mXOffset) * getDimensionX(),
-					 mYIdentifier[colIdx] * getDimensionY());
+			nodeId2D.setPositionTriggeredByJung(mXPositions[colIdx] * getDimensionX(), mYPositions[colIdx] * getDimensionY());
     	}
-		mYIdentifier[colIdx] += mYOffset;
+		mYPositions[colIdx] += mYOffset;
 		mDrawnNodes.add(nodeId2D);
 		
 		// first draw metadata nodes which are directly attached to identifier
@@ -336,23 +330,22 @@ public class LayoutBipartite2D extends Layout2D {
     		return;
     	}
     	assert nodeMe2D.getExpandedLink2D() != null || nodeMe2D.getNodeIdentifier2D() != null;	// metadata must be attached to either link or identifier
-		if (nodeMe2D.getExpandedLink2D() != null) {			// metadata node attached to link -> column 3
-			mYMetadata[1] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYMetadata[1]);
+		if (nodeMe2D.getExpandedLink2D() != null) {			// metadata node attached to link -> column 2 (center)
+	    	int colIdx = 2; 	// column 2 (center)
+			mYPositions[colIdx] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYPositions[colIdx]);
 	    	if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
-	    		nodeMe2D.setPositionTriggeredByJung(mXCenter * getDimensionX(),	mYMetadata[1] * getDimensionY());
+	    		nodeMe2D.setPositionTriggeredByJung(mXPositions[colIdx] * getDimensionX(),	mYPositions[colIdx] * getDimensionY());
 	    	}
-			mYMetadata[1] += mYOffset;
+	    	mYPositions[colIdx] += mYOffset;
 			mDrawnNodes.add(nodeMe2D);
 		}
-		else if (nodeMe2D.getNodeIdentifier2D() != null) {	// metadata node attached to identifier -> column 1 or 5
-	    	int colIdx = mXDir + 1;
-			mYMetadata[colIdx] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYMetadata[colIdx]);
+		else if (nodeMe2D.getNodeIdentifier2D() != null) {	// metadata node attached to identifier -> column 0 or 4
+	    	int colIdx = 2 + 2 * mXDir; 	// column 0 (left) or column 4  (right)
+			mYPositions[colIdx] = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), mYPositions[colIdx]);
 	    	if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
-				nodeMe2D.setPositionTriggeredByJung(
-						(mXCenter + mXDir * 2 * mXOffset) * getDimensionX(),
-						mYMetadata[colIdx] * getDimensionY());
+	    		nodeMe2D.setPositionTriggeredByJung(mXPositions[colIdx] * getDimensionX(),	mYPositions[colIdx] * getDimensionY());
 	    	}
-			mYMetadata[colIdx] += mYOffset;
+	    	mYPositions[colIdx] += mYOffset;
 			mDrawnNodes.add(nodeMe2D);
 		}
 	}

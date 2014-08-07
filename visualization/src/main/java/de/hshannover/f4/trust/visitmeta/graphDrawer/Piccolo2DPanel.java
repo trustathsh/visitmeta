@@ -556,7 +556,6 @@ public class Piccolo2DPanel implements GraphPanel {
 			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
 			vText.setTextPaint(getColorText(vPublisher));
 			/* Rectangle */
-
 			final PPath vNode = PPath.createRectangle(
 					-5 - 0.5F * (float) vText.getWidth(), // x
 					-5 - 0.5F * (float) vText.getHeight(), // y

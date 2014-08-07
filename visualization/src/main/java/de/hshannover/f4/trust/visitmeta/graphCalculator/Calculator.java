@@ -48,8 +48,6 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.MetadataCollocation;
 
 /**
  * Interface for a graph calculator.

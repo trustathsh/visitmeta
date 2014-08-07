@@ -53,8 +53,6 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.Graph2D;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.MetadataCollocation;
 
 public class JungCalculator implements Calculator {
 

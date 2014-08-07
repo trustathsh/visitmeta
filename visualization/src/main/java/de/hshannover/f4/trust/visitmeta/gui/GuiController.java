@@ -44,7 +44,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 

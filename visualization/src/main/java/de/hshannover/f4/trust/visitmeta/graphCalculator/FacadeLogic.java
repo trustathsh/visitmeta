@@ -49,8 +49,6 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
-//TODO: Hide JUNG implementation details from Facade, e.g., by providing a method getSuppoprtedLayoutTypes(). <VA> 2014-08-05
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 
 /**

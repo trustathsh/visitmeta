@@ -46,6 +46,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.graphCalculator.MetadataCollocation;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 
 /**

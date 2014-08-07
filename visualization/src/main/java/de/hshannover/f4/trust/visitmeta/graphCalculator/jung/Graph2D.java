@@ -57,6 +57,8 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.MetadataCollocation;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 

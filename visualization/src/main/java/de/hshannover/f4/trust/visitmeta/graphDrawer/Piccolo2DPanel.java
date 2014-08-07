@@ -323,10 +323,11 @@ public class Piccolo2DPanel implements GraphPanel {
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorIdentifierText(pNode));
 
-			final PPath vNode = PPath.createRoundRectangle(-5, // x TODO Set
-					// text in
-					// center
-					-5, // y TODO Set text in center
+			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
+
+			final PPath vNode = PPath.createRoundRectangle(
+					-5 - 0.5F * (float) vText.getWidth(), // x
+					-5 - 0.5F * (float) vText.getHeight(), // y
 					(float) vText.getWidth() + 10, // width TODO Add offset
 					(float) vText.getHeight() + 10, // height TODO Add offset
 					20.0f, // arcWidth TODO Design variable
@@ -552,11 +553,13 @@ public class Piccolo2DPanel implements GraphPanel {
 			}
 			/* Text */
 			PText vText = new PText(pNode.getMetadata().getTypeName());
+			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
 			vText.setTextPaint(getColorText(vPublisher));
 			/* Rectangle */
-			final PPath vNode = PPath.createRectangle(-5, // x TODO Set text in
-					// center
-					-5, // y TODO Set text in center
+
+			final PPath vNode = PPath.createRectangle(
+					-5 - 0.5F * (float) vText.getWidth(), // x
+					-5 - 0.5F * (float) vText.getHeight(), // y
 					(float) vText.getWidth() + 10, // width TODO Add offset
 					(float) vText.getHeight() + 10 // height TODO Add offset
 					);
@@ -846,8 +849,9 @@ public class Piccolo2DPanel implements GraphPanel {
 		PBounds vBound = pNode.getFullBoundsReference();
 		float vShadowWidth = (float) (vBound.getWidth() + mGlowWidth);
 		float vShadowHeight = (float) (vBound.getHeight() + mGlowHeight);
-		PPath vShadow = PPath.createEllipse((float) (-mGlowWidth / 2 - 5), // x
-				(float) (-mGlowHeight / 2 - 5), // y
+		PPath vShadow = PPath.createEllipse(
+				-0.5F * vShadowWidth, // x
+				-0.5F * vShadowHeight, // y
 				vShadowWidth, // width
 				vShadowHeight // height
 				);
@@ -855,11 +859,13 @@ public class Piccolo2DPanel implements GraphPanel {
 				(float) (vPosition.getY()) // y
 				);
 		vShadow.setStroke(null);
+		Color opaqueHighlight = new Color(pHighlight.getRed(), pHighlight.getGreen(), pHighlight.getBlue(), 255);
+		Color transparentHighlight = new Color(pHighlight.getRed(), pHighlight.getGreen(), pHighlight.getBlue(), 0);
 		vShadow.setPaint(createGradientColor(
 				vShadow,
-				pHighlight,
-				mColorBackground // TODO mTransparency dosn't work.
-				));
+				opaqueHighlight,
+				transparentHighlight
+		));
 		vShadow.setTransparency(0.0f);
 		synchronized (pNode) {
 			mLayerGlow.addChild(vShadow);

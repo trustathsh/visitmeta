@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.AffineTransform;
@@ -92,14 +93,14 @@ public class Piccolo2DPanel implements GraphPanel {
 	private double mAreaOffsetY = 0.0;
 	private double mAreaWidth = 650.0;
 	private double mAreaHeight = 650.0;
-	public double mGlowWidth = 40.0;
+	public double mGlowWidth = 80.0;
 	public double mGlowHeight = 40.0;
+	private int mFontSize = 20;
 
 	private Color mColorBackground = null;
 	private Color mColorEdge = null;
 	private Color mColorNewNode = null;
 	private Color mColorDeleteNode = null;
-	//	private Color mTransparency          = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	private List<String> mPublisher = new ArrayList<>();
 
@@ -322,7 +323,7 @@ public class Piccolo2DPanel implements GraphPanel {
 			PText vText = createIdentifierText(pNode);
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorIdentifierText(pNode));
-
+			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
 			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
 
 			final PPath vNode = PPath.createRoundRectangle(
@@ -553,8 +554,10 @@ public class Piccolo2DPanel implements GraphPanel {
 			}
 			/* Text */
 			PText vText = new PText(pNode.getMetadata().getTypeName());
-			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
 			vText.setTextPaint(getColorText(vPublisher));
+			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
+			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
+
 			/* Rectangle */
 			final PPath vNode = PPath.createRectangle(
 					-5 - 0.5F * (float) vText.getWidth(), // x
@@ -846,7 +849,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	private void addGlow(PComposite pNode, Color pHighlight) {
 		Point2D vPosition = pNode.getOffset();
 		PBounds vBound = pNode.getFullBoundsReference();
-		float vShadowWidth = (float) (vBound.getWidth() + mGlowWidth);
+		float vShadowWidth = (float) (1.1 * vBound.getWidth() + mGlowWidth);
 		float vShadowHeight = (float) (vBound.getHeight() + mGlowHeight);
 		PPath vShadow = PPath.createEllipse(
 				-0.5F * vShadowWidth, // x

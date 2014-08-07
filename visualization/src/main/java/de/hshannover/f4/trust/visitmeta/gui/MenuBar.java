@@ -56,9 +56,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
-//TODO: Hide JUNG implementation details from Menu, e.g., by providing a method getSuppoprtedLayoutTypes(). <VA> 2014-08-05
 import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
@@ -280,7 +279,7 @@ public class MenuBar extends JMenuBar {
 			});
 		}
 		
-		// TODO: Initialize layout type from user settings/preferences. <VA> 2014-08-05
+		// TODO: Initialize layout type from user settings/preferences, remove dependency on JungCalculator. <VA> 2014-08-05
 		layoutMap.get(JungCalculator.DEFAULT_LAYOUT_TYPE).setSelected(true);
 	}
 	

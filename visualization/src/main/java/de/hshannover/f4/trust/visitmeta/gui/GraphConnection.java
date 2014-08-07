@@ -57,7 +57,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
-import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.LayoutType;
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 

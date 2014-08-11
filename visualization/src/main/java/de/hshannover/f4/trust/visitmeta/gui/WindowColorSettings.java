@@ -221,6 +221,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		mSelectPublisher.addItem("identifier: ip-address");
 		mSelectPublisher.addItem("identifier: mac-address");
 		mSelectPublisher.addItem("identifier: extended");
+		mSelectPublisher.addItem("default metadata");
 		for (String s : mPublisher) {
 			mSelectPublisher.addItem(s);
 		}

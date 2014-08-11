@@ -43,7 +43,6 @@ import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -57,8 +56,6 @@ import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 
 public class RestConnection {
-
-	private static final Logger log = Logger.getLogger(RestConnection.class);
 
 	private static final String DEFAULT_URL = "https://localhost:8443";
 

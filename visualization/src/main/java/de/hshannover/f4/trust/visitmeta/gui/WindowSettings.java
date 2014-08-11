@@ -57,7 +57,6 @@ public class WindowSettings extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowSettings.class);
-	@SuppressWarnings("unused")
 	private SettingManager mSettingManager = null;
 	private JPanel mPanel = null;
 	private SpringLayout mSpringLayout = null;
@@ -71,7 +70,7 @@ public class WindowSettings extends JFrame {
 	private JLabel mLabelIterations = null;
 	private JLabel mLabelHighlights = null;
 	private JLabel mLabelNodeTranslationDuration = null;
-	
+
 	private JPanel mPanelButton = null;
 	private JButton mButtonSave = null;
 	private JButton mButtonCancel = null;
@@ -81,7 +80,7 @@ public class WindowSettings extends JFrame {
 	private String mCalculationIterations = null;
 	private String mHighlightsTimeout = null;
 	private String mNodeTranslationDuration = null;
-	
+
 	/**
 	 * Calls the init() method to initialize the settings window
 	 */
@@ -90,10 +89,10 @@ public class WindowSettings extends JFrame {
 		init(settingManager);
 		pack();
 	}
-	
+
 	/**
 	 * Initializes a settings window
-	 * @param settingManager 
+	 * @param settingManager
 	 */
 	private void init(SettingManager settingManager) {
 		LOGGER.trace("Init Settings Window");
@@ -108,7 +107,7 @@ public class WindowSettings extends JFrame {
 
 	/**
 	 * Initializes the main components
-	 * @param settingManager 
+	 * @param settingManager
 	 */
 	private void initWindow(SettingManager settingManager) {
 		mSettingManager = settingManager;
@@ -229,7 +228,7 @@ public class WindowSettings extends JFrame {
 				setVisible(false);
 			}
 		});
-		
+
 	}
 
 	/**

@@ -111,6 +111,7 @@ public class DataserviceConnection {
 		jsonResponse = buildWebResource().path("/").queryParam("allValues", String.valueOf(true))
 				.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
 
+		@SuppressWarnings("unchecked")
 		Iterator<String> i = jsonResponse.keys();
 		while(i.hasNext()){
 			String connectionName = i.next();

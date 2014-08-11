@@ -63,6 +63,8 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+
 /**
  * Factory for {@link IdentifierWrapper} instances.
  * 
@@ -161,7 +163,7 @@ public class IdentifierHelper {
 	 * @param document a identifier document
 	 * @return the wrapped Identifier
 	 */
-	public static IdentifierWrapper identifier(String rawXml) {
+	public static IdentifierWrapper identifier(Identifier identifier) {
 		try {
 			Transformer printFormatTransformer = TRANSFORMER_FACTORY.newTransformer();
 			printFormatTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -182,8 +184,9 @@ public class IdentifierHelper {
 			try
 			{
 				builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
-				document = builder.parse( new InputSource(new StringReader(rawXml)));
+				document = builder.parse( new InputSource(new StringReader(identifier.getRawData())));
 				return new IdentifierWrapperImpl(
+						identifier.getTypeName(),
 						document,
 						xPath,
 						printFormatTransformer,
@@ -204,6 +207,7 @@ public class IdentifierHelper {
 	 */
 	private static class IdentifierWrapperImpl implements IdentifierWrapper {
 
+		final String mTypeName;
 		final Document mDocument;
 		final XPath mXpath;
 		final Transformer mPrintTransformer;
@@ -218,10 +222,12 @@ public class IdentifierHelper {
 		 * @param equalsTransformer the transformer to use for canonical serialization
 		 */
 		public IdentifierWrapperImpl(
+				String typeName,
 				Document document,
 				XPath xpath,
 				Transformer printFormatTransformer,
 				NamespaceContext namespaceContext) {
+			mTypeName = typeName;
 			mDocument = document;
 			mXpath = xpath;
 			mPrintTransformer = printFormatTransformer;
@@ -272,6 +278,11 @@ public class IdentifierHelper {
 		@Override
 		public void setNamespaceContext(NamespaceContext context) {
 			mXpath.setNamespaceContext(context);
+		}
+
+		@Override
+		public String getTypeName() {
+			return mTypeName;
 		}
 	}
 }

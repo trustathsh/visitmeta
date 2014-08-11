@@ -59,6 +59,12 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategy;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyType;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategy;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
@@ -104,6 +110,9 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	private List<String> mPublisher = new ArrayList<>();
 
+	private IdentifierInformationStrategy mIdentifierInformationStrategy;
+	private MetadataInformationStrategy mMetadataInformationStrategy;
+
 	public Piccolo2DPanel(GraphConnection connection) {
 		mNodeTranslationDuration = connection.getSettingManager().getNodeTranslationDuration();
 
@@ -133,6 +142,12 @@ public class Piccolo2DPanel implements GraphPanel {
 		mColorEdge = Color.decode(vColorEdge);
 		mColorDeleteNode = Color.decode(vColorDeleteNode);
 		mPanel.setBackground(mColorBackground);
+
+		String nodeInformationStyle = PropertiesManager.getProperty("visualizationConfig", "identifier.text.style", "SINGLE_LINE");
+		mIdentifierInformationStrategy = IdentifierInformationStrategyFactory.create(IdentifierInformationStrategyType.valueOf(nodeInformationStyle));
+
+		String metadataInformationStyle = PropertiesManager.getProperty("visualizationConfig", "metadata.text.style", "SINGLE_LINE");
+		mMetadataInformationStrategy = MetadataInformationStrategyFactory.create(MetadataInformationStrategyType.valueOf(metadataInformationStyle));
 	}
 
 	/**
@@ -191,7 +206,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 			// Special case: extended identifier
 			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.extended.inside", "0x9999FF");
@@ -236,7 +251,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 			// Special case: extended identifier
 			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vColor = PropertiesManager.getProperty("color", "color.identifier.extended.text", "0x000000");
@@ -264,7 +279,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 			// Special case: extended identifier
 			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier.getRawData());
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vOutside = PropertiesManager.getProperty("color", "color.identifier.extended.border", "0x000000");
@@ -320,7 +335,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void addIdentifier(NodeIdentifier pNode) {
 		LOGGER.trace("Method addIdentifier(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			PText vText = createIdentifierText(pNode);
+			PText vText = new PText(mIdentifierInformationStrategy.getText(pNode.getIdentifier()));
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorIdentifierText(pNode));
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
@@ -360,178 +375,6 @@ public class Piccolo2DPanel implements GraphPanel {
 		}
 	}
 
-	/**
-	 * Creates the text written into a Identifier-node,
-	 * based on the information of the identifier itself.
-	 *
-	 * Examples:
-	 * <ul>
-	 * <li> access-request: ar1
-	 * <li> device: switch
-	 * <li> ip-address: 127.0.0.1 (IPv4)
-	 * <li> mac-address: aa:bb:cc:dd:ee:ff
-	 * <li> identity: John Doe (username)
-	 * <li> extended-identifier
-	 * </ul>
-	 *
-	 * @param pNode the {@link NodeIdentifier} for creating the text
-	 * @return a {@link PText} containing the specific information for the given {@link NodeIdentifier}
-	 */
-	private PText createIdentifierText(NodeIdentifier pNode) {
-		StringBuilder sb = new StringBuilder();
-
-		Identifier identifier = pNode.getIdentifier();
-		String typeName = identifier.getTypeName();
-		IdentifierWrapper identifierWrapper = IdentifierHelper.identifier(identifier.getRawData());
-
-		sb.append(typeName);
-
-		String administrativeDomain = identifierWrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTIFIER_ATTR_ADMIN_DOMAIN);	// administrative-domain
-
-		boolean multiLine = Boolean.parseBoolean(PropertiesManager.getProperty("visualizationConfig", "node.text.multiline", "true"));
-
-		switch (typeName) {
-		case IdentifierHelper.ACCESS_REQUEST_EL_NAME:
-			sb = createIdentifierTextForAccessRequest(identifierWrapper, sb, multiLine);
-			break;
-		case IdentifierHelper.DEVICE_EL_NAME:
-			sb = createIdentifierTextForDevice(identifierWrapper, sb, multiLine);
-			break;
-		case IdentifierHelper.IDENTITY_EL_NAME:
-			sb = createIdentifierTextForIdentity(identifierWrapper, sb, multiLine);
-			break;
-		case IdentifierHelper.MAC_ADDRESS_EL_NAME:
-			sb = createIdentifierTextForMacAddress(identifierWrapper, sb, multiLine);
-			break;
-		case IdentifierHelper.IP_ADDRESS_EL_NAME:
-			sb = createIdentifierTextForIPAddress(identifierWrapper, sb, multiLine);
-			break;
-		default:
-			break;
-		}
-
-		if (administrativeDomain != null && !administrativeDomain.isEmpty()) {
-			sb.append("\n");
-			sb.append("<");
-			sb.append(administrativeDomain);
-			sb.append(">");
-		}
-
-		return new PText(sb.toString());
-	}
-
-	private StringBuilder createIdentifierTextForAccessRequest(IdentifierWrapper wrapper, StringBuilder sb, boolean multiLine) {
-		if (multiLine) {
-			sb.append("\n");
-			sb.append("[ name=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
-			sb.append(" ]");
-		} else {
-			sb.append(": ");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
-		}
-
-		return sb;
-	}
-
-	private StringBuilder createIdentifierTextForDevice(IdentifierWrapper wrapper, StringBuilder sb, boolean multiLine) {
-		if (multiLine) {
-			sb.append("\n");
-			sb.append("[ name=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
-			sb.append(" ]");
-		} else {
-			sb.append(": ");
-			sb.append(wrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
-		}
-
-		return sb;
-	}
-
-	private StringBuilder createIdentifierTextForIdentity(IdentifierWrapper wrapper, StringBuilder sb, boolean multiLine) {
-		String type = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type");
-
-		if (multiLine) {
-			if (type.equals("other")) {
-				sb.append("\n");
-				String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name");	// name
-				sb.append("[ name=");
-				sb.append(otherTypeDefinition.substring(otherTypeDefinition.indexOf(";") + 1, otherTypeDefinition.indexOf(" ")));
-				sb.append(" ]");
-				sb.append("\n");
-
-				sb.append("[ type=");
-				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type"));	// type
-				sb.append(" ]");
-				sb.append("\n");
-
-				sb.append("[ other-type-definition=");
-				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
-				sb.append(" ]");
-			} else {
-				sb.append("\n");
-				sb.append("[ name=");
-				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
-				sb.append(" ]");
-				sb.append("\n");
-				sb.append("[ type=");
-				sb.append(type);	// type
-				sb.append(" ]");
-			}
-		} else {
-			if (type.equals("other")) {
-				sb = new StringBuilder();
-				sb.append("extended-identifier: ");
-				String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name");	// name
-				sb.append(otherTypeDefinition.substring(otherTypeDefinition.indexOf(";") + 1, otherTypeDefinition.indexOf(" ")));
-			} else {
-				sb.append(": ");
-				sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
-				sb.append(" (");
-				sb.append(type);	// type
-				sb.append(")");
-			}
-
-		}
-
-		return sb;
-	}
-
-	private StringBuilder createIdentifierTextForIPAddress(IdentifierWrapper wrapper, StringBuilder sb, boolean multiLine) {
-		if (multiLine) {
-			sb.append("\n");
-			sb.append("[ value=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
-			sb.append(" ]");
-			sb.append("\n");
-			sb.append("[ type=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
-			sb.append(" ]");
-		} else {
-			sb.append(": ");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
-			sb.append(" (");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
-			sb.append(")");
-		}
-
-		return sb;
-	}
-
-	private StringBuilder createIdentifierTextForMacAddress(IdentifierWrapper wrapper, StringBuilder sb, boolean multiLine) {
-		if (multiLine) {
-			sb.append("\n");
-			sb.append("[ value=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
-			sb.append(" ]");
-		} else {
-			sb.append(": ");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
-		}
-
-		return sb;
-	}
-
 	private void addMetadata(NodeMetadata pNode) {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
@@ -541,7 +384,8 @@ public class Piccolo2DPanel implements GraphPanel {
 				mPublisher.add(vPublisher);
 			}
 			/* Text */
-			PText vText = new PText(pNode.getMetadata().getTypeName());
+			PText vText = new PText(mMetadataInformationStrategy.getText(pNode.getMetadata()));
+			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorText(vPublisher));
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
 			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());

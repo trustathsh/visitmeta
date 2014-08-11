@@ -40,8 +40,10 @@ package de.hshannover.f4.trust.visitmeta.util;
 
 import javax.xml.namespace.NamespaceContext;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+
 /**
- * Wrapper-interface for common IF-MAP identifier information.
+ * Wrapper-interface for common IF-MAP {@link Identifier} information.
  * 
  * @author Bastian Hellmann
  *
@@ -49,8 +51,8 @@ import javax.xml.namespace.NamespaceContext;
 public interface IdentifierWrapper {
 
 	/**
-	 * Evaluate the given XPath expression on this metadata document and return
-	 * the result string. If this metadata object does not match the given
+	 * Evaluate the given XPath expression on this {@link Identifier} document and return
+	 * the result string. If this {@link Identifier} object does not match the given
 	 * expression the empty string is returned. If the evaluation of the
 	 * expression fails null is returned.
 	 *
@@ -60,7 +62,7 @@ public interface IdentifierWrapper {
 	public String getValueForXpathExpression(String xPathExpression);
 
 	/**
-	 * Evaluate the given XPath expression on this identifier document and return
+	 * Evaluate the given XPath expression on this {@link Identifier} document and return
 	 * the result string. If the evaluation fails the given default value will
 	 * be returned.
 	 *
@@ -72,7 +74,7 @@ public interface IdentifierWrapper {
 			String defaultValue);
 
 	/**
-	 * Returns a formatted XML string representation of this identifier document.
+	 * Returns a formatted XML string representation of this {@link Identifier} document.
 	 *
 	 * @return formatted XML string
 	 */
@@ -85,5 +87,12 @@ public interface IdentifierWrapper {
 	 * @param context the new namespace context
 	 */
 	public void setNamespaceContext(NamespaceContext context);
+
+	/**
+	 * Returns the typename for the {@link Identifier}.
+	 * 
+	 * @return typename of the {@link Identifier} as a {@link String}.
+	 */
+	public String getTypeName();
 
 }

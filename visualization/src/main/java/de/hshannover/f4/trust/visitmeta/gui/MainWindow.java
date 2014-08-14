@@ -186,9 +186,6 @@ public class MainWindow extends JFrame {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		//		ImageIcon visitmetaIcon = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath());
-		//		this.setIconImage(visitmetaIcon.getImage());
-
 		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath()).getImage();
 		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath()).getImage();
 		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath()).getImage();

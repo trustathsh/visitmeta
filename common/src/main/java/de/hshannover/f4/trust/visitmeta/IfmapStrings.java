@@ -41,6 +41,13 @@ package de.hshannover.f4.trust.visitmeta;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A class that contains IF-MAP related {@link String} constants and Lists.
+ * Partly copied from ifmapj 2.2.0.
+ * 
+ * @author Bastian Hellmann
+ *
+ */
 public class IfmapStrings {
 
 	public static final String IFMAP_TIMESTAMP_ATTR = "ifmap-timestamp";

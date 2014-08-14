@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
@@ -107,12 +105,11 @@ public class NodeEventHandler extends PDragEventHandler {
 				0.0, // z
 				pinNode
 				);
-		Point vMouse = MouseInfo.getPointerInfo().getLocation();
 		Position vNode = (Position) e.getPickedNode().getAttribute("position");
 		if (vNode instanceof NodeIdentifier) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier(), vMouse.x, vMouse.y);
+			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier());
 		} else if (vNode instanceof NodeMetadata) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata(), vMouse.x, vMouse.y);
+			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata());
 		}
 		vNode.setInUse(false);
 	}
@@ -121,12 +118,11 @@ public class NodeEventHandler extends PDragEventHandler {
 	public void mouseEntered(PInputEvent e) {
 		LOGGER.trace("Method mouseEntered(" + e + ") called.");
 		super.mouseEntered(e);
-		Point vMouse = MouseInfo.getPointerInfo().getLocation();
 		Object vNode = e.getPickedNode().getAttribute("position");
 		if (vNode instanceof NodeIdentifier) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier(), vMouse.x, vMouse.y);
+			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier());
 		} else if (vNode instanceof NodeMetadata) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata(), vMouse.x, vMouse.y);
+			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata());
 		}
 	}
 

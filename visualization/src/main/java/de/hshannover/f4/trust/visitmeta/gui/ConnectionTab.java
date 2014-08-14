@@ -212,8 +212,8 @@ public class ConnectionTab extends JPanel {
 		return mGraphConnection.getPublisher();
 	}
 
-	public void showPropertiesOfNode(final Propable pData, final int pX, final int pY) {
-		mPanelXmlTree.fill(pData.getRawData());
+	public void showPropertiesOfNode(final Propable propable) {
+		mPanelXmlTree.fill(propable);
 		mPanelXmlTree.repaint();
 	}
 

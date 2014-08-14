@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
 
+import de.hshannover.f4.trust.ifmapj.binding.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
@@ -65,15 +66,15 @@ public abstract class IdentifierInformationStrategy {
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 
 		switch (wrapper.getTypeName()) {
-		case IdentifierHelper.ACCESS_REQUEST_EL_NAME:
+		case IfmapStrings.ACCESS_REQUEST_EL_NAME:
 			return createTextForAccessRequest(wrapper);
-		case IdentifierHelper.DEVICE_EL_NAME:
+		case IfmapStrings.DEVICE_EL_NAME:
 			return createTextForDevice(wrapper);
-		case IdentifierHelper.IDENTITY_EL_NAME:
+		case IfmapStrings.IDENTITY_EL_NAME:
 			return createTextForIdentity(wrapper);
-		case IdentifierHelper.MAC_ADDRESS_EL_NAME:
+		case IfmapStrings.MAC_ADDRESS_EL_NAME:
 			return createTextForMacAddress(wrapper);
-		case IdentifierHelper.IP_ADDRESS_EL_NAME:
+		case IfmapStrings.IP_ADDRESS_EL_NAME:
 			return createTextForIPAddress(wrapper);
 		default:
 			throw new IllegalArgumentException("Unsupported identifier type: " + wrapper.getTypeName());

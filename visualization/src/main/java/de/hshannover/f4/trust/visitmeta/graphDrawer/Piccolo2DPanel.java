@@ -54,6 +54,7 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
@@ -200,14 +201,14 @@ public class Piccolo2DPanel implements GraphPanel {
 		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
-		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
 			vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".inside", "0x9999FF");
 			vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".outside", "0x9999FF");
 
 			// Special case: extended identifier
-			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.extended.inside", "0x9999FF");
 					vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.extended.outside", "0x9999FF");
@@ -246,13 +247,13 @@ public class Piccolo2DPanel implements GraphPanel {
 		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
-		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
 			vColor = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".text", "0x000000");
 
 			// Special case: extended identifier
-			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vColor = PropertiesManager.getProperty("color", "color.identifier.extended.text", "0x000000");
 				}
@@ -274,13 +275,13 @@ public class Piccolo2DPanel implements GraphPanel {
 		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
-		if (IdentifierHelper.IDENTIFIER_TYPES.contains(typeName)) {
+		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
 			vOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".border", "0x000000");
 
 			// Special case: extended identifier
-			if (typeName.equals(IdentifierHelper.IDENTITY_EL_NAME)) {
+			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IdentifierHelper.IDENTITY_ATTR_TYPE);
+				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
 					vOutside = PropertiesManager.getProperty("color", "color.identifier.extended.border", "0x000000");
 				}

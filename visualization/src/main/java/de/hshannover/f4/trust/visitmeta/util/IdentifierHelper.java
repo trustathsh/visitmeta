@@ -42,7 +42,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -63,6 +62,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 
 /**
@@ -74,43 +74,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 public class IdentifierHelper {
 
 	private static Logger LOGGER = Logger.getLogger(IdentifierHelper.class);
-
-	/**
-	 * From ifmapj 2.2.0: de.hshannover.f4.trust.ifmapj.binding.IfmapStrings.java
-	 */
-	public static final String BASE_PREFIX = "ifmap";
-	public static final String BASE_NS_URI =  "http://www.trustedcomputinggroup.org/2010/IFMAP/2";
-
-	public static final String STD_METADATA_PREFIX =  "meta";
-	public static final String STD_METADATA_NS_URI =  "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2";
-
-	/* Identifier stuff */
-	public static final String IDENTIFIER_ATTR_ADMIN_DOMAIN = "administrative-domain";
-
-	public static final String ACCESS_REQUEST_EL_NAME = "access-request";
-	public static final String ACCESS_REQUEST_ATTR_NAME = "name";
-
-	public static final String DEVICE_EL_NAME = "device";
-	public static final String DEVICE_NAME_EL_NAME = "name";
-
-	public static final String IDENTITY_EL_NAME = "identity";
-	public static final String IDENTITY_ATTR_NAME = "name";
-	public static final String IDENTITY_ATTR_TYPE = "type";
-	public static final String IDENTITY_ATTR_OTHER_TYPE_DEF = "other-type-definition";
-
-	public static final String IP_ADDRESS_EL_NAME = "ip-address";
-	public static final String IP_ADDRESS_ATTR_VALUE = "value";
-	public static final String IP_ADDRESS_ATTR_TYPE = "type";
-
-	public static final String MAC_ADDRESS_EL_NAME = "mac-address";
-	public static final String MAC_ADDRESS_ATTR_VALUE = "value";
-	/**
-	 * End of imported strings from ifmpaj 2.2.0: de.hshannover.f4.trust.ifmapj.binding.IfmapStrings.java
-	 */
-
-	public static final String OTHER_TYPE_EXTENDED_IDENTIFIER = "extended";
-
-	public static final List<String> IDENTIFIER_TYPES = Arrays.asList(ACCESS_REQUEST_EL_NAME, DEVICE_EL_NAME, IDENTITY_EL_NAME, IP_ADDRESS_EL_NAME, MAC_ADDRESS_EL_NAME);
 
 	private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 
@@ -129,17 +92,17 @@ public class IdentifierHelper {
 		@Override
 		public Iterator<String> getPrefixes(String namespaceURI) {
 			return Arrays.asList(
-					STD_METADATA_PREFIX,
-					BASE_PREFIX)
+					IfmapStrings.STD_METADATA_PREFIX,
+					IfmapStrings.BASE_PREFIX)
 					.iterator();
 		}
 
 		@Override
 		public String getPrefix(String namespaceURI) {
-			if (namespaceURI.equals(STD_METADATA_NS_URI)) {
-				return STD_METADATA_PREFIX;
-			} else if (namespaceURI.equals(BASE_NS_URI)) {
-				return BASE_PREFIX;
+			if (namespaceURI.equals(IfmapStrings.STD_METADATA_NS_URI)) {
+				return IfmapStrings.STD_METADATA_PREFIX;
+			} else if (namespaceURI.equals(IfmapStrings.BASE_NS_URI)) {
+				return IfmapStrings.BASE_PREFIX;
 			} else {
 				return null;
 			}
@@ -147,10 +110,10 @@ public class IdentifierHelper {
 
 		@Override
 		public String getNamespaceURI(String prefix) {
-			if (prefix.equals(STD_METADATA_PREFIX)) {
-				return STD_METADATA_NS_URI;
-			} else if (prefix.equals(BASE_PREFIX)) {
-				return BASE_NS_URI;
+			if (prefix.equals(IfmapStrings.STD_METADATA_PREFIX)) {
+				return IfmapStrings.STD_METADATA_NS_URI;
+			} else if (prefix.equals(IfmapStrings.BASE_PREFIX)) {
+				return IfmapStrings.BASE_NS_URI;
 			} else {
 				return XMLConstants.NULL_NS_URI;
 			}

@@ -38,8 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
 
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
-import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 
 /**
@@ -63,7 +63,7 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
 		sb.append("[ name=");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.ACCESS_REQUEST_ATTR_NAME, "name"));	// name
 		sb.append(" ]");
 		sb.append(getAdministrativeDomain(wrapper));
 		return sb.toString();
@@ -75,11 +75,11 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
 		sb.append("[ value=");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_VALUE, "value"));	// value
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IP_ADDRESS_ATTR_VALUE, "value"));	// value
 		sb.append(" ]");
 		sb.append("\n");
 		sb.append("[ type=");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IP_ADDRESS_ATTR_TYPE, "type"));	// type
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IP_ADDRESS_ATTR_TYPE, "type"));	// type
 		sb.append(" ]");
 		sb.append(getAdministrativeDomain(wrapper));
 		return sb.toString();
@@ -91,7 +91,7 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
 		sb.append("[ value=");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.MAC_ADDRESS_ATTR_VALUE, "value"));	// value
 		sb.append(" ]");
 		sb.append(getAdministrativeDomain(wrapper));
 		return sb.toString();
@@ -99,31 +99,31 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 
 	@Override
 	public String createTextForIdentity(IdentifierWrapper wrapper) {
-		String type = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type");
+		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "type");	// type
+		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name");	// name
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 
 		if (type.equals("other")) {
 			sb.append("\n");
-			String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name");	// name
 			sb.append("[ name=");
-			sb.append(otherTypeDefinition.substring(otherTypeDefinition.indexOf(";") + 1, otherTypeDefinition.indexOf(" ")));
+			sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
 			sb.append(" ]");
 			sb.append("\n");
 
 			sb.append("[ type=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_TYPE, "type"));	// type
+			sb.append(type);	// type
 			sb.append(" ]");
 			sb.append("\n");
 
 			sb.append("[ other-type-definition=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
+			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
 			sb.append(" ]");
 		} else {
 			sb.append("\n");
 			sb.append("[ name=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IdentifierHelper.IDENTITY_ATTR_NAME, "name"));	// name
+			sb.append(name);	// name
 			sb.append(" ]");
 			sb.append("\n");
 			sb.append("[ type=");
@@ -140,7 +140,7 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
 		sb.append("[ name=");
-		sb.append(wrapper.getValueForXpathExpressionOrElse(IdentifierHelper.DEVICE_NAME_EL_NAME, "name"));	// name
+		sb.append(wrapper.getValueForXpathExpressionOrElse(IfmapStrings.DEVICE_NAME_EL_NAME, "name"));	// name
 		sb.append(" ]");
 		return sb.toString();
 	}
@@ -154,7 +154,7 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 	 */
 	private String getAdministrativeDomain(
 			IdentifierWrapper identifier) {
-		String administrativeDomain = identifier.getValueForXpathExpression("@" + IdentifierHelper.IDENTIFIER_ATTR_ADMIN_DOMAIN);	// administrative-domain
+		String administrativeDomain = identifier.getValueForXpathExpression("@" + IfmapStrings.IDENTIFIER_ATTR_ADMIN_DOMAIN);	// administrative-domain
 
 		StringBuilder sb = new StringBuilder();
 		if (administrativeDomain != null && !administrativeDomain.isEmpty()) {

@@ -68,6 +68,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.Met
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeSelectionEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
@@ -133,6 +134,7 @@ public class Piccolo2DPanel implements GraphPanel {
 		mPanel.addMouseListener(new ClickEventHandler(this));
 		mPanel.setZoomEventHandler(new ZoomEventHandler(this));
 		mLayerNode.addInputEventListener(new NodeEventHandler(connection, this));
+		mPanel.addInputEventListener(new NodeSelectionEventHandler(connection));
 
 		String vColorBackground = PropertiesManager.getProperty("color", "color.background", "0xFFFFFF");
 		String vColorEdge = PropertiesManager.getProperty("color", "color.edge", "0x000000");

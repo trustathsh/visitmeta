@@ -60,7 +60,12 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
+/**
+ * @author bahellma
+ *
+ */
 public class GraphConnection implements Observer {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private GraphContainer mConnetion = null;
@@ -73,6 +78,7 @@ public class GraphConnection implements Observer {
 	private boolean mAddHighlights = true;
 	private ConnectionTab mParentTab = null;
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
+	private boolean mIsPropablePicked = false;
 
 	public GraphConnection(GraphContainer connection) {
 		mConnetion = connection;
@@ -421,5 +427,27 @@ public class GraphConnection implements Observer {
 			mGraphPanel.setNodeTranslationDuration(mSettingManager.getNodeTranslationDuration());
 		}
 	}
-	
+
+	/**
+	 * Shows the properties of the given {@link Propable} object and
+	 * stores whether it was marked as picked or not.
+	 * 
+	 * @param propable the {@link Propable} object to show
+	 * @param isPicked if the {@link Propable} object was marked as picked or not
+	 */
+	public void setAndShowPropable(Propable propable, boolean isPicked) {
+		mIsPropablePicked = isPicked;
+		mParentTab.showPropertiesOfNode(propable);
+	}
+
+	/**
+	 * Returns if the current shown {@link Propable} object was marked as picked
+	 * or not.
+	 * 
+	 * @return true if current shown {@link Propable} object was marked as picked, false if not
+	 */
+	public boolean isPropablePicked() {
+		return mIsPropablePicked;
+	}
+
 }

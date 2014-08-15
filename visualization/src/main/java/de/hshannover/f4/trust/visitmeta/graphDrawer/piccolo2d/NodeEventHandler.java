@@ -107,9 +107,9 @@ public class NodeEventHandler extends PDragEventHandler {
 				);
 		Position vNode = (Position) e.getPickedNode().getAttribute("position");
 		if (vNode instanceof NodeIdentifier) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier());
+			mConnection.setAndShowPropable(((NodeIdentifier) vNode).getIdentifier(), true);
 		} else if (vNode instanceof NodeMetadata) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata());
+			mConnection.setAndShowPropable(((NodeMetadata) vNode).getMetadata(), true);
 		}
 		vNode.setInUse(false);
 	}
@@ -118,11 +118,14 @@ public class NodeEventHandler extends PDragEventHandler {
 	public void mouseEntered(PInputEvent e) {
 		LOGGER.trace("Method mouseEntered(" + e + ") called.");
 		super.mouseEntered(e);
-		Object vNode = e.getPickedNode().getAttribute("position");
-		if (vNode instanceof NodeIdentifier) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeIdentifier) vNode).getIdentifier());
-		} else if (vNode instanceof NodeMetadata) {
-			mConnection.getParentTab().showPropertiesOfNode(((NodeMetadata) vNode).getMetadata());
+
+		if (!mConnection.isPropablePicked()) {
+			Object vNode = e.getPickedNode().getAttribute("position");
+			if (vNode instanceof NodeIdentifier) {
+				mConnection.setAndShowPropable(((NodeIdentifier) vNode).getIdentifier(), false);
+			} else if (vNode instanceof NodeMetadata) {
+				mConnection.setAndShowPropable(((NodeMetadata) vNode).getMetadata(), false);
+			}
 		}
 	}
 

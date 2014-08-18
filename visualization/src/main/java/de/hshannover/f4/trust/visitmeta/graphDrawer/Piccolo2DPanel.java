@@ -58,6 +58,7 @@ import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategy;
@@ -68,10 +69,11 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.Met
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeSelectionEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import edu.umd.cs.piccolo.PCanvas;
@@ -109,11 +111,14 @@ public class Piccolo2DPanel implements GraphPanel {
 	private Color mColorEdge = null;
 	private Color mColorNewNode = null;
 	private Color mColorDeleteNode = null;
+	private Paint mColorSelectedNode = null;
 
 	private List<String> mPublisher = new ArrayList<>();
 
 	private IdentifierInformationStrategy mIdentifierInformationStrategy;
 	private MetadataInformationStrategy mMetadataInformationStrategy;
+
+	private Propable mSelectedNode = null;
 
 	public Piccolo2DPanel(GraphConnection connection) {
 		mNodeTranslationDuration = connection.getSettingManager().getNodeTranslationDuration();
@@ -133,17 +138,18 @@ public class Piccolo2DPanel implements GraphPanel {
 
 		mPanel.addMouseListener(new ClickEventHandler(this));
 		mPanel.setZoomEventHandler(new ZoomEventHandler(this));
-		mLayerNode.addInputEventListener(new NodeEventHandler(connection, this));
-		mPanel.addInputEventListener(new NodeSelectionEventHandler(connection));
+		mPanel.addInputEventListener(new NodeEventHandler(connection, this));
 
 		String vColorBackground = PropertiesManager.getProperty("color", "color.background", "0xFFFFFF");
 		String vColorEdge = PropertiesManager.getProperty("color", "color.edge", "0x000000");
 		String vColorNewNode = PropertiesManager.getProperty("color", "color.node.new", "0xC5D931");
 		String vColorDeleteNode = PropertiesManager.getProperty("color", "color.node.delete", "0x82150F");
+		String vColorSelectedNode = PropertiesManager.getProperty("color", "color.node.selected", "0xFFF687");
 		mColorNewNode = Color.decode(vColorNewNode);
 		mColorBackground = Color.decode(vColorBackground);
 		mColorEdge = Color.decode(vColorEdge);
 		mColorDeleteNode = Color.decode(vColorDeleteNode);
+		mColorSelectedNode = Color.decode(vColorSelectedNode);
 		mPanel.setBackground(mColorBackground);
 
 		String nodeInformationStyle = PropertiesManager.getProperty("visualizationConfig", "identifier.text.style", "SINGLE_LINE");
@@ -362,7 +368,7 @@ public class Piccolo2DPanel implements GraphPanel {
 					mAreaOffsetX + pNode.getX() * mAreaWidth, // x
 					mAreaOffsetY + pNode.getY() * mAreaHeight // y
 					);
-			vCom.addAttribute("type", "identifier");
+			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
 			// edges
@@ -407,7 +413,7 @@ public class Piccolo2DPanel implements GraphPanel {
 			vCom.addChild(vNode);
 			vCom.addChild(vText);
 			vCom.setOffset(mAreaOffsetX + pNode.getX() * mAreaWidth, mAreaOffsetY + pNode.getY() * mAreaHeight);
-			vCom.addAttribute("type", "metadata");
+			vCom.addAttribute("type", NodeType.METADATA);
 			vCom.addAttribute("publisher", vPublisher);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
@@ -550,7 +556,7 @@ public class Piccolo2DPanel implements GraphPanel {
 								}
 							}
 						};
-						mMapNode.get(pNode).addAttribute("activitie", vNodeTranslation);
+						mMapNode.get(pNode).addAttribute("activity", vNodeTranslation);
 						/* Add node activity */
 						vNode.addActivity(vNodeTranslation);
 					} else {
@@ -776,7 +782,7 @@ public class Piccolo2DPanel implements GraphPanel {
 	}
 
 	@Override
-	public void repaintNodes(String pType, String pPublisher) {
+	public void repaintNodes(NodeType pType, String pPublisher) {
 		LOGGER.trace("Method repaintNodes(" + pType + ", " + pPublisher + ") called.");
 		for (Object key : mMapNode.keySet()) {
 			PComposite vCom = mMapNode.get(key);
@@ -785,22 +791,35 @@ public class Piccolo2DPanel implements GraphPanel {
 			/* Check if node is highlighted */
 			boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
 					|| vNode.getStrokePaint().equals(mColorDeleteNode);
-			if (pType.equals("identifier")) {
+			boolean isSelected;
+			if (pType == NodeType.IDENTIFIER) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeIdentifier i = (NodeIdentifier) key;
+					isSelected = (mSelectedNode == i.getIdentifier());
 					/* Repaint identifier nodes */
-					vNode.setPaint(getColor(vNode, i));
+					if (isSelected) {
+						vNode.setPaint(mColorSelectedNode);
+					} else {
+						vNode.setPaint(getColor(vNode, i));
+					}
 					if (!isHighlighted) {
 						vNode.setStrokePaint(getColorIdentifierStroke(i));
 					}
 					vText.setTextPaint(getColorIdentifierText(i));
 				}
-			} else if (pType.equals("metadata")) {
+			} else if (pType == NodeType.METADATA) {
 				if (vCom.getAttribute("type").equals(pType)) {
+					NodeMetadata m = (NodeMetadata) key;
+					isSelected = (mSelectedNode == m.getMetadata());
 					/* Repaint metadata nodes */
 					if (vCom.getAttribute("publisher").equals(pPublisher)) {
 						/* Repaint the nodes of this publisher */
-						vNode.setPaint(getColor(pPublisher, vNode));
+						if (isSelected) {
+							System.out.println("repaintNodes: " + m);
+							vNode.setPaint(mColorSelectedNode);
+						} else {
+							vNode.setPaint(getColor(pPublisher, vNode));
+						}
 						if (!isHighlighted) {
 							vNode.setStrokePaint(getColorMetadataStroke(pPublisher));
 						}
@@ -811,7 +830,11 @@ public class Piccolo2DPanel implements GraphPanel {
 						 * own color
 						 */
 						String vPublisher = (String) vCom.getAttribute("publisher");
-						vNode.setPaint(getColor(vPublisher, vNode));
+						if (isSelected) {
+							vNode.setPaint(mColorSelectedNode);
+						} else {
+							vNode.setPaint(getColor(vPublisher, vNode));
+						}
 						if (!isHighlighted) {
 							vNode.setStrokePaint(getColorMetadataStroke(vPublisher));
 						}
@@ -877,4 +900,62 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void setNodeTranslationDuration(int pNodeTranslationDuration) {
 		mNodeTranslationDuration = pNodeTranslationDuration;
 	}
+
+	@Override
+	public void selectNode(Propable propable) {
+		LOGGER.trace("Method selectNode(" + propable + ") called.");
+		if ((propable != null) && (mSelectedNode != propable)) {
+			Propable unselectedNode = mSelectedNode;
+			mSelectedNode = propable;
+			triggerRepaint(propable);
+			triggerRepaint(unselectedNode);
+		}
+	}
+
+	@Override
+	public void unselectNode() {
+		LOGGER.trace("Method unselectNode() called.");
+		Propable unselectedNode = mSelectedNode;
+		mSelectedNode = null;
+		triggerRepaint(unselectedNode);
+	}
+
+	/**
+	 * Triggers repainting the nodes according to the type of a given
+	 * {@link Propable} object.
+	 * 
+	 * @param propable a {@link Propable} instance
+	 */
+	private void triggerRepaint(Propable propable) {
+		LOGGER.trace("Method triggerRepaint(" + propable + ") called.");
+
+		if (propable instanceof Identifier) {
+			repaintNodes(NodeType.IDENTIFIER, "");
+		} else if (propable instanceof Metadata) {
+			repaintNodes(NodeType.METADATA, extractPublisherId((Metadata) propable));
+		}
+	}
+
+	/**
+	 * Tries to extract the IF-MAP publisher id of a {@link Metadata}
+	 * object.
+	 * 
+	 * @param propable a {@link Metadata} object
+	 * @return the IF-MAP publisher id for the given {@link Metadata} object, if
+	 * it is found in the properties; otherweise, a empty string is returned
+	 */
+	private String extractPublisherId(Metadata metadata) {
+		LOGGER.trace("Method extractPublisherId(" + metadata + ") called.");
+		String publisherId = "";
+
+		List<String> properties = metadata.getProperties();
+		for (String p : properties) {
+			if (p.contains(IfmapStrings.PUBLISHER_ID_ATTR)) {
+				publisherId = metadata.valueFor(p);
+			}
+		}
+
+		return publisherId;
+	}
+
 }

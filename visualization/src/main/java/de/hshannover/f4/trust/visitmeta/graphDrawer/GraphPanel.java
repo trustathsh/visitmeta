@@ -49,15 +49,17 @@ import javax.swing.JComponent;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 /* Class **********************************************************************/
 /**
  * A Panel that shows the graph.
  */
 public interface GraphPanel {
-/* Attributes *****************************************************************/
-/* Constructors ***************************************************************/
-/* Methods ********************************************************************/
+	/* Attributes *****************************************************************/
+	/* Constructors ***************************************************************/
+	/* Methods ********************************************************************/
 	/**
 	 * Return a Panel with the graph.
 	 * @return the Panel.
@@ -123,7 +125,7 @@ public interface GraphPanel {
 	 * @param pPublisher the id of the current publisher, empty if the default color is changed.
 	 * @param pType the type of the node,
 	 */
-	public void repaintNodes(String pType, String pPublisher);
+	public void repaintNodes(NodeType pType, String pPublisher);
 	/**
 	 * Repaint the panel.
 	 */
@@ -137,4 +139,16 @@ public interface GraphPanel {
 	 * @param pNodeTranslationDuration the time.
 	 */
 	public void setNodeTranslationDuration(int pNodeTranslationDuration);
+
+	/**
+	 * Mark a node as selected.
+	 * 
+	 * @param propable the {@link Propable} object that was selected
+	 */
+	public void selectNode(Propable propable);
+
+	/**
+	 * Unselects the former selected node.
+	 */
+	public void unselectNode();
 }

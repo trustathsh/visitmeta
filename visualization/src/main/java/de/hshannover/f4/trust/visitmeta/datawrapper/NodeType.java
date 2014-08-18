@@ -36,43 +36,15 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d;
-
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
-import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PPath;
+package de.hshannover.f4.trust.visitmeta.datawrapper;
 
 /**
- * A class that extends {@link PBasicInputEventHandler}.
- * Handles clicks of the left mouse button and clears the panel that shows
- * properties of {@link Identifier} or {@link Metadata} objects.
- * 
- * Used to allow de-selecting nodes by clicking in the background.
+ * Enumeration class for Node-types.
  * 
  * @author Bastian Hellmann
  *
  */
-public class NodeSelectionEventHandler extends PBasicInputEventHandler {
-
-	private static final int MOUSE_LEFT_BUTTON = 1;
-	private GraphConnection mConnection;
-
-	public NodeSelectionEventHandler(GraphConnection connection) {
-		mConnection = connection;
-	}
-
-	@Override
-	public void mouseClicked(PInputEvent event) {
-		super.mouseClicked(event);
-		PNode pickedNode = event.getPickedNode();
-
-		if (event.getButton() == MOUSE_LEFT_BUTTON && (pickedNode instanceof PCamera || pickedNode instanceof PPath)) {
-			mConnection.setAndShowPropable(null, false);
-		}
-	}
+public enum NodeType {
+	IDENTIFIER,
+	METADATA
 }

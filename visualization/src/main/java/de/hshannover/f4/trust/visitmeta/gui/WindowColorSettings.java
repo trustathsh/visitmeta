@@ -59,6 +59,7 @@ import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
+import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
@@ -107,39 +108,39 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent pE) {
 				if (mSelectPublisher.getItemCount() > 0) {
 					String vParam = mGroup.getSelection().getActionCommand();
-					String vType = "";
+					NodeType vType;
 					String vPublisher = "";
 					String vProperty = "";
 					if (mSelectPublisher.getSelectedIndex() == 0) {
 						/* First item is the identifier color for access-requests */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + "." + IfmapStrings.ACCESS_REQUEST_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 1) {
 						/* Second item is the identifier color for devices */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + "." + IfmapStrings.DEVICE_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 2) {
 						/* Third item is the identifier color for identities */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + "." + IfmapStrings.IDENTITY_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 3) {
 						/* Fourth item is the identifier color for ip-addresses */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + "." + IfmapStrings.IP_ADDRESS_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 4) {
 						/* Fifth item is the identifier color for mac-addresses */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + "." + IfmapStrings.MAC_ADDRESS_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 5) {
 						/* Sixth item is the identifier color for extended-identifiers */
-						vType = "identifier";
+						vType = NodeType.IDENTIFIER;
 						vProperty = "color." + vType + ".extended." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 6) {
 						/* Seventh item is the default metadata color */
-						vType = "metadata";
+						vType = NodeType.METADATA;
 						vProperty = "color." + vType + "." + vParam;
 					} else {
-						vType = "metadata";
+						vType = NodeType.METADATA;
 						vPublisher = (String) mSelectPublisher.getSelectedItem();
 						vProperty = "color." + vPublisher + "." + vParam;
 					}

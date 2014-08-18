@@ -50,6 +50,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
+import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
@@ -62,10 +63,6 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
-/**
- * @author bahellma
- *
- */
 public class GraphConnection implements Observer {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
 	private GraphContainer mConnetion = null;
@@ -273,7 +270,7 @@ public class GraphConnection implements Observer {
 	 * @param pType
 	 *            the type of the node,
 	 */
-	public void repaintNodes(String pType, String pPublisher) {
+	public void repaintNodes(NodeType pType, String pPublisher) {
 		LOGGER.trace("Method repaintMetadata(" + pPublisher + ") called.");
 		mGraphPanel.repaintNodes(pType, pPublisher);
 	}
@@ -429,15 +426,40 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Shows the properties of the given {@link Propable} object and
-	 * stores whether it was marked as picked or not.
+	 * Shows the properties of the given {@link Propable} object,
+	 * sets is as selected in the {@link GraphPanel} instance
+	 * and stores whether it was marked as picked or not.
 	 * 
 	 * @param propable the {@link Propable} object to show
-	 * @param isPicked if the {@link Propable} object was marked as picked or not
 	 */
-	public void setAndShowPropable(Propable propable, boolean isPicked) {
-		mIsPropablePicked = isPicked;
+	public void pickAndShowProperties(Propable propable) {
+		LOGGER.trace("Method pickAndShowProperties(" + propable + ") called.");
+		mIsPropablePicked = true;
 		mParentTab.showPropertiesOfNode(propable);
+		mGraphPanel.selectNode(propable);
+	}
+
+	/**
+	 * Just shows the properties of the given {@link Propable} object,
+	 * without marking it as selected or storing whether it was picked.
+	 * 
+	 * @param propable the {@link Propable} object to show
+	 */
+	public void showProperty(Propable propable) {
+		LOGGER.trace("Method showProperties(" + propable + ") called.");
+		mParentTab.showPropertiesOfNode(propable);
+	}
+
+	/**
+	 * Clears the shown properties,
+	 * stores that nothing is picked at the moment
+	 * and informs the {@link GraphPanel} that nothing is selected anymore.
+	 */
+	public void clearProperties() {
+		LOGGER.trace("Method clearProperties() called.");
+		mIsPropablePicked = false;
+		mParentTab.showPropertiesOfNode(null);
+		mGraphPanel.unselectNode();
 	}
 
 	/**
@@ -447,6 +469,7 @@ public class GraphConnection implements Observer {
 	 * @return true if current shown {@link Propable} object was marked as picked, false if not
 	 */
 	public boolean isPropablePicked() {
+		LOGGER.trace("Method isPropablePicked() called.");
 		return mIsPropablePicked;
 	}
 

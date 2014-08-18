@@ -37,13 +37,8 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d;
-
-
-
-
-
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import org.apache.log4j.Logger;
 
@@ -51,36 +46,19 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
 /**
  * EventHandler for clicks in the panel.
  */
-public class ClickEventHandler implements MouseListener {
+public class ClickEventHandler extends MouseAdapter {
 	private static final Logger LOGGER = Logger.getLogger(ClickEventHandler.class);
 	Piccolo2DPanel mPanel      = null;
 
 	public ClickEventHandler(Piccolo2DPanel pPanel) {
-		mPanel      = pPanel;
+		mPanel = pPanel;
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		LOGGER.trace("Method mouseClicked(" + e + ") called.");
-		if (e.getClickCount() == 2) {
+		if ((e.getClickCount() == 2) && (e.getButton() == MouseEvent.BUTTON3)) {
 			mPanel.setFocusToCenter();
 		}
 	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
 }

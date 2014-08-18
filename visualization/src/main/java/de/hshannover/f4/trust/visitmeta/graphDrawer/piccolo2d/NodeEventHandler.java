@@ -48,6 +48,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -55,6 +56,9 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolox.nodes.PComposite;
 
 public class NodeEventHandler extends PDragEventHandler {
+
+	private static final int MOUSE_LEFT_BUTTON = 1;
+
 	private static final Logger LOGGER = Logger.getLogger(NodeEventHandler.class);
 	GraphConnection mConnection = null;
 	Piccolo2DPanel mPanel = null;
@@ -67,51 +71,63 @@ public class NodeEventHandler extends PDragEventHandler {
 	@Override
 	protected void startDrag(PInputEvent e) {
 		LOGGER.trace("Method startDrag(" + e + ") called.");
-		super.startDrag(e);
-		e.setHandled(true);
-		e.getPickedNode().moveToFront();
-		((Position) e.getPickedNode().getAttribute("position")).setInUse(true);
-		((PActivity) e.getPickedNode().getAttribute("activitie")).terminate();
+		PNode pickedNode = e.getPickedNode();
+		if (pickedNode instanceof PComposite) {
+			super.startDrag(e);
+			e.setHandled(true);
+			pickedNode.moveToFront();
+			Position position = (Position) pickedNode.getAttribute("position");
+			if (position != null) {
+				position.setInUse(true);
+			}
+
+			PActivity activity = (PActivity) pickedNode.getAttribute("activity");
+			if (activity != null) {
+				activity.terminate();
+			}
+		}
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	protected void drag(PInputEvent e) {
 		LOGGER.trace("Method drag(" + e + ") called.");
-		super.drag(e);
-		PComposite vNode = (PComposite) e.getPickedNode();
-		/* Redraw edges */
-		ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
-		for (PPath vEdge : vEdges) {
-			mPanel.updateEdge(vEdge);
-		}
-		/* TODO Redraw the shadow */
-		PPath vShadow = (PPath) vNode.getAttribute("glow");
-		if (vShadow != null) {
-			vShadow.setOffset(vNode.getOffset());
+		PNode pickedNode = e.getPickedNode();
+		if (pickedNode instanceof PComposite) {
+			super.drag(e);
+			PComposite vNode = (PComposite) pickedNode;
+
+			/* Redraw edges */
+			ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
+			for (PPath vEdge : vEdges) {
+				mPanel.updateEdge(vEdge);
+			}
+			/* TODO Redraw the shadow */
+			PPath vShadow = (PPath) vNode.getAttribute("glow");
+			if (vShadow != null) {
+				vShadow.setOffset(vNode.getOffset());
+			}
 		}
 	}
 
 	@Override
 	protected void endDrag(PInputEvent e) {
 		LOGGER.trace("Method endDrag(" + e + ") called.");
-		super.endDrag(e);
-		/* Set new position */
-		Point2D vPoint = e.getPickedNode().getOffset();
-		boolean pinNode = e.isControlDown() ? true : false;
-		mConnection.updateNode((Position) e.getPickedNode().getAttribute("position"), // Position-Object
-				(vPoint.getX() / mPanel.getAreaWidth()) + mPanel.getAreaOffsetX(), // x
-				(vPoint.getY() / mPanel.getAreaHeight()) + mPanel.getAreaOffsetY(), // y
-				0.0, // z
-				pinNode
-				);
-		Position vNode = (Position) e.getPickedNode().getAttribute("position");
-		if (vNode instanceof NodeIdentifier) {
-			mConnection.setAndShowPropable(((NodeIdentifier) vNode).getIdentifier(), true);
-		} else if (vNode instanceof NodeMetadata) {
-			mConnection.setAndShowPropable(((NodeMetadata) vNode).getMetadata(), true);
+		PNode pickedNode = e.getPickedNode();
+		if (pickedNode instanceof PComposite) {
+			super.endDrag(e);
+			/* Set new position */
+			Point2D vPoint = e.getPickedNode().getOffset();
+			boolean pinNode = e.isControlDown() ? true : false;
+			Position vNode = (Position) e.getPickedNode().getAttribute("position");
+			mConnection.updateNode(vNode, // Position-Object
+					(vPoint.getX() / mPanel.getAreaWidth()) + mPanel.getAreaOffsetX(), // x
+					(vPoint.getY() / mPanel.getAreaHeight()) + mPanel.getAreaOffsetY(), // y
+					0.0, // z
+					pinNode
+					);
+			vNode.setInUse(false);
 		}
-		vNode.setInUse(false);
 	}
 
 	@Override
@@ -120,18 +136,35 @@ public class NodeEventHandler extends PDragEventHandler {
 		super.mouseEntered(e);
 
 		if (!mConnection.isPropablePicked()) {
-			Object vNode = e.getPickedNode().getAttribute("position");
-			if (vNode instanceof NodeIdentifier) {
-				mConnection.setAndShowPropable(((NodeIdentifier) vNode).getIdentifier(), false);
-			} else if (vNode instanceof NodeMetadata) {
-				mConnection.setAndShowPropable(((NodeMetadata) vNode).getMetadata(), false);
+			PNode pickedNode = e.getPickedNode();
+			if (pickedNode instanceof PComposite) {
+				Object vNode = pickedNode.getAttribute("position");
+				if (vNode instanceof NodeIdentifier) {
+					mConnection.showProperty(((NodeIdentifier) vNode).getIdentifier());
+				} else if (vNode instanceof NodeMetadata) {
+					mConnection.showProperty(((NodeMetadata) vNode).getMetadata());
+				}
 			}
 		}
 	}
 
 	@Override
-	public void mouseExited(PInputEvent e) {
-		LOGGER.trace("Method mouseExited(" + e + ") called.");
-		super.mouseExited(e);
+	public void mouseClicked(PInputEvent e) {
+		LOGGER.trace("Method mouseClicked (" + e + ") called.");
+		super.mouseClicked(e);
+
+		if (e.getButton() == MOUSE_LEFT_BUTTON) {
+			PNode pickedNode = e.getPickedNode();
+			if (pickedNode instanceof PComposite) {
+				Position vNode = (Position) pickedNode.getAttribute("position");
+				if (vNode instanceof NodeIdentifier) {
+					mConnection.pickAndShowProperties(((NodeIdentifier) vNode).getIdentifier());
+				} else if (vNode instanceof NodeMetadata) {
+					mConnection.pickAndShowProperties(((NodeMetadata) vNode).getMetadata());
+				}
+			} else {
+				mConnection.clearProperties();
+			}
+		}
 	}
 }

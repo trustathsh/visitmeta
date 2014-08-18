@@ -212,6 +212,13 @@ public class ConnectionTab extends JPanel {
 		return mGraphConnection.getPublisher();
 	}
 
+	/**
+	 * Shows the information of the given {@link Propable} object
+	 * by filling the {@link PanelXmlTree}.
+	 * 
+	 * @param propable the {@link Propable} objects, whose information shall be
+	 * shown
+	 */
 	public void showPropertiesOfNode(final Propable propable) {
 		mPanelXmlTree.fill(propable);
 		mPanelXmlTree.repaint();

@@ -70,7 +70,7 @@ public abstract class TimeManager implements Runnable, Observer {
 	protected ArrayList<Pair<Long, Position>> mNodes = null;
 	private GraphContainer mConnection = null;
 	private SettingManager mSettingManger = null;
-	private TimeSelector mTimeSelector = null;
+	private TimeHolder mTimeHolder = null;
 	private boolean mIsDone = false;
 	private int mTimeout = 0;
 	private boolean mLiveView = true;
@@ -78,12 +78,12 @@ public abstract class TimeManager implements Runnable, Observer {
 	public TimeManager(GraphContainer connection) {
 		mConnection = connection;
 		mSettingManger = mConnection.getSettingManager();
-		mTimeSelector = mConnection.getTimeSelector();
+		mTimeHolder = mConnection.getTimeHolder();
 		mNodes = new ArrayList<>();
 		mTimeout = mSettingManger.getHighlightsTimeout();
-		mLiveView = mTimeSelector.isLiveView();
+		mLiveView = mTimeHolder.isLiveView();
 		mSettingManger.addObserver(this);
-		mTimeSelector.addObserver(this);
+		mTimeHolder.addObserver(this);
 	}
 
 	/**
@@ -135,9 +135,9 @@ public abstract class TimeManager implements Runnable, Observer {
 	@Override
 	public synchronized void update(Observable pO, Object pArg) {
 		LOGGER.trace("Method update(" + pO + ", " + pArg + ") called.");
-		if (pO instanceof TimeSelector) {
+		if (pO instanceof TimeHolder) {
 			synchronized (this) {
-				boolean vLiveView = mTimeSelector.isLiveView();
+				boolean vLiveView = mTimeHolder.isLiveView();
 				// if(mLiveView != vLiveView) {
 				// removeAll();
 				mLiveView = vLiveView;

@@ -38,10 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.network;
 
-
-
-
-
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -50,135 +46,68 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+
 /**
- * Pool class that contains a mapping of all Identifiers to NodeIdentifiers in the current layout.
- * TODO Pool must manage the count of entities.
+ * Pool class that contains a mapping of all Identifiers to NodeIdentifiers in
+ * the current layout.
  */
 public class PoolNodeIdentifier {
-
 	private static final Logger LOGGER = Logger.getLogger(PoolNodeIdentifier.class);
 
-	private static HashMap<Identifier,NodeIdentifier> mPoolIdentifierActive  = new HashMap<Identifier,NodeIdentifier>();
-//	private static HashMap<Identifier,NodeIdentifier> mPoolIdentifierSuspend = new HashMap<Identifier,NodeIdentifier>();
+	private PoolNodeMetadata mMetadataPool;
+	private HashMap<Identifier, NodeIdentifier> mIdentifierPool = new HashMap<Identifier, NodeIdentifier>();
 
 	/**
-	 * Get a NodeIdentifier.
-	 * @param identifier the Identifier for the NodeIdentifier.
-	 * @return the NodeIdentifier (active) or
-	 *         Null if the NodeIdentifier doesn't exist.
+	 * @param metadataPool
+	 *            Metadata pool related to the Identifier pool.
 	 */
-	public static NodeIdentifier getActive(Identifier identifier) {
-		LOGGER.trace("Method getActive(" + identifier + ") called.");
-		return mPoolIdentifierActive.get(identifier);
-	}
-
-//	/**
-//	 * Get a NodeIdentifier.
-//	 * @param identifier the Identifier for the NodeIdentifier.
-//	 * @return the NodeIdentifier (active or suspend) or
-//	 *         Null if the NodeIdentifier doesn't exist.
-//	 */
-//	public static NodeIdentifier getActiveOrSuspend(Identifier identifier) {
-//		LOGGER.trace("Method getActiveOrSuspend(" + identifier + ") called.");
-//		NodeIdentifier result = mPoolIdentifierActive.get(identifier);
-//		if(result == null) {
-//			result = mPoolIdentifierSuspend.get(identifier);
-//		}
-//		return result;
-//	}
-
-	public static HashMap<Identifier,NodeIdentifier> get() {
-		LOGGER.trace("Method get() called.");
-		return mPoolIdentifierActive;
+	public PoolNodeIdentifier(PoolNodeMetadata metadataPool) {
+		mMetadataPool = metadataPool;
 	}
 
 	/**
-	 * Suspend a NodeIdentifier.
-	 * @param identifier the Identifier that reference the ExpandedLink.
+	 * @param identifier
+	 *            The Identifier for the NodeIdentifier.
+	 * @return The NodeIdentifier or null if the NodeIdentifier does not exist.
 	 */
-	public static void release(Identifier identifier) {
-		LOGGER.trace("Method release(" + identifier + ") called.");
-//		mPoolIdentifierSuspend.put(identifier, mPoolIdentifierActive.get(identifier));
-		mPoolIdentifierActive.remove(identifier);
+	public NodeIdentifier getIdentifier(Identifier identifier) {
+		return mIdentifierPool.get(identifier);
 	}
 
 	/**
-	 * Suspend all NodeIdentifier.
+	 * Removes a NodeIdentifier.
+	 * 
+	 * @param identifier
+	 *            The Identifier that reference the ExpandedLink.
 	 */
-	public static void clear() {
-		LOGGER.trace("Method clear() called.");
-//		mPoolIdentifierSuspend.putAll(mPoolIdentifierActive);
-		mPoolIdentifierActive.clear();
+	public void release(Identifier identifier) {
+		mIdentifierPool.remove(identifier);
 	}
 
 	/**
-	 * Create a new NodeIdentifier.
-	 * @param identifier the Identifier for the NodeIdentifier.
-	 * @return the new NodeIdentifier or null if the NodeIdentifier already existed.
+	 * Removes all NodeIdentifier.
 	 */
-	public static NodeIdentifier create(Identifier identifier) {
-		LOGGER.trace("Method create(" + identifier + ") called.");
-		if(mPoolIdentifierActive.containsKey(identifier)) {
+	public void clear() {
+		mIdentifierPool.clear();
+	}
+
+	/**
+	 * @param identifier
+	 *            The Identifier for the NodeIdentifier.
+	 * @return The new NodeIdentifier or null if the NodeIdentifier already
+	 *         existed.
+	 */
+	public NodeIdentifier create(Identifier identifier) {
+		if (mIdentifierPool.containsKey(identifier)) {
 			return null;
 		} else {
 			LOGGER.debug("Create new identifier.");
 			NodeIdentifier nodeIdentifier = new NodeIdentifier(identifier);
-			for(Metadata metadata : identifier.getMetadata()) {
-				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(new RichMetadata(metadata, identifier)));
+			for (Metadata metadata : identifier.getMetadata()) {
+				nodeIdentifier.addNodeMetadata(mMetadataPool.createOrGet(new RichMetadata(metadata, identifier)));
 			}
-			mPoolIdentifierActive.put(identifier, nodeIdentifier);
+			mIdentifierPool.put(identifier, nodeIdentifier);
 			return nodeIdentifier;
 		}
 	}
-
-//	/**
-//	 * Create or get a NodeIdentifier and activate the NodeIdentifier if suspend.
-//	 * @param identifier the Identifier for the NodeIdentifier.
-//	 * @return the new NodeIdentifier or the already existing NodeIdentifier (active and suspend).
-//	 */
-//	public static NodeIdentifier createOrActivate(Identifier identifier) {
-//		LOGGER.trace("Method createOrActive(" + identifier + ") called.");
-//		if(mPoolIdentifierActive.containsKey(identifier)) {
-//			/* NodeIdentifier is active */
-//			return null;
-//		} else if(mPoolIdentifierSuspend.containsKey(identifier)) {
-//			/* Activate NodeIdentifier */
-//			NodeIdentifier nodeIdentifier = mPoolIdentifierSuspend.get(identifier);
-//			mPoolIdentifierActive.put(identifier, nodeIdentifier);
-//			mPoolIdentifierSuspend.remove(identifier);
-//			return nodeIdentifier;
-//		} else {
-//			/* Create new NodeIdentifier */
-//			LOGGER.debug("Create new identifier.");
-//			NodeIdentifier nodeIdentifier = new NodeIdentifier(identifier);
-//			for(Metadata metadata : identifier.getMetadata()) {
-//				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(metadata));
-//			}
-//			mPoolIdentifierActive.put(identifier, nodeIdentifier);
-//			return nodeIdentifier;
-//		}
-//	}
-
-	/**
-	 * Create or get a NodeIdentifier.
-	 * @param identifier the Identifier for the NodeIdentifier.
-	 * @return the new NodeIdentifier or the already existing NodeIdentifier (active).
-	 *         Null if the NodeIdentifier is suspend.
-	 */
-	public static NodeIdentifier createOrGet(Identifier identifier) {
-		LOGGER.trace("Method createOrGet(" + identifier + ") called.");
-		if(mPoolIdentifierActive.containsKey(identifier)) {
-			LOGGER.debug("Found existing identifier.");
-			return getActive(identifier);
-		} else {
-			LOGGER.debug("Create new identifier.");
-			NodeIdentifier nodeIdentifier = new NodeIdentifier(identifier);
-			for(Metadata metadata : identifier.getMetadata()) {
-				nodeIdentifier.addNodeMetadata(PoolNodeMetadata.createOrGet(new RichMetadata(metadata, identifier)));
-			}
-			mPoolIdentifierActive.put(identifier, nodeIdentifier);
-			return nodeIdentifier;
-		}
-	}
-
 }

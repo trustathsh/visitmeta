@@ -48,8 +48,11 @@ import de.hshannover.f4.trust.visitmeta.network.Connection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
+import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 
 /**
+ * This class is a container class, holding the needed information about a
+ * connection to a graph.
  * 
  * @author oelsner
  * 
@@ -63,17 +66,26 @@ public class GraphContainer {
 	private FacadeNetwork mFacadeNetwork = null;
 	private FacadeLogic mFacadeLogic = null;
 	private GraphConnection mGraphConnection = null;
+	private GraphPool mGraphPool = null;
 	private TimeHolder mTimeHolder = null;
-	private TimeSelector mTimeSelector = null;
 	private TimeManagerCreation mTimeManagerCreation = null;
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
 
+	/**
+	 * The constructor initializes and connects all classes needed for a
+	 * connection to a given graph.
+	 * 
+	 * @param restConnectionName
+	 *            is the name of the selected graph
+	 * @param dataserviceConnection
+	 *            is the connection to the selected dataservice
+	 */
 	public GraphContainer(String restConnectionName, DataserviceConnection dataserviceConnection) {
 		mName = dataserviceConnection.getName() + ":" + restConnectionName;
 		mRestConnectionName = restConnectionName;
-		mTimeHolder = new TimeHolder(this);
-		mTimeSelector = new TimeSelector(this);
+		mTimeHolder = new TimeHolder();
+		mGraphPool = new GraphPool();
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
@@ -94,10 +106,6 @@ public class GraphContainer {
 
 	public TimeHolder getTimeHolder() {
 		return mTimeHolder;
-	}
-
-	public TimeSelector getTimeSelector() {
-		return mTimeSelector;
 	}
 
 	public TimeManagerCreation getTimeManagerCreation() {
@@ -128,6 +136,10 @@ public class GraphContainer {
 		return mFacadeNetwork;
 	}
 
+	public GraphPool getGraphPool() {
+		return mGraphPool;
+	}
+
 	public Calculator getCalculator() {
 		return mCalculator;
 	}
@@ -151,9 +163,9 @@ public class GraphContainer {
 
 	@Override
 	public boolean equals(Object o) {
-		if(o == null || !(o instanceof GraphContainer))
+		if (o == null || !(o instanceof GraphContainer)) {
 			return false;
+		}
 		return mName.equals((((GraphContainer) o).mName));
 	}
-
 }

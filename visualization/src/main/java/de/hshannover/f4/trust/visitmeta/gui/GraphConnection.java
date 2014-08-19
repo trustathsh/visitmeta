@@ -53,9 +53,9 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
+import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerCreation;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
-import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
@@ -69,7 +69,7 @@ public class GraphConnection implements Observer {
 	private FacadeLogic mFacadeLogic = null;
 	private GraphPanel mGraphPanel = null;
 	private SettingManager mSettingManager = null;
-	private TimeSelector mTimeSelector = null;
+	private TimeHolder mTimeHolder = null;
 	private TimeManagerCreation mTimerCreation = null;
 	private TimeManagerDeletion mTimerDeletion = null;
 	private boolean mAddHighlights = true;
@@ -77,10 +77,14 @@ public class GraphConnection implements Observer {
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 	private boolean mIsPropablePicked = false;
 
-	public GraphConnection(GraphContainer connection) {
-		mConnetion = connection;
+	/**
+	 * @param container
+	 *            Contains information about the Connection.
+	 */
+	public GraphConnection(GraphContainer container) {
+		mConnetion = container;
 		mFacadeLogic = mConnetion.getFacadeLogic();
-		mTimeSelector = mConnetion.getTimeSelector();
+		mTimeHolder = mConnetion.getTimeHolder();
 		mSettingManager = mConnetion.getSettingManager();
 		mGraphPanel = GraphPanelFactory.getGraphPanel("Piccolo2D", this);
 
@@ -91,15 +95,11 @@ public class GraphConnection implements Observer {
 
 		mSettingManager.addObserver(this);
 		mFacadeLogic.addObserver(this);
-		mTimeSelector.addObserver(this);
+		mTimeHolder.addObserver(this);
 	}
 
 	public SettingManager getSettingManager() {
 		return mSettingManager;
-	}
-
-	public TimeSelector getTimeSelector() {
-		return mTimeSelector;
 	}
 
 	public FacadeLogic getLogic() {
@@ -244,7 +244,8 @@ public class GraphConnection implements Observer {
 	 *            the new y coordinate.
 	 * @param pNewZ
 	 *            the new z coordinate.
-	 * @param pinNode TODO
+	 * @param pinNode
+	 *            TODO
 	 */
 	public void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
 		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
@@ -303,6 +304,7 @@ public class GraphConnection implements Observer {
 
 	/**
 	 * Set layout type (e.g., force-directed)
+	 * 
 	 * @param layoutType
 	 */
 	public void setLayoutType(LayoutType layoutType) {
@@ -322,7 +324,6 @@ public class GraphConnection implements Observer {
 	 */
 	public void clearGraph() {
 		LOGGER.trace("Method clearGraph() called.");
-		/* Delete observables */
 		for (Observable vObserbale : mObservables.keySet()) {
 			vObserbale.deleteObserver(this);
 		}
@@ -331,21 +332,26 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Load the initial graph to the timestamp in TimeSelector.
-	 * 
-	 * @see FacadeLogic#loadInitialGraph()
+	 * @see FacadeLogic#loadGraphAtDeltaStart()
 	 */
-	private void loadInitialGraph() {
-		LOGGER.trace("Method loadInitialGraph() called.");
+	private void loadGraphAtDeltaStart() {
 		mTimerCreation.removeAll();
 		mTimerDeletion.removeAll();
 		clearGraph();
-		mFacadeLogic.loadInitialGraph();
+		mFacadeLogic.loadGraphAtDeltaStart();
 	}
 
 	/**
-	 * Load the delta to the timestamps in TimeSelector.
-	 * 
+	 * @see FacadeLogic#loadCurrentGraph()
+	 */
+	private void loadCurrentGraph() {
+		mTimerCreation.removeAll();
+		mTimerDeletion.removeAll();
+		clearGraph();
+		mFacadeLogic.loadCurrentGraph();
+	}
+
+	/**
 	 * @see FacadeLogic#loadDelta()
 	 */
 	private void loadDelta() {
@@ -354,16 +360,16 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Load the initial graph and delta to the timestamp in TimeSelector.
+	 * Loads the Delta.
 	 * 
-	 * @see GraphConnection#loadInitialGraph()
+	 * @see GraphConnection#loadGraphAtDeltaStart()
 	 * @see GraphConnection#loadDelta()
 	 */
 	private void delta() {
 		LOGGER.trace("Method delta() called.");
 		mGraphPanel.setNodeTranslationDuration(0);
 		mAddHighlights = false;
-		loadInitialGraph();
+		loadGraphAtDeltaStart();
 		mTimerCreation.removeAll();
 		mTimerDeletion.removeAll();
 		mAddHighlights = true;
@@ -415,9 +421,11 @@ public class GraphConnection implements Observer {
 		} else if (o instanceof NodeMetadata) {
 			mGraphPanel.updateMetadata((NodeMetadata) o);
 			mGraphPanel.repaint();
-		} else if (o instanceof TimeSelector) {
-			if (!mTimeSelector.isLiveView()) {
+		} else if (o instanceof TimeHolder) {
+			if (!mTimeHolder.isLiveView()) {
 				delta();
+			} else if (mTimeHolder.isSetLive()) {
+				loadCurrentGraph();
 			}
 			mGraphPanel.repaint();
 		} else if (o instanceof SettingManager) {
@@ -426,11 +434,12 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Shows the properties of the given {@link Propable} object,
-	 * sets is as selected in the {@link GraphPanel} instance
-	 * and stores whether it was marked as picked or not.
+	 * Shows the properties of the given {@link Propable} object, sets is as
+	 * selected in the {@link GraphPanel} instance and stores whether it was
+	 * marked as picked or not.
 	 * 
-	 * @param propable the {@link Propable} object to show
+	 * @param propable
+	 *            the {@link Propable} object to show
 	 */
 	public void pickAndShowProperties(Propable propable) {
 		LOGGER.trace("Method pickAndShowProperties(" + propable + ") called.");
@@ -440,10 +449,11 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Just shows the properties of the given {@link Propable} object,
-	 * without marking it as selected or storing whether it was picked.
+	 * Just shows the properties of the given {@link Propable} object, without
+	 * marking it as selected or storing whether it was picked.
 	 * 
-	 * @param propable the {@link Propable} object to show
+	 * @param propable
+	 *            the {@link Propable} object to show
 	 */
 	public void showProperty(Propable propable) {
 		LOGGER.trace("Method showProperties(" + propable + ") called.");
@@ -451,8 +461,7 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Clears the shown properties,
-	 * stores that nothing is picked at the moment
+	 * Clears the shown properties, stores that nothing is picked at the moment
 	 * and informs the {@link GraphPanel} that nothing is selected anymore.
 	 */
 	public void clearProperties() {
@@ -466,7 +475,8 @@ public class GraphConnection implements Observer {
 	 * Returns if the current shown {@link Propable} object was marked as picked
 	 * or not.
 	 * 
-	 * @return true if current shown {@link Propable} object was marked as picked, false if not
+	 * @return true if current shown {@link Propable} object was marked as
+	 *         picked, false if not
 	 */
 	public boolean isPropablePicked() {
 		LOGGER.trace("Method isPropablePicked() called.");

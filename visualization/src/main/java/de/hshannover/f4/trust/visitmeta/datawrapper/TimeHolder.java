@@ -44,33 +44,44 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 
 /**
- * The class holds the timestamps.
+ * This class manages timestamps for a connection. The timestamps contained in
+ * this class have two purposes. One of which is managing the continuous updates
+ * during live view. The other purpose is to determine the correct delta for a
+ * historic snapshot.
  */
 public class TimeHolder extends Observable {
 	private static final Logger LOGGER = Logger.getLogger(TimeHolder.class);
 	private SortedMap<Long, Long> mChangesMap = null;
-	private long mTimeStart = 0L;
-	private long mTimeEnd = 0L;
+	private long mDeltaTimeStart = 0L;
+	private long mDeltaTimeEnd = 0L;
 	private boolean mIsInitialized = false;
+	private boolean mLiveView = true;
+	private boolean mIsSetLive = false;
 
-	public TimeHolder(GraphContainer connection) {
+	/**
+	 * No idempotent call! When this method is called the isSetLive flag will be
+	 * set to false.
+	 * 
+	 * @return Whether or not the view switched to live.
+	 */
+	public boolean isSetLive() {
+		boolean tmpIsSetLive = mIsSetLive;
+		mIsSetLive = false;
+		return tmpIsSetLive;
 	}
 
 	/**
-	 * Detects whether the TimeHolder object hat a ChangeMap
 	 * 
-	 * @return boolean whether the TimeHolder object has a ChangeMap or not
+	 * @return Whether or not a changesMap exists.
 	 */
 	public boolean hasChangeMap() {
-		LOGGER.trace("Method hasChangeMap() called.");
 		return mChangesMap != null && mChangesMap.size() > 0;
 	}
 
 	/**
-	 * The oldest possible timestamp to select.
+	 * @return The oldest timestamp.
 	 */
 	public synchronized long getBigBang() {
-		LOGGER.trace("Method getBigBang() called.");
 		if (hasChangeMap()) {
 			return mChangesMap.firstKey();
 		}
@@ -78,86 +89,144 @@ public class TimeHolder extends Observable {
 	}
 
 	/**
-	 * The newest possible timestamp to select
+	 * @return The newest timestamp.
 	 */
 	public synchronized long getNewestTime() {
-		LOGGER.trace("Method getNewestTime() called.");
 		if (hasChangeMap()) {
 			return mChangesMap.lastKey();
 		}
 		return 0L;
 	}
-	
-	/**
-	 * States whether the TimeHolder is initialized or not
-	 * @return true if TimeHolder is initialized
-	 */
+
 	public synchronized boolean isInitialized() {
 		return mIsInitialized;
 	}
 
-	public synchronized long getTimeStart() {
-		LOGGER.trace("Method getTimeStart() called.");
-		return mTimeStart;
-	}
-
-	public synchronized long getTimeEnd() {
-		LOGGER.trace("Method getTimeEnd() called.");
-		return mTimeEnd;
-	}
-
 	public synchronized SortedMap<Long, Long> getChangesMap() {
-		LOGGER.trace("Method getChangesMap() called.");
 		return mChangesMap;
 	}
 
-	public synchronized void setChangesMap(SortedMap<Long, Long> pMap) {
-		setChangesMap(pMap, true);
+	/**
+	 * @param changesMap
+	 *            A SortedMap that maps timestamps to the number of changes that
+	 *            occurred at that time in ascending order.
+	 */
+	public synchronized void setChangesMap(SortedMap<Long, Long> changesMap) {
+		setChangesMap(changesMap, true);
 	}
 
-	public synchronized void setChangesMap(SortedMap<Long, Long> pMap, boolean pNotify) {
-		LOGGER.trace("Method setChangesMap(" + pMap + ", " + pNotify + ") called.");
-		mChangesMap = pMap;
-		setTimeEnd(mChangesMap.get(mChangesMap.lastKey()));
-		setChanged();
-		if (pNotify) {
-			notifyObservers();
-		}
-	}
-
-	public synchronized void setTimeStart(long pTime) {
-		setTimeStart(pTime, true);
-	}
-
-	public synchronized void setTimeStart(long pTime, boolean pNotify) {
-		LOGGER.trace("Method setTimeStart(" + pTime + ", " + pNotify + ") called.");
-		if (hasChangeMap()) {
-			if (mChangesMap.firstKey() <= pTime && pTime <= mChangesMap.lastKey() && mTimeStart != pTime) {
-				mTimeStart = pTime;
+	/**
+	 * @param changesMap
+	 *            A SortedMap that maps timestamps to the number of changes that
+	 *            occurred at that time in ascending order.
+	 * @param notify
+	 *            Decides whether to notify its observers or not.
+	 */
+	public synchronized void setChangesMap(SortedMap<Long, Long> changesMap, boolean notify) {
+		if (changesMap != null && changesMap.size() > 0) {
+			if (!changesMap.equals(mChangesMap)) {
+				mChangesMap = changesMap;
+				if (!mIsInitialized) {
+					setDeltaTimeStart(mChangesMap.lastKey(), false);
+					setDeltaTimeEnd(mChangesMap.lastKey(), false);
+					mIsInitialized = true;
+					LOGGER.info("TimeHoler is initialized successfully.");
+				} else {
+					setDeltaTimeStart(mChangesMap.firstKey(), false);
+				}
 				setChanged();
-				if (pNotify) {
+				if (notify) {
 					notifyObservers();
 				}
 			}
 		}
-		mIsInitialized = true;
 	}
 
-	public synchronized void setTimeEnd(long pTime) {
-		setTimeEnd(pTime, true);
+	public synchronized boolean isLiveView() {
+		return mLiveView;
 	}
 
-	public synchronized void setTimeEnd(long pTime, boolean pNotify) {
-		LOGGER.trace("Method setTimeEnd(" + pTime + ", " + pNotify + ") called.");
-		if (hasChangeMap()) {
-			if (mChangesMap.firstKey() <= pTime && pTime <= mChangesMap.lastKey() && mTimeEnd != pTime) {
-				mTimeEnd = pTime;
-				setChanged();
-				if (pNotify) {
-					notifyObservers();
-				}
+	public synchronized long getDeltaTimeStart() {
+		return mDeltaTimeStart;
+	}
+
+	public synchronized long getDeltaTimeEnd() {
+		return mDeltaTimeEnd;
+	}
+
+	/**
+	 * @param deltaTimeStart
+	 *            Timestamp which indicates the start of a delta.
+	 */
+	public synchronized void setDeltaTimeStart(long deltaTimeStart) {
+		setDeltaTimeStart(deltaTimeStart, true);
+	}
+
+	/**
+	 * @param deltaTimeStart
+	 *            Timestamp which indicates the start of a delta.
+	 * @param notify
+	 *            Decides whether to notify its observers or not.
+	 */
+	public synchronized void setDeltaTimeStart(long deltaTimeStart, boolean notify) {
+		if (mDeltaTimeStart != deltaTimeStart) {
+			mDeltaTimeStart = deltaTimeStart;
+			setChanged();
+			if (notify) {
+				notifyObservers();
 			}
 		}
-		mIsInitialized = true;
+	}
+
+	/**
+	 * @param deltaTimeEnd
+	 *            Timestamp which indicates the end of a delta.
+	 */
+	public synchronized void setDeltaTimeEnd(long deltaTimeEnd) {
+		setDeltaTimeEnd(deltaTimeEnd, true);
+	}
+
+	/**
+	 * @param deltaTimeEnd
+	 *            Timestamp which indicates the end of a delta.
+	 * @param notify
+	 *            Decides whether to notify its observers or not.
+	 */
+	public synchronized void setDeltaTimeEnd(long deltaTimeEnd, boolean notify) {
+		if (mDeltaTimeEnd != deltaTimeEnd) {
+			mDeltaTimeEnd = deltaTimeEnd;
+			setChanged();
+			if (notify) {
+				notifyObservers();
+			}
+		}
+	}
+
+	/**
+	 * @param isLive
+	 *            Contains information whether the view is live or not.
+	 */
+	public synchronized void setLiveView(boolean isLive) {
+		setLiveView(isLive, true);
+	}
+
+	/**
+	 * 
+	 * @param isLive
+	 *            Contains information whether the view is live or not.
+	 * @param notify
+	 *            Decides whether to notify its observers or not.
+	 */
+	public synchronized void setLiveView(boolean isLive, boolean notify) {
+		if (mLiveView != isLive) {
+			mLiveView = isLive;
+			if (mLiveView) {
+				mIsSetLive = true;
+			}
+			setChanged();
+			if (notify) {
+				notifyObservers();
+			}
+		}
 	}
 }

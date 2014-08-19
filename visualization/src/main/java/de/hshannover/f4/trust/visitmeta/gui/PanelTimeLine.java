@@ -59,11 +59,10 @@ import javax.swing.event.ChangeListener;
 import com.github.ernieyu.swingRangeSlider.RangeSlider;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
-import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
 
 /**
- * This class represents the part of the gui which is responsible for viewing
- * and handling historic instances of a given dataservice
+ * This class represents the part of the GUI which is responsible for viewing
+ * and handling historic instances of a given map-server.
  *
  */
 public class PanelTimeLine extends JPanel implements Observer {
@@ -71,7 +70,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 	private static final String TIMEFORMAT = "yyyy-MM-FF HH:mm:ss";
 
 	private SortedMap<Long, Long> mChangesMap = null;
-	private TimeSelector mTimeSelector = null;
+	private TimeHolder mTimeHolder = null;
 	private Timer mDelay = null;
 
 	private SpringLayout mSpringLayout = null;
@@ -90,14 +89,14 @@ public class PanelTimeLine extends JPanel implements Observer {
 	/**
 	 * Constructor that initializes the TimeLine Panel.
 	 * 
-	 * @param timeSelector
-	 *            contains information about the connection
+	 * @param timeHolder
+	 *            Manages the timestamps for the historic view.
 	 */
-	public PanelTimeLine(TimeSelector timeSelector) {
+	public PanelTimeLine(TimeHolder timeHolder) {
 		super();
 		setPreferredSize(new Dimension(400, 33));
 		setMinimumSize(new Dimension(400, 0));
-		mTimeSelector = timeSelector;
+		mTimeHolder = timeHolder;
 		mSpringLayout = new SpringLayout();
 
 		mSpinnerTimeStartDateModel = new SpinnerDateModel(new Date(0L), null, null, Calendar.SECOND);
@@ -148,7 +147,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 		add(mChckbxLive);
 
 		addListener();
-		mTimeSelector.getTimeHolder().addObserver(this);
+		mTimeHolder.addObserver(this);
 	}
 
 	/**
@@ -186,6 +185,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 					mSlider.setEnabledUpperDragging(false);
 					mSpinnerTimeStart.setEnabled(false);
 					mSpinnerTimeEnd.setEnabled(false);
+					
 				} else {
 					mSlider.setEnabled(true);
 					mSlider.setEnabledLowerDragging(true);
@@ -201,10 +201,15 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mDelay = new Timer(500, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mTimeSelector.setTimeStart(((Date) mSpinnerTimeStart.getValue()).getTime(), false);
-				mTimeSelector.setTimeEnd(((Date) mSpinnerTimeEnd.getValue()).getTime(), false);
-				mTimeSelector.setLiveView(mChckbxLive.isSelected(), false);
-				mTimeSelector.notifyObservers();
+				mTimeHolder.setLiveView(mChckbxLive.isSelected(), false);
+				if(mTimeHolder.isLiveView()) {
+					mTimeHolder.setDeltaTimeStart(mTimeHolder.getNewestTime(), false);
+					mTimeHolder.setDeltaTimeEnd(mTimeHolder.getNewestTime(), false);
+				} else {
+					mTimeHolder.setDeltaTimeStart(((Date) mSpinnerTimeStart.getValue()).getTime(), false);
+					mTimeHolder.setDeltaTimeEnd(((Date) mSpinnerTimeEnd.getValue()).getTime(), false);
+				}
+				mTimeHolder.notifyObservers();
 			}
 		});
 
@@ -224,17 +229,17 @@ public class PanelTimeLine extends JPanel implements Observer {
 			mChckbxLive.removeChangeListener(mListenerChckbxLive);
 
 			mChckbxLive.setEnabled(true);
-			mChangesMap = mTimeSelector.getTimeHolder().getChangesMap();
+			mChangesMap = mTimeHolder.getChangesMap();
 			mSlider.setMaximum(mChangesMap.size() - 1);
 			mSpinnerTimeStartDateModel.setStart(new Date(tmpHolder.getBigBang()));
 			mSpinnerTimeStartDateModel.setEnd(new Date(tmpHolder.getNewestTime()));
 			mSpinnerTimeEndDateModel.setStart(new Date(tmpHolder.getBigBang()));
 			mSpinnerTimeEndDateModel.setEnd(new Date(tmpHolder.getNewestTime()));
 
-			if (mTimeSelector.isLiveView()) {
+			if (mTimeHolder.isLiveView()) {
 				mSlider.setUpperValue(mChangesMap.size() - 1);
-				mSpinnerTimeStartDateModel.setValue(new Date(mTimeSelector.getTimeHolder().getTimeStart()));
-				mSpinnerTimeEndDateModel.setValue(new Date(mTimeSelector.getTimeHolder().getTimeEnd()));
+				mSpinnerTimeStartDateModel.setValue(new Date(mTimeHolder.getBigBang()));
+				mSpinnerTimeEndDateModel.setValue(new Date(mTimeHolder.getNewestTime()));
 			}
 
 			mSpinnerTimeStart.addChangeListener(mListenerSpinnerTimeStart);

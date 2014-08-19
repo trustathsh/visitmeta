@@ -45,93 +45,108 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
+import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 
 /**
- * Network class that handles the connection to the dataservice.
+ * Main class for the graph management. The class updates and manages the graph
+ * during the programs life cycle.
  */
 public class FacadeNetwork extends Observable implements Runnable, Observer {
-
 	private static final Logger LOGGER = Logger.getLogger(FacadeNetwork.class);
 
 	private GraphContainer mConnection = null;
 	private Connection mNetworkConnection = null;
-	private TimeSelector mTimeSelector = null;
+	private TimeHolder mTimeHolder = null;
+	private GraphPool mGraphPool = null;
 	private SettingManager mSettingManager = null;
 	private boolean mIsDone = false;
 	private boolean mLoadNewest = true;
 	private int mInterval = 0;
 
-	public FacadeNetwork(GraphContainer connection) {
-		mConnection = connection;
+	/**
+	 * Initializes the FacadeNetwork and connects all needed classes.
+	 * 
+	 * @param container
+	 *            Contains information about the Connection.
+	 */
+	public FacadeNetwork(GraphContainer container) {
+		mConnection = container;
 		mNetworkConnection = mConnection.getConnection();
 		mSettingManager = mConnection.getSettingManager();
-		mTimeSelector = mConnection.getTimeSelector();
+		mTimeHolder = mConnection.getTimeHolder();
 		mInterval = mSettingManager.getNetworkInterval();
 		mSettingManager.addObserver(this);
-		mTimeSelector.addObserver(this);
+		mTimeHolder.addObserver(this);
+		mGraphPool = container.getGraphPool();
 	}
 
 	public synchronized UpdateContainer getUpdate() {
-		LOGGER.trace("Method getUpdate() called.");
 		return mNetworkConnection.getUpdate();
 	}
 
 	/**
-	 * Stop the loop of the run()-Method.
+	 * Ends the main loop.
 	 */
 	public synchronized void finish() {
-		LOGGER.trace("Method finish() called.");
 		mIsDone = true;
 	}
 
 	/**
-	 * Load the initial graph to the timestamp in TimeSelector. This methode
-	 * notify the observers.
+	 * Loads the initial graph. This method notifies the observer.
 	 * 
-	 * @see Connection#loadInitialGraph()
+	 * @see Connection#loadGraphAtDeltaStart()
 	 */
-	public synchronized void loadInitialGraph() {
-		LOGGER.trace("Method loadInitialGraph() called.");
+	public synchronized void loadGraphAtDeltaStart() {
 		clearGraph();
-		mNetworkConnection.loadInitialGraph();
+		try {
+			mNetworkConnection.loadGraphAtDeltaStart();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		setChanged();
 		notifyObservers();
 	}
 
 	/**
-	 * Load the delta to the timestamps in TimeSelector. This methode notify the
-	 * observers.
+	 * Loads the current graph. This method notifies the observer.
+	 * 
+	 * @see Connection#loadCurrentGraph()
+	 */
+	public synchronized void loadCurrentGraph() {
+		clearGraph();
+		try {
+			mNetworkConnection.loadCurrentGraph();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * Loads the delta. This method notifies the observer.
 	 * 
 	 * @see Connection#loadDelta()
 	 */
 	public synchronized void loadDelta() {
-		LOGGER.trace("Method loadDelta() called.");
 		mNetworkConnection.loadDelta();
 		setChanged();
 		notifyObservers();
 	}
 
 	/**
-	 * Clear the pools.
-	 * 
-	 * @see PoolNodeIdentifier#clear()
-	 * @see PoolNodeMetadata#clear()
-	 * @see PoolExpandedLink#clear()
+	 * Clears all data from the pools.
 	 */
 	public synchronized void clearGraph() {
-		LOGGER.trace("Method clearGraph() called.");
-		PoolNodeIdentifier.clear();
-		PoolNodeMetadata.clear();
-		PoolExpandedLink.clear();
+		mGraphPool.clearGraph();
 	}
 
 	@Override
 	public void run() {
-		LOGGER.trace("Method run() called.");
 		try {
 			synchronized (this) {
+				loadCurrentGraph();
 				while (!mIsDone) {
 					mNetworkConnection.loadChangesMap();
 					if (mLoadNewest && mNetworkConnection.updateGraph()) {
@@ -142,22 +157,17 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		LOGGER.info("Loop which updates the Graph has ended.");
 	}
 
 	@Override
-	public void update(Observable pO, Object pArg) {
-		LOGGER.trace("Method update(" + pO + ", " + pArg + ") called.");
+	public void update(Observable observable, Object obj) {
 		synchronized (this) {
-			if (pO instanceof TimeSelector) {
-				mLoadNewest = mTimeSelector.isLiveView();
-				// if (mConnection.delta()) {
-				// setChanged();
-				// notifyObservers();
-				// }
-			} else if (pO instanceof SettingManager) {
+			if (observable instanceof TimeHolder) {
+				mLoadNewest = mTimeHolder.isLiveView();
+			} else if (observable instanceof SettingManager) {
 				mInterval = mSettingManager.getNetworkInterval();
 			}
 		}

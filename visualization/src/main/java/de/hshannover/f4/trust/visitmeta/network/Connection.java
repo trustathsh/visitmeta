@@ -51,7 +51,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.RichMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.datawrapper.TimeSelector;
+import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -61,36 +61,45 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 /**
- * Class for managing the connection to the dataservice.
+ * Class for managing a graph received from a dataservice. Contains methods to
+ * update or load the graph.
  */
 public class Connection {
-
 	private static final Logger LOGGER = Logger.getLogger(Connection.class);
 
 	protected UpdateContainer mUpdateContainer;
 
 	private GraphService mGraphService = null;
-	private TimeSelector mTimeSelector = null;
+	private TimeHolder mTimeHolder = null;
+	private GraphPool mGraphPool = null;
 	private SortedMap<Long, Long> mChangesMap = null;
 
 	private SettingManager mSettingManager = null;
 	int mInterval = 0;
 
-	public Connection(GraphService graphService, GraphContainer con) {
+	/**
+	 * Initializes a Connection-class instance.
+	 * 
+	 * @param graphService
+	 *            The GraphService which matches the connection.
+	 * @param container
+	 *            Contains information about the Connection.
+	 */
+	public Connection(GraphService graphService, GraphContainer container) {
 		mUpdateContainer = new UpdateContainer();
 		mGraphService = graphService;
-		mTimeSelector = con.getTimeSelector();
-		mSettingManager = con.getSettingManager();
+		mTimeHolder = container.getTimeHolder();
+		mGraphPool = container.getGraphPool();
+		mSettingManager = container.getSettingManager();
 		mInterval = mSettingManager.getNetworkInterval();
 	}
 
 	/**
 	 * Returns the UpdateContainer which can be used freely.
 	 * 
-	 * @return a Container-Class with the changes.
+	 * @return A container class with the changes.
 	 */
 	public UpdateContainer getUpdate() {
-		LOGGER.trace("Method getUpdate() called.");
 		UpdateContainer result;
 		synchronized (this) {
 			result = mUpdateContainer;
@@ -103,308 +112,289 @@ public class Connection {
 	 * Release the data in the delete lists of the UpdateContainer.
 	 */
 	protected void releaseData() {
-		LOGGER.trace("Method releaseData() called.");
 		synchronized (this) {
-			for (NodeIdentifier vIdentifier : mUpdateContainer.getListDeleteIdentifier()) {
-				PoolNodeIdentifier.release(vIdentifier.getIdentifier());
+			for (NodeIdentifier identifier : mUpdateContainer.getListDeleteIdentifier()) {
+				mGraphPool.releaseIdentifier(identifier.getIdentifier());
 			}
-			for (ExpandedLink vLink : mUpdateContainer.getListDeleteLinks()) {
-				PoolExpandedLink.release(vLink.getLink());
+			for (ExpandedLink link : mUpdateContainer.getListDeleteLinks()) {
+				mGraphPool.releaseLink(link.getLink());
 			}
-			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataIdentifier().values()) {
-				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getRichMetadata());
+			for (List<NodeMetadata> listMetadata : mUpdateContainer.getListDeleteMetadataIdentifier().values()) {
+				for (NodeMetadata metadata : listMetadata) {
+					mGraphPool.releaseMetadata(metadata.getRichMetadata());
 				}
 			}
-			for (List<NodeMetadata> vListMetadata : mUpdateContainer.getListDeleteMetadataLinks().values()) {
-				for (NodeMetadata vMetadata : vListMetadata) {
-					PoolNodeMetadata.release(vMetadata.getRichMetadata());
+			for (List<NodeMetadata> listMetadata : mUpdateContainer.getListDeleteMetadataLinks().values()) {
+				for (NodeMetadata metadata : listMetadata) {
+					mGraphPool.releaseMetadata(metadata.getRichMetadata());
 				}
 			}
 		}
 	}
 
 	/**
-	 * Load the ChangesMap from the dataservice.
-	 */
-	public synchronized void loadChangesMap() {
-		LOGGER.trace("Method loadChangesMap() called.");
-		if (mTimeSelector.getTimeHolder().isInitialized()) {
-			mChangesMap = mGraphService.getChangesMap();
-			if (mChangesMap != null && 0 < mChangesMap.size()) {
-				LOGGER.debug("Server has " + mChangesMap.size() + " changes.");
-				mTimeSelector.getTimeHolder().setChangesMap(mChangesMap);
-			} else {
-				LOGGER.info("Server has no map of changes.");
-			}
-		}
-	}
-
-	/**
-	 * Load the initial graph to the timestamp in TimeSelector.
-	 */
-	public synchronized void loadInitialGraph() {
-		LOGGER.trace("Method loadInitialGraph() called.");
-		List<IdentifierGraph> vGraphs = mGraphService.getGraphAt(mTimeSelector.getTimeStart());
-		if (vGraphs != null && vGraphs.size() > 0) {
-			LOGGER.info("Load initial graph at: " + mTimeSelector.getTimeStart() + ".");
-			debugGraphContent("initial", vGraphs);
-			deltaUpdate(vGraphs);
-			synchronized (mTimeSelector.getTimeHolder()) {
-				mTimeSelector.getTimeHolder().setTimeStart(vGraphs.get(0).getTimestamp(), false);
-				mTimeSelector.getTimeHolder().setTimeEnd(vGraphs.get(0).getTimestamp(), false);
-			}
-			mTimeSelector.getTimeHolder().notifyObservers();
-		}
-	}
-
-	/**
-	 * Load the delta to the timestamps in TimeSelector.
+	 * Initializes the TimeHolder. Blocks till the TimeHolder is initialized!
 	 * 
-	 * @return true = has updates and/or deletes. false = no updates and
-	 *         deletes.
-	 */
-	public synchronized boolean loadDelta() {
-		LOGGER.trace("Method loadDelta() called.");
-		boolean vUpdate = false;
-		boolean vDelete = false;
-		if (mGraphService != null) {
-			long vTimeStart = 0;
-			long vTimeEnd = 0;
-			synchronized (mTimeSelector) {
-				vTimeStart = mTimeSelector.getTimeStart();
-				vTimeEnd = mTimeSelector.getTimeEnd();
-			}
-			LOGGER.info("Update start time of graph.");
-			LOGGER.info("From: " + vTimeStart);
-			LOGGER.info("To: " + vTimeEnd);
-			Delta vDelta = mGraphService.getDelta(vTimeStart,  vTimeEnd);
-			debugGraphContent(vDelta);
-			if (vDelta.getUpdates().size() > 0) {
-				vUpdate = deltaUpdate(vDelta.getUpdates());
-			}
-			if (vDelta.getDeletes().size() > 0) {
-				vDelete = deltaDelete(vDelta.getDeletes());
-			}
-			/* Set end time */
-			if (vUpdate || vDelete) {
-				mTimeSelector.getTimeHolder().setTimeEnd(vTimeEnd);
-			}
-		}
-		releaseData();
-		return vUpdate || vDelete;
-	}
-
-	/**
-	 * Load the delta for the live view.
-	 * 
-	 * @return
 	 * @throws InterruptedException
+	 *             If an interruption occurs during the timeout.
 	 */
-	public synchronized boolean updateGraph() throws InterruptedException {
-		LOGGER.trace("Method updateGraph() called.");
-		boolean vUpdate = false;
-		boolean vDelete = false;
-		
-		while (!mTimeSelector.getTimeHolder().isInitialized()) {
-			List<IdentifierGraph> vGraphs = mGraphService.getCurrentGraph();
-			if (vGraphs != null && vGraphs.size() > 0) {
-				LOGGER.info("Load initial graph.");
-				debugGraphContent("initial", vGraphs);
-				vUpdate = deltaUpdate(vGraphs);
-				loadChangesMap();
-				synchronized (mTimeSelector.getTimeHolder()) {
-					mTimeSelector.getTimeHolder().setTimeStart(vGraphs.get(0).getTimestamp(), false);
-					mTimeSelector.getTimeHolder().setTimeEnd(vGraphs.get(0).getTimestamp(), false);
-				}
-				mTimeSelector.getTimeHolder().notifyObservers();
-			} else {
-				// FIXME refactoring needed; wait for network-interval
+	private synchronized void initTimeHolder() throws InterruptedException {
+		// This loop makes sure the TimeHolder is initialized correctly
+		while (!mTimeHolder.isInitialized()) {
+			loadChangesMap();
+			mTimeHolder.notifyObservers();
+			if (!mTimeHolder.isInitialized()) {
 				LOGGER.info("No initial data found; retrying in " + mInterval + " milliseconds.");
 				Thread.sleep(mInterval);
 			}
 		}
-		/* Update */
-		long vTimeEnd = 0;
-		long vNewestTime = 0;
-		synchronized (mTimeSelector.getTimeHolder()) {
-			vTimeEnd = mTimeSelector.getTimeHolder().getTimeEnd();
-			vNewestTime = mTimeSelector.getTimeHolder().getNewestTime();
+	}
+
+	/**
+	 * Loads the ChangesMap from the dataservice.
+	 */
+	public synchronized void loadChangesMap() {
+		mChangesMap = mGraphService.getChangesMap();
+		if (mChangesMap != null && 0 < mChangesMap.size()) {
+			LOGGER.debug("Server has " + mChangesMap.size() + " changes.");
+			mTimeHolder.setChangesMap(mChangesMap);
+		} else {
+			LOGGER.info("Server has no map of changes.");
 		}
-		if (vTimeEnd < vNewestTime) {
-			LOGGER.info("Update graph.");
-			LOGGER.info("From: " + vTimeEnd);
-			LOGGER.info("To: " + vNewestTime);
-			Delta vDelta = mGraphService.getDelta(vTimeEnd, vNewestTime);
-			debugGraphContent(vDelta);
-			if (vDelta.getUpdates().size() > 0) {
-				vUpdate = deltaUpdate(vDelta.getUpdates());
+	}
+
+	/**
+	 * Loads the graph at the beginning of a delta. Blocks till the TimeHolder
+	 * is initialized!
+	 * 
+	 * @throws InterruptedException
+	 *             If an interruption occurs during the timeout.
+	 */
+	public synchronized void loadGraphAtDeltaStart() throws InterruptedException {
+		initTimeHolder();
+
+		List<IdentifierGraph> graphs = mGraphService.getGraphAt(mTimeHolder.getDeltaTimeStart());
+		if (graphs != null && graphs.size() > 0) {
+			LOGGER.info("Load initial graph at: " + mTimeHolder.getDeltaTimeStart() + ".");
+			debugGraphContent("initial", graphs);
+			deltaUpdate(graphs);
+			mTimeHolder.notifyObservers();
+		}
+	}
+
+	/**
+	 * Loads the current graph. Blocks till the TimeHolder is initialized!
+	 * 
+	 * @throws InterruptedException
+	 *             If an interruption occurs during the timeout.
+	 */
+	public synchronized void loadCurrentGraph() throws InterruptedException {
+		initTimeHolder();
+
+		List<IdentifierGraph> graphs = mGraphService.getCurrentGraph();
+		if (graphs != null && graphs.size() > 0) {
+			LOGGER.info("Load current graph.");
+			deltaUpdate(graphs);
+			mTimeHolder.notifyObservers();
+		}
+	}
+
+	/**
+	 * Loads a delta.
+	 * 
+	 * @return Whether any updates and/or deletes occurred.
+	 */
+	public synchronized boolean loadDelta() {
+		boolean update = false;
+		boolean delete = false;
+		if (mGraphService != null) {
+			long timeStart = 0;
+			long timeEnd = 0;
+			synchronized (mTimeHolder) {
+				timeStart = mTimeHolder.getDeltaTimeStart();
+				timeEnd = mTimeHolder.getDeltaTimeEnd();
 			}
-			if (vDelta.getDeletes().size() > 0) {
-				vDelete = deltaDelete(vDelta.getDeletes());
+			Delta delta = mGraphService.getDelta(timeStart, timeEnd);
+			debugGraphContent(delta);
+			if (delta.getUpdates().size() > 0) {
+				update = deltaUpdate(delta.getUpdates());
 			}
-			/* Set end time */
-			if (vUpdate || vDelete) {
-				mTimeSelector.getTimeHolder().setTimeEnd(vNewestTime);
+			if (delta.getDeletes().size() > 0) {
+				delete = deltaDelete(delta.getDeletes());
 			}
 		}
 		releaseData();
-		return vUpdate || vDelete;
+		return update || delete;
+	}
+
+	/**
+	 * Updates the graph. Blocks till the TimeHolder is initialized!
+	 * 
+	 * @return Whether the graph has changed or not.
+	 * @throws InterruptedException
+	 *             If an interruption occurs during the timeout.
+	 */
+	public synchronized boolean updateGraph() throws InterruptedException {
+		boolean update = false;
+		boolean delete = false;
+
+		initTimeHolder();
+
+		long timeEnd = 0L;
+		long newestTime = 0L;
+		synchronized (mTimeHolder) {
+			timeEnd = mTimeHolder.getDeltaTimeEnd();
+			newestTime = mTimeHolder.getNewestTime();
+		}
+		if (timeEnd < newestTime) {
+			Delta delta = mGraphService.getDelta(timeEnd, newestTime);
+			debugGraphContent(delta);
+			if (delta.getUpdates().size() > 0) {
+				update = deltaUpdate(delta.getUpdates());
+			}
+			if (delta.getDeletes().size() > 0) {
+				delete = deltaDelete(delta.getDeletes());
+			}
+			if (update || delete) {
+				mTimeHolder.setDeltaTimeEnd(newestTime, false);
+			}
+		}
+		releaseData();
+		return update || delete;
 	}
 
 	/**
 	 * Convert the updates from the dataservice to internal format.
 	 * 
-	 * @param pGraphs
-	 *            the graph with the changes.
-	 * @return true = has updates. false = no updates.
+	 * @param graphs
+	 *            the graph with the updates.
+	 * @return Whether any updates occurred.
 	 */
-	protected boolean deltaUpdate(List<IdentifierGraph> pGraphs) {
-		LOGGER.trace("Method deltaUpdate(" + pGraphs + ") called.");
-		boolean vResult = false;
-		/* Updates from delta */
-		for (IdentifierGraph graph : pGraphs) {
-			/* identifier */
+	// TODO bad method name!!! not only used for delta updates !!!
+	protected boolean deltaUpdate(List<IdentifierGraph> graphs) {
+		boolean result = false;
+		for (IdentifierGraph graph : graphs) {
 			for (Identifier identifier : graph.getIdentifiers()) {
-				NodeIdentifier tmpIdentifier = PoolNodeIdentifier.create(identifier);
+				NodeIdentifier tmpIdentifier = mGraphPool.createIdentifier(identifier);
 				if (tmpIdentifier == null) {
-					/* Identifier already exists */
-					tmpIdentifier = PoolNodeIdentifier.getActive(identifier);
-					/* Metadata */
+					tmpIdentifier = mGraphPool.getIdentifier(identifier);
 					List<NodeMetadata> listMetadata = mUpdateContainer.getListAddMetadataIdentifier()
 							.get(tmpIdentifier);
 					if (listMetadata == null) {
 						listMetadata = new ArrayList<>();
 						mUpdateContainer.getListAddMetadataIdentifier().put(tmpIdentifier, listMetadata);
 					}
-					/* Add new Metadata */
 					for (Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, identifier));
+						NodeMetadata tmpMetadata = mGraphPool.createMetadata(new RichMetadata(metadata, identifier));
 						if (tmpMetadata != null) {
 							LOGGER.debug("New metadata of an identifier.");
 							listMetadata.add(tmpMetadata);
-							PoolNodeIdentifier.getActive(identifier).addNodeMetadata(tmpMetadata);
-							vResult = true;
+							mGraphPool.getIdentifier(identifier).addNodeMetadata(tmpMetadata);
+							result = true;
 						}
 					}
 				} else {
-					/* Identifier is new */
 					LOGGER.debug("New identifier.");
 					mUpdateContainer.getListAddIdentifier().add(tmpIdentifier);
-					vResult = true;
+					result = true;
 				}
 			}
-			/* links */
 			for (Identifier identifier : graph.getIdentifiers()) {
 				for (Link link : identifier.getLinks()) {
-					ExpandedLink tmpLink = PoolExpandedLink.create(link);
+					ExpandedLink tmpLink = mGraphPool.createLink(link);
 					if (tmpLink == null) {
-						/* link already exists */
-						tmpLink = PoolExpandedLink.getActive(link);
-						/* Metadata */
+						tmpLink = mGraphPool.getLink(link);
 						List<NodeMetadata> listMetadata = mUpdateContainer.getListAddMetadataLinks().get(tmpLink);
 						if (listMetadata == null) {
 							listMetadata = new ArrayList<>();
 							mUpdateContainer.getListAddMetadataLinks().put(tmpLink, listMetadata);
 						}
-						/* Add new Metadata */
 						for (Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.create(new RichMetadata(metadata, link));
+							NodeMetadata tmpMetadata = mGraphPool.createMetadata(new RichMetadata(metadata, link));
 							if (tmpMetadata != null) {
 								LOGGER.debug("New metadata of an link.");
 								listMetadata.add(tmpMetadata);
-								PoolExpandedLink.getActive(link).addMetadata(tmpMetadata);
-								vResult = true;
+								mGraphPool.getLink(link).addMetadata(tmpMetadata);
+								result = true;
 							}
 						}
 					} else {
-						/* link is new */
 						LOGGER.debug("New link.");
 						mUpdateContainer.getListAddLinks().add(tmpLink);
-						vResult = true;
+						result = true;
 					}
 				}
 			}
 		}
-		LOGGER.debug("New data found: " + vResult);
-		return vResult;
+		LOGGER.debug("New data found: " + result);
+		return result;
 	}
 
 	/**
 	 * Convert the deletes from the dataservice to internal format.
 	 * 
-	 * @param pGraphs
-	 *            the graph with the changes.
-	 * @return true = has deletes. false = no deletes.
+	 * @param graphs
+	 *            the graph with the deletes.
+	 * @return Whether any deletes occured.
 	 */
-	protected boolean deltaDelete(List<IdentifierGraph> pGraphs) {
-		LOGGER.trace("Method deltaDelete(" + pGraphs + ") called.");
-		boolean vResult = false;
-		/* Deletes from delta */
-		for (IdentifierGraph graph : pGraphs) {
-			/* identifier */
+	protected boolean deltaDelete(List<IdentifierGraph> graphs) {
+		LOGGER.trace("Method deltaDelete(" + graphs + ") called.");
+		boolean result = false;
+		for (IdentifierGraph graph : graphs) {
 			for (Identifier identifier : graph.getIdentifiers()) {
-				NodeIdentifier tmpIdentifier = PoolNodeIdentifier.getActive(identifier);
+				NodeIdentifier tmpIdentifier = mGraphPool.getIdentifier(identifier);
 				if (tmpIdentifier != null) {
-					/* Metadata */
 					List<NodeMetadata> listMetadata = mUpdateContainer.getListDeleteMetadataIdentifier().get(
 							tmpIdentifier);
 					if (listMetadata == null) {
 						listMetadata = new ArrayList<>();
 						mUpdateContainer.getListDeleteMetadataIdentifier().put(tmpIdentifier, listMetadata);
 					}
-					/* Add old Metadata */
 					for (Metadata metadata : identifier.getMetadata()) {
-						NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, identifier));
+						NodeMetadata tmpMetadata = mGraphPool.getMetadata(new RichMetadata(metadata, identifier));
 						if (tmpMetadata != null) {
 							LOGGER.debug("Delete metadata of an identifer.");
 							listMetadata.add(tmpMetadata);
-							PoolNodeIdentifier.getActive(identifier).deleteNodeMetadata(tmpMetadata);
-							vResult = true;
+							mGraphPool.getIdentifier(identifier).deleteNodeMetadata(tmpMetadata);
+							result = true;
 						}
 					}
-					/* Add empty identifier to delete list */
 					if (!tmpIdentifier.hasMetadata() && !tmpIdentifier.hasLinks()) {
 						LOGGER.debug("Delete identifer.");
 						mUpdateContainer.getListDeleteIdentifier().add(tmpIdentifier);
-						vResult = true;
+						result = true;
 					}
 				}
 			}
-			/* links */
 			for (Identifier identifier : graph.getIdentifiers()) {
 				for (Link link : identifier.getLinks()) {
-					ExpandedLink tmpLink = PoolExpandedLink.getActive(link);
+					ExpandedLink tmpLink = mGraphPool.getLink(link);
 					if (tmpLink != null) {
-						/* Metadata */
 						List<NodeMetadata> listMetadata = mUpdateContainer.getListDeleteMetadataLinks().get(tmpLink);
 						if (listMetadata == null) {
 							listMetadata = new ArrayList<>();
 							mUpdateContainer.getListDeleteMetadataLinks().put(tmpLink, listMetadata);
 						}
-						/* Add old Metadata */
 						for (Metadata metadata : link.getMetadata()) {
-							NodeMetadata tmpMetadata = PoolNodeMetadata.getActive(new RichMetadata(metadata, link));
+							NodeMetadata tmpMetadata = mGraphPool.getMetadata(new RichMetadata(metadata, link));
 							if (tmpMetadata != null && !listMetadata.contains(tmpMetadata)) {
 								LOGGER.debug("Delete metadata of a link.");
 								listMetadata.add(tmpMetadata);
-								PoolExpandedLink.getActive(link).deleteMetadata(tmpMetadata);
-								vResult = true;
+								mGraphPool.getLink(link).deleteMetadata(tmpMetadata);
+								result = true;
 							}
 						}
-						/* Add empty link to delete list */
-						if(!tmpLink.hasMetadata()) {
+						if (!tmpLink.hasMetadata()) {
 							LOGGER.debug("Delete link.");
 							mUpdateContainer.getListDeleteLinks().add(tmpLink);
 							NodeIdentifier first = tmpLink.getFirst();
 							NodeIdentifier second = tmpLink.getSecond();
-							/* Add empty identifier to delete list */
 							if (first != null) {
 								tmpLink.deleteIdentifier(first);
 								if (!first.hasLinks() && !first.hasMetadata()) {
 									LOGGER.debug("Delete first identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(first);
-									vResult = true;
+									result = true;
 								}
 							}
 							if (second != null) {
@@ -412,7 +402,7 @@ public class Connection {
 								if (!second.hasLinks() && !second.hasMetadata()) {
 									LOGGER.debug("Delete second identifier of a link.");
 									mUpdateContainer.getListDeleteIdentifier().add(second);
-									vResult = true;
+									result = true;
 								}
 							}
 						}
@@ -420,32 +410,40 @@ public class Connection {
 				}
 			}
 		}
-		LOGGER.debug("Data to delete: " + vResult);
-		return vResult;
+		LOGGER.debug("Data to delete: " + result);
+		return result;
 	}
 
-	protected void debugGraphContent(String pGraphType, List<IdentifierGraph> pGraphs) {
-		if(Logger.getRootLogger().getLevel().toInt() < Level.INFO.toInt()) {
-			int vNumberOfGraph      = 0;
-			int vNumberOfIdentifier = 0;
-			int vNumberOfMetadata = 0;
-			int vNumberOfLinks = 0;
-			LOGGER.debug("Count content of " + pGraphType + " graph:");
-			/* Count Content */
-			for(IdentifierGraph vGraph : pGraphs) {
-				++vNumberOfGraph;
-				String logResult = "Graph " + vNumberOfGraph;
-				for(Identifier vIdentifier : vGraph.getIdentifiers()) {
-					++vNumberOfIdentifier;
+	/**
+	 * Shows the amounts of Identifier, Links and Metadata of the given Graph
+	 * with some more details.
+	 * 
+	 * @param graphType
+	 *            Type of the graph.
+	 * @param graphs
+	 *            Graph to debug.
+	 */
+	protected void debugGraphContent(String graphType, List<IdentifierGraph> graphs) {
+		if (Logger.getRootLogger().getLevel().toInt() < Level.INFO.toInt()) {
+			int numberOfGraph = 0;
+			int numberOfIdentifier = 0;
+			int numberOfMetadata = 0;
+			int numberOfLinks = 0;
+			LOGGER.debug("Count content of " + graphType + " graph:");
+			for (IdentifierGraph graph : graphs) {
+				++numberOfGraph;
+				String logResult = "Graph " + numberOfGraph;
+				for (Identifier vIdentifier : graph.getIdentifiers()) {
+					++numberOfIdentifier;
 					logResult += "\n* " + vIdentifier.getTypeName() + " |";
-					vNumberOfMetadata += vIdentifier.getMetadata().size();
+					numberOfMetadata += vIdentifier.getMetadata().size();
 					for (Metadata vMetadata : vIdentifier.getMetadata()) {
 						logResult += " " + vMetadata.getTypeName();
 					}
-					for(Link vLink : vIdentifier.getLinks()) {
-						++vNumberOfLinks;
+					for (Link vLink : vIdentifier.getLinks()) {
+						++numberOfLinks;
 						logResult += "\n    link |";
-						vNumberOfMetadata += vLink.getMetadata().size();
+						numberOfMetadata += vLink.getMetadata().size();
 						for (Metadata vMetadata : vLink.getMetadata()) {
 							logResult += " " + vMetadata.getTypeName();
 						}
@@ -453,17 +451,18 @@ public class Connection {
 				}
 				LOGGER.debug(logResult);
 			}
-			/* Logging */
-			LOGGER.debug("Graph has " + vNumberOfIdentifier + " references to identifier.");
-			LOGGER.debug("Graph has " + vNumberOfMetadata + " references to metadata.");
-			LOGGER.debug("Graph has " + vNumberOfLinks + " references to links.");
+			LOGGER.debug("Graph has " + numberOfIdentifier + " references to identifier.");
+			LOGGER.debug("Graph has " + numberOfMetadata + " references to metadata.");
+			LOGGER.debug("Graph has " + numberOfLinks + " references to links.");
 		}
 	}
 
-	protected void debugGraphContent(Delta pGraph) {
-		/* Update graph */
-		debugGraphContent("update", pGraph.getUpdates());
-		/* Delete graph */
-		debugGraphContent("delete", pGraph.getDeletes());
+	/**
+	 * @param graph
+	 *            A Delta containing updates and/or deletes.
+	 */
+	protected void debugGraphContent(Delta graph) {
+		debugGraphContent("update", graph.getUpdates());
+		debugGraphContent("delete", graph.getDeletes());
 	}
 }

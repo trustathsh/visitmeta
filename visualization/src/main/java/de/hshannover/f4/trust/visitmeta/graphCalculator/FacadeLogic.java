@@ -141,17 +141,21 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	}
 
 	/**
-	 * Load the initial graph to the timestamp in TimeSelector. This methode
-	 * notify the observers.
-	 * 
-	 * @see FacadeNetwork#loadInitialGraph()
+	 * @see FacadeNetwork#loadGraphAtDeltaStart()
 	 */
-	public synchronized void loadInitialGraph() {
-		LOGGER.trace("Method loadInitialGraph() called.");
-		/* Remove all data */
+	public synchronized void loadGraphAtDeltaStart() {
 		clearGraph();
-		/* Call for initial graph */
-		mFacadeNetwork.loadInitialGraph();
+		mFacadeNetwork.loadGraphAtDeltaStart();
+	}
+
+	/**
+	 * Loads the current graph
+	 * 
+	 * @see FacadeNetwork#loadCurrentGraph()
+	 */
+	public synchronized void loadCurrentGraph() {
+		clearGraph();
+		mFacadeNetwork.loadCurrentGraph();
 	}
 
 	/**
@@ -235,7 +239,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 			synchronized (this) {
 				while (!mIsDone) {
 					if (mDoCalculation) {
- 						mCalculator.adjustAllNodes(mIterations, true, true);
+						mCalculator.adjustAllNodes(mIterations, true, true);
 					}
 					wait(mInterval);
 				}
@@ -245,5 +249,5 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

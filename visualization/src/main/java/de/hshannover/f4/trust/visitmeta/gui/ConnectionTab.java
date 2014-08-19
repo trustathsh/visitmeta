@@ -95,7 +95,7 @@ public class ConnectionTab extends JPanel {
 		mDataserviceConnection = mConnection.getDataserviceConnection();
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
-		mTimeLine = new PanelTimeLine(mConnection.getTimeSelector());
+		mTimeLine = new PanelTimeLine(mConnection.getTimeHolder());
 		this.setLayout(new GridLayout());
 
 		initPanels();

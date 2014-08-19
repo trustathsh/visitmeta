@@ -38,10 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.network;
 
-
-
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,155 +51,73 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 /**
- * Pool class that contains a mapping of all Links to ExpandedLinks in the current layout.
- * TODO Pool must manage the count of entities.
+ * Pool class that contains a mapping of all Links to ExpandedLinks in the
+ * current layout.
  */
 public class PoolExpandedLink {
-
 	private static final Logger LOGGER = Logger.getLogger(PoolExpandedLink.class);
 
-	private static HashMap<Link,ExpandedLink> mPoolLinksActive  = new HashMap<Link,ExpandedLink>();
-//	private static HashMap<Link,ExpandedLink> mPoolLinksSuspend = new HashMap<Link,ExpandedLink>();
+	private PoolNodeIdentifier mIdentifierPool;
+	private PoolNodeMetadata mMetadataPool;
+	private HashMap<Link, ExpandedLink> mLinkPool;
 
 	/**
-	 * Get a ExpandedLink.
-	 * @param link the Link for the ExpandedLink.
-	 * @return the new ExpandedLink (active) or
-	 * Null if the ExpandedLink doesn't exist.
+	 * @param identifierPool
+	 *            Identifier pool related to the Link pool.
+	 * @param metadataPool
+	 *            Metadata pool related to the Link pool.
 	 */
-	public static ExpandedLink getActive(Link link) {
-		LOGGER.trace("Method getActive(" + link + ") called.");
-		return mPoolLinksActive.get(link);
-	}
-
-//	/**
-//	 * Get a ExpandedLink.
-//	 * @param link the Link for the ExpandedLink.
-//	 * @return the new ExpandedLink (active or suspend) or
-//	 * Null if the ExpandedLink doesn't exist.
-//	 */
-//	public static ExpandedLink getActiveOrSuspend(Link link) {
-//		LOGGER.trace("Method getActiveOrSuspend(" + link + ") called.");
-//		ExpandedLink result = mPoolLinksActive.get(link);
-//		if(result == null) {
-//			result = mPoolLinksSuspend.get(link);
-//		}
-//		return result;
-//	}
-
-	public static HashMap<Link,ExpandedLink> get() {
-		LOGGER.trace("Method get() called.");
-		return mPoolLinksActive;
+	public PoolExpandedLink(PoolNodeIdentifier identifierPool, PoolNodeMetadata metadataPool) {
+		mIdentifierPool = identifierPool;
+		mMetadataPool = metadataPool;
+		mLinkPool = new HashMap<Link, ExpandedLink>();
 	}
 
 	/**
-	 * Suspend an ExpandedLink.
-	 * @param link the Link that references the ExpandedLink.
+	 * @param link
+	 *            The Link for the ExpandedLink.
+	 * @return The new ExpandedLink or null if the ExpandedLink does not exist.
 	 */
-	public static void release(Link link) {
-		LOGGER.trace("Method release(" + link + ") called.");
-//		mPoolLinksSuspend.put(link, mPoolLinksActive.get(link));
-		mPoolLinksActive.remove(link);
+	public ExpandedLink getLink(Link link) {
+		return mLinkPool.get(link);
 	}
 
 	/**
-	 * Suspend all ExpandedLinks.
+	 * Removes an ExpandedLink.
+	 * 
+	 * @param link
+	 *            The Link that references the ExpandedLink.
 	 */
-	public static void clear() {
-		LOGGER.trace("Method clear() called.");
-//		mPoolLinksSuspend.putAll(mPoolLinksActive);
-		mPoolLinksActive.clear();
+	public void release(Link link) {
+		mLinkPool.remove(link);
 	}
 
 	/**
-	 * Create a new ExpandedLink.
-	 * @param link the Link for the ExpandedLink.
-	 * @return the new ExpandedLink or null if the ExpandedLink already existed.
+	 * Removes all ExpandedLinks.
 	 */
-	public static ExpandedLink create(Link link) {
-		LOGGER.trace("Method create(" + link + ") called.");
-		if(mPoolLinksActive.containsKey(link)) {
+	public void clear() {
+		mLinkPool.clear();
+	}
+
+	/**
+	 * @param link
+	 *            The Link for the ExpandedLink.
+	 * @return The new ExpandedLink or null if the ExpandedLink already existed.
+	 */
+	public ExpandedLink create(Link link) {
+		if (mLinkPool.containsKey(link)) {
 			return null;
 		} else {
 			LOGGER.debug("Create new link.");
 			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
-			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
+			for (Metadata metadata : link.getMetadata()) {
+				NodeMetadata nodeMetadata = mMetadataPool.createOrGet(new RichMetadata(metadata, link));
 				metaList.add(nodeMetadata);
 			}
-			ExpandedLink expandedLink = new ExpandedLink(
-					link,
-					PoolNodeIdentifier.getActive(link.getIdentifiers().getFirst()),
-					PoolNodeIdentifier.getActive(link.getIdentifiers().getSecond()),
-					metaList
-			);
-			mPoolLinksActive.put(link, expandedLink);
+			ExpandedLink expandedLink = new ExpandedLink(link, mIdentifierPool.getIdentifier(link.getIdentifiers()
+					.getFirst()), mIdentifierPool.getIdentifier(link.getIdentifiers().getSecond()), metaList);
+			mLinkPool.put(link, expandedLink);
 			return expandedLink;
 		}
 	}
-
-//	/**
-//	 * Create or get a ExpandedLink and activate the ExpandedLink if suspend.
-//	 * @param link the Link for the ExpandedLink.
-//	 * @return the new ExpandedLink or the already existing ExpandedLink (active and suspend).
-//	 */
-//	public static ExpandedLink createOrActivate(Link link) {
-//		LOGGER.trace("Method create(" + link + ") called.");
-//		if(mPoolLinksActive.containsKey(link)) {
-//			/* ExpandedLink is active*/
-//			return null;
-//		} else if(mPoolLinksSuspend.containsKey(link)) {
-//			/* Activate ExpandedLink */
-//			ExpandedLink expandedLink = mPoolLinksSuspend.get(link);
-//			mPoolLinksActive.put(link, expandedLink);
-//			mPoolLinksSuspend.remove(link);
-//			return expandedLink;
-//		} else {
-//			/* Create new ExpandedLink */
-//			LOGGER.debug("Create new link.");
-//			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
-//			for(Metadata metadata : link.getMetadata()) {
-//				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(metadata);
-//				metaList.add(nodeMetadata);
-//			}
-//			ExpandedLink expandedLink = new ExpandedLink(
-//					link,
-//					PoolNodeIdentifier.getActive(link.getIdentifiers().getFirst()),
-//					PoolNodeIdentifier.getActive(link.getIdentifiers().getSecond()),
-//					metaList
-//			);
-//			mPoolLinksActive.put(link, expandedLink);
-//			return expandedLink;
-//		}
-//	}
-
-	/**
-	 * Create or get a ExpandedLink.
-	 * @param link the Link for the ExpandedLink.
-	 * @return the new ExpandedLink or the already existing ExpandedLink (active).
-	 * Null if the ExpandedLink is suspend.
-	 */
-	public static ExpandedLink createOrGet(Link link) {
-		LOGGER.trace("Method createOrGet(" + link + ") called.");
-		if(mPoolLinksActive.containsKey(link)) {
-			LOGGER.debug("Found existing link.");
-			return getActive(link);
-		} else {
-			LOGGER.debug("Create new link.");
-			List<NodeMetadata> metaList = new ArrayList<NodeMetadata>();
-			for(Metadata metadata : link.getMetadata()) {
-				NodeMetadata nodeMetadata = PoolNodeMetadata.createOrGet(new RichMetadata(metadata, link));
-				metaList.add(nodeMetadata);
-			}
-			ExpandedLink expandedLink = new ExpandedLink(
-					link,
-					PoolNodeIdentifier.getActive(link.getIdentifiers().getFirst()),
-					PoolNodeIdentifier.getActive(link.getIdentifiers().getSecond()),
-					metaList
-			);
-			mPoolLinksActive.put(link, expandedLink);
-			return expandedLink;
-		}
-	}
-
 }

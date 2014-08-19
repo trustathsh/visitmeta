@@ -12,17 +12,17 @@ package de.hshannover.f4.trust.metalyzer.semantics.entities;
 
 /*
  * #%L
- * ====================================================
- *   _____                _     ____  _____ _   _ _   _
- *  |_   _|_ __ _   _ ___| |_  / __ \|  ___| | | | | | |
- *    | | | '__| | | / __| __|/ / _` | |_  | |_| | |_| |
- *    | | | |  | |_| \__ \ |_| | (_| |  _| |  _  |  _  |
- *    |_| |_|   \__,_|___/\__|\ \__,_|_|   |_| |_|_| |_|
+ * =====================================================
+ *   _____                _     ____  _   _       _   _
+ *  |_   _|_ __ _   _ ___| |_  / __ \| | | | ___ | | | |
+ *    | | | '__| | | / __| __|/ / _` | |_| |/ __|| |_| |
+ *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
+ *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
  * 
  * =====================================================
  * 
- * Hochschule Hannover 
+ * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
@@ -30,8 +30,8 @@ package de.hshannover.f4.trust.metalyzer.semantics.entities;
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of VisITMeta, version 0.0.2, implemented by the Trust@FHH 
- * research group at the Hochschule Hannover.
+ * This file is part of visitmeta common, version 0.1.2,
+ * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@FHH
  * %%

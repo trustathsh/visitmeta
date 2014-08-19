@@ -18,7 +18,7 @@
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of visitmeta common, version 0.1.2,
+ * This file is part of visitmeta common, version 0.0.5,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@HsH
@@ -111,4 +111,43 @@ public interface GraphService {
 	 * {@link Delta} object containing updates and deletes in seperate data structures.
 	 */
 	public Delta getDelta(long t1, long t2);
+	
+	/**
+	 * Counts all current entities of the given type in the graph.
+	 * @param type
+	 * @return
+	 */
+	public long count(GraphType type);
+	
+	/**
+	 * Counts all entities of the given type in the graph at the given timestamp.
+	 * @param type
+	 * @return
+	 */
+	public long count(GraphType type, long timestamp);
+	
+	/**
+	 * Counts all entities of the given type in the graph in the given delta.
+	 * @param type
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public long count(GraphType type, long from, long to);
+	
+	/**
+	 * Returns the mean of edges in the graph.
+	 * Beware: It does not count actual links. It counts metadata on a given link.
+	 * 			If one link has several metadata, the link will be counted multiple times!
+	 * @return
+	 */
+	public double meanOfEdges();
+	
+	/**
+	 * Returns the mean of edges in the graph.
+	* Beware: It does not count actual links. It counts metadata on a given link.
+	 * 			If one link has several metadata, the link will be counted multiple times!
+	 * @return
+	 */
+	public double meanOfEdges(long timestamp);
 }

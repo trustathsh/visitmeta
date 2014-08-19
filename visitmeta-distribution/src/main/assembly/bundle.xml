@@ -17,6 +17,7 @@
 			<includes>
 				<include>de.hshannover.f4.trust.visitmeta:dataservice</include>
 				<include>de.hshannover.f4.trust.visitmeta:visualization</include>
+				<include>de.hshannover.f4.trust.visitmeta:metalyzer</include>
 			</includes>
 			<binaries>
 				<outputDirectory>${artifactId}</outputDirectory>
@@ -55,6 +56,8 @@
 			<outputDirectory>${artifactId}</outputDirectory>
 			<excludes>
 				<exclude>start-dataservice.sh</exclude>
+				<exclude>start-dataservice-osx.sh</exclude>
+				<exclude>start-dataservice.bat</exclude>
 			</excludes>
 		</fileSet>
 		
@@ -63,6 +66,15 @@
 			<outputDirectory>${artifactId}</outputDirectory>
 			<excludes>
 				<exclude>start-visualization.sh</exclude>
+			</excludes>
+		</fileSet>
+		
+		<fileSet>
+			<directory>${basedir}/../metalyzer/src/main/templates/</directory>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<excludes>
+				<exclude>start-metalyzer.sh</exclude>
+				<exclude>start-metalyzer.bat</exclude>
 			</excludes>
 		</fileSet>
 	</fileSets>
@@ -75,11 +87,35 @@
 			<filtered>true</filtered>
 		</file>
 		<file>
+			<source>${basedir}/../dataservice/src/main/templates/start-dataservice-osx.sh</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>${basedir}/../dataservice/src/main/templates/start-dataservice.bat</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>
+		<file>
 			<source>${basedir}/../visualization/src/main/templates/start-visualization.sh</source>
 			<outputDirectory>${artifactId}</outputDirectory>
 			<fileMode>755</fileMode>
 			<filtered>true</filtered>
 		</file>
+		<file>
+			<source>${basedir}/../metalyzer/src/main/templates/start-metalyzer.sh</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>${basedir}/../metalyzer/src/main/templates/start-metalyzer.bat</source>
+			<outputDirectory>${artifactId}</outputDirectory>
+			<fileMode>755</fileMode>
+			<filtered>true</filtered>
+		</file>		
 		<file>
 			<source>${basedir}/../visualization/src/main/java/com/github/ernieyu/swingRangeSlider/LICENSE.txt</source>
 			<destName>LICENSE-swingRangeSlider.txt</destName>

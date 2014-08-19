@@ -71,6 +71,7 @@ import de.hshannover.f4.trust.visitmeta.implementations.internal.DeltaImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
@@ -518,5 +519,35 @@ public class ProxyGraphService implements GraphService {
             return new GregorianCalendar().getTimeInMillis();
         }
     }
+
+	@Override
+	public long count(GraphType type) {
+		log.error("Not implemented!");
+		throw new RuntimeException("Not implemented!");
+	}
+
+	@Override
+	public long count(GraphType type, long timestamp) {
+		log.error("Not implemented!");
+		throw new RuntimeException("Not implemented!");
+	}
+
+	@Override
+	public long count(GraphType type, long from, long to) {
+		log.error("Not implemented!");
+		throw new RuntimeException("Not implemented!");
+	}
+
+	@Override
+	public double meanOfEdges() {
+		log.error("Not implemented!");
+		throw new RuntimeException("Not implemented!");
+	}
+
+	@Override
+	public double meanOfEdges(long timestamp) {
+		log.error("Not implemented!");
+		throw new RuntimeException("Not implemented!");
+	}
 	
 }

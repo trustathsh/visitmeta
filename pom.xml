@@ -56,6 +56,7 @@
 		<module>common</module>
 		<module>dataservice</module>
 		<module>visualization</module>
+		<module>metalyzer</module>
 
 		<!-- the distribution module must be the last one -->
 		<module>visitmeta-distribution</module>
@@ -79,6 +80,17 @@
 					<descriptorRefs>
 						<descriptorRef>project</descriptorRef>
 					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- Excludes statistics test package wegen dependency Problemen zu jri -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.16</version>
+				<configuration>
+					<excludes>
+						<exclude>**/statistics/*.java</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>

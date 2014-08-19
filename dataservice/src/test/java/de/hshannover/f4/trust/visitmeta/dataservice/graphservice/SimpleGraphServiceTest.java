@@ -76,6 +76,7 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTypeLabels;
 public class SimpleGraphServiceTest {
 
 	private Reader mReader;
+	private Executor mExecutor;
 	private GraphDatabaseService mGraphDb;
 
 	@Before
@@ -92,6 +93,7 @@ public class SimpleGraphServiceTest {
 		when(dbConnection.getTimestampManager()).thenReturn(timestampManager);
 		when(dbConnection.getConnection()).thenReturn(mGraphDb);
 		mReader = new Neo4JReader(repo, dbConnection);
+		mExecutor = new Neo4JExecutor(dbConnection);
 	}
 
 	@After
@@ -247,7 +249,7 @@ public class SimpleGraphServiceTest {
 	@Test
 	public void testDeltaForSameTimeShouldBeEmpty() {
 		final long timestamp = 42;
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
 				timestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		Delta delta = sgs.getDelta(timestamp, timestamp);
@@ -259,7 +261,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfUpdatesInCaseOfUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -274,7 +276,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectContentOfUpdatesInCaseOfUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -297,7 +299,7 @@ public class SimpleGraphServiceTest {
 
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesInCaseOfUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -312,7 +314,7 @@ public class SimpleGraphServiceTest {
 
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfUpdatesInCaseOfDelete() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -328,7 +330,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesInCaseOfDelete() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -344,7 +346,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectContentOfDeletesInCaseOfDelete() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -368,7 +370,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesAndUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -386,7 +388,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnAIdentiferWithMetadataUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		final String newMeta = "event50";
@@ -405,7 +407,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnAIdentiferWithMetadataDeletes() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		final String deletedMetadata = "event50";
@@ -425,7 +427,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTwoIdentifiersWithMetadataUpdates() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		final String newMeta = "metadata50";
@@ -445,7 +447,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnCorrectResultsForUpdatesAndDeletes() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 
@@ -486,7 +488,7 @@ public class SimpleGraphServiceTest {
 	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldSwapTheTimestampsIntoProperOrder() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		final long secondTimestamp = 50;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
@@ -501,7 +503,7 @@ public class SimpleGraphServiceTest {
 
 	@Test
 	public void identifierGraphObjectsContainCorrectTimestamp() {
-		SimpleGraphService sgs = new SimpleGraphService(mReader, new DummyGraphCache());
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		final long firstTimestamp = 42;
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
 				firstTimestamp , InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);

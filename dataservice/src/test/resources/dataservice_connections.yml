@@ -5,3 +5,8 @@ default: !Connection
   userPass: visitmeta
   url: https://localhost:8443
   startupConnect: true
+  subscribeList:
+  - identifier: pdp1
+    identifierType: device
+    subscribeName: default
+    startupSubscribe: true

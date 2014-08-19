@@ -47,6 +47,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphCach
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
@@ -77,6 +78,8 @@ public class Neo4JDatabase {
 	private Thread writerThread;
 
 	private Reader mReader;
+	
+	private Executor mExecutor;
 
 
 	public Neo4JDatabase(String connectionName){
@@ -115,6 +118,7 @@ public class Neo4JDatabase {
 
 	private void initGraphService() {
 		mReader = new Neo4JReader(neo4jRepo, neo4jDb);
+		mExecutor = new Neo4JExecutor(neo4jDb);
 
 		GraphCache cache = null;
 
@@ -124,7 +128,7 @@ public class Neo4JDatabase {
 			cache = new DummyGraphCache();
 		}
 
-		mGraphService = new SimpleGraphService(mReader, cache);
+		mGraphService = new SimpleGraphService(mReader,mExecutor, cache);
 	}
 
 	public Writer getWriter() {

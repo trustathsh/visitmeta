@@ -49,6 +49,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
+import de.hshannover.f4.trust.metalyzer.api.MetalyzerAPI;
+import de.hshannover.f4.trust.metalyzer.semantics.debug.SemanticsMain;
+import de.hshannover.f4.trust.metalyzer.semantics.services.SemanticsController;
+import de.hshannover.f4.trust.metalyzer.statistic.StatisticController;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
@@ -90,6 +94,19 @@ public abstract class Application {
 	private static RestService restService;
 
 	private static Thread restServiceThread;
+	
+	/**
+	 * Metalyzer Classes
+	 */
+	private static MetalyzerAPI metaAPI;
+	private static SemanticsController semCon;
+	private static StatisticController statCon;
+	
+	/**
+	 * Metalyzer Debug Classes
+	 */
+	private static SemanticsMain semMain;
+	private static Thread semMainThread;
 
 	/**
 	 * @param args
@@ -114,8 +131,30 @@ public abstract class Application {
 		} catch (ConnectionException e) {
 			log.error("error while startupConnect", e);
 		}
+		
+		startMetalyzer();
+		startMetalyzerDebug();
 
 		log.info("dataservice started successfully");
+	}
+	
+	private static void startMetalyzerDebug(){
+		log.info("Starting Metalyzer Debug...");
+		semMain= new SemanticsMain();
+		semMainThread= new Thread(semMain, "Semantics Debug Thread");
+		
+		semMainThread.start();
+		
+		log.info("Metalyzer Debug started successfully.");
+	}
+	
+	private static void startMetalyzer(){
+		log.info("Starting Metalyzer...");
+		metaAPI= MetalyzerAPI.getInstance();
+		semCon= SemanticsController.getInstance();
+		statCon= StatisticController.getInstance();
+		statCon.setMetalyzerApi(metaAPI);
+		log.info("Metalyzer started successfully");
 	}
 
 	private static void startupConnect() throws ConnectionException {

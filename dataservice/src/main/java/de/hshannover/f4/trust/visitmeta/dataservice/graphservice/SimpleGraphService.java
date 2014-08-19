@@ -56,8 +56,10 @@ import de.hshannover.f4.trust.visitmeta.dataservice.util.GraphHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
 
@@ -69,15 +71,18 @@ public class SimpleGraphService implements GraphService {
 	private Reader mReader;
 
 	private GraphCache mCache;
+	
+	private Executor mExecutor;
 
 	private SimpleGraphService() {
 		log.trace("new SimpleGraphService");
 	}
 
-	public SimpleGraphService(Reader r, GraphCache cache) {
+	public SimpleGraphService(Reader r, Executor e, GraphCache cache) {
 		this();
 		mReader = r;
 		mCache = cache;
+		mExecutor = e;
 	}
 
 	@Override
@@ -415,5 +420,30 @@ public class SimpleGraphService implements GraphService {
 				}
 			}
 		}
+	}
+
+	@Override
+	public long count(GraphType type) {
+		return mExecutor.count(type);
+	}
+
+	@Override
+	public long count(GraphType type, long timestamp) {
+		return mExecutor.count(type, timestamp);
+	}
+
+	@Override
+	public long count(GraphType type, long from, long to) {
+		return mExecutor.count(type, from, to);
+	}
+
+	@Override
+	public double meanOfEdges() {
+		return mExecutor.meanOfEdges();
+	}
+
+	@Override
+	public double meanOfEdges(long timestamp) {
+		return mExecutor.meanOfEdges(timestamp);
 	}
 }

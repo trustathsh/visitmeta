@@ -56,6 +56,12 @@ public class Neo4JPropertyConstants {
 	public static final String HIDDEN_PROPERTIES_KEY_PREFIX = "neo4j_";
 
 	/**
+	 * The key for the type of the node, e.g. values behind this key are
+	 * "identifier", "link" or "Metadata".
+	 */
+	public static final String NODE_TYPE_KEY = HIDDEN_PROPERTIES_KEY_PREFIX + "type";
+	
+	/**
 	 * The key for the "hash" property of nodes.
 	 */
 	public static final String KEY_HASH = HIDDEN_PROPERTIES_KEY_PREFIX
@@ -100,6 +106,21 @@ public class Neo4JPropertyConstants {
 	 */
 	public static final String KEY_RAW_DATA = HIDDEN_PROPERTIES_KEY_PREFIX + "rawData";
 
+	/**
+	 * KEY_TYPE_NAME value for Links.
+	 */
+	public static final String VALUE_TYPE_NAME_LINK = "link";
+	
+	/**
+	 * KEY_TYPE_NAME value for Metadata;
+	 */
+	public static final String VALUE_TYPE_NAME_METADATA = "metadata";
+	
+	/**
+	 * KEY_TYPE_NAME value for Identifiers;
+	 */
+	public static final String VALUE_TYPE_NAME_IDENTIFIER = "identifier";
+	
 	/**
 	 * Key for the timestamp property of the Neo4J reference node, indicating the time of last
 	 * change of the graph.

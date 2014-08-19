@@ -53,6 +53,7 @@ import org.apache.log4j.Logger;
 import org.neo4j.cypher.ExecutionEngine;
 import org.neo4j.cypher.ExecutionResult;
 import org.neo4j.cypher.SyntaxException;
+import org.neo4j.kernel.impl.util.StringLogger;
 
 import scala.collection.Iterator;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
@@ -71,7 +72,7 @@ public class Neo4JExecutor implements Executor {
 	private ExecutionEngine cypher;
 	
 	private static final Logger log = Logger.getLogger(Neo4JExecutor.class);
-	
+
 	private final String ALL_IDENTIFIER = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_IDENTIFIER + "')";
 	
 	private final String ALL_LINKS = "START l=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_LINK + "')";
@@ -83,7 +84,7 @@ public class Neo4JExecutor implements Executor {
 	 * @param db
 	 */
 	public Neo4JExecutor(Neo4JConnection db) {
-		cypher = new ExecutionEngine(db.getConnection());
+		cypher = new ExecutionEngine(db.getConnection(), StringLogger.DEV_NULL);
 	}
 	
 	/**

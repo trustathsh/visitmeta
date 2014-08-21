@@ -85,6 +85,48 @@ public class Properties {
 
 	public boolean getBoolean(String propertyKey) {
 		return (boolean) getValue(propertyKey);
+	/**
+	 * Set and save the value under the key.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param propertyValue Only String|int|double|boolean
+	 * @throws PropertyException
+	 */
+	public void set(String propertyPath, Object propertyValue) throws PropertyException {
+		// check propertyPath
+		NullCheck.check(propertyPath, "propertyPath is null");
+
+		// check propertyValue
+		if(!(propertyValue instanceof String) && !(propertyValue instanceof Integer)
+				&& !(propertyValue instanceof Double) && !(propertyValue instanceof Boolean)){
+			throw new PropertyException("Only String|int|double|boolean can be set!");
+		}
+
+		// split propertyPath
+		String[] propertyKeyArray = propertyPath.split("\\.");
+
+		// build new Map's and add to root map
+		if(propertyKeyArray.length > 1){
+			Map<String, Object> tmpValueMap = new HashMap<String, Object>();
+			tmpValueMap.put(propertyKeyArray[propertyKeyArray.length-1], propertyValue);
+
+			for(int i=propertyKeyArray.length-2; i >= 1; i--){
+				Map<String, Object> tmp = new HashMap<String, Object>();
+				tmp.put(propertyKeyArray[i], tmpValueMap);
+				tmpValueMap = tmp;
+			}
+
+			mApplicationConfigs.put(propertyKeyArray[0], tmpValueMap);
+		}else{
+			mApplicationConfigs.put(propertyPath, propertyValue);
+		}
+
+		// save all
+		try {
+			save();
+		} catch (FileNotFoundException e) {
+			throw new PropertyException("File " + mFileName + " not found!");
+		}
 	}
 
 	@Override

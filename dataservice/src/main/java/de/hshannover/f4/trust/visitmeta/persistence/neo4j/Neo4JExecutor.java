@@ -122,7 +122,7 @@ public class Neo4JExecutor implements Executor {
 			source = ALL_IDENTIFIER;
 			
 			// Using an "or" in match
-			match = "MATCH (m)-[?:Meta]-(i)-[?:Link]-(l)-[:Meta]-(m)";
+			match = "MATCH (m)-[:Meta]-(i)-[:Link]-(l)-[:Meta]-(m)";
 			
 			countReturn = "RETURN count(distinct i) as result";
 			

@@ -106,7 +106,7 @@ public class Neo4JExecutorTest {
 	
 	private void buildIdentifierQuerieAtCurrent() {
 		String source = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_IDENTIFIER + "')";
-		String match = "MATCH (m)-[?:Meta]-(i)-[?:Link]-(l)-[:Meta]-(m)";
+		String match = "MATCH (m)-[:Meta]-(i)-[:Link]-(l)-[:Meta]-(m)";
 		String countReturn = "RETURN count(distinct i) as result";
 		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
 		

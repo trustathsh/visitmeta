@@ -56,8 +56,19 @@ public class Properties {
 		return context;
 	}
 
-	public Object getValue(String propertyKey) {
-		return mApplicationConfigs.get(propertyKey);
+	@SuppressWarnings("unchecked")
+	public Object getValue(String propertyPath) {
+		String[] propertyKeyArray = propertyPath.split("\\.");
+		Map<String, Object> applicationConfigs = mApplicationConfigs;
+		for(int i=0; i<propertyKeyArray.length; i++){
+			Object tmp = applicationConfigs.get(propertyKeyArray[i]);
+			if(tmp instanceof Map){
+				applicationConfigs = (Map<String, Object>) applicationConfigs.get(propertyKeyArray[i]);
+			}else if(tmp instanceof String || tmp instanceof Integer || tmp instanceof Double || tmp instanceof Boolean){
+				return tmp;
+			}
+		}
+		return null;
 	}
 
 	public String getString(String propertyKey) {

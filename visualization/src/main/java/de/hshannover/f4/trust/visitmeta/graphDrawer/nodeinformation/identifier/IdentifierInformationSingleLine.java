@@ -96,11 +96,20 @@ public class IdentifierInformationSingleLine extends IdentifierInformationStrate
 	public String createTextForIdentity(IdentifierWrapper wrapper) {
 		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "type");	// type
 		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name");	// name
+		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition");	// other-type-definition
 
 		StringBuilder sb = new StringBuilder();
 		if (type.equals("other")) {
 			sb.append("extended-identifier: ");
-			sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
+			int idxFirstSemicolon = name.indexOf(";");
+			if (idxFirstSemicolon != -1) {
+				sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
+			} else {
+				sb.append(name);	// name
+				sb.append(" (");
+				sb.append(otherTypeDefinition);	// other-type-definition
+				sb.append(")");
+			}
 		} else {
 			sb.append(wrapper.getTypeName());
 			sb.append(": ");

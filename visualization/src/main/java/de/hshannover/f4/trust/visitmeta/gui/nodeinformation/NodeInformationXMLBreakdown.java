@@ -242,21 +242,25 @@ public class NodeInformationXMLBreakdown extends NodeInformationStrategy {
 			IdentifierWrapper wrapper) {
 		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "-");
 		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "-");
+		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "-");
 
 		DefaultMutableTreeNode root;
 		DefaultMutableTreeNode childNode;
 
 		if (type.equals("other")) {
-			root = new DefaultMutableTreeNode("<html>" + name.substring(name.indexOf(";") + 1, name.indexOf(" ")) + " <i>(extended-identifier)</i></html>");
+			if (otherTypeDefinition.equals("extended")) {
+				root = new DefaultMutableTreeNode("<html>" + name.substring(name.indexOf(";") + 1, name.indexOf(" ")) + " <i>(extended-identifier)</i></html>");
 
-			childNode = handleExtendedIdentifierName(name);
-			root.add(childNode);
-
+				childNode = handleExtendedIdentifierName(name);
+				root.add(childNode);
+			} else {
+				root = new DefaultMutableTreeNode("<html>" + name + " <i>(extended-identifier)</i></html>");
+			}
 			childNode = new DefaultMutableTreeNode("<html><b>type:</b> " + type + "</html>");
 			childNode.setAllowsChildren(false);
 			root.add(childNode);
 
-			childNode = new DefaultMutableTreeNode("<html><b>other-type-definition:</b> " + wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "-") + "</html>");
+			childNode = new DefaultMutableTreeNode("<html><b>other-type-definition:</b> " + otherTypeDefinition + "</html>");
 			childNode.setAllowsChildren(false);
 			root.add(childNode);
 		} else {

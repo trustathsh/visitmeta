@@ -36,46 +36,28 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.exception;
+package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
+public class ConnectionException extends Exception {
 
+	private static final long serialVersionUID = 685270918564136642L;
 
-import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
-import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
+	private String mMsg;
 
-public class IfmapConnectionException extends ConnectionException {
+	public ConnectionException(){
 
-
-	private static final long serialVersionUID = -1557730289942824556L;
-
-	private IfmapException mIfmapException;
-	private IfmapErrorResult mErrorResult;
-
-	public IfmapConnectionException(IfmapErrorResult errorResult){
-		mErrorResult = errorResult;
 	}
 
-	public IfmapConnectionException(IfmapException ifMapException){
-		mIfmapException = ifMapException;
+	public ConnectionException(String msg){
+		mMsg = msg;
 	}
 
 	@Override
 	public String toString() {
-		if(mIfmapException != null){
-			return super.toString() + " IfmapException[Description: " + mIfmapException.getDescription() + " || Message: " + mIfmapException.getMessage() + "]";
-		}else if(mErrorResult != null){
-			return super.toString() + " IfmapErrorResult[ErrorString: " + mErrorResult.getErrorString() + " || Message: " + mErrorResult.getMessage() + "]";
-		}else{
-			return super.toString();
+		if(mMsg != null){
+			return this.getClass().getSimpleName() + "(" + mMsg + ")";
+		}else {
+			return this.getClass().getSimpleName();
 		}
 	}
-
-	public IfmapErrorResult getErrorResult() {
-		return mErrorResult;
-	}
-
-	public IfmapException getIfmapException () {
-		return mIfmapException;
-	}
-
 }

@@ -36,11 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.exception;
+package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
-public class ConnectionEstablishedException extends ConnectionException {
+public class NoSavedConnectionException extends ConnectionException {
 
 
-	private static final long serialVersionUID = 508775594043936595L;
+	private static final long serialVersionUID = -4720511483677862815L;
 
 }

@@ -36,11 +36,46 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.exception;
-
-public class NoSavedConnectionException extends ConnectionException {
+package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
 
-	private static final long serialVersionUID = -4720511483677862815L;
+
+import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
+
+public class IfmapConnectionException extends ConnectionException {
+
+
+	private static final long serialVersionUID = -1557730289942824556L;
+
+	private IfmapException mIfmapException;
+	private IfmapErrorResult mErrorResult;
+
+	public IfmapConnectionException(IfmapErrorResult errorResult){
+		mErrorResult = errorResult;
+	}
+
+	public IfmapConnectionException(IfmapException ifMapException){
+		mIfmapException = ifMapException;
+	}
+
+	@Override
+	public String toString() {
+		if(mIfmapException != null){
+			return super.toString() + " IfmapException[Description: " + mIfmapException.getDescription() + " || Message: " + mIfmapException.getMessage() + "]";
+		}else if(mErrorResult != null){
+			return super.toString() + " IfmapErrorResult[ErrorString: " + mErrorResult.getErrorString() + " || Message: " + mErrorResult.getMessage() + "]";
+		}else{
+			return super.toString();
+		}
+	}
+
+	public IfmapErrorResult getErrorResult() {
+		return mErrorResult;
+	}
+
+	public IfmapException getIfmapException () {
+		return mIfmapException;
+	}
 
 }

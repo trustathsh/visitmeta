@@ -66,11 +66,11 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifier
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionCloseException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionEstablishedException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.IfmapConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.NotConnectedException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
@@ -132,7 +132,7 @@ public class Connection {
 
 	/**
 	 * Represents an IF-MAP connection to a MAP server.
-	 * If not changed by yourself, following default values ​​are set:
+	 * If not changed by yourself, following default values are set:
 	 * <ul>
 	 * 	<li>AuthenticationBasic = true</li>
 	 * 	<li>TruststorePath = see config.property(ifmap.truststore.path)</li>

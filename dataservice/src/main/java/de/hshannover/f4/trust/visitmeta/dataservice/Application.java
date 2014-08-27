@@ -55,9 +55,9 @@ import de.hshannover.f4.trust.metalyzer.semantics.services.SemanticsController;
 import de.hshannover.f4.trust.metalyzer.statistic.StatisticController;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
 

@@ -55,8 +55,8 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.metalyzer.api.exception.MetalyzerAPIException;
 import de.hshannover.f4.trust.metalyzer.api.exception.NegativeTimestampException;
 import de.hshannover.f4.trust.metalyzer.api.exception.TimestampException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 /**

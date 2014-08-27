@@ -50,8 +50,8 @@ import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.exception.NoSavedConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 public class ConnectionManager {

@@ -36,28 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.exception;
+package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
-public class ConnectionException extends Exception {
+public class ConnectionEstablishedException extends ConnectionException {
 
-	private static final long serialVersionUID = 685270918564136642L;
 
-	private String mMsg;
+	private static final long serialVersionUID = 508775594043936595L;
 
-	public ConnectionException(){
-
-	}
-
-	public ConnectionException(String msg){
-		mMsg = msg;
-	}
-
-	@Override
-	public String toString() {
-		if(mMsg != null){
-			return this.getClass().getSimpleName() + "(" + mMsg + ")";
-		}else {
-			return this.getClass().getSimpleName();
-		}
-	}
 }

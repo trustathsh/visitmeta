@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.exception;
+package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
 
 public class ConnectionCloseException extends ConnectionException {

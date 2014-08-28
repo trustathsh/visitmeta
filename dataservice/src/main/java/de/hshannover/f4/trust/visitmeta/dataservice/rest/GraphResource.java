@@ -49,12 +49,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.ApplicationFacade;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.exception.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
@@ -79,6 +81,8 @@ import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 public class GraphResource {
 
 	private static final Logger log = Logger.getLogger(GraphResource.class);
+
+	@Context ApplicationFacade application;
 
 	@QueryParam("rawData")
 	@DefaultValue("false")

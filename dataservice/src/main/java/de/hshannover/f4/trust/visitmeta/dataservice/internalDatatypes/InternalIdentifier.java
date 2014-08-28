@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes;
 
-
-
 import java.util.Collections;
 import java.util.List;
 
@@ -49,10 +47,10 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 /**
  * Internal representation of an IF-MAP identifier.
  */
-public abstract class InternalIdentifier implements Propable{
+public abstract class InternalIdentifier implements Propable {
 	/**
-	 * Returns the raw, unparsed XML data used to describe this Identifier. <b>Note: The xml version
-	 * and encoding is included.</b>
+	 * Returns the raw, unparsed XML data used to describe this Identifier.
+	 * <b>Note: The xml version and encoding is included.</b>
 	 */
 	public abstract String getRawData();
 
@@ -62,13 +60,20 @@ public abstract class InternalIdentifier implements Propable{
 	public abstract void clearMetadata();
 
 	public abstract void addMetadata(InternalMetadata meta);
+
 	public abstract void removeMetadata(InternalMetadata meta);
+
+	public abstract void removeMetadata(InternalMetadata meta,
+			boolean isSingleValueDependent);
+
 	public abstract void updateMetadata(InternalMetadata meta);
+
 	public abstract boolean hasMetadata(InternalMetadata meta);
 
 	/**
-	 * Removes all Links connected to the Identifier. <b>Note: The List containing the Links 
-	 * is just cleared. The connected identifier is left unchanged.</b>
+	 * Removes all Links connected to the Identifier. <b>Note: The List
+	 * containing the Links is just cleared. The connected identifier is left
+	 * unchanged.</b>
 	 */
 	public abstract void clearLinks();
 
@@ -154,9 +159,11 @@ public abstract class InternalIdentifier implements Propable{
 	}
 
 	/**
-	 * Checks if this identifier is valid at the given timestamp.
-	 * An identifier is valid if it has any link or metadata which is valid.
-	 * @param timestamp the timestamp to check
+	 * Checks if this identifier is valid at the given timestamp. An identifier
+	 * is valid if it has any link or metadata which is valid.
+	 * 
+	 * @param timestamp
+	 *            the timestamp to check
 	 * @return the result wether it is valid or not
 	 */
 	public boolean isValidAt(long timestamp) {
@@ -176,10 +183,12 @@ public abstract class InternalIdentifier implements Propable{
 	}
 
 	/**
-	 * Performs a kind of equals check, but for Objects implementing the Identifier interface.
-	 * An Identifier and an InternalIdentifier are equal if they have the same typename and 
-	 * the same properties.
-	 * @param identifier The Identifier to compare with
+	 * Performs a kind of equals check, but for Objects implementing the
+	 * Identifier interface. An Identifier and an InternalIdentifier are equal
+	 * if they have the same typename and the same properties.
+	 * 
+	 * @param identifier
+	 *            The Identifier to compare with
 	 * @return Wether the identifier is "the same" as this object or not
 	 */
 	public boolean sameAs(Identifier identifier) {

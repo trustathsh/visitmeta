@@ -141,7 +141,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 		try {
 			Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Link)
 					.iterator();
-	
+
 			while (i.hasNext()) {
 				Relationship r = i.next();
 				InternalLink link = mRepo.getLink(r.getEndNode().getId());
@@ -161,7 +161,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 		try {
 			Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Meta)
 					.iterator();
-	
+
 			while (i.hasNext()) {
 				Relationship r = i.next();
 				InternalMetadata metadata = mRepo.getMetadata(r.getEndNode()
@@ -211,14 +211,36 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	 */
 	@Override
 	public void removeMetadata(InternalMetadata m) {
+		removeMetadata(m, true);
+	}
+
+	/**
+	 * Removes a given Metadata from the Identifier
+	 * 
+	 * @param Metadata
+	 *            to remove
+	 * @param isSingleValueDependent
+	 *            whether singleValue Metadata of the same time should be
+	 *            considered as equal
+	 */
+	@Override
+	public void removeMetadata(InternalMetadata m,
+			boolean isSingleValueDependent) {
 		Transaction tx = mRepo.beginTx();
 		try {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
-				if (m.equalsForLinks(n4jm)) {
-					mRepo.removeMetadata(n4jm.getNode());
-					break;
+				if (!isSingleValueDependent) {
+					if (m.equals(n4jm)) {
+						mRepo.removeMetadata(n4jm.getNode());
+						break;
+					}
+				} else {
+					if (m.equalsForLinks(n4jm)) {
+						mRepo.removeMetadata(n4jm.getNode());
+						break;
+					}
 				}
 			}
 			tx.success();
@@ -242,8 +264,8 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
 				if (m.equalsForLinks(n4jm)) {
-					Neo4JMetadata newM = (Neo4JMetadata) mRepo.updateMetadata(n4jm,
-							m);
+					Neo4JMetadata newM = (Neo4JMetadata) mRepo.updateMetadata(
+							n4jm, m);
 					mRepo.connectMeta(this, newM);
 					break;
 				}

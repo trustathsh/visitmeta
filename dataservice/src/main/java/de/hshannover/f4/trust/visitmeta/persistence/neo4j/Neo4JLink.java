@@ -157,14 +157,36 @@ public class Neo4JLink extends InternalLink {
 	 */
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
+		removeMetadata(meta, true);
+	}
+
+	/**
+	 * Removes a given Metadata from the Link
+	 * 
+	 * @param Metadata
+	 *            to remove
+	 * @param isSingleValueDependent
+	 *            whether singleValue Metadata of the same time should be
+	 *            considered as equal
+	 */
+	@Override
+	public void removeMetadata(InternalMetadata meta,
+			boolean isSingleValueDependent) {
 		Transaction tx = mRepo.beginTx();
 		try {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo
 						.getMetadata(r.getEndNode().getId());
-				if (meta.equalsForLinks(neo4jMetadata)) {
-					mRepo.remove(neo4jMetadata.getNode().getId());
-					break;
+				if (!isSingleValueDependent) {
+					if (meta.equals(neo4jMetadata)) {
+						mRepo.remove(neo4jMetadata.getNode().getId());
+						break;
+					}
+				} else {
+					if (meta.equalsForLinks(neo4jMetadata)) {
+						mRepo.remove(neo4jMetadata.getNode().getId());
+						break;
+					}
 				}
 			}
 			tx.success();

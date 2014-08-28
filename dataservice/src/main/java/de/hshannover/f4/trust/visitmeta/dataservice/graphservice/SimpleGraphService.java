@@ -262,14 +262,14 @@ public class SimpleGraphService implements GraphService {
 	private void stripMetadataFromIdentifier(InternalIdentifier id,
 			List<InternalMetadata> metadata) {
 		for (InternalMetadata meta : metadata) {
-			id.removeMetadata(meta);
+			id.removeMetadata(meta, false);
 		}
 	}
 
 	private void stripMetadataFromLink(InternalLink link,
 			List<InternalMetadata> metadata) {
 		for (InternalMetadata meta : metadata) {
-			link.removeMetadata(meta);
+			link.removeMetadata(meta, false);
 		}
 	}
 

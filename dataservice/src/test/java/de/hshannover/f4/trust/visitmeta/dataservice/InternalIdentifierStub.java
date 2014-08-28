@@ -97,6 +97,11 @@ public class InternalIdentifierStub extends InternalIdentifier {
 
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
+		removeMetadata(meta, true);
+	}
+	
+	@Override
+	public void removeMetadata(InternalMetadata meta, boolean isSingleValueDependent) {
 		throw new UnsupportedOperationException();
 	}
 	

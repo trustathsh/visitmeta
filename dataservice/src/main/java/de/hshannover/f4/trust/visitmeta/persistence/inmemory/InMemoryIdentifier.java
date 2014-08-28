@@ -38,9 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
-
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,7 +72,7 @@ public class InMemoryIdentifier extends InternalIdentifier {
 	 * Creates a new InternalIdentifier based on the original.
 	 * {@link InMemoryMetadata} and properties are copied, but its
 	 * {@link InMemoryLink}s are removed.
-	 *
+	 * 
 	 * @param original
 	 *            The original identifier
 	 */
@@ -96,12 +93,12 @@ public class InMemoryIdentifier extends InternalIdentifier {
 	public InMemoryIdentifier clone() {
 		return new InMemoryIdentifier(this);
 	}
-	
+
 	@Override
 	public void clearMetadata() {
 		mMeta.clear();
 	}
-	
+
 	@Override
 	public void addMetadata(InternalMetadata meta) {
 		mMeta.add(meta);
@@ -109,37 +106,50 @@ public class InMemoryIdentifier extends InternalIdentifier {
 
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
+		removeMetadata(meta, true);
+	}
+
+	@Override
+	public void removeMetadata(InternalMetadata meta,
+			boolean isSingleValueDependent) {
 		InternalMetadata toRemove = null;
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
-				toRemove = m;
-				break;
+		for (InternalMetadata m : mMeta) {
+			if (!isSingleValueDependent) {
+				if (m.equals(meta)) {
+					toRemove = m;
+					break;
+				}
+			} else {
+				if (m.equalsForLinks(meta)) {
+					toRemove = m;
+					break;
+				}
 			}
 		}
-		if(toRemove != null) {
+		if (toRemove != null) {
 			mMeta.remove(toRemove);
 		}
 	}
-	
+
 	@Override
 	public void updateMetadata(InternalMetadata meta) {
 		InternalMetadata toUpdate = null;
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsForLinks(meta)) {
 				toUpdate = m;
 				break;
 			}
 		}
-		if(toUpdate != null) {
+		if (toUpdate != null) {
 			mMeta.remove(toUpdate);
 			mMeta.add(meta);
 		}
 	}
-	
+
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsForLinks(meta)) {
 				return true;
 			}
 		}
@@ -195,9 +205,9 @@ public class InMemoryIdentifier extends InternalIdentifier {
 		mLinks.remove(link);
 	}
 
-
 	/**
 	 * IMPORTANT: This method is supposed to be called by the repository only.
+	 * 
 	 * @param l
 	 */
 	void addLink(InMemoryLink link) {

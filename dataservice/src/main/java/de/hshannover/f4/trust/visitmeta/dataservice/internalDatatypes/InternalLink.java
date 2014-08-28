@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes;
 
-
-
 import java.util.List;
 
 /**
@@ -47,11 +45,20 @@ import java.util.List;
  */
 public abstract class InternalLink {
 	public abstract void addMetadata(InternalMetadata meta);
+
 	public abstract void clearMetadata();
+
 	public abstract void removeMetadata(InternalMetadata meta);
+
+	public abstract void removeMetadata(InternalMetadata meta,
+			boolean isSingleValueDependent);
+
 	public abstract void updateMetadata(InternalMetadata meta);
+
 	public abstract boolean hasMetadata(InternalMetadata meta);
+
 	public abstract InternalIdentifierPair getIdentifiers();
+
 	public abstract List<InternalMetadata> getMetadata();
 
 	@Override
@@ -76,14 +83,18 @@ public abstract class InternalLink {
 	public boolean equals(Object o) {
 		if (o == null)
 			return false;
-		if (! (o instanceof InternalLink))
+		if (!(o instanceof InternalLink))
 			return false;
 		InternalLink other = (InternalLink) o;
-		if (getIdentifiers().getFirst().equals(other.getIdentifiers().getFirst())) {
-			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getSecond()))
+		if (getIdentifiers().getFirst().equals(
+				other.getIdentifiers().getFirst())) {
+			if (getIdentifiers().getSecond().equals(
+					other.getIdentifiers().getSecond()))
 				return true;
-		} else if (getIdentifiers().getFirst().equals(other.getIdentifiers().getSecond())) {
-			if (getIdentifiers().getSecond().equals(other.getIdentifiers().getFirst()))
+		} else if (getIdentifiers().getFirst().equals(
+				other.getIdentifiers().getSecond())) {
+			if (getIdentifiers().getSecond().equals(
+					other.getIdentifiers().getFirst()))
 				return true;
 		}
 		return false;
@@ -93,20 +104,22 @@ public abstract class InternalLink {
 	public int hashCode() {
 		int prime = 31;
 		int result = 1;
-		result = prime * result +
-				getIdentifiers().getFirst().hashCode() + getIdentifiers().getSecond().hashCode();
+		result = prime * result + getIdentifiers().getFirst().hashCode()
+				+ getIdentifiers().getSecond().hashCode();
 		return result;
 	}
 
 	/**
-	 * Checks if this link is valid at the given timestamp.
-	 * A link is valid if it has any metadata which is valid.
-	 * @param timestamp the timestamp to check
+	 * Checks if this link is valid at the given timestamp. A link is valid if
+	 * it has any metadata which is valid.
+	 * 
+	 * @param timestamp
+	 *            the timestamp to check
 	 * @return the result wether it is valid or not
 	 */
 	public boolean isValidAt(long timestamp) {
-		for(InternalMetadata m : getMetadata()) {
-			if(((InternalMetadata) m).isValidAt(timestamp)) {
+		for (InternalMetadata m : getMetadata()) {
+			if (((InternalMetadata) m).isValidAt(timestamp)) {
 				return true;
 			}
 		}

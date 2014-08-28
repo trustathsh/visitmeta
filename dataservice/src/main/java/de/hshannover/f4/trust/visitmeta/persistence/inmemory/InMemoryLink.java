@@ -38,9 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
-
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,7 +68,7 @@ public class InMemoryLink extends InternalLink {
 	 * Creates a new InternalLink based on the original.
 	 * {@link InMemoryMetadata} is copied, but its {@link InMemoryIdentifier}
 	 * are set to null.
-	 *
+	 * 
 	 * @param original
 	 *            The original identifier
 	 */
@@ -84,7 +81,7 @@ public class InMemoryLink extends InternalLink {
 	/**
 	 * Returns a clone of the {@link InMemoryLink}, but sets its
 	 * {@link InMemoryIdentifier} to null.
-	 *
+	 * 
 	 * @return An {@link InMemoryLink} Object with clones Metadate, but
 	 *         imcomplete since it does not have a start or end node.
 	 */
@@ -97,7 +94,7 @@ public class InMemoryLink extends InternalLink {
 	public InternalIdentifierPair getIdentifiers() {
 		return new InternalIdentifierPair(mFirstIdentifier, mSecondIdentifier);
 	}
-	
+
 	public void clearMetadata() {
 		mMeta.clear();
 	}
@@ -109,28 +106,41 @@ public class InMemoryLink extends InternalLink {
 
 	@Override
 	public void removeMetadata(InternalMetadata meta) {
+		removeMetadata(meta, true);
+	}
+
+	@Override
+	public void removeMetadata(InternalMetadata meta,
+			boolean isSingleValueDependent) {
 		InternalMetadata toRemove = null;
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
-				toRemove = m;
-				break;
+		for (InternalMetadata m : mMeta) {
+			if (!isSingleValueDependent) {
+				if (m.equals(meta)) {
+					toRemove = m;
+					break;
+				}
+			} else {
+				if (m.equalsForLinks(meta)) {
+					toRemove = m;
+					break;
+				}
 			}
 		}
-		if(toRemove != null) {
+		if (toRemove != null) {
 			mMeta.remove(toRemove);
 		}
 	}
-	
+
 	@Override
 	public void updateMetadata(InternalMetadata meta) {
 		InternalMetadata toUpdate = null;
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsForLinks(meta)) {
 				toUpdate = m;
 				break;
 			}
 		}
-		if(toUpdate != null) {
+		if (toUpdate != null) {
 			mMeta.remove(toUpdate);
 			mMeta.add(meta);
 		}
@@ -138,8 +148,8 @@ public class InMemoryLink extends InternalLink {
 
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		for(InternalMetadata m : mMeta) {
-			if(m.equalsForLinks(meta)) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsForLinks(meta)) {
 				return true;
 			}
 		}

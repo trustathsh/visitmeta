@@ -43,6 +43,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -79,6 +80,8 @@ import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 public class GraphResource {
 
 	private static final Logger log = Logger.getLogger(GraphResource.class);
+
+//	@Inject MyDependency service;
 
 	@QueryParam("rawData")
 	@DefaultValue("false")

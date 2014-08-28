@@ -40,16 +40,18 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
-
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.ApplicationFacade;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
+
 
 public class RestService implements Runnable {
 
@@ -70,8 +72,10 @@ public class RestService implements Runnable {
 		log.info("starting REST service on "+url+"...");
 
 		try {
+//			ResourceConfig rc = new ResourceConfig().packages(
+//					"com.sun.jersey.config.property.packages", "de.hshannover.f4.trust.visitmeta.dataservice.rest");
+			HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create(url), new ApplicationFacade( /* dependecies ... */ ));
 
-			HttpServer server = GrizzlyWebContainerFactory.create(url, params);
 			log.debug("REST service running.");
 			// TODO shutdown server properly
 

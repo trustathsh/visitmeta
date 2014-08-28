@@ -31,6 +31,5 @@ ifmap:
     name: visitmeta-1
   connection:
     maxretry: 10
-  connection:
     # in seconds
     retryinterval: 10

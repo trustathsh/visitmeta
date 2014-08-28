@@ -49,16 +49,28 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.util.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);
 
-	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
-	private static final int MAX_DEPTH = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-	private static final int MAX_SIZE = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+	private static final Properties config = Application.getConfig();
+
+	private static final int MAX_DEPTH;
+	private static final int MAX_SIZE;
+
+	static {
+		try{
+			MAX_DEPTH = config.getInt("ifmap.maxdepth");
+			MAX_SIZE = config.getInt("ifmap.maxsize");
+		} catch (PropertyException e) {
+			log.fatal(e.toString(), e);
+			throw new RuntimeException("could not load requested properties", e);
+		}
+	}
+
 	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
 	public static final String JSON_KEY_IDENTIFIER = "identifier";
 	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";

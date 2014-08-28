@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,12 +46,12 @@ import de.hshannover.f4.trust.ifmapj.channel.ARC;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.util.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 /**
  * When a <tt>UpdateService</tt> is started, it will subscribe for the
@@ -68,10 +68,10 @@ public class UpdateService implements Runnable {
 	protected final static int DEFAULT_MAX_RETRY = 10;
 	protected final static int DEFAULT_RETRY_INTERVAL = 10;
 
-	protected PropertiesReaderWriter config = Application.getIFMAPConfig();
+	protected Properties config = Application.getConfig();
 
-	protected final int MAX_DEPTH = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-	protected final int MAX_SIZE = Integer.valueOf(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+	protected final int MAX_DEPTH;
+	protected final int MAX_SIZE;
 	protected final int MAX_RETRY;
 	protected final int RETRY_INTERVAL;
 
@@ -97,6 +97,14 @@ public class UpdateService implements Runnable {
 	public UpdateService(Connection connection, Writer writer, InternalIdentifierFactory identifierFactory, InternalMetadataFactory metadataFactory) {
 		log.trace("new UpdateService() ...");
 
+		try{
+			MAX_DEPTH = config.getInt("ifmap.maxdepth");
+			MAX_SIZE = config.getInt("ifmap.maxsize");
+		} catch (PropertyException e) {
+			log.fatal(e.toString(), e);
+			throw new RuntimeException("could not load requested properties", e);
+		}
+
 		if (writer == null) {
 			throw new IllegalArgumentException("writer cannot be null");
 		}
@@ -116,14 +124,16 @@ public class UpdateService implements Runnable {
 
 		int tmp = 0;
 		try {
-			tmp = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_RETRY));
-		} catch (NumberFormatException e) {
+			tmp = config.getInt("ifmap.connection.maxretry");
+		} catch (PropertyException e) {
+			log.error(e.toString(), e);
 			tmp = DEFAULT_MAX_RETRY;
 		}
 		MAX_RETRY = tmp;
 		try {
-			tmp = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_RETRY_INTERVAL));
-		} catch (NumberFormatException e) {
+			tmp = config.getInt("ifmap.connection.retryinterval");
+		} catch (PropertyException e) {
+			log.error(e.toString(), e);
 			tmp = DEFAULT_RETRY_INTERVAL;
 		}
 		RETRY_INTERVAL = tmp;

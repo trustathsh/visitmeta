@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,43 +63,48 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
-import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 
 /**
  * An implementation of the {@link Connection} interface.
- * 
+ *
  * @author Bastian Hellmann
  * @author Marcel Reichenbach
  */
 public class ConnectionImpl implements Connection {
 
+	private static final Logger log = Logger.getLogger(Connection.class);
+
 	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
 
-	public static final String DEFAULT_TRUSTSTORE_PATH = Application
-			.getIFMAPConfig()
-			.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+	public static final String DEFAULT_TRUSTSTORE_PATH;
 
-	public static final String DEFAULT_TRUSTSTORE_PASS = Application
-			.getIFMAPConfig()
-			.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+	public static final String DEFAULT_TRUSTSTORE_PASS;
 
-	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = Integer
-			.parseInt(Application.getIFMAPConfig().getProperty(
-					ConfigParameter.IFMAP_MAX_SIZE));
+	public static final int DEFAULT_MAX_POLL_RESULT_SIZE;
+
+	static {
+		try{
+			DEFAULT_TRUSTSTORE_PATH = Application.getConfig().getString("ifmap.truststore.path");
+			DEFAULT_TRUSTSTORE_PASS = Application.getConfig().getString("ifmap.truststore.pw");
+			DEFAULT_MAX_POLL_RESULT_SIZE = Application.getConfig().getInt("ifmap.maxsize");
+		} catch (PropertyException e) {
+			log.fatal(e.toString(), e);
+			throw new RuntimeException("could not load requested properties", e);
+		}
+	}
 
 	public static final boolean DEFAULT_STARTUP_CONNECT = false;
 
-	private static final Logger log = Logger.getLogger(ConnectionImpl.class);
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
@@ -151,7 +156,7 @@ public class ConnectionImpl implements Connection {
 	 * <li>MaxPollResultSize = see config.property(ifmap.maxsize)</li>
 	 * <li>StartupConnect = false</li>
 	 * </ul>
-	 * 
+	 *
 	 * @throws ConnectionException
 	 */
 	public ConnectionImpl(String name, String url, String userName,
@@ -186,7 +191,7 @@ public class ConnectionImpl implements Connection {
 
 	private void initSsrc(String url, String user, String userPass,
 			String truststore, String truststorePass)
-			throws IfmapConnectionException {
+					throws IfmapConnectionException {
 		log.trace("init SSRC ...");
 
 		try {

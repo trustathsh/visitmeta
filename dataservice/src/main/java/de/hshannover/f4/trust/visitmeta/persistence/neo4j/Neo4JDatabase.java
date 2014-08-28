@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,26 +45,26 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.util.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 public class Neo4JDatabase {
 
 	private Logger log = Logger.getLogger(Neo4JDatabase.class);
 
-	private PropertiesReaderWriter config = Application.getIFMAPConfig();
+	private Properties mConfig = Application.getConfig();
 
-	private boolean clearDatabase = Boolean.parseBoolean(config.getProperty(ConfigParameter.NEO4J_CLEAR_DB_ON_STARTUP));
+	private boolean mClearDatabase;
 
-	private boolean dbCaching = Boolean.parseBoolean(config.getProperty(ConfigParameter.DS_CACHE_ENABLE));
+	private boolean mDbCaching;
 
-	private int dbCachSize = Integer.parseInt(config.getProperty(ConfigParameter.DS_CACHE_SIZE));
+	private int mDbCachSize;
 
-	private String neo4JdbPath = config.getProperty(ConfigParameter.NEO4J_DB_PATH);
+	private String mNeo4JdbPath;
 
 	private Neo4JConnection neo4jDb;
 
@@ -77,12 +77,22 @@ public class Neo4JDatabase {
 	private Thread writerThread;
 
 	private Reader mReader;
-	
+
 	private Executor mExecutor;
 
 
 	public Neo4JDatabase(String connectionName){
 		log.trace("new Neo4JDatabase() ...");
+
+		try {
+			mClearDatabase = mConfig.getBoolean("neo4j.db.clear");
+			mDbCaching = mConfig.getBoolean("dataservice.cache.enable");
+			mDbCachSize = mConfig.getInt("dataservice.cache.size");
+			mNeo4JdbPath = mConfig.getString("neo4j.db.path");
+		} catch (PropertyException e) {
+			log.fatal(e.toString(), e);
+			throw new RuntimeException("could not load requested properties", e);
+		}
 
 		initNeo4JConnection(connectionName);
 		initWriter(connectionName);
@@ -93,9 +103,9 @@ public class Neo4JDatabase {
 	}
 
 	private void initNeo4JConnection(String connectionName) {
-		neo4jDb = new Neo4JConnection(neo4JdbPath + "/connection/" + connectionName);
+		neo4jDb = new Neo4JConnection(mNeo4JdbPath + "/connection/" + connectionName);
 
-		if(clearDatabase){
+		if(mClearDatabase){
 
 			neo4jDb.ClearDatabase();
 		}
@@ -121,8 +131,8 @@ public class Neo4JDatabase {
 
 		GraphCache cache = null;
 
-		if (dbCaching) {
-			cache =	new SimpleGraphCache(dbCachSize);
+		if (mDbCaching) {
+			cache =	new SimpleGraphCache(mDbCachSize);
 		} else {
 			cache = new DummyGraphCache();
 		}

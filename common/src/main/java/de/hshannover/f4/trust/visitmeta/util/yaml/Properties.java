@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertiesReader;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertiesWriter;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 public class Properties {
 
@@ -116,6 +113,24 @@ public class Properties {
 	}
 
 	/**
+	 * Get the value from the property path.
+	 * If the property path does not exist, the default value is returned.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param defaultValue
+	 * @return
+	 */
+	public Object getValue(String propertyPath, Object defaultValue) {
+		Object o = null;
+		try {
+			o = getValue(propertyPath);
+		} catch (PropertyException e) {
+			return defaultValue;
+		}
+		return o;
+	}
+
+	/**
 	 * Get the String-value from the property path. Throw a PropertyException when the value is not a String.
 	 * 
 	 * @param propertyPath foo.bar.property
@@ -128,6 +143,22 @@ public class Properties {
 			return (String) o;
 		}
 		throw new PropertyException("The value from property path[" + propertyPath + "] is not a String!");
+	}
+
+	/**
+	 * Get the String-value from the property path.
+	 * If the property path does not exist, the default value is returned.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param defaultValue
+	 * @return String
+	 */
+	public String getString(String propertyPath, String defaultValue) {
+		Object o =  getValue(propertyPath, defaultValue);
+		if(o instanceof String){
+			return (String) o;
+		}
+		return defaultValue;
 	}
 
 	/**
@@ -146,6 +177,22 @@ public class Properties {
 	}
 
 	/**
+	 * Get the int-value from the property path.
+	 * If the property path does not exist, the default value is returned.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param defaultValue
+	 * @return String
+	 */
+	public int getInt(String propertyPath, int defaultValue) {
+		Object o =  getValue(propertyPath, defaultValue);
+		if(o instanceof Integer){
+			return (int) o;
+		}
+		return defaultValue;
+	}
+
+	/**
 	 * Get the double-value from the property path. Throw a PropertyException when the value is not a double.
 	 * 
 	 * @param propertyPath foo.bar.property
@@ -161,6 +208,22 @@ public class Properties {
 	}
 
 	/**
+	 * Get the double-value from the property path.
+	 * If the property path does not exist, the default value is returned.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param defaultValue
+	 * @return String
+	 */
+	public double getDouble(String propertyPath, double defaultValue) {
+		Object o =  getValue(propertyPath, defaultValue);
+		if(o instanceof Double){
+			return (double) o;
+		}
+		return defaultValue;
+	}
+
+	/**
 	 * Get the boolean-value from the property path. Throw a PropertyException when the value is not a boolean.
 	 * 
 	 * @param propertyPath foo.bar.property
@@ -173,6 +236,22 @@ public class Properties {
 			return (boolean) o;
 		}
 		throw new PropertyException("The value from property path[" + propertyPath + "] is not a boolean!");
+	}
+
+	/**
+	 * Get the boolean-value from the property path.
+	 * If the property path does not exist, the default value is returned.
+	 * 
+	 * @param propertyPath foo.bar.property
+	 * @param defaultValue
+	 * @return String
+	 */
+	public boolean getBoolean(String propertyPath, boolean defaultValue) {
+		Object o =  getValue(propertyPath, defaultValue);
+		if(o instanceof Boolean){
+			return (boolean) o;
+		}
+		return defaultValue;
 	}
 
 	/**

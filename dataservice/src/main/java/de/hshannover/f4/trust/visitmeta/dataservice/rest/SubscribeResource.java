@@ -63,7 +63,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.util.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 /**

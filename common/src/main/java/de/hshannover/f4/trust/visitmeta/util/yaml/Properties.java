@@ -1,9 +1,10 @@
-package de.hshannover.f4.trust.visitmeta.util;
+package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 import de.hshannover.f4.trust.visitmeta.util.yaml.PropertiesReader;
 import de.hshannover.f4.trust.visitmeta.util.yaml.PropertiesWriter;
 import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;

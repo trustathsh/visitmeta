@@ -46,8 +46,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
-import de.hshannover.f4.trust.visitmeta.util.Properties;
-
 public class PropertiesWriter extends YamlPersister {
 
 	private static final Logger log = Logger.getLogger(PropertiesWriter.class);

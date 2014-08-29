@@ -59,13 +59,16 @@ import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(WindowColorSettings.class);
+	private static final Properties mConfig = Main.getConfig();
 	private JPanel mPanel = null;
 	private JColorChooser mColorChooser = null;
 	private Timer mDelay = null;
@@ -114,38 +117,43 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 					if (mSelectPublisher.getSelectedIndex() == 0) {
 						/* First item is the identifier color for access-requests */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + "." + IfmapStrings.ACCESS_REQUEST_EL_NAME + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + IfmapStrings.ACCESS_REQUEST_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 1) {
 						/* Second item is the identifier color for devices */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + "." + IfmapStrings.DEVICE_EL_NAME + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + IfmapStrings.DEVICE_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 2) {
 						/* Third item is the identifier color for identities */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + "." + IfmapStrings.IDENTITY_EL_NAME + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + IfmapStrings.IDENTITY_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 3) {
 						/* Fourth item is the identifier color for ip-addresses */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + "." + IfmapStrings.IP_ADDRESS_EL_NAME + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + IfmapStrings.IP_ADDRESS_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 4) {
 						/* Fifth item is the identifier color for mac-addresses */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + "." + IfmapStrings.MAC_ADDRESS_EL_NAME + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + IfmapStrings.MAC_ADDRESS_EL_NAME + "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 5) {
 						/* Sixth item is the identifier color for extended-identifiers */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType + ".extended." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + ".extended." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 6) {
 						/* Seventh item is the default metadata color */
 						vType = NodeType.METADATA;
-						vProperty = "color." + vType + "." + vParam;
+						vProperty = "color." + vType.toString().toLowerCase() + "." + vParam;
 					} else {
 						vType = NodeType.METADATA;
 						vPublisher = (String) mSelectPublisher.getSelectedItem();
 						vProperty = "color." + vPublisher + "." + vParam;
 					}
 					String vColor = "0x" + Integer.toHexString(mColorChooser.getColor().getRGB()).substring(2);
-					PropertiesManager.storeProperty("color", vProperty, vColor);
+					try {
+						mConfig.set(vProperty, vColor);
+					} catch (PropertyException e) {
+						LOGGER.fatal(e.toString(), e);
+						throw new RuntimeException("could not save property");
+					}
 					mConnection.getConnection().repaintNodes(vType, vPublisher);
 				}
 				mDelay.stop();
@@ -235,9 +243,8 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		LOGGER.trace("Method setColorChooserColor() called.");
 		ButtonModel vButton = mGroup.getSelection();
 		String vKey = "color." + mSelectPublisher.getSelectedItem() + "." + vButton.getActionCommand();
-		String vDefault = PropertiesManager.getProperty("color", "color.metadata." + vButton.getActionCommand(),
-				"0xFFFFFF");
-		Color vColor = Color.decode(PropertiesManager.getProperty("color", vKey, vDefault));
+		String vDefault = mConfig.getString("color.metadata." + vButton.getActionCommand(), "0xFFFFFF");
+		Color vColor = Color.decode(mConfig.getString(vKey, vDefault));
 		mColorChooser.setColor(vColor);
 		mDelay.stop();
 	}

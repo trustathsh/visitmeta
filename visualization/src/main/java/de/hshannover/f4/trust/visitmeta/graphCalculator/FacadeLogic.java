@@ -43,9 +43,9 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
@@ -208,10 +208,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	 */
 	public synchronized void recalculateGraph() {
 		LOGGER.trace("Method recalculateGraph() called.");
-		mCalculator.adjustGraphAnew(Integer.parseInt(PropertiesManager.getProperty("visualizationConfig", // FileName
-				"calculation.iterations", // Key
-				"100" // Alternative
-		)));
+		mCalculator.adjustGraphAnew(Main.getConfig().getInt("visualization.calculation.iterations", 100));
 	}
 
 	@Override

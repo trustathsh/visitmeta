@@ -40,12 +40,12 @@ package de.hshannover.f4.trust.visitmeta;
 
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.DeviceToGuiConnector;
@@ -53,6 +53,7 @@ import de.hshannover.f4.trust.visitmeta.input.device.Device;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 
 /**
  * Class with main-method.
@@ -62,6 +63,11 @@ public final class Main {
 	public static final String VISUALIZATION_VERSION = "${project.version}";
 
 	private static final Logger LOGGER = Logger.getLogger(Main.class);
+
+	/**
+	 * Configuration class for the application.
+	 */
+	private static Properties mConfig;
 
 	private static DataservicePersister mDataservicePersister;
 
@@ -90,7 +96,10 @@ public final class Main {
 			LOGGER.error("error while load persistent dataservices", e);
 		}
 
-		String vConnectionTypeString = PropertiesManager.getProperty("application", "dataservice.connectiontype", "local").toUpperCase();
+		String vConnectionTypeString = null;
+
+		vConnectionTypeString = getConfig().getString("dataservice.connectiontype", "local").toUpperCase();
+
 		ConnectionType vConnectionType = ConnectionType.valueOf(vConnectionTypeString);
 
 		/**
@@ -111,11 +120,32 @@ public final class Main {
 
 	public static void initComponents() {
 
+		String config = Main.class.getClassLoader().getResource("visualization_config.yml").getPath();
 		String dataservicePath = Main.class.getClassLoader().getResource("dataservices.yml").getPath();
+
+		try{
+			mConfig = new Properties(config);
+		} catch (IOException e) {
+			String msg = "Error while reading the config files";
+			LOGGER.fatal(msg);
+			throw new RuntimeException(msg, e);
+		}
+
 		mDataservicePersister = new DataservicePersister(dataservicePath);
 
 		LOGGER.info("components initialized");
 
+	}
+
+	/**
+	 * @return
+	 */
+	public static Properties getConfig() {
+		if (mConfig == null) {
+			throw new RuntimeException(
+					"Application property has not been initialized. This is not good!");
+		}
+		return mConfig;
 	}
 
 	/**

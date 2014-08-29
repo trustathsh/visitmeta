@@ -42,34 +42,34 @@ import java.util.Observable;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+
 /**
  * Manage the settings of the application.
  */
 public class SettingManager extends Observable {
 	private static final Logger LOGGER = Logger.getLogger(SettingManager.class);
 
+	private static final Properties mConfig = Main.getConfig();
+
 	private int mNetworkInterval = 0;
 	private int mCalculationInterval = 0;
 	private int mCalculationIterations = 0;
 	private int mHighlightsTimeout = 0;
 	private int mNodeTranslationDuration = 0;
-	
+
 	private GraphContainer mConnection = null;
 
 	public SettingManager(GraphContainer connection) {
 		LOGGER.debug("Load settings.");
 		mConnection = connection;
 		mConnection.getName();
-		mNetworkInterval = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig", "network.interval",
-				"10000"));
-		mCalculationInterval = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig",
-				"calculation.interval", "3000"));
-		mCalculationIterations = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig",
-				"calculation.iterations", "100"));
-		mHighlightsTimeout = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig",
-				"highlights.timeout", "5000"));
-		mNodeTranslationDuration = Integer.parseInt(PropertiesManager.getProperty("visualizationConfig",
-				"node.translation.duration", "1000"));
+		mNetworkInterval = mConfig.getInt("visualization.network.interval", 10000);
+		mCalculationInterval = mConfig.getInt("visualization.calculation.interval", 3000);
+		mCalculationIterations = mConfig.getInt("visualization.calculation.iterations", 100);
+		mHighlightsTimeout = mConfig.getInt("visualization.highlights.timeout", 5000);
+		mNodeTranslationDuration = mConfig.getInt("visualization.node.translation.duration", 1000);
 	}
 
 	@Override
@@ -77,15 +77,11 @@ public class SettingManager extends Observable {
 		super.finalize();
 
 		LOGGER.debug("Save settings.");
-		PropertiesManager.storeProperty("visualizationConfig", "network.interval", String.valueOf(mNetworkInterval));
-		PropertiesManager.storeProperty("visualizationConfig", "calculation.interval",
-				String.valueOf(mCalculationInterval));
-		PropertiesManager.storeProperty("visualizationConfig", "calculation.iterations",
-				String.valueOf(mCalculationIterations));
-		PropertiesManager
-				.storeProperty("visualizationConfig", "highlights.timeout", String.valueOf(mHighlightsTimeout));
-		PropertiesManager.storeProperty("visualizationConfig", "node.translation.duration",
-				String.valueOf(mNodeTranslationDuration));
+		mConfig.set("visualization.network.interval", mNetworkInterval);
+		mConfig.set("visualization.calculation.interval", mCalculationInterval);
+		mConfig.set("visualization.calculation.iterations",	mCalculationIterations);
+		mConfig.set("visualization.highlights.timeout", mHighlightsTimeout);
+		mConfig.set("visualization.node.translation.duration", mNodeTranslationDuration);
 	}
 
 	public synchronized int getNetworkInterval() {

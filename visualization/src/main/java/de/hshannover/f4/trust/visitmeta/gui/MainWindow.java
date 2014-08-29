@@ -79,16 +79,17 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
-import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
-import de.hshannover.f4.trust.visitmeta.gui.ConnectionTabListMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
+
+	private static final Properties mConfig = Main.getConfig();
 
 	private static final String VISITMETA_ICON_16PX = "visitmeta-icon-16px.png";
 	private static final String VISITMETA_ICON_32PX = "visitmeta-icon-32px.png";
@@ -355,10 +356,8 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setLocation(Integer.parseInt(PropertiesManager.getProperty("window", "position.x", "0")),
-				Integer.parseInt(PropertiesManager.getProperty("window", "position.y", "0")));
-		setPreferredSize(new Dimension(Integer.parseInt(PropertiesManager.getProperty("window", "width", "700")),
-				Integer.parseInt(PropertiesManager.getProperty("window", "height", "700"))));
+		setLocation(mConfig.getInt("window.position.x", 0), mConfig.getInt("window.position.y", 0));
+		setPreferredSize(new Dimension(mConfig.getInt("window.width", 700), mConfig.getInt("window.height", 700)));
 	}
 
 	/**
@@ -370,12 +369,15 @@ public class MainWindow extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent we) {
-				PropertiesManager.storeProperty("window", "position.x",
-						String.valueOf((int) getLocationOnScreen().getX()));
-				PropertiesManager.storeProperty("window", "position.y",
-						String.valueOf((int) getLocationOnScreen().getY()));
-				PropertiesManager.storeProperty("window", "width", String.valueOf(getWidth()));
-				PropertiesManager.storeProperty("window", "height", String.valueOf(getHeight()));
+				try {
+					mConfig.set("window.position.x", (int) getLocationOnScreen().getX());
+					mConfig.set("window.position.y", (int) getLocationOnScreen().getY());
+					mConfig.set("window.width", getWidth());
+					mConfig.set("window.height", getHeight());
+				} catch (PropertyException e) {
+					LOGGER.fatal(e.toString(), e);
+					throw new RuntimeException("could not save properties");
+				}
 				System.exit(0);
 			}
 		});

@@ -55,12 +55,12 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategy;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyType;
@@ -76,6 +76,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -91,6 +92,7 @@ import edu.umd.cs.piccolox.nodes.PComposite;
 
 public class Piccolo2DPanel implements GraphPanel {
 	private static final Logger LOGGER = Logger.getLogger(Piccolo2DPanel.class);
+	private static final Properties mConfig = Main.getConfig();
 	private PLayer mLayerNode = null;
 	private PLayer mLayerEdge = null;
 	private PLayer mLayerGlow = null;
@@ -140,11 +142,11 @@ public class Piccolo2DPanel implements GraphPanel {
 		mPanel.setZoomEventHandler(new ZoomEventHandler(this));
 		mPanel.addInputEventListener(new NodeEventHandler(connection, this));
 
-		String vColorBackground = PropertiesManager.getProperty("color", "color.background", "0xFFFFFF");
-		String vColorEdge = PropertiesManager.getProperty("color", "color.edge", "0x000000");
-		String vColorNewNode = PropertiesManager.getProperty("color", "color.node.new", "0xC5D931");
-		String vColorDeleteNode = PropertiesManager.getProperty("color", "color.node.delete", "0x82150F");
-		String vColorSelectedNode = PropertiesManager.getProperty("color", "color.node.selected", "0xFFF687");
+		String vColorBackground = mConfig.getString("color.background", "0xFFFFFF");
+		String vColorEdge = mConfig.getString("color.edge", "0x000000");
+		String vColorNewNode = mConfig.getString("color.node.new", "0xC5D931");
+		String vColorDeleteNode = mConfig.getString("color.node.delete", "0x82150F");
+		String vColorSelectedNode = mConfig.getString("color.node.selected", "0xFFF687");
 		mColorNewNode = Color.decode(vColorNewNode);
 		mColorBackground = Color.decode(vColorBackground);
 		mColorEdge = Color.decode(vColorEdge);
@@ -152,10 +154,10 @@ public class Piccolo2DPanel implements GraphPanel {
 		mColorSelectedNode = Color.decode(vColorSelectedNode);
 		mPanel.setBackground(mColorBackground);
 
-		String nodeInformationStyle = PropertiesManager.getProperty("visualizationConfig", "identifier.text.style", "SINGLE_LINE");
+		String nodeInformationStyle = mConfig.getString("visualization.identifier.text.style", "SINGLE_LINE");
 		mIdentifierInformationStrategy = IdentifierInformationStrategyFactory.create(IdentifierInformationStrategyType.valueOf(nodeInformationStyle));
 
-		String metadataInformationStyle = PropertiesManager.getProperty("visualizationConfig", "metadata.text.style", "SINGLE_LINE");
+		String metadataInformationStyle = mConfig.getString("visualization.metadata.text.style", "SINGLE_LINE");
 		mMetadataInformationStrategy = MetadataInformationStrategyFactory.create(MetadataInformationStrategyType.valueOf(metadataInformationStyle));
 	}
 
@@ -210,16 +212,16 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".inside", "0x9999FF");
-			vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".outside", "0x9999FF");
+			vIdentifierInside = mConfig.getString("color.identifier." + typeName + ".inside", "0x9999FF");
+			vIdentifierOutside = mConfig.getString("color.identifier." + typeName + ".outside", "0x9999FF");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vIdentifierInside = PropertiesManager.getProperty("color", "color.identifier.extended.inside", "0x9999FF");
-					vIdentifierOutside = PropertiesManager.getProperty("color", "color.identifier.extended.outside", "0x9999FF");
+					vIdentifierInside = mConfig.getString("color.identifier.extended.inside", "0x9999FF");
+					vIdentifierOutside = mConfig.getString("color.identifier.extended.outside", "0x9999FF");
 				}
 			}
 		}
@@ -238,8 +240,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	 */
 	private Paint getColorText(String pPublisher) {
 		LOGGER.trace("Method getColorText(" + pPublisher + ") called.");
-		String vDefaultText = PropertiesManager.getProperty("color", "color.metadata.text", "0x000000");
-		String vText = PropertiesManager.getProperty("color", "color." + pPublisher + ".text", vDefaultText);
+		String vDefaultText = mConfig.getString("color.metadata.text", "0x000000");
+		String vText = mConfig.getString("color." + pPublisher + ".text", vDefaultText);
 		return Color.decode(vText);
 	}
 
@@ -256,14 +258,14 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vColor = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".text", "0x000000");
+			vColor = mConfig.getString("color.identifier." + typeName + ".text", "0x000000");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vColor = PropertiesManager.getProperty("color", "color.identifier.extended.text", "0x000000");
+					vColor = mConfig.getString("color.identifier.extended.text", "0x000000");
 				}
 			}
 		}
@@ -284,14 +286,14 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vOutside = PropertiesManager.getProperty("color", "color.identifier." + typeName + ".border", "0x000000");
+			vOutside = mConfig.getString("color.identifier." + typeName + ".border", "0x000000");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
 				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vOutside = PropertiesManager.getProperty("color", "color.identifier.extended.border", "0x000000");
+					vOutside = mConfig.getString("color.identifier.extended.border", "0x000000");
 				}
 			}
 		}
@@ -308,8 +310,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	 */
 	private Color getColorMetadataStroke(String pPublisher) {
 		LOGGER.trace("Method getColorMetadataStroke(" + pPublisher + ") called.");
-		String vDefaultStroke = PropertiesManager.getProperty("color", "color.metadata.border", "0x000000");
-		String vStroke = PropertiesManager.getProperty("color", "color." + pPublisher + ".border", vDefaultStroke);
+		String vDefaultStroke = mConfig.getString("color.metadata.border", "0x000000");
+		String vStroke = mConfig.getString("color." + pPublisher + ".border", vDefaultStroke);
 		return Color.decode(vStroke);
 	}
 
@@ -325,10 +327,10 @@ public class Piccolo2DPanel implements GraphPanel {
 	private Paint getColor(String pPublisher, PPath pNode) {
 		LOGGER.trace("Method getColor(" + pPublisher + ", " + pNode + ") called.");
 
-		String vDefaultInside = PropertiesManager.getProperty("color", "color.metadata.inside", "0xFF9966");
-		String vDefaultOutside = PropertiesManager.getProperty("color", "color.metadata.outside", "0xFF9966");
-		String vInside = PropertiesManager.getProperty("color", "color." + pPublisher + ".inside", vDefaultInside);
-		String vOutside = PropertiesManager.getProperty("color", "color." + pPublisher + ".outside", vDefaultOutside);
+		String vDefaultInside = mConfig.getString("color.metadata.inside", "0xFF9966");
+		String vDefaultOutside = mConfig.getString("color.metadata.outside", "0xFF9966");
+		String vInside = mConfig.getString("color." + pPublisher + ".inside", vDefaultInside);
+		String vOutside = mConfig.getString("color." + pPublisher + ".outside", vDefaultOutside);
 		Color vColorInside = Color.decode(vInside);
 		Color vColorOutside = Color.decode(vOutside);
 		return createGradientColor(pNode, vColorInside, vColorOutside);

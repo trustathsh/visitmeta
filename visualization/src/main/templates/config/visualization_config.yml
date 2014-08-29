@@ -1,0 +1,93 @@
+visualization:
+  connection:
+    default:
+      name: localhost
+      url: http://localhost:8000
+      rawxml: true
+  network:
+    # The time interval (milliseconds) to request the dataservice for new changes.
+    interval: 10000
+  calculation:
+    # The time interval (milliseconds) to recalculate the position of the nodes.
+    interval: 5000
+    # Count of Iterations for the position calculation of the nodes.
+    iterations: 100
+  highlights:
+    # Timeout (milliseconds) to show the highlights for new and deleted nodes.
+    timeout: 5000
+  node:
+    translation:
+      # The animation time for the translation of a node to the new position.
+      duration: 3000
+  identifier:
+    text:
+      # Sets the text style for identifier nodes; possible values are:
+      # SINGLE_LINE: a minimized style with all information in a single line
+      # MULTI_LINE:  a more detailed style with possibly more information,
+      #              using multiple lines
+      style: SINGLE_LINE
+  metadata:
+    text:
+      # Sets the text style for metadata nodes; possible values are:
+      # SINGLE_LINE:    just the typename of the metadata is used
+      # WITH_TIMESTAMP: adds a line with the publisher timestamp to the typename
+      style: SINGLE_LINE
+
+dataservice:
+  connectiontype: rest
+  
+guicontroller:
+  zfactor: 0.03
+  xyfactor: 20.0
+
+window:
+  width: 700
+  height: 700
+  splitpercent: 0.8
+  position:
+    x: 0
+    y: 0
+
+color:
+  background: '0xFFFFFF'
+  edge: '0x000000'
+  metadata:
+    text: '0x000000'
+    inside: '0xFF9966'
+    outside: '0xFF9966'
+    border: '0x000000'
+  node:
+    new: '0xC5D931'
+    delete: '0x82150F'
+    selected: '0xFFF02E'
+  identifier:
+    access-request:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'
+    device:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'
+    identity:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'
+    ip-address:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'
+    mac-address:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'
+    extended:
+      text: '0x000000'
+      inside: '0x9999FF'
+      outside: '0x9999FF'
+      border: '0x000000'

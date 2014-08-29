@@ -86,20 +86,21 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.datawrapper.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersisterException;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 
 public class ConnectionDialog extends JDialog{
 
 	private static final long serialVersionUID = 3274298974215759835L;
 
 	private static final Logger log = Logger.getLogger(ConnectionDialog.class);
+
+	private static final Properties mConfig = Main.getConfig();
 
 	private static DataservicePersister mDataservicePersister = Main.getDataservicePersister();
 
@@ -692,7 +693,7 @@ public class ConnectionDialog extends JDialog{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String name = "New Connection (" + (mListModelDataService.getSize() + 1) + ")";
-					String url = PropertiesManager.getProperty("application", ConfigParameter.VISUALIZATION_DEFAULT_URL, "http://localhost:8000");
+					String url = mConfig.getString("visualization.connection.default.url", "http://localhost:8000");
 					DataserviceConnection param = new DataserviceConnection(name, url, true);
 
 					try {

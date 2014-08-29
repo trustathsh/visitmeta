@@ -40,8 +40,9 @@ package de.hshannover.f4.trust.visitmeta.input.gui;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.PropertiesManager;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
+import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 
@@ -64,14 +65,14 @@ public class MotionControllerPiccolo2D implements MotionController {
 
 	private static final Logger logger = Logger.getLogger(MotionControllerPiccolo2D.class);
 
+	private static final Properties mConfig = Main.getConfig();
+
 	public MotionControllerPiccolo2D(ConnectionTab tab) {
 		this.motionInformationPane = tab.getMotionInformationPane();
 
 		this.vCamera = ((PCanvas) tab.getGraphPanel().getPanel()).getCamera();
-		this.zfactor = Double.valueOf(PropertiesManager.getProperty("input",
-				"guicontroller.zfactor", ""));
-		this.xyfactor = Double.valueOf(PropertiesManager.getProperty("input",
-				"guicontroller.xyfactor", ""));
+		this.zfactor = mConfig.getDouble("guicontroller.zfactor", 0.0);
+		this.xyfactor = mConfig.getDouble("guicontroller.xyfactor", 0.0);
 	}
 
 	@Override

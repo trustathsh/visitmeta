@@ -104,7 +104,7 @@ public class Properties {
 				}
 			}
 			if(tmp instanceof Map){
-				applicationConfigs = (Map<String, Object>) applicationConfigs.get(propertyKeyArray[i]);
+				applicationConfigs = (Map<String, Object>) tmp;
 			}else {
 				return tmp;
 			}
@@ -261,6 +261,7 @@ public class Properties {
 	 * @param propertyValue Only String|int|double|boolean
 	 * @throws PropertyException
 	 */
+	@SuppressWarnings("unchecked")
 	public void set(String propertyPath, Object propertyValue) throws PropertyException {
 		// check propertyPath
 		NullCheck.check(propertyPath, "propertyPath is null");
@@ -274,18 +275,34 @@ public class Properties {
 		// split propertyPath
 		String[] propertyKeyArray = propertyPath.split("\\.");
 
-		// build new Map's and add to root map
+		// get or build new Map's and add to root map
 		if(propertyKeyArray.length > 1){
-			Map<String, Object> tmpValueMap = new HashMap<String, Object>();
-			tmpValueMap.put(propertyKeyArray[propertyKeyArray.length-1], propertyValue);
+			Object tmpValueMap = propertyValue;
 
-			for(int i=propertyKeyArray.length-2; i >= 1; i--){
-				Map<String, Object> tmp = new HashMap<String, Object>();
-				tmp.put(propertyKeyArray[i], tmpValueMap);
-				tmpValueMap = tmp;
+			for(int i=propertyKeyArray.length-2; i >= 0; i--){
+				StringBuilder sb = new StringBuilder();
+				for(int j=0; j <i; j++){
+					sb.append(propertyKeyArray[j]);
+					sb.append('.');
+				}
+				sb.append(propertyKeyArray[i]);
+
+				Map<String, Object> tmp = null;
+				try{
+					tmp = (Map<String, Object>) getValue(sb.toString());
+				}catch (PropertyException e){
+					// when PropertyException nothing found -> tmp = null
+				}
+
+				if(tmp != null){
+					tmp.put(propertyKeyArray[i+1], tmpValueMap);
+					break;
+				}else{
+					tmp = new HashMap<String, Object>();
+					tmp.put(propertyKeyArray[i+1], tmpValueMap);
+					tmpValueMap = tmp;
+				}
 			}
-
-			mApplicationConfigs.put(propertyKeyArray[0], tmpValueMap);
 		}else{
 			mApplicationConfigs.put(propertyPath, propertyValue);
 		}

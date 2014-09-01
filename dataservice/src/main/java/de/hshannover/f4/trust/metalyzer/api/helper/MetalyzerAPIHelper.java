@@ -52,11 +52,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.metalyzer.api.exception.MetalyzerAPIException;
 import de.hshannover.f4.trust.metalyzer.api.exception.NegativeTimestampException;
 import de.hshannover.f4.trust.metalyzer.api.exception.TimestampException;
-import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 
 /**
@@ -96,23 +93,6 @@ public class MetalyzerAPIHelper {
 		if( from > to ) {
 			log.error("Delta ist not possible: " + from + " - " + to);
 			throw new TimestampException("From must not be later than to! (from: " + from + " to: " + to + ")");
-		}
-	}
-	
-	/**
-	 * Returns the default Graphservice used in MetalyzerAPI.
-	 * @param connectionName specifies an connection from the VisITMeta-connectionpool.
-	 * @return
-	 * @author Johannes Busch
-	 * @throws MetalyzerAPIException Accours when no GraphService is available.
-	 */
-	public static GraphService getGraphService(String connectionName) throws MetalyzerAPIException {
-		
-		try {
-			return ConnectionManager.getGraphServiceFromConnection(connectionName);
-		} catch (ConnectionException e) {
-			log.error("Error with: " + connectionName + " " + e.getMessage());
-			throw new MetalyzerAPIException("Error while retrieving " + connectionName + "-Connection found! -> " + e.getMessage());
 		}
 	}
 	

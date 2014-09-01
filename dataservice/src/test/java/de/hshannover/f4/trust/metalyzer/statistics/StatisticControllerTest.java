@@ -82,7 +82,7 @@ public class StatisticControllerTest {
 	public StatisticControllerTest(){
 		Mockito.when(mApi.getIdentifierFinder()).thenReturn(identfinder);
 		Mockito.when(mApi.getMetadataFinder()).thenReturn(metadataFinder);
-		sc.setMetalyzerApi(mApi);
+		Mockito.when(sc.getAPI()).thenReturn(mApi);
 	}
 	
 	@Test

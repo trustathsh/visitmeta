@@ -54,6 +54,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFa
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 
 /**
  * A <tt>PollTask</tt> executes one IF-MAP poll request.

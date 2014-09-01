@@ -48,15 +48,15 @@ import org.codehaus.jettison.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
 public class ConnectionPersister extends YamlPersister {
 
-	private static final Logger log = Logger.getLogger(ConnectionPersister.class);
+	private static final Logger log = Logger
+			.getLogger(ConnectionPersister.class);
 
 	public static final String CONNECTION_TAG = "!Connection";
-
 
 	private String mFileName;
 
@@ -64,22 +64,23 @@ public class ConnectionPersister extends YamlPersister {
 
 	private boolean mAppend;
 
-
 	private DumperOptions mOptions;
 
 	private ConnectionRepresenter mConnectionRepresenter;
 
 	private ConnectionConstructor mConnectionConstructor;
 
+	private ConnectionManager mManager;
 
 	/**
 	 * Create a JyamlPersister for Connections with default minimalOutput = true
-	 *
+	 * 
 	 * @param fileName
 	 * @param append
 	 */
-	public ConnectionPersister(String fileName){
+	public ConnectionPersister(ConnectionManager manager, String fileName) {
 		log.trace("new ConnectionPersister()...");
+		mManager = manager;
 		mFileName = fileName;
 		mAppend = false;
 		mMinimalOutput = true;
@@ -88,7 +89,7 @@ public class ConnectionPersister extends YamlPersister {
 		mOptions = buildDumperOptions();
 	}
 
-	private DumperOptions buildDumperOptions(){
+	private DumperOptions buildDumperOptions() {
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		options.setExplicitStart(true);
@@ -96,18 +97,19 @@ public class ConnectionPersister extends YamlPersister {
 	}
 
 	public void persistConnections() throws FileNotFoundException {
-		Map<String, Connection> connectionMap = ConnectionManager.getConnectionPool();
+		Map<String, Connection> connectionMap = mManager.getSavedConnections();
 		mConnectionRepresenter.setMinoutput(mMinimalOutput);
 		mConnectionRepresenter.addClassTag(JSONObject.class, Tag.MAP);
-		persist(mFileName, connectionMap, mAppend, mConnectionRepresenter, mOptions);
+		persist(mFileName, connectionMap, mAppend, mConnectionRepresenter,
+				mOptions);
 	}
 
 	public Map<String, Connection> load() throws FileNotFoundException {
 		mConnectionConstructor.setConnectionAsMap(false);
 		Map<String, Connection> newMap = new HashMap<String, Connection>();
 		Map<String, Object> map = loadMap(mFileName, mConnectionConstructor);
-		if(map != null){
-			for(Entry<String, Object> e: map.entrySet()){
+		if (map != null) {
+			for (Entry<String, Object> e : map.entrySet()) {
 				newMap.put(e.getKey(), (Connection) e.getValue());
 			}
 		}
@@ -115,23 +117,24 @@ public class ConnectionPersister extends YamlPersister {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<String, String>> loadAsMap() throws FileNotFoundException {
+	public Map<String, Map<String, String>> loadAsMap()
+			throws FileNotFoundException {
 		mConnectionConstructor.setConnectionAsMap(true);
 		Map<String, Map<String, String>> newMap = new HashMap<String, Map<String, String>>();
 		Map<String, Object> map = loadMap(mFileName, mConnectionConstructor);
-		if(map != null){
-			for(Entry<String, Object> e: map.entrySet()){
+		if (map != null) {
+			for (Entry<String, Object> e : map.entrySet()) {
 				newMap.put(e.getKey(), (Map<String, String>) e.getValue());
 			}
 		}
 		return newMap;
 	}
 
-	public void setMinimalOutput(boolean minimalOutput){
+	public void setMinimalOutput(boolean minimalOutput) {
 		mMinimalOutput = minimalOutput;
 	}
 
-	public boolean isMinimalOutput(){
+	public boolean isMinimalOutput() {
 		return mMinimalOutput;
 	}
 }

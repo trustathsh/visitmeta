@@ -38,35 +38,34 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice;
 
-
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
-import de.hshannover.f4.trust.metalyzer.api.MetalyzerAPI;
-import de.hshannover.f4.trust.metalyzer.semantics.debug.SemanticsMain;
-import de.hshannover.f4.trust.metalyzer.semantics.services.SemanticsController;
-import de.hshannover.f4.trust.metalyzer.statistic.StatisticController;
+import de.hshannover.f4.trust.metalyzer.api.MetalyzerModule;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManagerImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:
  * Must only contain static methods and therefore is abstract</i>
- *
+ * 
  * @author rosso
- *
+ * 
  */
 public abstract class Application {
 
@@ -94,29 +93,24 @@ public abstract class Application {
 	private static RestService restService;
 
 	private static Thread restServiceThread;
-	
-	/**
-	 * Metalyzer Classes
-	 */
-	private static MetalyzerAPI metaAPI;
-	private static SemanticsController semCon;
-	private static StatisticController statCon;
-	
-	/**
-	 * Metalyzer Debug Classes
-	 */
-	private static SemanticsMain semMain;
-	private static Thread semMainThread;
+
+	private static ConnectionManager mManager;
 
 	/**
 	 * @param args
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		log.info("VisITMeta dataservice application v" + DATASERVICE_VERSION + " started.");
+		log.info("VisITMeta dataservice application v" + DATASERVICE_VERSION
+				+ " started.");
+
+		getConnectionManager();
 
 		initComponents();
-		startRestService();
+
+		List<DataserviceModule> loadedModules = loadModules();
+		List<DataserviceModule> initalizedModules = initModules(loadedModules);
+		startRestService(initalizedModules);
 
 		try {
 			loadPersistentConnections();
@@ -131,72 +125,112 @@ public abstract class Application {
 		} catch (ConnectionException e) {
 			log.error("error while startupConnect", e);
 		}
-		
-		startMetalyzer();
-		startMetalyzerDebug();
 
 		log.info("dataservice started successfully");
 	}
-	
-	private static void startMetalyzerDebug(){
-		log.info("Starting Metalyzer Debug...");
-		semMain= new SemanticsMain();
-		semMainThread= new Thread(semMain, "Semantics Debug Thread");
-		
-		semMainThread.start();
-		
-		log.info("Metalyzer Debug started successfully.");
+
+	public synchronized static ConnectionManager getConnectionManager() {
+		if (mManager == null) {
+			mManager = new ConnectionManagerImpl();
+		}
+
+		return mManager;
 	}
-	
-	private static void startMetalyzer(){
-		log.info("Starting Metalyzer...");
-		metaAPI= MetalyzerAPI.getInstance();
-		semCon= SemanticsController.getInstance();
-		statCon= StatisticController.getInstance();
-		statCon.setMetalyzerApi(metaAPI);
-		log.info("Metalyzer started successfully");
+
+	private static List<DataserviceModule> initModules(
+			List<DataserviceModule> loadedModules) {
+		List<DataserviceModule> initializedModules = new ArrayList<>();
+
+		boolean result;
+		int i = 1;
+		int num = loadedModules.size();
+		for (DataserviceModule module : loadedModules) {
+			module.setConnectionManager(mManager);
+			result = module.init();
+			if (result) {
+				initializedModules.add(module);
+				log.info("Module (" + i + "/" + num + ") '" + module.getName()
+						+ "' was initialized.");
+			} else {
+				log.info("Module (" + i + "/" + num + ") '" + module.getName()
+						+ "' could not be initialized.");
+			}
+			i++;
+		}
+
+		return initializedModules;
+	}
+
+	private static List<DataserviceModule> loadModules() {
+		List<DataserviceModule> loadedModules = new ArrayList<>();
+
+		// TODO load modules from jar-files
+		loadedModules.add(new MetalyzerModule());
+
+		return loadedModules;
 	}
 
 	private static void startupConnect() throws ConnectionException {
 		log.debug("startupConnect...");
-		ConnectionManager.startupConnect();
+		mManager.executeStartupConnections();
+		;
 	}
 
-	private static void loadPersistentConnections() throws FileNotFoundException {
+	private static void loadPersistentConnections()
+			throws FileNotFoundException {
 		log.info("load persistent connections");
 		Map<String, Connection> connectionList = mConnectionPersister.load();
 
-		for(Connection c: connectionList.values()){
+		for (Connection c : connectionList.values()) {
 			try {
-				ConnectionManager.add(c);
+				mManager.addConnection(c);
 			} catch (ConnectionException e) {
-				log.error("error while adding connection to the connection pool", e);
+				log.error(
+						"error while adding connection to the connection pool",
+						e);
 			}
 		}
 	}
 
-	private static void startRestService() {
+	private static void startRestService(List<DataserviceModule> modules) {
 		log.info("start RestService");
-		restService = new RestService();
-		restServiceThread = new Thread(restService, "RestService-Thread");
 
+		List<String> packages = getRestPackagesOfModules(modules);
+		packages.add(RestService.DEFAULT_DATASERVICE_REST_URI);
+		restService = new RestService(packages.toArray(new String[] {}));
+
+		restServiceThread = new Thread(restService, "RestService-Thread");
 		restServiceThread.start();
+	}
+
+	private static List<String> getRestPackagesOfModules(
+			List<DataserviceModule> modules) {
+		List<String> result = new ArrayList<>();
+
+		for (DataserviceModule module : modules) {
+			result.addAll(module.getRestPackages());
+		}
+
+		return result;
 	}
 
 	public static void initComponents() {
 		try {
-
-			String dbConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
-			String ifmapConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
-			String dsConfig = Application.class.getClassLoader().getResource("dataservice_config.properties").getPath();
-			String connections = Application.class.getClassLoader().getResource("dataservice_connections.yml").getPath();
+			String dbConfig = Application.class.getClassLoader()
+					.getResource("dataservice_config.properties").getPath();
+			String ifmapConfig = Application.class.getClassLoader()
+					.getResource("dataservice_config.properties").getPath();
+			String dsConfig = Application.class.getClassLoader()
+					.getResource("dataservice_config.properties").getPath();
+			String connections = Application.class.getClassLoader()
+					.getResource("dataservice_connections.yml").getPath();
 			mDBConfig = new PropertiesReaderWriter(dbConfig, false);
 			mIFMAPConfig = new PropertiesReaderWriter(ifmapConfig, false);
 			mDSConfig = new PropertiesReaderWriter(dsConfig, false);
-			mConnectionPersister = new ConnectionPersister(connections);
+			mConnectionPersister = new ConnectionPersister(mManager,
+					connections);
 
 			log.info("components initialized");
-
 		} catch (IOException e) {
 			String msg = "Error while reading the config files";
 			log.fatal(msg);
@@ -206,11 +240,13 @@ public abstract class Application {
 
 	public static MessageDigest loadHashAlgorithm() {
 		try {
-			String algoname = mDBConfig.getProperty(ConfigParameter.NEO4J_HASH_ALGO);
-			log.trace("try to load MessageDigest for '"+algoname+"'");
+			String algoname = mDBConfig
+					.getProperty(ConfigParameter.NEO4J_HASH_ALGO);
+			log.trace("try to load MessageDigest for '" + algoname + "'");
 			return MessageDigest.getInstance(algoname);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("could not load requested hash algorithm", e);
+			throw new RuntimeException(
+					"could not load requested hash algorithm", e);
 		}
 	}
 

@@ -52,8 +52,10 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 
 public class ConnectionConstructor extends Constructor {
@@ -127,14 +129,14 @@ public class ConnectionConstructor extends Constructor {
 			String userName = (String) connectionDataMap.get("mUserName");
 			String userPass = (String) connectionDataMap.get("mUserPass");
 
-			Connection c = null;
+			ConnectionImpl c = null;
 			try {
-				c = new Connection(connectionName, url, userName, userPass);
+				c = (ConnectionImpl) Application.getConnectionManager().createConnection(connectionName, url, userName, userPass);
 			} catch (ConnectionException e) {
 				log.error("Error while create a new Connection.", e);
 			}
 
-			for (Field field: Connection.class.getDeclaredFields()){
+			for (Field field: ConnectionImpl.class.getDeclaredFields()){
 				try {
 
 					if(field.isAnnotationPresent(OPTIONAL.class)){
@@ -156,7 +158,7 @@ public class ConnectionConstructor extends Constructor {
 				for(Object listObject: subscribeList){
 					if(listObject instanceof Map){
 						JSONObject json = new JSONObject((Map)listObject);
-						c.addSubscribe(json);
+						c.addSubscription(json);
 					}
 				}
 

@@ -21,7 +21,7 @@
  * This file is part of visitmeta dataservice, version 0.1.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2014 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,35 +36,58 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.metalyzer.api;
 
-
-
-import java.util.SortedMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
-public class Neo4JReader extends AbstractReader {
+import de.hshannover.f4.trust.metalyzer.semantics.debug.SemanticsMain;
+import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
-	private Logger log = Logger.getLogger(Neo4JReader.class);
+public class MetalyzerModule implements DataserviceModule {
 
-	private Neo4JConnection mConnection;
+	private static Logger logger = Logger.getLogger(MetalyzerModule.class);
 
-	public Neo4JReader(Neo4JRepository repo, Neo4JConnection connection) {
-		log.trace("new Neo4JReader()");
-		mRepo = repo;
-		mConnection = connection;
+	private ConnectionManager mManager;
+
+	@Override
+	public void setConnectionManager(ConnectionManager manager) {
+		mManager = manager;
 	}
 
 	@Override
-	public long getTimeOfLastUpdate() {
-		return getChangesMap().lastKey();
+	public boolean init() {
+		MetalyzerAPI.setConnectionManager(mManager);
+		logger.info(getName() + " started successfully");
+
+		// startDebug();
+
+		return true;
 	}
 
 	@Override
-	public SortedMap<Long, Long> getChangesMap() {
-		return mConnection.getTimestampManager().getChangesMap();
+	public List<String> getRestPackages() {
+		List<String> result = new ArrayList<>();
+		result.add("de.hshannover.f4.trust.metalyzer.semantics.rest");
+		result.add("de.hshannover.f4.trust.metalyzer.statistic.rest");
+		return result;
 	}
 
+	@Override
+	public String getName() {
+		return "Metalyzer";
+	}
+
+	@SuppressWarnings("unused")
+	private void startDebug() {
+		logger.info("Starting Metalyzer Debug...");
+		SemanticsMain semanticsMain = new SemanticsMain();
+		Thread semanticsMainThread = new Thread(semanticsMain,
+				"Semantics Debug Thread");
+		semanticsMainThread.start();
+		logger.info("Metalyzer Debug started successfully.");
+	}
 }

@@ -416,7 +416,7 @@ public class IpAddressService {
 	 */
 	private Collection<Identifier> getAllIpAddressIdentifiers(long timestamp) throws MetalyzerAPIException{
 		log.info("Request to get all IP-Address-Identifiers from the MetalyzerAPI at timestamp " + timestamp);
-		return semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, timestamp);
+		return semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, timestamp);
 	}
 	/**
 	 * Helper-method to get a collection of all IP-Address-Identifiers at a given period of time.
@@ -429,7 +429,7 @@ public class IpAddressService {
 	 */
 	private Collection<Identifier> getAllIpAddressIdentifiers(long fromTimestamp, long toTimestamp) throws MetalyzerAPIException{
 		log.info("Request to get all IP-Address-Identifiers from the MetalyzerAPI at interval [" + fromTimestamp + ", " + toTimestamp + "]");
-		MetalyzerDelta<Identifier> delta = semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, fromTimestamp, toTimestamp);
+		MetalyzerDelta<Identifier> delta = semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, fromTimestamp, toTimestamp);
 		//return delta.getAvailables();
 		return delta.getUpdates();
 	}
@@ -441,7 +441,7 @@ public class IpAddressService {
 	 */
 	private Collection<Identifier> getAllIpAddressIdentifiers() throws MetalyzerAPIException{
 		log.info("Request to get all IP-Address-Identifiers from the MetalyzerAPI at the current timestamp");
-		return semCon.getConnection().getIdentifierFinder().getCurrent(StandardIdentifierType.IP_ADDRESS);
+		return semCon.getAPI().getIdentifierFinder().getCurrent(StandardIdentifierType.IP_ADDRESS);
 	}
 
 }

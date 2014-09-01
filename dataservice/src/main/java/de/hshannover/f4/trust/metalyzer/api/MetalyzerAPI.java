@@ -51,16 +51,15 @@ package de.hshannover.f4.trust.metalyzer.api;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
-import de.hshannover.f4.trust.metalyzer.api.exception.MetalyzerAPIException;
 import de.hshannover.f4.trust.metalyzer.api.finder.GeneralFinderImpl;
 import de.hshannover.f4.trust.metalyzer.api.finder.IdentifierFinderImpl;
 import de.hshannover.f4.trust.metalyzer.api.finder.MetadataFinderImpl;
 import de.hshannover.f4.trust.metalyzer.api.helper.MetalyzerAPIHelper;
 import de.hshannover.f4.trust.metalyzer.api.impl.GraphAnalyzerImpl;
 import de.hshannover.f4.trust.metalyzer.api.impl.MetalyzerFilterImpl;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
 /**
  * Entry point for all api methods.
@@ -74,7 +73,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
  */
 public class MetalyzerAPI {
 	
-	private static final Logger log = Logger.getLogger(MetalyzerAPI.class);
+	public static final String DEFAULT_CONNECTION = "default";
 	
 	/**
 	 * Structures that caches all api connection objects.
@@ -87,13 +86,20 @@ public class MetalyzerAPI {
 	
 	private GraphAnalyzer graphAnalyzer;
 	
+	private static volatile ConnectionManager manager;
+	
+	public static void setConnectionManager(ConnectionManager manager) {
+		MetalyzerAPI.manager = manager;
+	}
+	
 	/**
 	 * Instance of an VisITMeta GraphService as an entry point to their api.
 	 */
 	private GraphService gs;
 	
-	private MetalyzerAPI(String connection) throws MetalyzerAPIException{
-		gs = MetalyzerAPIHelper.getGraphService(connection);
+	private MetalyzerAPI(String connection) throws ConnectionException {
+		gs = manager.getGraphService(connection);
+		
 		// Initializing the finder.
 		identFinder = new IdentifierFinderImpl(gs);
 		metaFinder = new MetadataFinderImpl(gs);
@@ -104,29 +110,19 @@ public class MetalyzerAPI {
 	/**
 	 * Creates an Singleton instances of MetalyzerAPI
 	 * @author Sören Grzanna
-	 * @return {@link MetalyzerAPI}
-	 * @throws MetalyzerAPIException 
-	 */
-	public static synchronized MetalyzerAPI getInstance() {
-		return MetalyzerAPI.getInstance("default");
-	}
-	
-	/**
-	 * Creates an Singleton instances of MetalyzerAPI
-	 * @author Sören Grzanna
 	 * @param string connection
 	 * @return {@link MetalyzerAPI}
-	 * @throws MetalyzerAPIException
+	 * @throws ConnectionException 
 	 */
-	public static synchronized MetalyzerAPI getInstance(String connection){
-		if( !instances.containsKey(connection) ){
+	public static synchronized MetalyzerAPI getInstance(String connection) {
+		if (!instances.containsKey(connection)){
 			try {
 				instances.put(connection, new MetalyzerAPI(connection));
-			} catch (MetalyzerAPIException e) {
-				log.error("MetalyzerAPI konnte nicht erstellt werden: " + e.getMessage());
-				e.printStackTrace();
+			} catch (ConnectionException e) {
+				
 			}
 		}
+		
 		return instances.get(connection);
 	}
 	

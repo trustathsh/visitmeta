@@ -53,7 +53,8 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 
@@ -113,10 +114,10 @@ public class ConnectionRepresenter extends Representer {
 		public Node representData(Object data) {
 			Map<String, Object> dataMap = new HashMap<String, Object>();
 
-			if(data instanceof Connection){
-				Connection connection = (Connection) data;
+			if(data instanceof ConnectionImpl){
+				ConnectionImpl connection = (ConnectionImpl) data;
 
-				for (Field field: Connection.class.getDeclaredFields()){
+				for (Field field: ConnectionImpl.class.getDeclaredFields()){
 					// find all REQUIRED and OPTIONAL annotations fields
 					for(int i=0; i<field.getAnnotations().length; i++){
 						try{
@@ -130,7 +131,7 @@ public class ConnectionRepresenter extends Representer {
 								field.setAccessible(true);
 								OPTIONAL optionalAnnotation = (OPTIONAL) field.getAnnotations()[i];
 								Object fieldValue = field.get(connection);
-								Object oTmp = Connection.class.getField(optionalAnnotation.value()).get(connection);
+								Object oTmp = ConnectionImpl.class.getField(optionalAnnotation.value()).get(connection);
 								if(!same(fieldValue, oTmp) || !mMinOutput){
 									dataMap.put(transformKey(field.getName()), fieldValue);
 								}
@@ -144,7 +145,7 @@ public class ConnectionRepresenter extends Representer {
 				}
 
 				// save subscribes
-				List<JSONObject> jsonList = connection.getSubscribeList();
+				List<JSONObject> jsonList = connection.getSubscriptions();
 				List<Map<String, Object>> subscribeList = new ArrayList<Map<String,Object>>();
 				for(JSONObject json: jsonList){
 					Map<String,Object> subscribeMap = new TreeMap<String,Object>();

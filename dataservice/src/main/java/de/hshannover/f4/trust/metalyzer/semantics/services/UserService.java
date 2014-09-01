@@ -48,8 +48,8 @@
 
 package de.hshannover.f4.trust.metalyzer.semantics.services;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -71,31 +71,32 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 /**
- * Service-class to provide query-methods to search information for specific users.
- * The UserService provides methods for timestamp-, timeinterval- and current-requests.
- *
+ * Service-class to provide query-methods to search information for specific
+ * users. The UserService provides methods for timestamp-, timeinterval- and
+ * current-requests.
+ * 
  */
-public class UserService{
-	// SemanticsController for the connection to User-REST-API and MetalyzerAPI: 
+public class UserService {
+	// SemanticsController for the connection to User-REST-API and MetalyzerAPI:
 	private SemanticsController semCon;
-	
+
 	// Logging:
 	private static final Logger log = Logger.getLogger(UserService.class);
 
 	/**
-	 * Constructor
-	 * Uses the getInstance-method to set the SemanticsController-Attribute.
+	 * Constructor Uses the getInstance-method to set the
+	 * SemanticsController-Attribute.
 	 */
 	public UserService() {
 		semCon = SemanticsController.getInstance();
 	}
 
 	/**
-	 * Constructor
-	 * Uses a parameter to set the SemanticsController-Attribute.
+	 * Constructor Uses a parameter to set the SemanticsController-Attribute.
 	 * Mainly used in MacAddressService-UnitTests.
+	 * 
 	 * @param semCon
-	 * SemanticsController
+	 *            SemanticsController
 	 */
 	public UserService(SemanticsController semCon) {
 		this.semCon = semCon;
@@ -103,19 +104,21 @@ public class UserService{
 
 	/**
 	 * Query-method to get all users at a given Unix-Timestamp.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
+	 *            Type of the request (timestamp, interval, current).
 	 * @param fromTimestamp
-	 * Unix-Timestamp of the beginning of the search-interval.
+	 *            Unix-Timestamp of the beginning of the search-interval.
 	 * @param toTimestamp
-	 * Unix-Timestamp of the end of the search-interval.
-	 * @return
-	 * Returns a list of all users at the given Unix-Timestamp.
+	 *            Unix-Timestamp of the end of the search-interval.
+	 * @return Returns a list of all users at the given Unix-Timestamp.
 	 */
-	public ArrayList<User> getUsers(RequestType requestType, long fromTimestamp, long toTimestamp) throws MetalyzerAPIException {
+	public ArrayList<User> getUsers(RequestType requestType,
+			long fromTimestamp, long toTimestamp) throws MetalyzerAPIException {
 		log.info("Searching for all User-Objects");
-		
-		//Searching for all user-identifiers (timestamp, timeinterval, current).
+
+		// Searching for all user-identifiers (timestamp, timeinterval,
+		// current).
 		Collection<Identifier> userList = null;
 		if (requestType == RequestType.TIMESTAMP_REQUEST) {
 			userList = getAllUserIdentifiers(fromTimestamp);
@@ -129,20 +132,22 @@ public class UserService{
 		String username;
 		String role;
 		long publishTimestamp = 0;
-		
+
 		for (Identifier userIdentifier : userList) {
-			username= "";
-			role= "";
-			if(!userIdentifier.valueFor("/identity[@type]").equals("other")) {
+			username = "";
+			role = "";
+			if (!userIdentifier.valueFor("/identity[@type]").equals("other")) {
 				username = userIdentifier.valueFor("/identity[@name]");
 				for (Link userLink : userIdentifier.getLinks()) {
 					for (Metadata linkMetadata : userLink.getMetadata()) {
-						//Searching for the corresponding publish-timestamp:
-						if (linkMetadata.getTypeName().equals("authenticated-as")) {
-							publishTimestamp = linkMetadata.getPublishTimestamp();
+						// Searching for the corresponding publish-timestamp:
+						if (linkMetadata.getTypeName().equals(
+								"authenticated-as")) {
+							publishTimestamp = linkMetadata
+									.getPublishTimestamp();
 						}
 
-						//Searching for the corresponding role:
+						// Searching for the corresponding role:
 						if (linkMetadata.getTypeName().equals("role")) {
 							role = linkMetadata.valueFor("/meta:role/name");
 						}
@@ -156,24 +161,25 @@ public class UserService{
 
 	/**
 	 * Query-method to get the publish-timestamp of a specific User-Object.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
+	 *            Type of the request (timestamp, interval, current).
 	 * @param user
-	 * User to which the Unix-Timestamp should be searched.
-	 * @return
-	 * Returns the Unix-Timestamp of the given user.
+	 *            User to which the Unix-Timestamp should be searched.
+	 * @return Returns the Unix-Timestamp of the given user.
 	 */
-	public long getTimestamp(RequestType requestType, User user) throws MetalyzerAPIException {
+	public long getTimestamp(RequestType requestType, User user)
+			throws MetalyzerAPIException {
 		log.info("Searching for the publish-timestamp of a given user");
-		
-		//Searching for the User-Identifier.
+
+		// Searching for the User-Identifier.
 		Identifier userIdentifier = getUserIdentifier(requestType, user);
-		
+
 		Metadata authenticatedAs = null;
 
-		//Searching for the publish-timestamp for the user.
+		// Searching for the publish-timestamp for the user.
 		if (userIdentifier != null) {
-			//Check all links.
+			// Check all links.
 			for (Link userLink : userIdentifier.getLinks()) {
 				for (Metadata linkMetadata : userLink.getMetadata()) {
 					if (linkMetadata.getTypeName().equals("authenticated-as")) {
@@ -183,99 +189,109 @@ public class UserService{
 				}
 			}
 		}
-		
+
 		if (authenticatedAs != null) {
-			//Try to get the publish-timestamp from the authenticated-as-metadata.
+			// Try to get the publish-timestamp from the
+			// authenticated-as-metadata.
 			return authenticatedAs.getPublishTimestamp();
 		} else {
-			//Else no publish-timestamp was found, so set it to 0.
+			// Else no publish-timestamp was found, so set it to 0.
 			return 0;
 		}
 	}
 
 	/**
-	 * Query-method to get all associated IP-Addresses of a given User-Object at a 
-	 * given Unix-Timestamp. The timestamp-attribute of the User-Object can be chosen
-	 * freely to narrow down the search-results. In the IF-MAP-Graph only IP-Addresses
-	 * with an earlier or same publish-timestamp as the timestamp-attribute of the given
-	 * User-Object will be found.
+	 * Query-method to get all associated IP-Addresses of a given User-Object at
+	 * a given Unix-Timestamp. The timestamp-attribute of the User-Object can be
+	 * chosen freely to narrow down the search-results. In the IF-MAP-Graph only
+	 * IP-Addresses with an earlier or same publish-timestamp as the
+	 * timestamp-attribute of the given User-Object will be found.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
+	 *            Type of the request (timestamp, interval, current).
 	 * @param user
-	 * User to which the IP-Addresses should be searched.
-	 * @return
-	 * Returns a list of all IP-Addresses of the given user.
+	 *            User to which the IP-Addresses should be searched.
+	 * @return Returns a list of all IP-Addresses of the given user.
 	 */
-	public ArrayList<IpAddress> getIpAddresses(RequestType requestType, User user) throws MetalyzerAPIException {
+	public ArrayList<IpAddress> getIpAddresses(RequestType requestType,
+			User user) throws MetalyzerAPIException {
 		log.info("Searching for the IP-Addresses of a given user");
-		
-		//Searching for the User-Identifier.
+
+		// Searching for the User-Identifier.
 		Identifier userIdentifier = getUserIdentifier(requestType, user);
 
 		ArrayList<IpAddress> ipAddresses = new ArrayList<IpAddress>();
 
-		//Searching for the corresponding IP-Addresses for the user.
+		// Searching for the corresponding IP-Addresses for the user.
 		if (userIdentifier != null) {
-			//Check all links.
+			// Check all links.
 			for (Link userLink : userIdentifier.getLinks()) {
 				IdentifierPair identifierPair = userLink.getIdentifiers();
 				Identifier first = identifierPair.getFirst();
 				Identifier second = identifierPair.getSecond();
 
-				//First identifier of the link is the access-request.
+				// First identifier of the link is the access-request.
 				if (first.getTypeName().equals("access-request")) {
-					IpAddressHelper.findIPAddressesFromIdentifier(first, ipAddresses); //IP-Addresses over Access-Request
-					IpAddressHelper.findIpAddressesOverMacAddresses(first, ipAddresses); //IP-Addresses over MAC-Address
+					IpAddressHelper.findIPAddressesFromIdentifier(first,
+							ipAddresses); // IP-Addresses over Access-Request
+					IpAddressHelper.findIpAddressesOverMacAddresses(first,
+							ipAddresses); // IP-Addresses over MAC-Address
 
-					//Second identifier of the link is the access-request.
+					// Second identifier of the link is the access-request.
 				} else if (second.getTypeName().equals("access-request")) {
-					IpAddressHelper.findIPAddressesFromIdentifier(second, ipAddresses); //IP-Addresses over Access-Request
-					IpAddressHelper.findIpAddressesOverMacAddresses(second, ipAddresses); //IP-Addresses over MAC-Address
+					IpAddressHelper.findIPAddressesFromIdentifier(second,
+							ipAddresses); // IP-Addresses over Access-Request
+					IpAddressHelper.findIpAddressesOverMacAddresses(second,
+							ipAddresses); // IP-Addresses over MAC-Address
 				}
 			}
 		}
 		return ipAddresses;
 	}
 
-
 	/**
-	 * Query-method to get all associated MAC-Addresses of a given User-Object at a 
-	 * given Unix-Timestamp. The timestamp-attribute of the User-Object can be chosen
-	 * freely to narrow down the search-results. In the IF-MAP-Graph only MAC-Addresses
-	 * with an earlier or same publish-timestamp as the timestamp-attribute of the given
-	 * User-Object will be found.
+	 * Query-method to get all associated MAC-Addresses of a given User-Object
+	 * at a given Unix-Timestamp. The timestamp-attribute of the User-Object can
+	 * be chosen freely to narrow down the search-results. In the IF-MAP-Graph
+	 * only MAC-Addresses with an earlier or same publish-timestamp as the
+	 * timestamp-attribute of the given User-Object will be found.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
+	 *            Type of the request (timestamp, interval, current).
 	 * @param user
-	 * User to which the MAC-Addresses should be searched.
-	 * @return
-	 * Returns a list of all MAC-Addresses of the given user.
+	 *            User to which the MAC-Addresses should be searched.
+	 * @return Returns a list of all MAC-Addresses of the given user.
 	 */
-	public ArrayList<MacAddress> getMacAddresses(RequestType requestType, User user) throws MetalyzerAPIException {
+	public ArrayList<MacAddress> getMacAddresses(RequestType requestType,
+			User user) throws MetalyzerAPIException {
 		log.info("Searching for the MAC-Addresses of a given user");
-		
-		//Searching for the User-Identifier.
+
+		// Searching for the User-Identifier.
 		Identifier userIdentifier = getUserIdentifier(requestType, user);
 
 		ArrayList<MacAddress> macAddresses = new ArrayList<MacAddress>();
 
-		//Searching for the corresponding MAC-Addresses for the user.
+		// Searching for the corresponding MAC-Addresses for the user.
 		if (userIdentifier != null) {
-			//Check all links.
+			// Check all links.
 			for (Link userLink : userIdentifier.getLinks()) {
 				IdentifierPair identifierPair = userLink.getIdentifiers();
 				Identifier first = identifierPair.getFirst();
 				Identifier second = identifierPair.getSecond();
 
-				//First identifier of the link is the access-request.
+				// First identifier of the link is the access-request.
 				if (first.getTypeName().equals("access-request")) {
-					MacAddressHelper.findMacAddressesFromIdentifier(first, macAddresses); //MAC-Addresses over Access-Request
-					MacAddressHelper.findMacAddressesOverIpAddresses(first, macAddresses); //MAC-Addresses over IP-Address
+					MacAddressHelper.findMacAddressesFromIdentifier(first,
+							macAddresses); // MAC-Addresses over Access-Request
+					MacAddressHelper.findMacAddressesOverIpAddresses(first,
+							macAddresses); // MAC-Addresses over IP-Address
 
-					//Second identifier of the link is the access-request.
+					// Second identifier of the link is the access-request.
 				} else if (second.getTypeName().equals("access-request")) {
-					MacAddressHelper.findMacAddressesFromIdentifier(second, macAddresses); //MAC-Addresses over Access-Request
-					MacAddressHelper.findMacAddressesOverIpAddresses(second, macAddresses); //MAC-Addresses over IP-Address
+					MacAddressHelper.findMacAddressesFromIdentifier(second,
+							macAddresses); // MAC-Addresses over Access-Request
+					MacAddressHelper.findMacAddressesOverIpAddresses(second,
+							macAddresses); // MAC-Addresses over IP-Address
 				}
 			}
 		}
@@ -283,91 +299,95 @@ public class UserService{
 	}
 
 	/**
-	 * Query-method to get all associated devices of a given User-Object at a 
-	 * given Unix-Timestamp. The timestamp-attribute of the User-Object can be 
+	 * Query-method to get all associated devices of a given User-Object at a
+	 * given Unix-Timestamp. The timestamp-attribute of the User-Object can be
 	 * chosen freely to narrow down the search-results. In the IF-MAP-Graph only
-	 * devices with an earlier or same publish-timestamp as the timestamp-attribute
-	 * of the given User-Object will be found.
+	 * devices with an earlier or same publish-timestamp as the
+	 * timestamp-attribute of the given User-Object will be found.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
-	 * @param user  
-	 * User to which the devices should be searched.
-	 * @return
-	 * Returns a list of all devices of the given user.
+	 *            Type of the request (timestamp, interval, current).
+	 * @param user
+	 *            User to which the devices should be searched.
+	 * @return Returns a list of all devices of the given user.
 	 */
-	public ArrayList<Device> getDevices(RequestType requestType, User user) throws MetalyzerAPIException {
+	public ArrayList<Device> getDevices(RequestType requestType, User user)
+			throws MetalyzerAPIException {
 		log.info("Searching for the devices of a given user");
-		
-		//Searching for the User-Identifier.
+
+		// Searching for the User-Identifier.
 		Identifier userIdentifier = getUserIdentifier(requestType, user);
 
 		ArrayList<Device> devices = new ArrayList<Device>();
 
-		//Searching for the corresponding devices for the user.
+		// Searching for the corresponding devices for the user.
 		if (userIdentifier != null) {
-			//Check all links.
+			// Check all links.
 			for (Link userLink : userIdentifier.getLinks()) {
 				IdentifierPair identifierPair = userLink.getIdentifiers();
 				Identifier first = identifierPair.getFirst();
 				Identifier second = identifierPair.getSecond();
 
-				//First identifier of the link is the access-request.
+				// First identifier of the link is the access-request.
 				if (first.getTypeName().equals("access-request")) {
-					//DeviceHelper.findDevicesFromIdentifier(first, devices); //to find infrastructure-devices (Switch etc.)
-					DeviceHelper.findAccessRequestDevices(first, devices); 
+					// DeviceHelper.findDevicesFromIdentifier(first, devices);
+					// //to find infrastructure-devices (Switch etc.)
+					DeviceHelper.findAccessRequestDevices(first, devices);
 
-					//Second identifier of the link is the access-request.
+					// Second identifier of the link is the access-request.
 				} else if (second.getTypeName().equals("access-request")) {
-					//DeviceHelper.findDevicesFromIdentifier(second, devices); //to find infrastructure-devices (Switch etc.)
+					// DeviceHelper.findDevicesFromIdentifier(second, devices);
+					// //to find infrastructure-devices (Switch etc.)
 					DeviceHelper.findAccessRequestDevices(second, devices);
 				}
 			}
 		}
 		return devices;
 	}
-	
-	
-	//########################### Helper-Methods ###########################
 
-	
+	// ########################### Helper-Methods ###########################
+
 	/**
 	 * Helper-method to get the corresponding Identifier of a given User-Object.
-	 * The timestamp-attributes of the User-Object can be chosen freely to get the 
-	 * identifier in a specific situation of the IF-MAP-Graph.
+	 * The timestamp-attributes of the User-Object can be chosen freely to get
+	 * the identifier in a specific situation of the IF-MAP-Graph.
+	 * 
 	 * @param requestType
-	 * Type of the request (timestamp, interval, current).
-	 * @param user  
-	 * User to which the corresponding identifier should be searched.
-	 * @return
-	 * Returns the identifier of the given user.
+	 *            Type of the request (timestamp, interval, current).
+	 * @param user
+	 *            User to which the corresponding identifier should be searched.
+	 * @return Returns the identifier of the given user.
 	 */
-	private Identifier getUserIdentifier(RequestType requestType, User user) throws MetalyzerAPIException {
-		//Searching for all user-identifiers.
+	private Identifier getUserIdentifier(RequestType requestType, User user)
+			throws MetalyzerAPIException {
+		// Searching for all user-identifiers.
 		Collection<Identifier> userList = null;
 		if (requestType == RequestType.TIMESTAMP_REQUEST) {
 			userList = getAllUserIdentifiers(user.getSearchTimestamp());
 		} else if (requestType == RequestType.TIMEINTERVAL_REQUEST) {
-			userList = getAllUserIdentifiers(user.getSearchFromTimestamp(), user.getSearchToTimestamp());
+			userList = getAllUserIdentifiers(user.getSearchFromTimestamp(),
+					user.getSearchToTimestamp());
 		} else if (requestType == RequestType.CURRENT_REQUEST) {
 			userList = getAllUserIdentifiers();
 		}
-		
+
 		log.debug("Available users: " + userList.toString());
 
-		//Searching for the corresponding identifier for the user.
+		// Searching for the corresponding identifier for the user.
 		Identifier userIdentifier = null;
 		Iterator<Identifier> userIterator = userList.iterator();
 		boolean foundUser = false;
 		while (userIterator.hasNext() && !foundUser) {
 			userIdentifier = userIterator.next();
 			if (userIdentifier.getTypeName().equals("identity")) {
-				if (userIdentifier.valueFor("/identity[@name]").equals(user.getName())) {
+				if (userIdentifier.valueFor("/identity[@name]").equals(
+						user.getName())) {
 					foundUser = true;
 				}
 			}
 		}
-		
-		//Check if the User-Identifier was found.
+
+		// Check if the User-Identifier was found.
 		if (foundUser) {
 			return userIdentifier;
 		} else {
@@ -376,43 +396,63 @@ public class UserService{
 	}
 
 	/**
-	 * Helper-method to get a collection of all User-Identifiers at a given Unix-Timestamp.
-	 * @param timestamp  
-	 * Unix-Timestamp to which the user-identifiers should be searched.
-	 * @return
-	 * Returns a collection of all user-identifiers at the given Unix-Timestamp.
+	 * Helper-method to get a collection of all User-Identifiers at a given
+	 * Unix-Timestamp.
+	 * 
+	 * @param timestamp
+	 *            Unix-Timestamp to which the user-identifiers should be
+	 *            searched.
+	 * @return Returns a collection of all user-identifiers at the given
+	 *         Unix-Timestamp.
 	 */
-	private Collection<Identifier> getAllUserIdentifiers(long timestamp) throws MetalyzerAPIException {
-		log.info("Request to get all User-Identifiers from the MetalyzerAPI at timestamp " + timestamp);
-		
-		return semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.IDENTITY, timestamp);
+	private Collection<Identifier> getAllUserIdentifiers(long timestamp)
+			throws MetalyzerAPIException {
+		log.info("Request to get all User-Identifiers from the MetalyzerAPI at timestamp "
+				+ timestamp);
+
+		return semCon.getAPI().getIdentifierFinder()
+				.get(StandardIdentifierType.IDENTITY, timestamp);
 	}
-	
+
 	/**
-	 * Helper-method to get a collection of all User-Identifiers at a given period of time.
-	 * @param fromTimestamp  
-	 * Unix-Timestamp of the beginning of the search period.
+	 * Helper-method to get a collection of all User-Identifiers at a given
+	 * period of time.
+	 * 
+	 * @param fromTimestamp
+	 *            Unix-Timestamp of the beginning of the search period.
 	 * @param toTimestamp
-	 * Unix-Timestamp of the end of the search period.
-	 * @return
-	 * Returns a collection of all User-Identifiers at the given period of time.
+	 *            Unix-Timestamp of the end of the search period.
+	 * @return Returns a collection of all User-Identifiers at the given period
+	 *         of time.
 	 */
-	private Collection<Identifier> getAllUserIdentifiers(long fromTimestamp, long toTimestamp) throws MetalyzerAPIException {
-		log.info("Request to get all User-Identifiers from the MetalyzerAPI at interval [" + fromTimestamp + ", " + toTimestamp + "]");
-		MetalyzerDelta<Identifier> delta = semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.IDENTITY, fromTimestamp, toTimestamp);
-		
-		//return delta.getAvailables(); //To get all available MacAddresses at the timeinterval.
-		return delta.getUpdates(); //To get just the updates of MacAddresses at the timeinterval.
+	private Collection<Identifier> getAllUserIdentifiers(long fromTimestamp,
+			long toTimestamp) throws MetalyzerAPIException {
+		log.info("Request to get all User-Identifiers from the MetalyzerAPI at interval ["
+				+ fromTimestamp + ", " + toTimestamp + "]");
+		MetalyzerDelta<Identifier> delta = semCon
+				.getAPI()
+				.getIdentifierFinder()
+				.get(StandardIdentifierType.IDENTITY, fromTimestamp,
+						toTimestamp);
+
+		// return delta.getAvailables(); //To get all available MacAddresses at
+		// the timeinterval.
+		return delta.getUpdates(); // To get just the updates of MacAddresses at
+									// the timeinterval.
 	}
-	
+
 	/**
-	 * Helper-method to get a collection of all User-Identifiers at the current timestamp.
-	 * @return
-	 * Returns a collection of all User-Identifiers at the current timestamp.
+	 * Helper-method to get a collection of all User-Identifiers at the current
+	 * timestamp.
+	 * 
+	 * @return Returns a collection of all User-Identifiers at the current
+	 *         timestamp.
 	 */
-	private Collection<Identifier> getAllUserIdentifiers() throws MetalyzerAPIException {
+	private Collection<Identifier> getAllUserIdentifiers()
+			throws MetalyzerAPIException {
 		log.info("Request to get all User-Identifiers from the MetalyzerAPI at the current timestamp");
-		
-		return semCon.getConnection().getIdentifierFinder().getCurrent(StandardIdentifierType.IDENTITY);
+
+		return semCon.getAPI().getIdentifierFinder()
+				.getCurrent(StandardIdentifierType.IDENTITY);
 	}
 }

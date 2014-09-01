@@ -46,7 +46,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
@@ -55,7 +54,7 @@ import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 
 public class Neo4JDatabase {
 
-	private Logger log = Logger.getLogger(Connection.class);
+	private Logger log = Logger.getLogger(Neo4JDatabase.class);
 
 	private PropertiesReaderWriter config = Application.getIFMAPConfig();
 

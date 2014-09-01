@@ -449,7 +449,7 @@ public class DeviceService {
 	 * @return @see{Collection} of device @link{Identifiers}
 	 */
 	private Collection<Identifier> getAllDeviceIdentifiers() throws MetalyzerAPIException {
-		return semCon.getConnection().getIdentifierFinder().getCurrent(StandardIdentifierType.DEVICE);
+		return semCon.getAPI().getIdentifierFinder().getCurrent(StandardIdentifierType.DEVICE);
 	}
 
 	/**
@@ -460,7 +460,7 @@ public class DeviceService {
 	 */
 	private Collection<Identifier> getAllDeviceIdentifiers(long fromTimestamp,
 			long toTimestamp) throws MetalyzerAPIException {
-		MetalyzerDelta<Identifier> deviceDelta = semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.DEVICE, fromTimestamp, toTimestamp);
+		MetalyzerDelta<Identifier> deviceDelta = semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.DEVICE, fromTimestamp, toTimestamp);
 		return deviceDelta.getAvailables();
 	}
 
@@ -470,7 +470,7 @@ public class DeviceService {
 	 * @return @link{Collection} of device @link{Identifiers}s
 	 */
 	private Collection<Identifier> getAllDeviceIdentifiers(long timestamp) throws MetalyzerAPIException {
-		return semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.DEVICE, timestamp);
+		return semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.DEVICE, timestamp);
 	}	
 
 }

@@ -55,16 +55,12 @@ public class SemanticsMain implements Runnable {
 	
 	Logger log= Logger.getLogger(SemanticsMain.class);
 	
-	/**
-	 * @param args
-	 */
 	public void runSemantics() {
 		
 		SemanticsController semCon= SemanticsController.getInstance();
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		log.info("Running runSemantics");
@@ -72,9 +68,8 @@ public class SemanticsMain implements Runnable {
 
 		Collection<Identifier> userList = null;
 		try {
-			userList = semCon.getConnection().getIdentifierFinder().getCurrent();
+			userList = semCon.getAPI().getIdentifierFinder().getCurrent();
 		} catch (MetalyzerAPIException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(userList != null){
@@ -103,9 +98,8 @@ public class SemanticsMain implements Runnable {
 		Collection<Metadata> metaList = null;
 		log.info("------------------------------------Metadata: ------------------------------------");
 		try {
-			metaList = semCon.getConnection().getMetadataFinder().getCurrent();
+			metaList = semCon.getAPI().getMetadataFinder().getCurrent();
 		} catch (MetalyzerAPIException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(metaList != null){
@@ -134,26 +128,27 @@ public class SemanticsMain implements Runnable {
 	private void runCount() {
 		try {
 			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		log.info("Running Test");
 		
-		log.info("Current Nodes: " + MetalyzerAPI.getInstance().getGraphAnalyzer().countNodes());
-		log.info("Nodes at 1400845125000: " + MetalyzerAPI.getInstance().getGraphAnalyzer().countNodesAt(1401450107000L));
-		log.info("Nodes ( 1400845125000, 1400845127000 ): " + MetalyzerAPI.getInstance().getGraphAnalyzer().countNodes(1401450107000L,1401450113000L));
+		MetalyzerAPI api = MetalyzerAPI.getInstance(MetalyzerAPI.DEFAULT_CONNECTION);
 		
-		log.info("Current Edges: " + MetalyzerAPI.getInstance().getGraphAnalyzer().countEdges());
-		log.info("Edges at 1400845125000: " + MetalyzerAPI.getInstance().getGraphAnalyzer().countEdgesAt(1401450107000L));
-		log.info("Edges ( 1400845125000, 1400845127000 ): " + MetalyzerAPI.getInstance().getGraphAnalyzer().countEdges(1401450107000L,1401450113000L));
+		log.info("Current Nodes: " + api.getGraphAnalyzer().countNodes());
+		log.info("Nodes at 1400845125000: " + api.getGraphAnalyzer().countNodesAt(1401450107000L));
+		log.info("Nodes ( 1400845125000, 1400845127000 ): " + api.getGraphAnalyzer().countNodes(1401450107000L,1401450113000L));
 		
-		log.info("Current Metadata: " + MetalyzerAPI.getInstance().getMetadataFinder().count());
-		log.info("Metadata at 1400845125000: " + MetalyzerAPI.getInstance().getMetadataFinder().count(1401450107000L));
-		log.info("Metadata ( 1400845125000, 1400845127000 ): " + MetalyzerAPI.getInstance().getMetadataFinder().count(1401450107000L,1401450113000L));
+		log.info("Current Edges: " + api.getGraphAnalyzer().countEdges());
+		log.info("Edges at 1400845125000: " + api.getGraphAnalyzer().countEdgesAt(1401450107000L));
+		log.info("Edges ( 1400845125000, 1400845127000 ): " + api.getGraphAnalyzer().countEdges(1401450107000L,1401450113000L));
 		
-		log.info("Mean of current Edges: " + MetalyzerAPI.getInstance().getGraphAnalyzer().getMeanOfEdges());
-		log.info("Mean of current Edges at 1400845125000: " + MetalyzerAPI.getInstance().getGraphAnalyzer().getMeanOfEdges(1401450107000L));
+		log.info("Current Metadata: " + api.getMetadataFinder().count());
+		log.info("Metadata at 1400845125000: " + api.getMetadataFinder().count(1401450107000L));
+		log.info("Metadata ( 1400845125000, 1400845127000 ): " + api.getMetadataFinder().count(1401450107000L,1401450113000L));
+		
+		log.info("Mean of current Edges: " + api.getGraphAnalyzer().getMeanOfEdges());
+		log.info("Mean of current Edges at 1400845125000: " + api.getGraphAnalyzer().getMeanOfEdges(1401450107000L));
 	}
 	
 }

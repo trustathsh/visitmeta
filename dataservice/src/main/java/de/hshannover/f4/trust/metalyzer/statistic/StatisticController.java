@@ -49,50 +49,53 @@
 package de.hshannover.f4.trust.metalyzer.statistic;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.hshannover.f4.trust.metalyzer.api.MetalyzerAPI;
 import de.hshannover.f4.trust.metalyzer.api.StandardIdentifierType;
 import de.hshannover.f4.trust.metalyzer.api.exception.MetalyzerAPIException;
-import de.hshannover.f4.trust.metalyzer.statistic.FrequencyType;
-import de.hshannover.f4.trust.metalyzer.statistic.MeanType;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 
 public class StatisticController {
-    private static MetalyzerAPI metalyzerAPI; 
+	
     private static StatisticController statController;
-
-    private StatisticController(){
-
+    
+    private String connectionName;
+    
+    private StatisticController() {
+    	// do nothing
     }
+    
     /**
 	 * @return  Returns an object of the StatisticController.
 	 */
-    public static StatisticController getInstance() {
+    public static synchronized StatisticController getInstance() {
     	if (statController == null) {
                 statController = new StatisticController();
-//                statController.initialize();
         }
+    	
         return statController;
     }
 
-    /**
-	 * Initialization of the StatisticController.
-	 */
-    private void initialize(){
-        metalyzerAPI = MetalyzerAPI.getInstance();
-    }
-
+	/**
+	 * To get the connection to MetalyzerAPI.
+	 * @return an object of the MetalyzerAPI.
+	 */	
+	public MetalyzerAPI getAPI() {
+		if (connectionName != null) {
+			return MetalyzerAPI.getInstance(connectionName);
+		} else {
+			return MetalyzerAPI.getInstance(MetalyzerAPI.DEFAULT_CONNECTION);
+		}
+	}
     
     /**
      * Set metalyzerAPI to specified connection
      */
     public void setConnection(String connectionName){
-    	if(connectionName != null){
-    		metalyzerAPI= MetalyzerAPI.getInstance(connectionName);
+    	if (connectionName != null) {
+    		this.connectionName = connectionName;
     	}
     }
 
@@ -191,7 +194,7 @@ public class StatisticController {
      * @return returns the result of the node query as a ResultObject<NodeResult>
      */    
     public ResultObject<NodeResult> getNodeCharecteristic(long from, long to){
-    	ArrayList<Long> intervalTimestamps = metalyzerAPI.getTimestampsBetween(from, to);
+    	ArrayList<Long> intervalTimestamps = getAPI().getTimestampsBetween(from, to);
     	ArrayList<Long> evaluationList = new ArrayList<>();
     	double meanResult = 0.0;
     	double stdDeviation = 0.0;
@@ -199,12 +202,12 @@ public class StatisticController {
     	long numbersOfIdentifier;
 		ArrayList<NodeResult> nodeResult = new ArrayList<>();
     	for(long timestamp : intervalTimestamps){
-    		numbersOfIdentifier= metalyzerAPI.getGraphAnalyzer().countNodesAt(timestamp);
+    		numbersOfIdentifier= getAPI().getGraphAnalyzer().countNodesAt(timestamp);
     		evaluationList.add(numbersOfIdentifier);
     	}
         meanResult = new RMean(evaluationList).getMean();
     	for(long timestamp : intervalTimestamps){
-    		numbersOfIdentifier= metalyzerAPI.getGraphAnalyzer().countNodesAt(timestamp);
+    		numbersOfIdentifier= getAPI().getGraphAnalyzer().countNodesAt(timestamp);
     		deviation = Math.abs(numbersOfIdentifier - meanResult);
     		nodeResult.add(new NodeResult(timestamp,deviation,numbersOfIdentifier));
     	}
@@ -224,7 +227,7 @@ public class StatisticController {
      * @return returns the result of the edge query as a ResultObject<EdgeResult>
      */
 	public ResultObject<EdgeResult> getEdgeCharecteristic(long from, long to){
-		ArrayList<Long> intervalTimestamps = metalyzerAPI.getTimestampsBetween(from, to);
+		ArrayList<Long> intervalTimestamps = getAPI().getTimestampsBetween(from, to);
     	ArrayList<Long> evaluationList = new ArrayList<>();
     	double meanResult = 0.0;
     	double stdDeviation = 0.0;
@@ -232,13 +235,13 @@ public class StatisticController {
     	ArrayList<EdgeResult> edgeResult = new ArrayList<>();
     	long numbersOfEdges;
 		for(long timestamp : intervalTimestamps){
-    		numbersOfEdges= metalyzerAPI.getGraphAnalyzer().countEdgesAt(timestamp);
+    		numbersOfEdges= getAPI().getGraphAnalyzer().countEdgesAt(timestamp);
     		evaluationList.add(numbersOfEdges);
     	}
         meanResult = new RMean(evaluationList).getMean();
 		
      	for(long timestamp : intervalTimestamps){
-    		numbersOfEdges= metalyzerAPI.getGraphAnalyzer().countEdgesAt(timestamp);
+    		numbersOfEdges= getAPI().getGraphAnalyzer().countEdgesAt(timestamp);
     		deviation = Math.abs(numbersOfEdges - meanResult);
     		edgeResult.add(new EdgeResult(timestamp,deviation,numbersOfEdges));
     	}
@@ -258,7 +261,7 @@ public class StatisticController {
      * @return returns the result of the edge per nodes query as a ResultObject<MeanOfEdgeResult>
      */    	
 	public ResultObject<MeanOfEdgeResult> getMeanOfEdgeCharecteristic(long from, long to){
-		ArrayList<Long> intervalTimestamps = metalyzerAPI.getTimestampsBetween(from, to);
+		ArrayList<Long> intervalTimestamps = getAPI().getTimestampsBetween(from, to);
     	double meanResult = 0.0;
     	double stdDeviation = 0.0;
     	double deviation = 0.0;
@@ -267,12 +270,12 @@ public class StatisticController {
     	ArrayList<MeanOfEdgeResult> edgeResult = new ArrayList<>();
 		ArrayList<Double> edgesEvaluation = new ArrayList<Double>();
 		for(long timestamp : intervalTimestamps){
-    		meanOfEdges= metalyzerAPI.getGraphAnalyzer().getMeanOfEdges(timestamp);
+    		meanOfEdges= getAPI().getGraphAnalyzer().getMeanOfEdges(timestamp);
     		edgesEvaluation.add(meanOfEdges);
     	}
 		meanResult = new RMean(edgesEvaluation).getMean();
 		for(long timestamp : intervalTimestamps){
-    		meanOfEdges = metalyzerAPI.getGraphAnalyzer().getMeanOfEdges(timestamp);
+    		meanOfEdges = getAPI().getGraphAnalyzer().getMeanOfEdges(timestamp);
     		deviation = Math.abs(meanOfEdges - meanResult);
     		edgeResult.add(new MeanOfEdgeResult(timestamp,deviation,meanOfEdges));
     	}
@@ -291,13 +294,13 @@ public class StatisticController {
      */
 	public ArrayList<RateOfChangeResult> rateOfChange(long from, long to, StandardIdentifierType type){
    	ArrayList<RateOfChangeResult> resultList = new ArrayList<>();
-   	ArrayList<Long> timestamps = metalyzerAPI.getTimestampsBetween(from, to);
+   	ArrayList<Long> timestamps = getAPI().getTimestampsBetween(from, to);
    	
 		long nextStamp = timestamps.get(0+1);
 		long currentStamp = timestamps.get(0);
 		
-		int current = metalyzerAPI.getIdentifierFinder().get(type, currentStamp).size();
-		int next = metalyzerAPI.getIdentifierFinder().get(type, nextStamp).size();
+		int current = getAPI().getIdentifierFinder().get(type, currentStamp).size();
+		int next = getAPI().getIdentifierFinder().get(type, nextStamp).size();
 		
 		resultList.add(new RateOfChangeResult(currentStamp, current, 0, current-next));
    	   	
@@ -307,9 +310,9 @@ public class StatisticController {
    		long nextTimestamp = timestamps.get(i+1);
    		long currentTimestamp = timestamps.get(i);
    		
-   		int countOfMetdataPrevious = metalyzerAPI.getIdentifierFinder().get(type, previousTimestamp).size();
-   		int countOfMetadataCurrent = metalyzerAPI.getIdentifierFinder().get(type, currentTimestamp).size();
-   		int countOfMetadataNext = metalyzerAPI.getIdentifierFinder().get(type, nextTimestamp).size();
+   		int countOfMetdataPrevious = getAPI().getIdentifierFinder().get(type, previousTimestamp).size();
+   		int countOfMetadataCurrent = getAPI().getIdentifierFinder().get(type, currentTimestamp).size();
+   		int countOfMetadataNext = getAPI().getIdentifierFinder().get(type, nextTimestamp).size();
    		
    		int differencePrevious = countOfMetadataCurrent-countOfMetdataPrevious;
    		int differenceNext = countOfMetadataCurrent-countOfMetadataNext;
@@ -321,8 +324,8 @@ public class StatisticController {
    	long previousStamp = timestamps.get(0+1);
 		currentStamp = timestamps.get(0);
 		
-		current = metalyzerAPI.getIdentifierFinder().get(type, currentStamp).size();
-		int previous = metalyzerAPI.getIdentifierFinder().get(type, previousStamp).size();
+		current = getAPI().getIdentifierFinder().get(type, currentStamp).size();
+		int previous = getAPI().getIdentifierFinder().get(type, previousStamp).size();
 		
 		resultList.add(new RateOfChangeResult(currentStamp, current, current-previous, 0));
    	
@@ -339,13 +342,13 @@ public class StatisticController {
 	 */
 	public ArrayList<RateOfChangeResult> rateOfChange(long from, long to, String type){
 	   	ArrayList<RateOfChangeResult> resultList = new ArrayList<>();
-	   	ArrayList<Long> timestamps = metalyzerAPI.getTimestampsBetween(from, to);
+	   	ArrayList<Long> timestamps = getAPI().getTimestampsBetween(from, to);
 	   	
 			long nextStamp = timestamps.get(0+1);
 			long currentStamp = timestamps.get(0);
 			
-			int current = metalyzerAPI.getMetadataFinder().get(type, currentStamp).size();
-			int next = metalyzerAPI.getMetadataFinder().get(type, nextStamp).size();
+			int current = getAPI().getMetadataFinder().get(type, currentStamp).size();
+			int next = getAPI().getMetadataFinder().get(type, nextStamp).size();
 			
 			resultList.add(new RateOfChangeResult(currentStamp, current, 0, current-next));
 	   	   	
@@ -355,9 +358,9 @@ public class StatisticController {
 	   		long nextTimestamp = timestamps.get(i+1);
 	   		long currentTimestamp = timestamps.get(i);
 	   		
-	   		int countOfMetdataPrevious = metalyzerAPI.getMetadataFinder().get(type, previousTimestamp).size();
-	   		int countOfMetadataCurrent = metalyzerAPI.getMetadataFinder().get(type, currentTimestamp).size();
-	   		int countOfMetadataNext = metalyzerAPI.getMetadataFinder().get(type, nextTimestamp).size();
+	   		int countOfMetdataPrevious = getAPI().getMetadataFinder().get(type, previousTimestamp).size();
+	   		int countOfMetadataCurrent = getAPI().getMetadataFinder().get(type, currentTimestamp).size();
+	   		int countOfMetadataNext = getAPI().getMetadataFinder().get(type, nextTimestamp).size();
 	   		
 	   		int differencePrevious = countOfMetadataCurrent-countOfMetdataPrevious;
 	   		int differenceNext = countOfMetadataCurrent-countOfMetadataNext;
@@ -369,8 +372,8 @@ public class StatisticController {
    	long previousStamp = timestamps.get(0+1);
 		currentStamp = timestamps.get(0);
 		
-		current = metalyzerAPI.getMetadataFinder().get(type, currentStamp).size();
-		int previous = metalyzerAPI.getMetadataFinder().get(type, previousStamp).size();
+		current = getAPI().getMetadataFinder().get(type, currentStamp).size();
+		int previous = getAPI().getMetadataFinder().get(type, previousStamp).size();
 		
 		resultList.add(new RateOfChangeResult(currentStamp, current, current-previous, 0));
 		    	
@@ -387,13 +390,13 @@ public class StatisticController {
 	 */
 	public ArrayList<RateOfChangeResult> rateOfChange(long from, long to){
    	ArrayList<RateOfChangeResult> resultList = new ArrayList<>();
-   	ArrayList<Long> timestamps = metalyzerAPI.getTimestampsBetween(from, to);
+   	ArrayList<Long> timestamps = getAPI().getTimestampsBetween(from, to);
    	
 		long nextStamp = timestamps.get(0+1);
 		long currentStamp = timestamps.get(0);
 		
-		int current = metalyzerAPI.getMetadataFinder().get(currentStamp).size();
-		int next = metalyzerAPI.getMetadataFinder().get(nextStamp).size();
+		int current = getAPI().getMetadataFinder().get(currentStamp).size();
+		int next = getAPI().getMetadataFinder().get(nextStamp).size();
 		
 		resultList.add(new RateOfChangeResult(currentStamp, current, 0, current-next));
    	   	
@@ -405,9 +408,9 @@ public class StatisticController {
    		long currentTimestamp = timestamps.get(i);
    		
    		//number of Metadatas at relevant timestamps
-   		int countOfMetdataPrevious = metalyzerAPI.getMetadataFinder().get(previousTimestamp).size();
-   		int countOfMetadataCurrent = metalyzerAPI.getMetadataFinder().get(currentTimestamp).size();
-   		int countOfMetadataNext = metalyzerAPI.getMetadataFinder().get(nextTimestamp).size();
+   		int countOfMetdataPrevious = getAPI().getMetadataFinder().get(previousTimestamp).size();
+   		int countOfMetadataCurrent = getAPI().getMetadataFinder().get(currentTimestamp).size();
+   		int countOfMetadataNext = getAPI().getMetadataFinder().get(nextTimestamp).size();
    		
    		int differencePrevious = countOfMetadataCurrent-countOfMetdataPrevious;
    		int differenceNext = countOfMetadataCurrent-countOfMetadataNext;
@@ -419,8 +422,8 @@ public class StatisticController {
    	long previousStamp = timestamps.get(0+1);
 		currentStamp = timestamps.get(0);
 		
-		current = metalyzerAPI.getMetadataFinder().get(currentStamp).size();
-		int previous = metalyzerAPI.getMetadataFinder().get(previousStamp).size();
+		current = getAPI().getMetadataFinder().get(currentStamp).size();
+		int previous = getAPI().getMetadataFinder().get(previousStamp).size();
 		
 		resultList.add(new RateOfChangeResult(currentStamp, current, current-previous, 0));
 		    	
@@ -433,8 +436,8 @@ public class StatisticController {
 	 * @return the relation of nodes to links
 	 */
 	public double relationOfNodesToLinks(long timestamp){    	
-   	double numberOfNodes = metalyzerAPI.getGraphAnalyzer().countNodesAt(timestamp);
-   	double numberOfLinks = metalyzerAPI.getGraphAnalyzer().countEdgesAt(timestamp);    	
+   	double numberOfNodes = getAPI().getGraphAnalyzer().countNodesAt(timestamp);
+   	double numberOfLinks = getAPI().getGraphAnalyzer().countEdgesAt(timestamp);    	
    	return numberOfNodes/numberOfLinks;
    }
    
@@ -447,7 +450,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */ 
 	public int countIpAdresses(long from, long to) throws MetalyzerAPIException{
-    	return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, from, to).getAvailables().size();
+    	return getAPI().getIdentifierFinder().get(StandardIdentifierType.IP_ADDRESS, from, to).getAvailables().size();
     }
 	
 	/**
@@ -459,7 +462,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countMacAdresses(long from, long to) throws MetalyzerAPIException{
-		return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, from, to).getAvailables().size();
+		return getAPI().getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, from, to).getAvailables().size();
 	}
 	
 	/**
@@ -471,7 +474,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countDevices(long from, long to) throws MetalyzerAPIException{
-		return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.DEVICE, from, to).getAvailables().size();
+		return getAPI().getIdentifierFinder().get(StandardIdentifierType.DEVICE, from, to).getAvailables().size();
 	}
 	
 	/**
@@ -483,7 +486,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countIdentity(long from, long to) throws MetalyzerAPIException{
-	    return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.IDENTITY, from, to).getAvailables().size();
+	    return getAPI().getIdentifierFinder().get(StandardIdentifierType.IDENTITY, from, to).getAvailables().size();
 	}
 
 	/**
@@ -495,7 +498,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countAccessRequests(long from, long to) throws MetalyzerAPIException{
-		return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.ACCESS_REQUEST, from, to).getAvailables().size();
+		return getAPI().getIdentifierFinder().get(StandardIdentifierType.ACCESS_REQUEST, from, to).getAvailables().size();
 	}
 	
 	/**
@@ -507,7 +510,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countIdentifier(long from, long to) throws MetalyzerAPIException {    	
-		return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.ALL, from, to).getAvailables().size();
+		return getAPI().getIdentifierFinder().get(StandardIdentifierType.ALL, from, to).getAvailables().size();
 		 
     }
     
@@ -519,7 +522,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countIdentifier(long timestamp) throws MetalyzerAPIException {
-		return metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.ALL, timestamp).size();
+		return getAPI().getIdentifierFinder().get(StandardIdentifierType.ALL, timestamp).size();
 		
 		
     }
@@ -531,7 +534,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public long countIdentifier() throws MetalyzerAPIException {    	
-		return metalyzerAPI.getIdentifierFinder().count();
+		return getAPI().getIdentifierFinder().count();
 		
     }
     
@@ -544,7 +547,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */
 	public int countMetadata(long from, long to) throws MetalyzerAPIException{
-			return metalyzerAPI.getMetadataFinder().get(from, to).getAvailables().size();
+			return getAPI().getMetadataFinder().get(from, to).getAvailables().size();
     }
     
 	/**
@@ -556,7 +559,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */    
 	public int countMetadata(long timestamp) throws MetalyzerAPIException{
-		return metalyzerAPI.getMetadataFinder().get(timestamp).size();
+		return getAPI().getMetadataFinder().get(timestamp).size();
     }
     
 	/**
@@ -566,7 +569,7 @@ public class StatisticController {
 	 * @throws MetalyzerAPIException
 	 */    
 	public long countMetadata() throws MetalyzerAPIException{
-		return metalyzerAPI.getMetadataFinder().count();
+		return getAPI().getMetadataFinder().count();
     }   
     
 	/**
@@ -584,11 +587,11 @@ public class StatisticController {
     	ArrayList<Integer> evalList;
     	
     	if(isDeltaMethod){
-    		listOfIdentifiers = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(filter, fromOrTimestamp, to).getAvailables());
+    		listOfIdentifiers = new ArrayList<>(getAPI().getIdentifierFinder().get(filter, fromOrTimestamp, to).getAvailables());
     	} else if(fromOrTimestamp != 0.0){
-    		listOfIdentifiers = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(filter, fromOrTimestamp));
+    		listOfIdentifiers = new ArrayList<>(getAPI().getIdentifierFinder().get(filter, fromOrTimestamp));
     	} else {
-    		listOfIdentifiers = new ArrayList<>(metalyzerAPI.getIdentifierFinder().getCurrent(filter));
+    		listOfIdentifiers = new ArrayList<>(getAPI().getIdentifierFinder().getCurrent(filter));
     	}
     	
     	switch(type){
@@ -613,45 +616,42 @@ public class StatisticController {
 	 */
 	public HashMap<String, Double> calculateFrequency(long fromOrTimestamp, long to, FrequencyType type, FrequencySelection selection){    	
     	
-    	boolean isDeltaMethod = fromOrTimestamp !=0 && to !=00;    	
+    	boolean isDeltaMethod = fromOrTimestamp !=0 && to !=0;	
     	ArrayList<? extends Propable> list=null;
     	
     	if(isDeltaMethod){
     		if(type == FrequencyType.IDENTIFIER){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.ALL,fromOrTimestamp,to).getAvailables());
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().get(StandardIdentifierType.ALL,fromOrTimestamp,to).getAvailables());
     		}else if(type == FrequencyType.DEVICES){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.DEVICE,fromOrTimestamp,to).getAvailables());
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().get(StandardIdentifierType.DEVICE,fromOrTimestamp,to).getAvailables());
     		}else if(type == FrequencyType.METADATA){
-    			list = new ArrayList<>(metalyzerAPI.getMetadataFinder().get(fromOrTimestamp,to).getAvailables());
+    			list = new ArrayList<>(getAPI().getMetadataFinder().get(fromOrTimestamp,to).getAvailables());
     		}else if(type == FrequencyType.ROLES){
-    			list = new ArrayList<> (metalyzerAPI.getMetadataFinder().get("role",fromOrTimestamp,to).getAvailables());
+    			list = new ArrayList<> (getAPI().getMetadataFinder().get("role",fromOrTimestamp,to).getAvailables());
     		}
     	} else if(fromOrTimestamp!=0.0){
     		if(type == FrequencyType.IDENTIFIER){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(fromOrTimestamp));
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().get(fromOrTimestamp));
     		}else if(type == FrequencyType.DEVICES){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().get(StandardIdentifierType.DEVICE, fromOrTimestamp));
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().get(StandardIdentifierType.DEVICE, fromOrTimestamp));
     		}else if(type == FrequencyType.METADATA){
-    			list = new ArrayList<>(metalyzerAPI.getMetadataFinder().get(fromOrTimestamp));
+    			list = new ArrayList<>(getAPI().getMetadataFinder().get(fromOrTimestamp));
     		}else if(type == FrequencyType.ROLES){
-    			list = new ArrayList<>(metalyzerAPI.getMetadataFinder().get("role",fromOrTimestamp));
+    			list = new ArrayList<>(getAPI().getMetadataFinder().get("role",fromOrTimestamp));
     		}
     	}else{
     		if(type == FrequencyType.IDENTIFIER){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().getCurrent(StandardIdentifierType.ALL));
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().getCurrent(StandardIdentifierType.ALL));
     		}else if(type == FrequencyType.DEVICES){
-    			list = new ArrayList<>(metalyzerAPI.getIdentifierFinder().getCurrent(StandardIdentifierType.DEVICE));
+    			list = new ArrayList<>(getAPI().getIdentifierFinder().getCurrent(StandardIdentifierType.DEVICE));
     		}else if(type == FrequencyType.METADATA){
-    			list = new ArrayList<>(metalyzerAPI.getMetadataFinder().getCurrent());
+    			list = new ArrayList<>(getAPI().getMetadataFinder().getCurrent());
     		}else if(type == FrequencyType.ROLES){
-    			list = new ArrayList<> (metalyzerAPI.getMetadataFinder().getCurrent("role"));    		
+    			list = new ArrayList<> (getAPI().getMetadataFinder().getCurrent("role"));    		
     		}else{
     			list = new ArrayList<>();
     		}
     	}    	
     	return new RFrequency(list, type, selection).getFrequency();    	
     }
-	public void setMetalyzerApi(MetalyzerAPI api){
-		StatisticController.metalyzerAPI = api;
-	}
 }

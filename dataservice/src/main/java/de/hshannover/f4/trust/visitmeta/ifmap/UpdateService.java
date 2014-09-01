@@ -49,6 +49,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFa
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
 import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
 

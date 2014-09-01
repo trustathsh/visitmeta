@@ -21,7 +21,7 @@
  * This file is part of visitmeta common, version 0.1.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2014 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,28 +36,48 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
+package de.hshannover.f4.trust.visitmeta.interfaces;
 
-public class ConnectionException extends Exception {
+import java.util.List;
 
-	private static final long serialVersionUID = 685270918564136642L;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
-	private String mMsg;
+/**
+ * Interface for Dataservice modules.
+ * 
+ * @author Bastian Hellmann
+ * 
+ */
+public interface DataserviceModule {
 
-	public ConnectionException(){
+	/**
+	 * Sets the {@link ConnectionManager} instance for this module.
+	 * 
+	 * @param manager
+	 *            a {@link ConnectionManager} instance
+	 */
+	public void setConnectionManager(ConnectionManager manager);
 
-	}
+	/**
+	 * Initializes the module.
+	 * 
+	 * @return true, if initialization was successful
+	 */
+	public boolean init();
 
-	public ConnectionException(String msg){
-		mMsg = msg;
-	}
+	/**
+	 * Returns a {@link List} of {@link String} that represent all packages that
+	 * contain REST resources.
+	 * 
+	 * @return a {@link List} of packages containing REST resources
+	 */
+	public List<String> getRestPackages();
 
-	@Override
-	public String toString() {
-		if(mMsg != null){
-			return this.getClass().getSimpleName() + "(" + mMsg + ")";
-		}else {
-			return this.getClass().getSimpleName();
-		}
-	}
+	/**
+	 * Returns the name of this module.
+	 * 
+	 * @return the name of this module
+	 */
+	public String getName();
+
 }

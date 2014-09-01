@@ -37,181 +37,130 @@
  * #L%
  */
 /** Project: Metalyzer
-* Author: Michael Felchner
-* Author: Mihaela Stein
-* Author: Sven Steinbach
-* Last Change:
-* 	by: $Author: $
-* 	date: $Date: $
-* Copyright (c): Hochschule Hannover
-*/
+ * Author: Michael Felchner
+ * Author: Mihaela Stein
+ * Author: Sven Steinbach
+ * Last Change:
+ * 	by: $Author: $
+ * 	date: $Date: $
+ * Copyright (c): Hochschule Hannover
+ */
 
 package de.hshannover.f4.trust.metalyzer.semantics.services;
 
 import de.hshannover.f4.trust.metalyzer.api.MetalyzerAPI;
-import de.hshannover.f4.trust.metalyzer.semantics.rest.SemanticsDeviceResource;
-import de.hshannover.f4.trust.metalyzer.semantics.rest.SemanticsIpAddressResource;
-import de.hshannover.f4.trust.metalyzer.semantics.rest.SemanticsMacAddressResource;
-import de.hshannover.f4.trust.metalyzer.semantics.rest.SemanticsUserResource;
 import de.hshannover.f4.trust.metalyzer.statistic.StatisticController;
 
 /**
- * Controller-Class to instantiate all Service- and Resource-Classes and to delegate
- * the incoming requests from the Resource-Classes to the specific Service-Classes.
- * It also delegates the requests of all semantics-services to the MetalyzerAPI. 
- *
+ * Controller-Class to instantiate all Service- and Resource-Classes and to
+ * delegate the incoming requests from the Resource-Classes to the specific
+ * Service-Classes. It also delegates the requests of all semantics-services to
+ * the MetalyzerAPI.
+ * 
  */
 public class SemanticsController {
-	//Enums for the 3 different types of semantic-requests.
+	// Enums for the 3 different types of semantic-requests.
 	public enum RequestType {
 		TIMESTAMP_REQUEST, TIMEINTERVAL_REQUEST, CURRENT_REQUEST
 	}
-	
-	//Semantics-Services, Semantics-Resources, MetalyzerAPI and statisticController 
+
+	// Semantics-Services, Semantics-Resources, MetalyzerAPI and
+	// statisticController
 	private static SemanticsController semController;
-	private MetalyzerAPI mAPI;
+
 	private UserService userServ;
 	private DeviceService devServ;
 	private IpAddressService ipServ;
 	private MacAddressService macServ;
-	private SemanticsUserResource semUserRes;
-	private SemanticsIpAddressResource semIpAddressRes;
-	private SemanticsMacAddressResource semMacAddressRes;
-	private SemanticsDeviceResource semDeviceRes;
+
 	private StatisticController evaCon;
-	
+
 	private String connectionName;
-	
-	/**
-	 * Constructor
-	 * (Empty)
-	 */
+
 	private SemanticsController() {
+		connectionName = "default";
 	}
-	
-	/**
-	 * Initialization of the SemanticsController and the semantics-services.
-	 */
-	public void initialize(){
-		//mAPI= MetalyzerAPI.getInstance();
-		userServ= new UserService();
-		devServ= new DeviceService();
-		ipServ= new IpAddressService();
-		macServ= new MacAddressService();
-		semUserRes = new SemanticsUserResource();
-		semIpAddressRes = new SemanticsIpAddressResource();
-		semMacAddressRes = new SemanticsMacAddressResource();
-		semDeviceRes = new SemanticsDeviceResource();
-		connectionName= "default";
-		//evaCon= new EvaluationController(); // Connection to the statistic-layer; for later use
+
+	private void init() {
+		userServ = new UserService();
+		devServ = new DeviceService();
+		ipServ = new IpAddressService();
+		macServ = new MacAddressService();
 	}
-	
+
 	/**
 	 * GetInstance-Method for singleton-pattern.
-	 * @return 
-	 * Returns an object of the SemanticsController.
+	 * 
+	 * @return an object of the SemanticsController.
 	 */
-	
 	public static synchronized SemanticsController getInstance() {
 		if (semController == null) {
 			semController = new SemanticsController();
-			semController.initialize();
+			semController.init();
 		}
+
 		return semController;
 	}
-	
+
 	/**
 	 * To get the connection to MetalyzerAPI.
-	 * @return 
-	 * Returns an object of the MetalyzerAPI.
+	 * 
+	 * @return an object of the MetalyzerAPI.
 	 */
-	
-	public MetalyzerAPI getConnection(){
-		return MetalyzerAPI.getInstance(connectionName);
-	}
-	
-	public void setConnection(String connectionName){
-		if(connectionName != null){
-			this.connectionName= connectionName;
+	public MetalyzerAPI getAPI() {
+		if (connectionName != null) {
+			return MetalyzerAPI.getInstance(connectionName);
+		} else {
+			return MetalyzerAPI.getInstance(MetalyzerAPI.DEFAULT_CONNECTION);
 		}
 	}
-	
+
+	public void setConnection(String connectionName) {
+		if (connectionName != null) {
+			this.connectionName = connectionName;
+		}
+	}
+
 	/**
 	 * To get the instance of the UserService.
-	 * @return 
-	 * Returns an object of the UserService.
+	 * 
+	 * @return Returns an object of the UserService.
 	 */
 	public UserService getUserService() {
 		return userServ;
 	}
-	
+
 	/**
 	 * To get the instance of the DeviceService.
-	 * @return 
-	 * Returns an object of the DeviceService.
+	 * 
+	 * @return Returns an object of the DeviceService.
 	 */
 	public DeviceService getDeviceService() {
 		return devServ;
 	}
-	
+
 	/**
 	 * To get the instance of the IpAddressService.
-	 * @return 
-	 * Returns an object of the IpAddressService.
+	 * 
+	 * @return Returns an object of the IpAddressService.
 	 */
 	public IpAddressService getIpAddressService() {
 		return ipServ;
 	}
-	
+
 	/**
 	 * To get the instance of the MacAddressService.
-	 * @return 
-	 * Returns an object of the MacAddressService.
+	 * 
+	 * @return Returns an object of the MacAddressService.
 	 */
 	public MacAddressService getMacAddressService() {
 		return macServ;
 	}
-	
-	/**
-	 * To get the instance of the SemanticsUserResource.
-	 * @return 
-	 * Returns an object of the SemanticsUserResource.
-	 */
-	public SemanticsUserResource getSemanticsUserResource() {
-		return semUserRes;
-	}
-	
-	/**
-	 * To get the instance of the SemanticsIpAddressResource.
-	 * @return 
-	 * Returns an object of the SemanticsIpAddressResource.
-	 */
-	public SemanticsIpAddressResource getSemanticsIpAddressResource() {
-		return semIpAddressRes;
-	}
-	
-	/**
-	 * To get the instance of the SemanticsMacAddressResource.
-	 * @return 
-	 * Returns an object of the SemanticsMacAddressResource.
-	 */
-	public SemanticsMacAddressResource getSemanticsMacAddressResource() {
-		return semMacAddressRes;
-	}
-	
-	/**
-	 * To get the instance of the SemanticsDeviceResource.
-	 * @return 
-	 * Returns an object of the SemanticsDeviceResource.
-	 */
-	public SemanticsDeviceResource getSemanticsDeviceResource() {
-		return semDeviceRes;
-	}
-	
+
 	/**
 	 * To get the connection to the statisticsController.
-	 * @return
-	 * Returns an object of the StatisticController.
+	 * 
+	 * @return Returns an object of the StatisticController.
 	 */
 	public StatisticController getEvaluationController() {
 		return evaCon;

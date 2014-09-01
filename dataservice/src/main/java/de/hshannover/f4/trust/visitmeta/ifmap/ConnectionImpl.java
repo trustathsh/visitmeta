@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,24 +69,37 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedEx
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
+import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 
-public class Connection {
+/**
+ * An implementation of the {@link Connection} interface.
+ * 
+ * @author Bastian Hellmann
+ * @author Marcel Reichenbach
+ */
+public class ConnectionImpl implements Connection {
 
 	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
 
-	public static final String DEFAULT_TRUSTSTORE_PATH = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
+	public static final String DEFAULT_TRUSTSTORE_PATH = Application
+			.getIFMAPConfig()
+			.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PATH);
 
-	public static final String DEFAULT_TRUSTSTORE_PASS = Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
+	public static final String DEFAULT_TRUSTSTORE_PASS = Application
+			.getIFMAPConfig()
+			.getProperty(ConfigParameter.IFMAP_TRUSTSTORE_PASS);
 
-	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = Integer.parseInt(Application.getIFMAPConfig().getProperty(ConfigParameter.IFMAP_MAX_SIZE));
+	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = Integer
+			.parseInt(Application.getIFMAPConfig().getProperty(
+					ConfigParameter.IFMAP_MAX_SIZE));
 
 	public static final boolean DEFAULT_STARTUP_CONNECT = false;
 
-	private static final Logger log = Logger.getLogger(Connection.class);
-
+	private static final Logger log = Logger.getLogger(ConnectionImpl.class);
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
@@ -131,23 +142,21 @@ public class Connection {
 	private List<JSONObject> mSubscribeList;
 
 	/**
-	 * Represents an IF-MAP connection to a MAP server.
-	 * If not changed by yourself, following default values are set:
+	 * Represents an IF-MAP connection to a MAP server. If not changed by
+	 * yourself, following default values are set:
 	 * <ul>
-	 * 	<li>AuthenticationBasic = true</li>
-	 * 	<li>TruststorePath = see config.property(ifmap.truststore.path)</li>
-	 * 	<li>TruststorePass = see config.property(ifmap.truststore.pw)</li>
-	 * 	<li>MaxPollResultSize = see config.property(ifmap.maxsize)</li>
-	 * 	<li>StartupConnect = false</li>
+	 * <li>AuthenticationBasic = true</li>
+	 * <li>TruststorePath = see config.property(ifmap.truststore.path)</li>
+	 * <li>TruststorePass = see config.property(ifmap.truststore.pw)</li>
+	 * <li>MaxPollResultSize = see config.property(ifmap.maxsize)</li>
+	 * <li>StartupConnect = false</li>
 	 * </ul>
+	 * 
 	 * @throws ConnectionException
 	 */
-	public Connection(String name, String url, String userName, String userPass) throws ConnectionException {
+	public ConnectionImpl(String name, String url, String userName,
+			String userPass) throws ConnectionException {
 		log.trace("new Connection() ...");
-
-		if(ConnectionManager.existsConnectionName(name)){
-			throw new ConnectionException(name + " connection already exists");
-		}
 
 		setConnectionName(name);
 		setUrl(url);
@@ -166,24 +175,23 @@ public class Connection {
 		log.trace("... new Connection() OK");
 	}
 
-	/**
-	 * Connect to the MAP-Server.
-	 * 
-	 * 
-	 * @throws ConnectionException
-	 */
+	@Override
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 
-		initSsrc(getUrl(), getUserName(), getUserPass(), mTruststorePath, mTruststorePass);
+		initSsrc(getUrl(), getUserName(), getUserPassword(), mTruststorePath,
+				mTruststorePass);
 		initSession();
 	}
 
-	private void initSsrc(String url, String user, String userPass, String truststore, String truststorePass) throws IfmapConnectionException {
+	private void initSsrc(String url, String user, String userPass,
+			String truststore, String truststorePass)
+			throws IfmapConnectionException {
 		log.trace("init SSRC ...");
 
 		try {
-			BasicAuthConfig config = new BasicAuthConfig(url, user, userPass, truststore, truststorePass, true, 120 * 1000);
+			BasicAuthConfig config = new BasicAuthConfig(url, user, userPass,
+					truststore, truststorePass, true, 120 * 1000);
 			mSsrc = IfmapJ.createSsrc(config);
 		} catch (InitializationException e) {
 			resetConnection();
@@ -197,14 +205,11 @@ public class Connection {
 		log.trace("creating new SSRC session ...");
 
 		try {
-
 			mSsrc.newSession(mMaxPollResultSize);
 			setConnected(true);
-
 		} catch (IfmapErrorResult e) {
 			resetConnection();
 			throw new IfmapConnectionException(e);
-
 		} catch (IfmapException e) {
 			resetConnection();
 			throw new IfmapConnectionException(e);
@@ -213,16 +218,11 @@ public class Connection {
 		log.debug("new SSRC session OK");
 	}
 
-	/**
-	 * Close a connection to the MAP-Server.
-	 * 
-	 * @throws ConnectionException
-	 */
+	@Override
 	public void disconnect() throws ConnectionException {
 		checkIsConnectionEstablished();
 
 		try {
-
 			log.trace("endSession() ...");
 			mSsrc.endSession();
 			log.debug("endSession() OK");
@@ -230,53 +230,47 @@ public class Connection {
 			log.trace("closeTcpConnection() ...");
 			mSsrc.closeTcpConnection();
 			log.debug("closeTcpConnection() OK");
-
 		} catch (IfmapErrorResult e) {
 			throw new IfmapConnectionException(e);
-
 		} catch (CommunicationException e) {
 			throw new IfmapConnectionException(e);
-
 		} catch (IfmapException e) {
 			throw new IfmapConnectionException(e);
-
-		}finally{
+		} finally {
 			resetConnection();
 		}
 	}
 
-	private void startUpdateService() throws ConnectionException{
-		if(mUpdateThread == null || !mUpdateThread.isAlive()){
-			log.trace("start UpdateService from connection " + mConnectionName + " ...");
+	private void startUpdateService() throws ConnectionException {
+		if ((mUpdateThread == null) || !mUpdateThread.isAlive()) {
+			log.trace("start UpdateService from connection " + mConnectionName
+					+ " ...");
 
 			checkIsConnectionEstablished();
 
-			if(mUpdateService == null){
-				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(), new InMemoryIdentifierFactory(), new InMemoryMetadataFactory());
+			if (mUpdateService == null) {
+				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(),
+						new InMemoryIdentifierFactory(),
+						new InMemoryMetadataFactory());
 			}
 
-			mUpdateThread = new Thread(mUpdateService, "UpdateThread-" + mConnectionName);
+			mUpdateThread = new Thread(mUpdateService, "UpdateThread-"
+					+ mConnectionName);
 			mUpdateThread.start();
 
-			log.debug("UpdateService for connection " + mConnectionName + " started");
+			log.debug("UpdateService for connection " + mConnectionName
+					+ " started");
 		}
 	}
 
-	/**
-	 * Send a SubscribeRequest to the map server.
-	 * 
-	 * @param request
-	 * @throws ConnectionException
-	 */
+	@Override
 	public void subscribe(SubscribeRequest request) throws ConnectionException {
 		checkIsConnectionEstablished();
 		startUpdateService();
 
-		if(request == null || !request.getSubscribeElements().isEmpty()){
+		if ((request == null) || !request.getSubscribeElements().isEmpty()) {
 			try {
-
 				mSsrc.subscribe(request);
-
 			} catch (IfmapErrorResult e) {
 				throw new IfmapConnectionException(e);
 
@@ -284,27 +278,20 @@ public class Connection {
 				throw new IfmapConnectionException(e);
 			}
 
-			for(SubscribeElement r: request.getSubscribeElements()){
+			for (SubscribeElement r : request.getSubscribeElements()) {
 				activeSubscriptions.add(r.getName());
 			}
-		}else{
+		} else {
 			log.warn("Subscribe-Request was null or empty.");
 		}
 	}
 
-	/**
-	 * A poll-request over the ARC
-	 * 
-	 * @return PollResult
-	 * @throws ConnectionException
-	 */
+	@Override
 	public PollResult poll() throws ConnectionException {
 		checkIsConnectionEstablished();
 
 		try {
-
 			return mSsrc.getArc().poll();
-
 		} catch (IfmapErrorResult e) {
 			throw new IfmapConnectionException(e);
 
@@ -317,13 +304,8 @@ public class Connection {
 		}
 	}
 
-	/**
-	 * Delete a subscription with his name.
-	 * 
-	 * @param sName The subscription name.
-	 * @throws ConnectionException
-	 */
-	public void deleteSubscribe(String sName) throws ConnectionException {
+	@Override
+	public void deleteSubscription(String sName) throws ConnectionException {
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeDelete subscribe = Requests.createSubscribeDelete(sName);
 
@@ -333,15 +315,11 @@ public class Connection {
 		activeSubscriptions.remove(sName);
 	}
 
-	/**
-	 * Delete all active subscriptions.
-	 * 
-	 * @throws ConnectionException
-	 */
-	public void deleteSubscriptions() throws ConnectionException{
+	@Override
+	public void deleteAllSubscriptions() throws ConnectionException {
 		SubscribeRequest request = Requests.createSubscribeReq();
 
-		for(String sKey: activeSubscriptions){
+		for (String sKey : activeSubscriptions) {
 			SubscribeDelete subscribe = Requests.createSubscribeDelete(sKey);
 			request.addSubscribeElement(subscribe);
 		}
@@ -352,7 +330,7 @@ public class Connection {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Connection: ").append(mConnectionName).append(" | URL: ");
@@ -361,26 +339,20 @@ public class Connection {
 		return sb.toString();
 	}
 
-	/**
-	 * @return The session-id of the SSRC
-	 * @throws ConnectionException
-	 */
+	@Override
 	public String getSessionId() throws ConnectionException {
 		checkIsConnectionEstablished();
 		return mSsrc.getSessionId();
 	}
 
-	/**
-	 * @return The publisher-id of the SSRC
-	 * @throws ConnectionException
-	 */
-	public String getPublisherId() throws ConnectionException{
+	@Override
+	public String getPublisherId() throws ConnectionException {
 		checkIsConnectionEstablished();
 		return mSsrc.getPublisherId();
 	}
 
-	public void checkIsConnectionEstablished() throws NotConnectedException{
-		if(mSsrc == null || !isConnected() || mSsrc.getSessionId() == null){
+	private void checkIsConnectionEstablished() throws NotConnectedException {
+		if ((mSsrc == null) || !isConnected() || (mSsrc.getSessionId() == null)) {
 			NotConnectedException e = new NotConnectedException();
 			log.error(e.toString());
 			resetConnection();
@@ -388,16 +360,14 @@ public class Connection {
 		}
 	}
 
-	private void checkIsConnectionDisconnected() throws ConnectionEstablishedException {
-		if(mSsrc != null && isConnected() && mSsrc.getSessionId() != null){
+	private void checkIsConnectionDisconnected()
+			throws ConnectionEstablishedException {
+		if ((mSsrc != null) && isConnected() && (mSsrc.getSessionId() != null)) {
 			throw new ConnectionEstablishedException();
 		}
 	}
 
-	/**
-	 * @return A Set<String> with the active subscriptions.
-	 * @throws ConnectionException
-	 */
+	@Override
 	public Set<String> getActiveSubscriptions() throws ConnectionException {
 		checkIsConnectionEstablished();
 		HashSet<String> temp = new HashSet<String>(activeSubscriptions);
@@ -416,24 +386,21 @@ public class Connection {
 		log.trace("... resetConnection() OK");
 	}
 
-	private void setConnected(boolean b){
+	private void setConnected(boolean b) {
 		connected = b;
 	}
 
-	/**
-	 * @return True when the connection to a MAP-Server is active.
-	 */
+	@Override
 	public boolean isConnected() {
 		return connected;
 	}
 
-	/**
-	 * @return A SimpleGraphService from the Neo4J-Database.
-	 */
+	@Override
 	public SimpleGraphService getGraphService() {
 		return mNeo4JDb.getGraphService();
 	}
 
+	@Override
 	public String getUrl() {
 		return mUrl;
 	}
@@ -442,6 +409,7 @@ public class Connection {
 		mUrl = url;
 	}
 
+	@Override
 	public String getUserName() {
 		return mUserName;
 	}
@@ -450,7 +418,8 @@ public class Connection {
 		mUserName = userName;
 	}
 
-	public String getUserPass() {
+	@Override
+	public String getUserPassword() {
 		return mUserPass;
 	}
 
@@ -458,6 +427,7 @@ public class Connection {
 		mUserPass = userPass;
 	}
 
+	@Override
 	public String getConnectionName() {
 		return mConnectionName;
 	}
@@ -466,52 +436,63 @@ public class Connection {
 		mConnectionName = connectionName;
 	}
 
+	@Override
 	public String getTruststorePath() {
 		return mTruststorePath;
 	}
 
+	@Override
 	public void setTruststorePath(String truststorePath) {
 		mTruststorePath = truststorePath;
 	}
 
-	public String getTruststorePass() {
+	@Override
+	public String getTruststorePassword() {
 		return mTruststorePass;
 	}
 
+	@Override
 	public void setTruststorePass(String truststorePass) {
 		mTruststorePass = truststorePass;
 	}
 
+	@Override
 	public int getMaxPollResultSize() {
 		return mMaxPollResultSize;
 	}
 
+	@Override
 	public void setMaxPollResultSize(int maxPollResultSize) {
 		mMaxPollResultSize = maxPollResultSize;
 	}
 
+	@Override
 	public void setAuthenticationBasic(boolean authenticationBasic) {
 		mAuthenticationBasic = authenticationBasic;
 	}
 
+	@Override
 	public boolean isAuthenticationBasic() {
 		return mAuthenticationBasic;
 	}
 
+	@Override
 	public void setStartupConnect(boolean startupConnect) {
 		mStartupConnect = startupConnect;
 	}
 
-	public boolean isStartupConnect() {
+	@Override
+	public boolean doesConnectOnStartup() {
 		return mStartupConnect;
 	}
 
-	public List<JSONObject> getSubscribeList() {
+	@Override
+	public void addSubscription(JSONObject json) {
+		mSubscribeList.add(json);
+	}
+
+	@Override
+	public List<JSONObject> getSubscriptions() {
 		return mSubscribeList;
 	}
-
-	public void addSubscribe(JSONObject jObj) {
-		mSubscribeList.add(jObj);
-	}
 }
-

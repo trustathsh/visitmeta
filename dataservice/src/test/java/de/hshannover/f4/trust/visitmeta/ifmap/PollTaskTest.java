@@ -65,6 +65,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifier
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 
 public class PollTaskTest {
 

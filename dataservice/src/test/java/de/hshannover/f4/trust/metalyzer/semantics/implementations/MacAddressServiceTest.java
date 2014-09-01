@@ -545,7 +545,7 @@ public class MacAddressServiceTest {
 			fail("Exception was thrown. This should not happen!" + e.getMessage());
 		}
 		Mockito.when(mAPI.getIdentifierFinder()).thenReturn(identifierFinder);
-		Mockito.when(semCon.getConnection()).thenReturn(mAPI);
+		Mockito.when(semCon.getAPI()).thenReturn(mAPI);
 		macAddressService = new MacAddressService(semCon);
 	}
 }

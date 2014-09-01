@@ -48,7 +48,8 @@
 
 package de.hshannover.f4.trust.metalyzer.semantics.implementations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -561,7 +562,7 @@ public class IpAddressServiceTest {
 		}
 
 		Mockito.when(mAPI.getIdentifierFinder()).thenReturn(identifierFinder);
-		Mockito.when(semCon.getConnection()).thenReturn(mAPI);
+		Mockito.when(semCon.getAPI()).thenReturn(mAPI);
 		
 		
 		ipAddressService = new IpAddressService(semCon);

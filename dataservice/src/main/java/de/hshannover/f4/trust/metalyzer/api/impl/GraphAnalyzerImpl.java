@@ -44,34 +44,32 @@
  */
 package de.hshannover.f4.trust.metalyzer.api.impl;
 
-import org.apache.log4j.Logger;
-
 import de.hshannover.f4.trust.metalyzer.api.GraphAnalyzer;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
 
 /**
- * Impl class which implements all necessary methods of the
- * GraphAnalyzer interface. Has the connection to the database ( if-map graph )
- * through the GraphService.
+ * Impl class which implements all necessary methods of the GraphAnalyzer
+ * interface. Has the connection to the database ( if-map graph ) through the
+ * GraphService.
  * 
  * @author Johannes Busch
- *
+ * 
  */
 public class GraphAnalyzerImpl implements GraphAnalyzer {
-	
-	private static final Logger log = Logger.getLogger(GraphAnalyzerImpl.class);
-	
+
 	private GraphService mService;
-	
+
 	/**
 	 * service must not be null.
-	 * @param service if-map connection
+	 * 
+	 * @param service
+	 *            if-map connection
 	 */
 	public GraphAnalyzerImpl(GraphService service) {
 		mService = service;
 	}
-	
+
 	/**
 	 * Counts all current nodes ( identifier ) in the graph.
 	 */
@@ -79,7 +77,7 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countNodes() {
 		return mService.count(GraphType.IDENTIFIER);
 	}
-	
+
 	/**
 	 * Counts all nodes ( identifier ) in the graph at the given timestamp.
 	 * Timestamp must not be negative!
@@ -88,7 +86,7 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countNodesAt(long timestamp) {
 		return mService.count(GraphType.IDENTIFIER, timestamp);
 	}
-	
+
 	/**
 	 * Counts all nodes ( identifier ) in the graph in the given time delta.
 	 * Timestamps must not be negative!
@@ -97,7 +95,7 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countNodes(long from, long to) {
 		return mService.count(GraphType.IDENTIFIER, from, to);
 	}
-	
+
 	/**
 	 * Counts all current edges ( relationships ) in the graph.
 	 */
@@ -105,7 +103,7 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countEdges() {
 		return mService.count(GraphType.LINK);
 	}
-	
+
 	/**
 	 * Counts all edges ( relationships ) in the graph at the given timestamp.
 	 * Timestamp must not be negative!
@@ -114,7 +112,7 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countEdgesAt(long timestamp) {
 		return mService.count(GraphType.LINK, timestamp);
 	}
-	
+
 	/**
 	 * Counts all edges ( relationships ) in the graph in the given time delta.
 	 * Timestamps must not be negative!
@@ -123,9 +121,10 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	public long countEdges(long from, long to) {
 		return mService.count(GraphType.LINK, from, to);
 	}
-	
+
 	/**
-	 * Returns the current mean of edges for nodes. Every metadata has its own edge.
+	 * Returns the current mean of edges for nodes. Every metadata has its own
+	 * edge.
 	 */
 	@Override
 	public double getMeanOfEdges() {
@@ -133,8 +132,8 @@ public class GraphAnalyzerImpl implements GraphAnalyzer {
 	}
 
 	/**
-	 * Returns the mean of edges for nodes at the given timestamp. Every metadata has its own edge.
-	 * Timestamp must not be negative!
+	 * Returns the mean of edges for nodes at the given timestamp. Every
+	 * metadata has its own edge. Timestamp must not be negative!
 	 */
 	@Override
 	public double getMeanOfEdges(long timestamp) {

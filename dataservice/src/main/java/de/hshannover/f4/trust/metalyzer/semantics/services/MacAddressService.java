@@ -406,7 +406,7 @@ public class MacAddressService {
 	private Collection<Identifier> getAllMacAddressIdentifiers(long timestamp) throws MetalyzerAPIException {
 		log.info("Request to get all MAC-Address-Identifiers from the MetalyzerAPI at timestamp " + timestamp);
 		
-		return semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, timestamp);
+		return semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, timestamp);
 	}
 	
 	/**
@@ -421,7 +421,7 @@ public class MacAddressService {
 	private Collection<Identifier> getAllMacAddressIdentifiers(long fromTimestamp, long toTimestamp) throws MetalyzerAPIException {
 		log.info("Request to get all MAC-Address-Identifiers from the MetalyzerAPI at interval [" + fromTimestamp + ", " + toTimestamp + "]");
 		
-		MetalyzerDelta<Identifier> delta = semCon.getConnection().getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, fromTimestamp, toTimestamp);
+		MetalyzerDelta<Identifier> delta = semCon.getAPI().getIdentifierFinder().get(StandardIdentifierType.MAC_ADDRESS, fromTimestamp, toTimestamp);
 		//return delta.getAvailables(); //To get all available MacAddresses at the timeinterval.
 		return delta.getUpdates(); //To get just the updates of MacAddresses at the timeinterval. 
 	}
@@ -434,6 +434,6 @@ public class MacAddressService {
 	private Collection<Identifier> getAllMacAddressIdentifiers() throws MetalyzerAPIException {
 		log.info("Request to get all MAC-Address-Identifiers from the MetalyzerAPI at the current timestamp");
 		
-		return semCon.getConnection().getIdentifierFinder().getCurrent(StandardIdentifierType.MAC_ADDRESS);
+		return semCon.getAPI().getIdentifierFinder().getCurrent(StandardIdentifierType.MAC_ADDRESS);
 	}
 }

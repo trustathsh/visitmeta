@@ -55,8 +55,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
@@ -109,9 +109,7 @@ public class GraphResource {
 	public Object getChangesMap(@PathParam("connectionName") String name) {
 		JSONObject changes;
 		try{
-
-			changes = new JSONObject(ConnectionManager.getGraphServiceFromConnection(name).getChangesMap());
-
+			changes = new JSONObject(Application.getConnectionManager().getGraphService(name).getChangesMap());
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
@@ -130,7 +128,7 @@ public class GraphResource {
 		List<IdentifierGraph> graphs;
 		try{
 
-			graphs = ConnectionManager.getGraphServiceFromConnection(name).getInitialGraph();
+			graphs = Application.getConnectionManager().getGraphService(name).getInitialGraph();
 
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -152,7 +150,7 @@ public class GraphResource {
 		List<IdentifierGraph> graphs;
 		try{
 
-			graphs = ConnectionManager.getGraphServiceFromConnection(name).getGraphAt(timestamp);
+			graphs = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp);
 
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -175,7 +173,7 @@ public class GraphResource {
 		List<IdentifierGraph> graphs;
 		try{
 
-			graphs = ConnectionManager.getGraphServiceFromConnection(name).getCurrentGraph();
+			graphs = Application.getConnectionManager().getGraphService(name).getCurrentGraph();
 
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -200,7 +198,7 @@ public class GraphResource {
 		Delta delta;
 		try{
 
-			delta = ConnectionManager.getGraphServiceFromConnection(name).getDelta(t1, t2);
+			delta = Application.getConnectionManager().getGraphService(name).getDelta(t1, t2);
 
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();

@@ -65,16 +65,14 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
-import de.hshannover.f4.trust.visitmeta.ifmap.Connection;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
-
 
 @Path("/")
 public class ConnectionResource {
 
-	private static final Logger log = Logger.getLogger(ConnectionResource.class);
-
+	private static final Logger log = Logger
+			.getLogger(ConnectionResource.class);
 
 	@QueryParam("onlyActive")
 	@DefaultValue("false")
@@ -92,42 +90,43 @@ public class ConnectionResource {
 	@DELETE
 	@Path("{connectionName}")
 	public Response deleteConnection(@PathParam("connectionName") String name) {
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Not implemented").build();
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+				.entity("Not implemented").build();
 	}
 
 	/**
 	 * <br>
 	 * <ul>
-	 * 	<li><b><i>saveConnection</i></b><br>
-	 * 	<br>
-	 * 	Persist a new connection to a MAP-Server.<br>
-	 * 	<br>
-	 * 	Example-URL: <tt>http://example.com:8000/default</tt><br>
-	 * 	<br>
-	 * 	Example-JSONObject:<br>
-	 * 	{<br>
-	 * 	url:"https://localhost:8443",<br>
-	 *  user.name:visitmeta,<br>
-	 *  user.password:visitmeta,<br>
-	 * 	}<br>
-	 * 	<br>
-	 * 	<b>required values:</b>
-	 *  <ul>
-	 *  	<li>url</li>
-	 *  	<li>user.name</li>
-	 *  	<li>user.password</li>
-	 *  </ul>
-	 * 	<br>
-	 * 	<b>optional values:</b><br>
-	 * 	<ul>
-	 * 		<li>authentication.basic</li>
-	 * 		<li>authentication.cert</li> <b>(!is not implemented yet!)</b>
-	 * 		<li>truststore.path</li>
-	 * 		<li>truststore.pw</li>
-	 * 		<li>startup.connect</li>
-	 * 		<li>maxPollResultSize</li>
-	 * 	</ul>
-	 * 	</li>
+	 * <li><b><i>saveConnection</i></b><br>
+	 * <br>
+	 * Persist a new connection to a MAP-Server.<br>
+	 * <br>
+	 * Example-URL: <tt>http://example.com:8000/default</tt><br>
+	 * <br>
+	 * Example-JSONObject:<br>
+	 * {<br>
+	 * url:"https://localhost:8443",<br>
+	 * user.name:visitmeta,<br>
+	 * user.password:visitmeta,<br>
+	 * }<br>
+	 * <br>
+	 * <b>required values:</b>
+	 * <ul>
+	 * <li>url</li>
+	 * <li>user.name</li>
+	 * <li>user.password</li>
+	 * </ul>
+	 * <br>
+	 * <b>optional values:</b><br>
+	 * <ul>
+	 * <li>authentication.basic</li>
+	 * <li>authentication.cert</li> <b>(!is not implemented yet!)</b>
+	 * <li>truststore.path</li>
+	 * <li>truststore.pw</li>
+	 * <li>startup.connect</li>
+	 * <li>maxPollResultSize</li>
+	 * </ul>
+	 * </li>
 	 * </ul>
 	 */
 	@PUT
@@ -150,13 +149,15 @@ public class ConnectionResource {
 			userPassword = jObj.getString(ConnectionKey.USER_PASSWORD);
 
 		} catch (JSONException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
 		// get optional values
 		log.trace(connectionName + ": get optional values");
 
-		boolean authenticationBasic = jObj.optBoolean(ConnectionKey.AUTHENTICATION_BASIC);
+		boolean authenticationBasic = jObj
+				.optBoolean(ConnectionKey.AUTHENTICATION_BASIC);
 		String truststorePath = jObj.optString(ConnectionKey.TRUSTSTORE_PATH);
 		String truststorePass = jObj.optString(ConnectionKey.TRUSTSTORE_PASS);
 		boolean startupConnect = jObj.optBoolean(ConnectionKey.STARTUP_CONNECT);
@@ -167,11 +168,14 @@ public class ConnectionResource {
 
 		Connection newConnection = null;
 		try {
-			newConnection = new Connection(connectionName, url, userName, userPassword);
+			newConnection = Application.getConnectionManager()
+					.createConnection(connectionName, url, userName,
+							userPassword);
 		} catch (ConnectionException e) {
 			String msg = "error while new Connection()";
 			log.error(msg, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
 		// set optional values
@@ -182,33 +186,42 @@ public class ConnectionResource {
 			String jKey = i.next();
 
 			switch (jKey) {
-			case ConnectionKey.AUTHENTICATION_BASIC: newConnection.setAuthenticationBasic(authenticationBasic);
-			break;
+			case ConnectionKey.AUTHENTICATION_BASIC:
+				newConnection.setAuthenticationBasic(authenticationBasic);
+				break;
 
-			case ConnectionKey.TRUSTSTORE_PATH: newConnection.setTruststorePath(truststorePath);
-			break;
+			case ConnectionKey.TRUSTSTORE_PATH:
+				newConnection.setTruststorePath(truststorePath);
+				break;
 
-			case ConnectionKey.TRUSTSTORE_PASS: newConnection.setTruststorePass(truststorePass);
-			break;
+			case ConnectionKey.TRUSTSTORE_PASS:
+				newConnection.setTruststorePass(truststorePass);
+				break;
 
-			case ConnectionKey.STARTUP_CONNECT: newConnection.setStartupConnect(startupConnect);
-			break;
+			case ConnectionKey.STARTUP_CONNECT:
+				newConnection.setStartupConnect(startupConnect);
+				break;
 
-			case ConnectionKey.MAX_POLL_RESULT_SIZE: newConnection.setMaxPollResultSize(maxPollResultSize);
-			break;
+			case ConnectionKey.MAX_POLL_RESULT_SIZE:
+				newConnection.setMaxPollResultSize(maxPollResultSize);
+				break;
 
-			case ConnectionKey.AUTHENTICATION_CERT: return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(ConnectionKey.AUTHENTICATION_CERT + " is not implemented yet").build();
+			case ConnectionKey.AUTHENTICATION_CERT:
+				return Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(ConnectionKey.AUTHENTICATION_CERT
+								+ " is not implemented yet").build();
 			}
 		}
 
 		// add to connection pool
 		try {
-			ConnectionManager.add(newConnection);
+			Application.getConnectionManager().addConnection(newConnection);
 		} catch (ConnectionException e) {
 			String msg = "error while adding connection to the connection pool";
 			log.error(msg, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(msg + " | Exception: " + e.toString()).build();
 		}
 
 		// persist connection in property
@@ -216,10 +229,14 @@ public class ConnectionResource {
 			Application.getConnectionPersister().persistConnections();
 		} catch (FileNotFoundException e) {
 			log.error("error while connection persist", e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error while connection persist -> " + e.toString()).build();
+			return Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while connection persist -> " + e.toString())
+					.build();
 		}
 
-		log.trace("... new rest PUT saveConnection " + connectionName + " success");
+		log.trace("... new rest PUT saveConnection " + connectionName
+				+ " success");
 		return Response.ok().entity(connectionName + " was saved").build();
 	}
 
@@ -227,6 +244,7 @@ public class ConnectionResource {
 	 * Conneced the dataservice with connection default to a MAP-Server.
 	 * 
 	 * Example-URL: <tt>http://example.com:8000/default/connect</tt>
+	 * 
 	 * @throws HttpException
 	 * 
 	 **/
@@ -234,15 +252,15 @@ public class ConnectionResource {
 	@Path("{connectionName}/connect")
 	public Response connect(@PathParam("connectionName") String name) {
 		try {
-
-			ConnectionManager.connectTo(name);
-
-		} catch (ConnectionEstablishedException e){
+			Application.getConnectionManager().connect(name);
+		} catch (ConnectionEstablishedException e) {
 			log.warn(e.toString());
-			return Response.ok().entity("INFO: connection allready aktive").build();
+			return Response.ok().entity("INFO: connection allready aktive")
+					.build();
 		} catch (ConnectionException e) {
 			log.error("error while connecting to " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
 		return Response.ok("INFO: connecting successfully").build();
@@ -258,43 +276,50 @@ public class ConnectionResource {
 	@Path("{connectionName}/disconnect")
 	public Response disconnect(@PathParam("connectionName") String name) {
 		try {
-
-			ConnectionManager.disconnectFrom(name);
-
-		} catch (NotConnectedException e){
+			Application.getConnectionManager().disconnect(name);
+		} catch (NotConnectedException e) {
 			log.error("error while disconnect from " + name, e);
-			return Response.ok().entity("INFO: connection allready disconnected").build();
+			return Response.ok()
+					.entity("INFO: connection allready disconnected").build();
 		} catch (ConnectionException e) {
 			log.error("error while disconnect from " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
 		return Response.ok().entity("INFO: disconnection successfully").build();
 	}
 
 	/**
-	 * Returns a JSONObject with saved connections to a MAP-Server.
-	 * Example-URL: <tt>http://example.com:8000/</tt>
+	 * Returns a JSONObject with saved connections to a MAP-Server. Example-URL:
+	 * <tt>http://example.com:8000/</tt>
 	 * 
-	 * You can set the onlyActive value of true.
-	 * Example-URL: <tt>http://example.com:8000/?onlyActive=true</tt>
+	 * You can set the onlyActive value of true. Example-URL:
+	 * <tt>http://example.com:8000/?onlyActive=true</tt>
 	 **/
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getConnections() {
-		if(mWithAllValues){
+		if (mWithAllValues) {
 			JSONObject jsonO = new JSONObject();
-			for(Connection c: ConnectionManager.getConnectionPool().values()){
-				Map<String,String> connectionMap = new HashMap<String,String>();
+			for (Connection c : Application.getConnectionManager()
+					.getSavedConnections().values()) {
+				Map<String, String> connectionMap = new HashMap<String, String>();
 
 				connectionMap.put(ConnectionKey.URL, c.getUrl());
 				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
-				connectionMap.put(ConnectionKey.USER_PASSWORD, c.getUserPass());
-				connectionMap.put(ConnectionKey.AUTHENTICATION_BASIC, String.valueOf(c.isAuthenticationBasic()));
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH, c.getTruststorePath());
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PASS, c.getTruststorePass());
-				connectionMap.put(ConnectionKey.STARTUP_CONNECT, String.valueOf(c.isStartupConnect()));
-				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE, String.valueOf(c.getMaxPollResultSize()));
+				connectionMap.put(ConnectionKey.USER_PASSWORD,
+						c.getUserPassword());
+				connectionMap.put(ConnectionKey.AUTHENTICATION_BASIC,
+						String.valueOf(c.isAuthenticationBasic()));
+				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH,
+						c.getTruststorePath());
+				connectionMap.put(ConnectionKey.TRUSTSTORE_PASS,
+						c.getTruststorePassword());
+				connectionMap.put(ConnectionKey.STARTUP_CONNECT,
+						String.valueOf(c.doesConnectOnStartup()));
+				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE,
+						String.valueOf(c.getMaxPollResultSize()));
 
 				JSONObject jsonConnection = new JSONObject(connectionMap);
 
@@ -302,24 +327,27 @@ public class ConnectionResource {
 					jsonO.put(c.getConnectionName(), jsonConnection);
 				} catch (JSONException e) {
 					log.error("error while put to JSONObject", e);
-					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+					return Response
+							.status(Response.Status.INTERNAL_SERVER_ERROR)
+							.entity(e.toString()).build();
 				}
 			}
 			return jsonO;
 
-
-		}else if(mOnlyActive){
+		} else if (mOnlyActive) {
 			JSONArray jsonA = new JSONArray();
-			for(Connection c: ConnectionManager.getConnectionPool().values()){
-				if(c.isConnected()){
+			for (Connection c : Application.getConnectionManager()
+					.getSavedConnections().values()) {
+				if (c.isConnected()) {
 					jsonA.put(c.getConnectionName());
 				}
 			}
 			return jsonA;
 
-		}else {
+		} else {
 			JSONArray jsonA = new JSONArray();
-			for(Connection c: ConnectionManager.getConnectionPool().values()){
+			for (Connection c : Application.getConnectionManager()
+					.getSavedConnections().values()) {
 				jsonA.put(c.getConnectionName());
 			}
 			return jsonA;

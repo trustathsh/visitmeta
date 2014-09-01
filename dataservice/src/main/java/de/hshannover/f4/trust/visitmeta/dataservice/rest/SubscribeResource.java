@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-
-
 import java.io.FileNotFoundException;
 import java.util.Iterator;
 
@@ -62,32 +60,24 @@ import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
-import de.hshannover.f4.trust.visitmeta.util.PropertiesReaderWriter;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
 /**
- * For each request a new object of this class will be created. The
- * resource is accessible under the path <tt>{connectionName}/subscribe</tt>.
- * About this interface can be update and delete subscriptions. Untder the
- * path {connectionName}/subscribe/active return a list for all active subscriptions.
- *
+ * For each request a new object of this class will be created. The resource is
+ * accessible under the path <tt>{connectionName}/subscribe</tt>. About this
+ * interface can be update and delete subscriptions. Untder the path
+ * {connectionName}/subscribe/active return a list for all active subscriptions.
+ * 
  * @author Marcel Reichenbach
- *
+ * 
  */
 
 @Path("{connectionName}/subscribe")
 public class SubscribeResource {
 
-
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
-
-	private static final PropertiesReaderWriter config = Application.getIFMAPConfig();
-
-	private static final int MAX_DEPTH = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_DEPTH));
-	private static final int MAX_SIZE = Integer.parseInt(config.getProperty(ConfigParameter.IFMAP_MAX_SIZE));
 
 	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
 	public static final String JSON_KEY_IDENTIFIER = "identifier";
@@ -102,89 +92,87 @@ public class SubscribeResource {
 	@DefaultValue("false")
 	private boolean mDeleteAll = false;
 
-
 	/**
-	 * Returns a JSONArray with the active subscriptions for the dataservice about the default connection.
+	 * Returns a JSONArray with the active subscriptions for the dataservice
+	 * about the default connection.
 	 * 
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe</tt>
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getActiveSubscriptions(@PathParam("connectionName") String name) {
+	public Object getActiveSubscriptions(
+			@PathParam("connectionName") String name) {
 		JSONArray activeSubscriptions;
 		try {
-
-			activeSubscriptions = new JSONArray(ConnectionManager.getActiveSubscriptionsFromConnection(name));
-
+			activeSubscriptions = new JSONArray(Application
+					.getConnectionManager().getActiveSubscriptions(name));
 		} catch (ConnectionException e) {
 			log.error("error at getActiveSubscriptions from " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
 		return activeSubscriptions;
 	}
 
 	/**
-	 * Send a subscribeUpdate to the MAP-Server with a JSONObject.
-	 * Max-Depth and Max-Size have the defaultValue 1000 and 1000000000. To change this values
+	 * Send a subscribeUpdate to the MAP-Server with a JSONObject. Max-Depth and
+	 * Max-Size have the defaultValue 1000 and 1000000000. To change this values
 	 * use the params "maxDepth" and "maxSize", or set this in the JSONObject.
 	 * 
-	 * On identifier type:
-	 * ip-address:     "[type],[value]" e.g. "IPv4,10.1.1.1"
-	 * device:         "[name]"
-	 * access-request: "[name]"
-	 * mac-address:    "[value]"
+	 * On identifier type: ip-address: "[type],[value]" e.g. "IPv4,10.1.1.1"
+	 * device: "[name]" access-request: "[name]" mac-address: "[value]"
 	 * 
-	 * Use the valid JSON-Keys for subscriptions:
-	 * SUBSCRIBE NAME = "subscribeName"
-	 * IDENTIFIER = "identifier"
-	 * IDENTIFIER-TYPE = "identifierType"
-	 * MAX-DEPTH = "maxDepth"
-	 * MAX-SIZE = "maxSize"
-	 * LINKS-FILTER = "linksFilter"
-	 * RESULT-FILTER = "resultFilter"
-	 * TERMINAL-IDENTIFIER-TYPES = "terminalIdentifierTypes"
+	 * Use the valid JSON-Keys for subscriptions: SUBSCRIBE NAME =
+	 * "subscribeName" IDENTIFIER = "identifier" IDENTIFIER-TYPE =
+	 * "identifierType" MAX-DEPTH = "maxDepth" MAX-SIZE = "maxSize" LINKS-FILTER
+	 * = "linksFilter" RESULT-FILTER = "resultFilter" TERMINAL-IDENTIFIER-TYPES
+	 * = "terminalIdentifierTypes"
 	 * 
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe/update</tt>
 	 * 
-	 * Example-JSONObject:
-	 * {
-	 * 	subscribeName:exampleSub,
-	 * 	identifierType:device,
-	 * 	identifier:device12
-	 * }
+	 * Example-JSONObject: { subscribeName:exampleSub, identifierType:device,
+	 * identifier:device12 }
 	 */
 	@PUT
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("connectionName") String name, JSONObject jObj) {
+	public Response update(@PathParam("connectionName") String name,
+			JSONObject jObj) {
+		ConnectionManager manager = Application.getConnectionManager();
 		try {
 
 			Iterator<String> i = jObj.keys();
-			while(i.hasNext()){
+			while (i.hasNext()) {
 				String jKey = i.next();
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
-				try{
+				try {
 
-					SubscribeRequest request = SubscriptionHelper.buildRequest(moreSubscribes);
-					ConnectionManager.subscribeFromConnection(name, request);
-					ConnectionManager.persistSubscribeToConnection(name, jObj);
+					SubscribeRequest request = SubscriptionHelper
+							.buildRequest(moreSubscribes);
+					manager.subscribe(name, request);
+					manager.storeSubscription(name, jObj);
 
 				} catch (ConnectionException | FileNotFoundException e) {
-					log.error("error while multiple subscribeUpdate from " + name, e);
-					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+					log.error("error while multiple subscribeUpdate from "
+							+ name, e);
+					return Response
+							.status(Response.Status.INTERNAL_SERVER_ERROR)
+							.entity(e.toString()).build();
 				}
 			}
 		} catch (JSONException e) {
-			try{
+			try {
 
-				SubscribeRequest request = SubscriptionHelper.buildRequest(jObj);
-				ConnectionManager.subscribeFromConnection(name, request);
-				ConnectionManager.persistSubscribeToConnection(name, jObj);
+				SubscribeRequest request = SubscriptionHelper
+						.buildRequest(jObj);
+				manager.subscribe(name, request);
+				manager.storeSubscription(name, jObj);
 
 			} catch (ConnectionException | FileNotFoundException ee) {
 				log.error("error while single subscribeUpdate from " + name, e);
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(ee.toString()).build();
 			}
 		}
 		return Response.ok().entity("INFO: subscribe successfully").build();
@@ -194,44 +182,57 @@ public class SubscribeResource {
 	 * Send a subscribeDelete for all active subscriptions to the MAP-Server.
 	 * You must set the deleteAll value of true.
 	 * 
-	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
+	 * Example-URL:
+	 * <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
 	 */
 	@DELETE
 	@Path("delete")
 	public Response delete(@PathParam("connectionName") String name) {
-		if(mDeleteAll){
-			try{
-
-				ConnectionManager.deleteSubscriptionsFromConnection(name);
-
+		if (mDeleteAll) {
+			try {
+				Application.getConnectionManager().deleteAllSubscriptions(name);
 			} catch (ConnectionException e) {
-				log.error("error while delete all subscriptions from " + name, e);
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+				log.error("error while delete all subscriptions from " + name,
+						e);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(e.toString()).build();
 			}
 
-			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
-		}else {
-			return Response.status(Response.Status.NOT_MODIFIED).entity("INFO: deleteAll value is not true, nothing were deleted").build();
+			return Response
+					.ok()
+					.entity("INFO: delete all active subscriptions successfully")
+					.build();
+		} else {
+			return Response
+					.status(Response.Status.NOT_MODIFIED)
+					.entity("INFO: deleteAll value is not true, nothing were deleted")
+					.build();
 		}
 	}
 
 	/**
 	 * Send a subscribeDelete for the active subscription to the MAP-Server.
 	 * 
-	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
+	 * Example-URL:
+	 * <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
 	 */
 	@DELETE
 	@Path("delete/{subscriptionName}")
-	public Response delete(@PathParam("connectionName") String name, @PathParam("subscriptionName") String subscriptionName) {
-		try{
-
-			ConnectionManager.deleteSubscribeFromConnection(name, subscriptionName);
-
+	public Response delete(@PathParam("connectionName") String name,
+			@PathParam("subscriptionName") String subscriptionName) {
+		try {
+			Application.getConnectionManager().deleteSubscription(name,
+					subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while delete " + subscriptionName + " from " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			log.error("error while delete " + subscriptionName + " from "
+					+ name, e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(e.toString()).build();
 		}
 
-		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();
+		return Response
+				.ok()
+				.entity("INFO: delete subscription(" + subscriptionName
+						+ ") successfully").build();
 	}
 }

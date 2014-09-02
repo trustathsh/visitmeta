@@ -139,10 +139,7 @@ public class Properties {
 	 */
 	public String getString(String propertyPath) throws PropertyException {
 		Object o =  getValue(propertyPath);
-		if(o instanceof String){
-			return (String) o;
-		}
-		throw new PropertyException("The value from property path[" + propertyPath + "] is not a String!");
+		return o.toString();
 	}
 
 	/**
@@ -155,25 +152,19 @@ public class Properties {
 	 */
 	public String getString(String propertyPath, String defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
-		if(o instanceof String){
-			return (String) o;
-		}
-		return defaultValue;
+		return o.toString();
 	}
 
 	/**
 	 * Get the int-value from the property path. Throw a PropertyException when the value is not a int.
 	 * 
 	 * @param propertyPath foo.bar.property
-	 * @return String
+	 * @return int
 	 * @throws PropertyException
 	 */
 	public int getInt(String propertyPath) throws PropertyException {
 		Object o =  getValue(propertyPath);
-		if(o instanceof Integer){
-			return (int) o;
-		}
-		throw new PropertyException("The value from property path[" + propertyPath + "] is not a int!");
+		return Integer.parseInt(o.toString());
 	}
 
 	/**
@@ -182,29 +173,23 @@ public class Properties {
 	 * 
 	 * @param propertyPath foo.bar.property
 	 * @param defaultValue
-	 * @return String
+	 * @return int
 	 */
 	public int getInt(String propertyPath, int defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
-		if(o instanceof Integer){
-			return (int) o;
-		}
-		return defaultValue;
+		return Integer.parseInt(o.toString());
 	}
 
 	/**
 	 * Get the double-value from the property path. Throw a PropertyException when the value is not a double.
 	 * 
 	 * @param propertyPath foo.bar.property
-	 * @return String
+	 * @return double
 	 * @throws PropertyException
 	 */
 	public double getDouble(String propertyPath) throws PropertyException {
 		Object o =  getValue(propertyPath);
-		if(o instanceof Double){
-			return (double) o;
-		}
-		throw new PropertyException("The value from property path[" + propertyPath + "] is not a double!");
+		return Double.parseDouble(o.toString());
 	}
 
 	/**
@@ -213,29 +198,23 @@ public class Properties {
 	 * 
 	 * @param propertyPath foo.bar.property
 	 * @param defaultValue
-	 * @return String
+	 * @return double
 	 */
 	public double getDouble(String propertyPath, double defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
-		if(o instanceof Double){
-			return (double) o;
-		}
-		return defaultValue;
+		return Double.parseDouble(o.toString());
 	}
 
 	/**
 	 * Get the boolean-value from the property path. Throw a PropertyException when the value is not a boolean.
 	 * 
 	 * @param propertyPath foo.bar.property
-	 * @return String
+	 * @return boolean
 	 * @throws PropertyException
 	 */
 	public boolean getBoolean(String propertyPath) throws PropertyException {
 		Object o =  getValue(propertyPath);
-		if(o instanceof Boolean){
-			return (boolean) o;
-		}
-		throw new PropertyException("The value from property path[" + propertyPath + "] is not a boolean!");
+		return Boolean.parseBoolean(o.toString());
 	}
 
 	/**
@@ -244,14 +223,11 @@ public class Properties {
 	 * 
 	 * @param propertyPath foo.bar.property
 	 * @param defaultValue
-	 * @return String
+	 * @return boolean
 	 */
 	public boolean getBoolean(String propertyPath, boolean defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
-		if(o instanceof Boolean){
-			return (boolean) o;
-		}
-		return defaultValue;
+		return Boolean.parseBoolean(o.toString());
 	}
 
 	/**

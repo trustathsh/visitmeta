@@ -61,7 +61,7 @@ public class PropertiesReader extends YamlPersister {
 	}
 
 	public Map<String, Object> load() throws FileNotFoundException {
-		log.debug("load()...");
+		log.trace("load()...");
 		Map<String, Object> data = loadMap(mFileName);
 		return data;
 	}

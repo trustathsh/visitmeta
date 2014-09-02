@@ -83,7 +83,7 @@ public class PropertiesWriter extends YamlPersister {
 	}
 
 	public synchronized void persist(Map<String, Object> propertiesData) throws FileNotFoundException {
-		log.debug("persist()...");
+		log.trace("persist()...");
 		persist(mFileName, propertiesData, mAppend, mRepresenter, mOptions);
 	}
 }

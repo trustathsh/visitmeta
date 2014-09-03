@@ -36,18 +36,14 @@
  * limitations under the License.
  * #L%
  */
-/**
- * Project: Metalyzer 
- * 
- * Auhtor: Johannes Busch
- * Last Change: 
- * 		by: 	$Author: $
- * 		date: 	$Date: $ 
- * Copyright (c): Hochschule Hannover
- */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.NODE_TYPE_KEY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_IDENTIFIER;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_LINK;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_TYPE_NAME_METADATA;
 
 import org.apache.log4j.Logger;
 import org.neo4j.cypher.ExecutionEngine;
@@ -61,35 +57,40 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 
 /**
- * Implements the Executor interface to allow deeper
- * queries against the neo4J database.
+ * Implements the Executor interface to allow deeper queries against the neo4J
+ * database.
  * 
  * @author Johannes Busch
- *
+ * 
  */
 public class Neo4JExecutor implements Executor {
-	
+
 	private ExecutionEngine cypher;
-	
+
 	private static final Logger log = Logger.getLogger(Neo4JExecutor.class);
 
-	private final String ALL_IDENTIFIER = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_IDENTIFIER + "')";
-	
-	private final String ALL_LINKS = "START l=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_LINK + "')";
-	
-	private final String ALL_METADATA = "START m=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_METADATA + "')";
-	
+	private final String ALL_IDENTIFIER = "START i=node:node_auto_index('"
+			+ NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_IDENTIFIER + "')";
+
+	private final String ALL_LINKS = "START l=node:node_auto_index('"
+			+ NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_LINK + "')";
+
+	private final String ALL_METADATA = "START m=node:node_auto_index('"
+			+ NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_METADATA + "')";
+
 	/**
 	 * Creates a new Executor wich queries the given database.
+	 * 
 	 * @param db
 	 */
 	public Neo4JExecutor(Neo4JConnection db) {
 		cypher = new ExecutionEngine(db.getConnection(), StringLogger.DEV_NULL);
 	}
-	
+
 	/**
-	 * Creates a new executor with the given cypher engine.
-	 * Just for testing purpose.
+	 * Creates a new executor with the given cypher engine. Just for testing
+	 * purpose.
+	 * 
 	 * @param cypher
 	 */
 	public Neo4JExecutor(ExecutionEngine cypher) {
@@ -98,138 +99,157 @@ public class Neo4JExecutor implements Executor {
 
 	/**
 	 * Returns a number of all current identifier in the graph.
+	 * 
 	 * @return
 	 */
 	@Override
 	public long count(GraphType type) {
-		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
-		
+		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
+
 		ExecutionResult result = executeQuery(buildQuerie(type, current));
-		
+
 		return getResult(result);
 	}
-	
+
 	/**
-	 * Builds a Queries for the given type.
-	 * Uses for identifier an "or" match by using optional relations.
+	 * Builds a Queries for the given type. Uses for identifier an "or" match by
+	 * using optional relations.
+	 * 
 	 * @param type
 	 * @return
 	 */
 	private String buildQuerie(GraphType type, String time) {
 		String source = "", match = "", countReturn = "";
-		
-		if( GraphType.IDENTIFIER == type ) {
+
+		if (GraphType.IDENTIFIER == type) {
 			source = ALL_IDENTIFIER;
-			
+
 			// Using an "or" in match
 			match = "MATCH (m)-[:Meta]-(i)-[:Link]-(l)-[:Meta]-(m)";
-			
+
 			countReturn = "RETURN count(distinct i) as result";
-			
-		} else if( GraphType.LINK == type ) {
+
+		} else if (GraphType.LINK == type) {
 			source = ALL_LINKS;
-			
+
 			match = "MATCH (l)-[:Meta]-(m)";
-			
+
 			countReturn = "RETURN count(distinct l) as result";
-			
-		} else if( GraphType.METADATA == type ) {
+
+		} else if (GraphType.METADATA == type) {
 			source = ALL_METADATA;
-			
+
 			countReturn = "RETURN count(distinct m) as result";
-			
+
 		} else {
 			log.error("No Querie for this type known ( possibly null )");
-			throw new RuntimeException("No Querie for this type known ( possibly null )");
+			throw new RuntimeException(
+					"No Querie for this type known ( possibly null )");
 		}
-		
+
 		return source + " " + match + " " + time + " " + countReturn;
 	}
 
 	/**
 	 * Executes the given query against the database and returns the
 	 * ExecutionResult.
+	 * 
 	 * @param query
 	 * @return
 	 */
 	private ExecutionResult executeQuery(String query) {
 		try {
 			return cypher.execute(query);
-		} catch(SyntaxException exception) {
+		} catch (SyntaxException exception) {
 			log.error(exception.getMessage());
-			throw new RuntimeException("Database query exception. More Infos in log-file!");
+			throw new RuntimeException(
+					"Database query exception. More Infos in log-file!");
 		}
 	}
-	
+
 	private long getResult(ExecutionResult result) {
 		Iterator<Long> nodes = result.columnAs("result");
-		
-		if(nodes.hasNext()) {
+
+		if (nodes.hasNext()) {
 			return nodes.next();
 		}
-		
+
 		log.error("Error occured while counting!");
 		throw new RuntimeException("Error occured while counting!");
 	}
 
 	@Override
 	public long count(GraphType type, long timestamp) {
-		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= " + timestamp + " and ";
-		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
-		String deleted = "m." + KEY_TIMESTAMP_DELETE + " >= " + timestamp + " ) )";
-		
-		ExecutionResult result = executeQuery(buildQuerie(type, published + not_Deleted + deleted));
-		
+		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= "
+				+ timestamp + " and ";
+		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
+		String deleted = "m." + KEY_TIMESTAMP_DELETE + " >= " + timestamp
+				+ " ) )";
+
+		ExecutionResult result = executeQuery(buildQuerie(type, published
+				+ not_Deleted + deleted));
+
 		return getResult(result);
 	}
 
 	@Override
 	public long count(GraphType type, long from, long to) {
-		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= " + to + " and ";
-		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
+		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= " + to
+				+ " and ";
+		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
 		String deleted = "m." + KEY_TIMESTAMP_DELETE + " >= " + from + " ) )";
-		
-		ExecutionResult result = executeQuery(buildQuerie(type, published + not_Deleted + deleted));
-		
+
+		ExecutionResult result = executeQuery(buildQuerie(type, published
+				+ not_Deleted + deleted));
+
 		return getResult(result);
 	}
 
 	@Override
 	public double meanOfEdges() {
-		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
-		
-		String querie = ALL_IDENTIFIER + " MATCH (i)-[:Link]-(l)-[:Meta]-(m) " + current + " RETURN count(l) / count(distinct i ) as result";
-		
+		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
+
+		String querie = ALL_IDENTIFIER + " MATCH (i)-[:Link]-(l)-[:Meta]-(m) "
+				+ current + " RETURN count(l) / count(distinct i ) as result";
+
 		ExecutionResult result = executeQuery(querie);
-		
+
 		Iterator<Double> nodes = result.columnAs("result");
-		
-		if(nodes.hasNext()) {
+
+		if (nodes.hasNext()) {
 			return nodes.next();
 		}
-		
+
 		log.error("Error occured while counting!");
 		throw new RuntimeException("Error occured while counting!");
 	}
 
 	@Override
 	public double meanOfEdges(long timestamp) {
-		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= " + timestamp + " and ";
-		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
-		String deleted = "m." + KEY_TIMESTAMP_DELETE + " >= " + timestamp + " ) )";
-		
+		String published = "WHERE (m. " + KEY_TIMESTAMP_PUBLISH + " <= "
+				+ timestamp + " and ";
+		String not_Deleted = "(m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + " or ";
+		String deleted = "m." + KEY_TIMESTAMP_DELETE + " >= " + timestamp
+				+ " ) )";
+
 		String time = published + not_Deleted + deleted;
-		
-		String querie = ALL_IDENTIFIER + " MATCH (i)-[:Link]-(l)-[:Meta]-(m) " + time + " RETURN count(l) / count(distinct i ) as result";
-		
+
+		String querie = ALL_IDENTIFIER + " MATCH (i)-[:Link]-(l)-[:Meta]-(m) "
+				+ time + " RETURN count(l) / count(distinct i ) as result";
+
 		ExecutionResult result = executeQuery(querie);
-		
+
 		Iterator<Double> nodes = result.columnAs("result");
-		
-		if(nodes.hasNext()) {
+
+		if (nodes.hasNext()) {
 			return nodes.next();
 		}
-		
+
 		log.error("Error occured while counting!");
 		throw new RuntimeException("Error occured while counting!");
 	}

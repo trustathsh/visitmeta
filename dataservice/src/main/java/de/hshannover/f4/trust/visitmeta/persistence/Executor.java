@@ -36,66 +36,61 @@
  * limitations under the License.
  * #L%
  */
-/**
- * Project: Metalyzer 
- * 
- * Auhtor: Johannes Busch
- * Last Change: 
- * 		by: 	$Author: $
- * 		date: 	$Date: $ 
- * Copyright (c): Hochschule Hannover
- */
 package de.hshannover.f4.trust.visitmeta.persistence;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
 
 /**
- * Interface for deeper queries against the
- * underlying data.
+ * Interface for deeper queries against the underlying data.
  * 
  * @author Johannes Busch
- *
+ * 
  */
 public interface Executor {
-	
+
 	/**
-	 * Returns a number of all current elements in the graph.
-	 * Elements are specified by the given type.
+	 * Returns a number of all current elements in the graph. Elements are
+	 * specified by the given type.
+	 * 
 	 * @return
 	 */
 	public long count(GraphType type);
-	
+
 	/**
 	 * Returns a number of all elements in the graph at the given timestamp.
 	 * Elements are specified by the given type.
+	 * 
 	 * @param type
 	 * @param timestamp
 	 * @return
 	 */
 	public long count(GraphType type, long timestamp);
-	
+
 	/**
 	 * Returns a number of all elements in the graph in the given delta.
 	 * Elements are specified by the given type.
+	 * 
 	 * @param type
 	 * @param from
 	 * @param to
 	 * @return
 	 */
 	public long count(GraphType type, long from, long to);
-	
+
 	/**
-	 * Returns the mean of edges in the graph.
-	 * Beware: It does not count actual links. It counts metadata on a given link.
-	 * 			If one link has several metadata, the link will be counted multiple times!
+	 * Returns the mean of edges in the graph. Beware: It does not count actual
+	 * links. It counts metadata on a given link. If one link has several
+	 * metadata, the link will be counted multiple times!
+	 * 
 	 * @return
 	 */
 	public double meanOfEdges();
-	
+
 	/**
-	 * Returns the mean of edges in the graph.
-	 * Beware: It does not count actual links. It counts metadata on a given link.
-	 * 			If one link has several metadata, the link will be counted multiple times!
+	 * Returns the mean of edges in the graph. Beware: It does not count actual
+	 * links. It counts metadata on a given link. If one link has several
+	 * metadata, the link will be counted multiple times!
+	 * 
 	 * @return
 	 */
 	public double meanOfEdges(long timestamp);

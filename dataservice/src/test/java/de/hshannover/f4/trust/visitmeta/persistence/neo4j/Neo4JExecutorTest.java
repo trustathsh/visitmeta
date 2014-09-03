@@ -36,15 +36,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * Project: Metalyzer 
- * 
- * Auhtor: Johannes Busch
- * Last Change: 
- * 		by: 	$Author: $
- * 		date: 	$Date: $ 
- * Copyright (c): Hochschule Hannover
- */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
@@ -64,52 +55,54 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
  * Test-class for Neo4JExecutor.
  * 
  * @author Johannes Busch
- *
+ * 
  */
 public class Neo4JExecutorTest {
-	
+
 	private ExecutionEngine cypher;
 
 	private Neo4JExecutor executor;
-	
+
 	private String query;
-	
+
 	@Test
 	public void testVerifyCountIdentifierQueryAtCurrent() {
 		givenNewIdentifierExecutor(GraphType.IDENTIFIER);
-		
+
 		executor.count(GraphType.IDENTIFIER);
-		
+
 		Mockito.verify(cypher).execute(query);
 	}
 
 	private void givenNewIdentifierExecutor(GraphType type) {
 		cypher = Mockito.mock(ExecutionEngine.class);
-		
+
 		Iterator<Object> nodes = Mockito.mock(Iterator.class);
-		
+
 		Mockito.when(nodes.hasNext()).thenReturn(true);
 		Mockito.when(nodes.next()).thenReturn(2L);
-		
+
 		ExecutionResult result = Mockito.mock(ExecutionResult.class);
-		
+
 		Mockito.when(result.columnAs("result")).thenReturn(nodes);
-		
-		if(GraphType.IDENTIFIER == type) {
+
+		if (GraphType.IDENTIFIER == type) {
 			buildIdentifierQuerieAtCurrent();
-			
+
 			Mockito.when(cypher.execute(query)).thenReturn(result);
 		}
-		
+
 		executor = new Neo4JExecutor(cypher);
 	}
-	
+
 	private void buildIdentifierQuerieAtCurrent() {
-		String source = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":" + VALUE_TYPE_NAME_IDENTIFIER + "')";
+		String source = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":"
+				+ VALUE_TYPE_NAME_IDENTIFIER + "')";
 		String match = "MATCH (m)-[:Meta]-(i)-[:Link]-(l)-[:Meta]-(m)";
 		String countReturn = "RETURN count(distinct i) as result";
-		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = " + InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
-		
+		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = "
+				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
+
 		query = source + " " + match + " " + current + " " + countReturn;
 	}
 }

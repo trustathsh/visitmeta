@@ -1,1 +1,0 @@
-java -jar metalyzer.jar

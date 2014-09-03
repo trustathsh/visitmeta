@@ -128,15 +128,5 @@
 			<artifactId>grizzly-servlet-webserver</artifactId>
 			<version>1.9.18-i</version>
 		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuiton.thirdparty</groupId>
-			<artifactId>JRI</artifactId>
-			<version>0.8-4</version>
-		</dependency>
 	</dependencies>
 </project>

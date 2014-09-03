@@ -49,7 +49,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
-import de.hshannover.f4.trust.metalyzer.api.MetalyzerModule;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
@@ -165,7 +164,6 @@ public abstract class Application {
 		List<DataserviceModule> loadedModules = new ArrayList<>();
 
 		// TODO load modules from jar-files
-		loadedModules.add(new MetalyzerModule());
 
 		return loadedModules;
 	}

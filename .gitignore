@@ -1,4 +1,4 @@
-/.settings
+.settings
 .project
 .classpath
 .DS_Store
@@ -8,7 +8,7 @@ dataservice/.checkstyle
 src/license/dummy/Dummy.java
 visitmeta-distribution/.checkstyle
 visualization/.checkstyle
-
+target/
 test.properties
 bin/
 .metadata

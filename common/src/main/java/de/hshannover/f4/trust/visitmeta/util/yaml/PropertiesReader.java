@@ -38,31 +38,33 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public class PropertiesReader extends YamlPersister {
+public class PropertiesReader extends YamlReader {
 
 	private static final Logger log = Logger.getLogger(PropertiesReader.class);
-
 
 	private String mFileName;
 
 	/**
-	 * Create a JyamlReader for ApplicationProperties
-	 *
-	 * @param fileName
+	 * Create a JyamlReader for application properties.
+	 * @param fileName The file name or the file path to the yml-file.
 	 */
 	public PropertiesReader(String fileName){
 		log.trace("new PropertiesReader()...");
 		mFileName = fileName;
 	}
 
-	public Map<String, Object> load() throws FileNotFoundException {
+	/**
+	 * Load the application properties as Map<String, Object>.
+	 * @return A Map<String, Object> with property keys and values.
+	 * @throws IOException
+	 */
+	public Map<String, Object> load() throws IOException {
 		log.trace("load()...");
-		Map<String, Object> data = loadMap(mFileName);
-		return data;
+		return loadMap(mFileName);
 	}
 }

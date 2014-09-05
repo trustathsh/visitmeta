@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -46,31 +46,25 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
-public class PropertiesWriter extends YamlPersister {
+public class PropertiesWriter extends YamlWriter {
 
 	private static final Logger log = Logger.getLogger(PropertiesWriter.class);
 
 	public static final String TAG = "!Properties";
 
-
 	private String mFileName;
-
-	private boolean mAppend;
-
 
 	private DumperOptions mOptions;
 
 	private Representer mRepresenter;
 
 	/**
-	 * Create a JyamlWriter for ApplicationProperties
-	 *
-	 * @param fileName
+	 * Create a JyamlWriter for application properties.
+	 * @param fileName The file name or the file path to the yml-file.
 	 */
 	public PropertiesWriter(String fileName){
 		log.trace("new PropertiesWriter()...");
 		mFileName = fileName;
-		mAppend = false;
 		mOptions = buildDumperOptions();
 		mRepresenter = new Representer();
 		mRepresenter.addClassTag(Properties.class, new Tag(TAG));
@@ -82,8 +76,13 @@ public class PropertiesWriter extends YamlPersister {
 		return options;
 	}
 
-	public synchronized void persist(Map<String, Object> propertiesData) throws FileNotFoundException {
-		log.trace("persist()...");
-		persist(mFileName, propertiesData, mAppend, mRepresenter, mOptions);
+	/**
+	 * Save the Map<String, Object> to the yml-file.
+	 * @param propertiesData The Object to be stored.
+	 * @throws IOException
+	 */
+	public void save(Map<String, Object> propertiesData) throws IOException {
+		log.trace("save()...");
+		persist(mFileName, propertiesData, mRepresenter, mOptions);
 	}
 }

@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -227,7 +227,7 @@ public class ConnectionResource {
 		// persist connection in property
 		try {
 			Application.getConnectionPersister().persistConnections();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			log.error("error while connection persist", e);
 			return Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)

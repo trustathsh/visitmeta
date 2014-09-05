@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -108,7 +108,7 @@ public abstract class Application {
 
 		try {
 			loadPersistentConnections();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			log.error("error while load persistent connections", e);
 		} catch (ConstructorException e) {
 			log.error("error while load persistent connections", e);
@@ -143,8 +143,7 @@ public abstract class Application {
 		;
 	}
 
-	private static void loadPersistentConnections()
-			throws FileNotFoundException {
+	private static void loadPersistentConnections() throws IOException {
 		log.info("load persistent connections");
 		Map<String, Connection> connectionList = mConnectionPersister.load();
 

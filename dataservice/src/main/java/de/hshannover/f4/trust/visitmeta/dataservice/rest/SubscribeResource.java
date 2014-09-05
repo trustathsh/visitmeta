@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.ws.rs.Consumes;
@@ -170,12 +170,9 @@ public class SubscribeResource {
 					manager.subscribe(name, request);
 					manager.storeSubscription(name, jObj);
 
-				} catch (ConnectionException | FileNotFoundException e) {
-					log.error("error while multiple subscribeUpdate from "
-							+ name, e);
-					return Response
-							.status(Response.Status.INTERNAL_SERVER_ERROR)
-							.entity(e.toString()).build();
+				} catch (ConnectionException | IOException e) {
+					log.error("error while multiple subscribeUpdate from " + name, e);
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
 		} catch (JSONException e) {
@@ -186,7 +183,7 @@ public class SubscribeResource {
 				manager.subscribe(name, request);
 				manager.storeSubscription(name, jObj);
 
-			} catch (ConnectionException | FileNotFoundException ee) {
+			} catch (ConnectionException | IOException ee) {
 				log.error("error while single subscribeUpdate from " + name, e);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(ee.toString()).build();

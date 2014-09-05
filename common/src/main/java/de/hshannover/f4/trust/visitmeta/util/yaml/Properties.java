@@ -2,6 +2,7 @@ package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
@@ -92,7 +93,7 @@ public class Properties {
 		// split propertyPath
 		String[] propertyKeyArray = propertyPath.split("\\.");
 
-		// iterate the root Map for every key
+		// iterate the root Map for every token
 		Map<String, Object> applicationConfigs = mApplicationConfigs;
 		for(int i=0; i<propertyKeyArray.length; i++){
 			Object tmp = applicationConfigs.get(propertyKeyArray[i]);
@@ -231,57 +232,82 @@ public class Properties {
 	}
 
 	/**
-	 * Set and save the value under the key.
+	 * 
+	 * Build a property path one level higher
+	 * Example:
+	 * 
+	 * @param foo.bar.property
+	 * @return foo.bar
+	 */
+	private String removeLastToken(String propertyPath){
+		String[] propertyKeyArray = propertyPath.split("\\.");
+
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i < propertyKeyArray.length-2; i++){
+			sb.append(propertyKeyArray[i]);
+			sb.append('.');
+		}
+		sb.append(propertyKeyArray[propertyKeyArray.length-2]);
+		return sb.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> addRecursiveInExistingMap(String propertyPath, Object propertyValue) throws PropertyException {
+		// split propertyPath
+		String[] propertyKeyArray = propertyPath.split("\\.");
+
+		// if simple token add too root map
+		if(propertyKeyArray.length == 1){
+			mApplicationConfigs.put(propertyPath, propertyValue);
+			return mApplicationConfigs;
+		}
+
+		// the path one level higher
+		String newPath = removeLastToken(propertyPath);
+
+		// find the value for this new path
+		Map<String, Object> foundedMap = null;
+		try{
+			Object foundedValue = getValue(newPath);
+			if(foundedValue instanceof Map){
+				foundedMap = (Map<String, Object>) getValue(newPath);
+			}
+		}catch (PropertyException e){
+			// nothing todo
+		}
+
+		if(foundedMap == null){
+			Map<String, Object> newMap = new HashMap<String, Object>();
+			newMap.put(propertyKeyArray[propertyKeyArray.length-1], propertyValue);
+			// recursive call with new path and new Map
+			foundedMap = addRecursiveInExistingMap(newPath, newMap);
+		}else{
+			foundedMap.put(propertyKeyArray[propertyKeyArray.length-1], propertyValue);
+		}
+
+		return foundedMap;
+	}
+
+	/**
+	 * Save the value under the key.
+	 * Maps and List can only obtain simple data-types.
 	 * 
 	 * @param propertyPath foo.bar.property
-	 * @param propertyValue Only String|int|double|boolean
+	 * @param propertyValue Only String|int|double|boolean|Map|List
 	 * @throws PropertyException
 	 */
-	@SuppressWarnings("unchecked")
 	public void set(String propertyPath, Object propertyValue) throws PropertyException {
 		// check propertyPath
 		NullCheck.check(propertyPath, "propertyPath is null");
 
 		// check propertyValue
 		if(!(propertyValue instanceof String) && !(propertyValue instanceof Integer)
-				&& !(propertyValue instanceof Double) && !(propertyValue instanceof Boolean)){
-			throw new PropertyException("Only String|int|double|boolean can be set!");
+				&& !(propertyValue instanceof Double) && !(propertyValue instanceof Boolean)
+				&& !(propertyValue instanceof Map) && !(propertyValue instanceof List)){
+			throw new PropertyException("Only String|int|double|boolean|Map|List can be set!");
 		}
 
-		// split propertyPath
-		String[] propertyKeyArray = propertyPath.split("\\.");
-
-		// get or build new Map's and add to root map
-		if(propertyKeyArray.length > 1){
-			Object tmpValueMap = propertyValue;
-
-			for(int i=propertyKeyArray.length-2; i >= 0; i--){
-				StringBuilder sb = new StringBuilder();
-				for(int j=0; j <i; j++){
-					sb.append(propertyKeyArray[j]);
-					sb.append('.');
-				}
-				sb.append(propertyKeyArray[i]);
-
-				Map<String, Object> tmp = null;
-				try{
-					tmp = (Map<String, Object>) getValue(sb.toString());
-				}catch (PropertyException e){
-					// when PropertyException nothing found -> tmp = null
-				}
-
-				if(tmp != null){
-					tmp.put(propertyKeyArray[i+1], tmpValueMap);
-					break;
-				}else{
-					tmp = new HashMap<String, Object>();
-					tmp.put(propertyKeyArray[i+1], tmpValueMap);
-					tmpValueMap = tmp;
-				}
-			}
-		}else{
-			mApplicationConfigs.put(propertyPath, propertyValue);
-		}
+		addRecursiveInExistingMap(propertyPath, propertyValue);
 
 		// save all
 		try {

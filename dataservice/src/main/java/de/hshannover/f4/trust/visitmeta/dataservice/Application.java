@@ -39,7 +39,6 @@
 package de.hshannover.f4.trust.visitmeta.dataservice;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -191,7 +190,7 @@ public abstract class Application {
 			mConnectionPersister = new ConnectionPersister(mManager, connections);
 
 			log.info("components initialized");
-		} catch (IOException e) {
+		} catch (PropertyException e) {
 			String msg = "Error while reading the config files";
 			log.fatal(msg);
 			throw new RuntimeException(msg, e);

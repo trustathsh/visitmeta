@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta;
 
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +53,7 @@ import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 /**
  * Class with main-method.
@@ -125,7 +125,7 @@ public final class Main {
 
 		try{
 			mConfig = new Properties(config);
-		} catch (IOException e) {
+		} catch (PropertyException e) {
 			String msg = "Error while reading the config files";
 			LOGGER.fatal(msg);
 			throw new RuntimeException(msg, e);

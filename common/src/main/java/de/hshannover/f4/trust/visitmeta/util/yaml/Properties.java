@@ -1,6 +1,6 @@
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +26,11 @@ public class Properties {
 
 	/**
 	 * Create a ApplicationProperties for load and save Application-YAML files.
-	 *
-	 * @param fileName
-	 * @throws FileNotFoundException
+	 * @param fileName The file name or the file path to the yml-file.
+	 * @throws IOException
+	 * @throws PropertyException
 	 */
-	public Properties(String fileName) throws FileNotFoundException{
+	public Properties(String fileName) throws PropertyException{
 		NullCheck.check(fileName, "fileName is null");
 		mFileName = fileName;
 		mWriter = new PropertiesWriter(mFileName);
@@ -39,21 +39,29 @@ public class Properties {
 	}
 
 	/**
-	 * Load the YAML-files new.
-	 *
-	 * @throws FileNotFoundException
+	 * Load the application properties as Map<String, Object>.
+	 * @throws PropertyException
+	 * @throws IOException
 	 */
-	public void load() throws FileNotFoundException{
-		mApplicationConfigs = mReader.load();
+	public void load() throws PropertyException {
+		try {
+			mApplicationConfigs = mReader.load();
+		} catch (IOException e) {
+			throw new PropertyException(e.getMessage());
+		}
 	}
 
 	/**
 	 * Save all properties in a YAML-files and override them.
-	 *
-	 * @throws FileNotFoundException
+	 * @throws PropertyException
+	 * @throws IOException
 	 */
-	public void save() throws FileNotFoundException {
-		mWriter.persist(mApplicationConfigs);
+	public void save() throws PropertyException {
+		try {
+			mWriter.save(mApplicationConfigs);
+		} catch (IOException e) {
+			throw new PropertyException(e.getMessage());
+		}
 	}
 
 	/**
@@ -310,11 +318,7 @@ public class Properties {
 		addRecursiveInExistingMap(propertyPath, propertyValue);
 
 		// save all
-		try {
-			save();
-		} catch (FileNotFoundException e) {
-			throw new PropertyException("File " + mFileName + " not found!");
-		}
+		save();
 	}
 
 

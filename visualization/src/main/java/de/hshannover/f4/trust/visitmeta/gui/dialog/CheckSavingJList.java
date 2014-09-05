@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -88,7 +88,7 @@ public class CheckSavingJList<E> extends JList<E> {
 
 				try {
 					yesOption();
-				} catch (FileNotFoundException	| DataservicePersisterException | JSONException e) {
+				} catch (IOException | DataservicePersisterException | JSONException e) {
 					// logging already finished
 				}
 
@@ -104,7 +104,7 @@ public class CheckSavingJList<E> extends JList<E> {
 		super.fireSelectionValueChanged(firstIndex, lastIndex, isAdjusting);
 	}
 
-	public void yesOption() throws DataservicePersisterException, FileNotFoundException, JSONException, JSONException {
+	public void yesOption() throws DataservicePersisterException, JSONException, JSONException, IOException {
 		if(mJPanel instanceof DataServicePanel){
 			DataServicePanel panel = (DataServicePanel)mJPanel;
 			DataserviceConnection tmp = panel.mPreviousConnection.copy();	// for rollback
@@ -114,7 +114,7 @@ public class CheckSavingJList<E> extends JList<E> {
 				mDataservicePersister.update(tmp.getName(), panel.mPreviousConnection);
 				panel.mChanges = false;
 
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				log.error("Error while updating the Dataservice-Connection", e);
 				//rollBack
 				panel.mPreviousConnection.update(tmp);

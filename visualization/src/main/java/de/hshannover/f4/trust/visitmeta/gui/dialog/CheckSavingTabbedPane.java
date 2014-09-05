@@ -39,7 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.Component;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -79,7 +79,7 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 				if (n == JOptionPane.YES_OPTION){
 					try{
 						yesOption(panel);
-					} catch (FileNotFoundException	| DataservicePersisterException | JSONException e) {
+					} catch (IOException | DataservicePersisterException | JSONException e) {
 						// logging already finished
 					}
 				}else if(n == JOptionPane.NO_OPTION){
@@ -93,7 +93,7 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 		super.setSelectedIndex(index);
 	}
 
-	public void yesOption(Component selectedComponent) throws FileNotFoundException, DataservicePersisterException, UniformInterfaceException, JSONException {
+	public void yesOption(Component selectedComponent) throws DataservicePersisterException, UniformInterfaceException, JSONException, IOException {
 		if(selectedComponent instanceof DataServicePanel){
 			DataServicePanel panel = (DataServicePanel)selectedComponent;
 
@@ -103,7 +103,7 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 			try {
 				mDataservicePersister.update(tmp.getName(), panel.mPreviousConnection);
 				panel.mChanges = false;
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				log.error("Error while updating the Dataservice-Connection(" + tmp.getName() + ")", e);
 				//rollBack
 				panel.mPreviousConnection.update(tmp);

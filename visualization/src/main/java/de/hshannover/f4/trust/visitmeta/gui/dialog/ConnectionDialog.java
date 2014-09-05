@@ -52,7 +52,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -194,11 +194,11 @@ public class ConnectionDialog extends JDialog{
 
 		mJtpMain = new CheckSavingTabbedPane(){
 			@Override
-			public void yesOption(Component selectedComponent) throws FileNotFoundException, DataservicePersisterException, UniformInterfaceException, JSONException {
+			public void yesOption(Component selectedComponent) throws IOException, DataservicePersisterException, UniformInterfaceException, JSONException {
 				try {
 					super.yesOption(selectedComponent);
 					saveEvent();
-				} catch (FileNotFoundException| DataservicePersisterException | JSONException e) {
+				} catch (DataservicePersisterException | JSONException | IOException e) {
 					log.trace("Error whil saving, save-button name-textfield remains activated.");
 					throw e;
 				}
@@ -393,7 +393,7 @@ public class ConnectionDialog extends JDialog{
 			Map<String, DataserviceConnection> dataserviceList = null;
 			try {
 				dataserviceList = mDataservicePersister.load();
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				log.error("Error while update Dataservice-Combo-Box", e);
 			}
 
@@ -626,11 +626,11 @@ public class ConnectionDialog extends JDialog{
 
 				mJlMapServerConnections = new CheckSavingJList<RestConnection>(this){
 					@Override
-					public void yesOption() throws FileNotFoundException, DataservicePersisterException, JSONException {
+					public void yesOption() throws IOException, DataservicePersisterException, JSONException {
 						try {
 							super.yesOption();
 							saveEvent();
-						} catch (FileNotFoundException| DataservicePersisterException | JSONException e) {
+						} catch (IOException| DataservicePersisterException | JSONException e) {
 							log.trace("Error whil saving, save-button name-textfield remains activated.");
 							throw e;
 						}
@@ -704,7 +704,7 @@ public class ConnectionDialog extends JDialog{
 						setChanges(true);
 						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 
-					} catch (FileNotFoundException e) {
+					} catch (IOException e) {
 						log.error("Error while copy new Dataservice-Connection", e);
 					} catch (DataservicePersisterException e) {
 						log.warn(e.toString());
@@ -719,7 +719,7 @@ public class ConnectionDialog extends JDialog{
 					if (index >= 0) {
 						try {
 							mDataservicePersister.remove(mJlDataServiceConnections.getSelectedValue().getName());
-						} catch (FileNotFoundException e) {
+						} catch (IOException e) {
 							log.error("Error while remove Dataservice-Connection(" + mJlDataServiceConnections.getSelectedValue().getName() + ")", e);
 						}
 						mListModelDataService.remove(index);
@@ -745,7 +745,7 @@ public class ConnectionDialog extends JDialog{
 							mListModelDataService.add(mListModelDataService.getSize(), param);
 							mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
 							setChanges(true);
-						} catch (FileNotFoundException e) {
+						} catch (IOException e) {
 							log.error("Error while copy new Dataservice-Connection", e);
 						} catch (DataservicePersisterException e) {
 							log.warn(e.toString());
@@ -773,7 +773,7 @@ public class ConnectionDialog extends JDialog{
 							saveEvent();
 							mChanges = false;
 							log.info("DataService Connections was persist");
-						} catch (FileNotFoundException e) {
+						} catch (IOException e) {
 							log.error("Error while update the Dataservice-Connection(" + param.getName() + ")", e);
 						} catch (DataservicePersisterException e) {
 							log.warn(e.toString());
@@ -813,7 +813,7 @@ public class ConnectionDialog extends JDialog{
 			Map<String, DataserviceConnection> dataserviceSet = null;
 			try {
 				dataserviceSet = mDataservicePersister.load();
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				log.error("Error while load persisted Dataservice-Connections", e);
 			}
 			for(DataserviceConnection dc: dataserviceSet.values()){
@@ -850,11 +850,11 @@ public class ConnectionDialog extends JDialog{
 				mListModelDataService = new DefaultListModel<DataserviceConnection>();
 				mJlDataServiceConnections = new CheckSavingJList<DataserviceConnection>(this){
 					@Override
-					public void yesOption() throws FileNotFoundException, DataservicePersisterException, JSONException {
+					public void yesOption() throws IOException, DataservicePersisterException, JSONException {
 						try {
 							super.yesOption();
 							saveEvent();
-						} catch (FileNotFoundException| DataservicePersisterException | JSONException e) {
+						} catch (IOException| DataservicePersisterException | JSONException e) {
 							log.trace("Error whil saving, mJbSave-button remains activated.");
 							throw e;
 						}

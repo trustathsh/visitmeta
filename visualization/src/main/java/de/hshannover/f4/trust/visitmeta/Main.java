@@ -39,7 +39,7 @@
 package de.hshannover.f4.trust.visitmeta;
 
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +92,7 @@ public final class Main {
 		Map<String, DataserviceConnection> dataserviceConnections = null;
 		try {
 			dataserviceConnections = getDataservicePersister().load();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			LOGGER.error("error while load persistent dataservices", e);
 		}
 

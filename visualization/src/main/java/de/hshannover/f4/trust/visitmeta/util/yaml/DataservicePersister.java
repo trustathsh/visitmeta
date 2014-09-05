@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +52,7 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 
-public class DataservicePersister extends YamlPersister {
+public class DataservicePersister {
 
 	private static final Logger log = Logger.getLogger(DataservicePersister.class);
 
@@ -62,8 +62,6 @@ public class DataservicePersister extends YamlPersister {
 	private String mFileName;
 
 	private boolean mMinimalOutput;
-
-	private boolean mAppend;
 
 
 	private DumperOptions mOptions;
@@ -81,7 +79,6 @@ public class DataservicePersister extends YamlPersister {
 	public DataservicePersister(String fileName){
 		log.trace("new DataservicePersister()...");
 		mFileName = fileName;
-		mAppend = false;
 		mMinimalOutput = true;
 		mOptions = buildDumperOptions();
 		mRepresenter = new Representer();
@@ -97,21 +94,21 @@ public class DataservicePersister extends YamlPersister {
 		return options;
 	}
 
-	public void add(DataserviceConnection connection) throws FileNotFoundException, DataservicePersisterException {
+	public void add(DataserviceConnection connection) throws DataservicePersisterException, IOException {
 		Map<String, DataserviceConnection> dataserviceMap = load();
 		checkContains(connection, dataserviceMap);
 		dataserviceMap.put(connection.getName(), connection);
-		persist(mFileName, dataserviceMap, mAppend, mRepresenter, mOptions);
+		YamlWriter.persist(mFileName, dataserviceMap, mRepresenter, mOptions);
 	}
 
-	public void update(String oldDataserviceConnectionName, DataserviceConnection dataservice) throws FileNotFoundException, DataservicePersisterException {
+	public void update(String oldDataserviceConnectionName, DataserviceConnection dataservice) throws DataservicePersisterException, IOException {
 		Map<String, DataserviceConnection> dataserviceMap = load();
 		DataserviceConnection oldDataservice = search(oldDataserviceConnectionName, dataserviceMap);
 		dataserviceMap.remove(oldDataserviceConnectionName);
 		if(oldDataservice != null){
 			oldDataservice.update(dataservice);
 			dataserviceMap.put(dataservice.getName(), dataservice);
-			persist(mFileName, dataserviceMap, mAppend, mRepresenter, mOptions);
+			YamlWriter.persist(mFileName, dataserviceMap, mRepresenter, mOptions);
 		}
 	}
 
@@ -125,15 +122,15 @@ public class DataservicePersister extends YamlPersister {
 		return null;
 	}
 
-	public void remove(String dataserviceName) throws FileNotFoundException{
+	public void remove(String dataserviceName) throws IOException{
 		Map<String, DataserviceConnection> dataserviceList = load();
 		dataserviceList.remove(search(dataserviceName, dataserviceList));
-		persist(mFileName, dataserviceList, mAppend, mRepresenter, mOptions);
+		YamlWriter.persist(mFileName, dataserviceList, mRepresenter, mOptions);
 	}
 
-	public Map<String, DataserviceConnection> load() throws FileNotFoundException {
+	public Map<String, DataserviceConnection> load() throws IOException {
 		Map<String, DataserviceConnection> newMap = new HashMap<String, DataserviceConnection>();
-		Map<String, Object> map = loadMap(mFileName, mConstructor);
+		Map<String, Object> map = YamlReader.loadMap(mFileName, mConstructor);
 		if(map != null){
 			for(Entry<String, Object> entry: map.entrySet()){
 				if(entry.getValue() instanceof DataserviceConnection){

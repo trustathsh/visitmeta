@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.util.yaml;
+package de.hshannover.f4.trust.visitmeta.util.properties;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -278,7 +278,7 @@ public class Properties {
 		try{
 			Object foundedValue = getValue(newPath);
 			if(foundedValue instanceof Map){
-				foundedMap = (Map<String, Object>) getValue(newPath);
+				foundedMap = (Map<String, Object>) foundedValue;
 			}
 		}catch (PropertyException e){
 			// nothing todo
@@ -315,6 +315,7 @@ public class Properties {
 			throw new PropertyException("Only String|int|double|boolean|Map|List can be set!");
 		}
 
+		// add to root map
 		addRecursiveInExistingMap(propertyPath, propertyValue);
 
 		// save all

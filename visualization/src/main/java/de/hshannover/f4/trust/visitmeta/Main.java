@@ -51,9 +51,9 @@ import de.hshannover.f4.trust.visitmeta.input.DeviceToGuiConnector;
 import de.hshannover.f4.trust.visitmeta.input.device.Device;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 /**
  * Class with main-method.

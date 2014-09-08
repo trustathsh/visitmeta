@@ -90,9 +90,9 @@ import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersisterException;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
 
 public class ConnectionDialog extends JDialog{
 

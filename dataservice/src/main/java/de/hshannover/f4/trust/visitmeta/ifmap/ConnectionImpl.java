@@ -70,7 +70,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionExceptio
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 

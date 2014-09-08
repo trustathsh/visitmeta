@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 

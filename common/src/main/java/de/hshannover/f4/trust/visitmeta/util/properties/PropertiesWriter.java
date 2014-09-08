@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.util.yaml;
+package de.hshannover.f4.trust.visitmeta.util.properties;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
+
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlWriter;
 
 public class PropertiesWriter extends YamlWriter {
 

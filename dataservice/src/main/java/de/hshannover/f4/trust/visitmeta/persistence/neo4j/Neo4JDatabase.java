@@ -49,8 +49,8 @@ import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 public class Neo4JDatabase {
 

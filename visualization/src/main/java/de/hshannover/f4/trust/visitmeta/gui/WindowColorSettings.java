@@ -61,8 +61,8 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
 

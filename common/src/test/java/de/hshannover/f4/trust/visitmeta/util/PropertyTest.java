@@ -46,8 +46,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 public class PropertyTest {
 

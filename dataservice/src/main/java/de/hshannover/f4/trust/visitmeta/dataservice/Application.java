@@ -55,9 +55,9 @@ import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManagerImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:

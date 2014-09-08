@@ -43,7 +43,7 @@ import java.util.Observable;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 
 /**
  * Manage the settings of the application.

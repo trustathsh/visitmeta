@@ -76,7 +76,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;

@@ -21,7 +21,7 @@
  * This file is part of visitmeta dataservice, version 0.1.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2014 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,28 +36,37 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.util.yaml;
+package de.hshannover.f4.trust.visitmeta.util.properties;
 
-public class PropertyException extends Exception {
+import java.io.IOException;
+import java.util.Map;
 
-	private static final long serialVersionUID = 5703896373482852374L;
+import org.apache.log4j.Logger;
 
-	private String mMsg;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlReader;
 
-	public PropertyException(){
+public class PropertiesReader extends YamlReader {
 
+	private static final Logger log = Logger.getLogger(PropertiesReader.class);
+
+	private String mFileName;
+
+	/**
+	 * Create a JyamlReader for application properties.
+	 * @param fileName The file name or the file path to the yml-file.
+	 */
+	public PropertiesReader(String fileName){
+		log.trace("new PropertiesReader()...");
+		mFileName = fileName;
 	}
 
-	public PropertyException(String msg){
-		mMsg = msg;
-	}
-
-	@Override
-	public String toString() {
-		if(mMsg != null){
-			return this.getClass().getSimpleName() + "(" + mMsg + ")";
-		}else {
-			return this.getClass().getSimpleName();
-		}
+	/**
+	 * Load the application properties as Map<String, Object>.
+	 * @return A Map<String, Object> with property keys and values.
+	 * @throws IOException
+	 */
+	public Map<String, Object> load() throws IOException {
+		log.trace("load()...");
+		return loadMap(mFileName);
 	}
 }

@@ -50,8 +50,8 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseExceptio
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.util.yaml.Properties;
-import de.hshannover.f4.trust.visitmeta.util.yaml.PropertyException;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 /**
  * When a <tt>UpdateService</tt> is started, it will subscribe for the

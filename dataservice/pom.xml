@@ -19,6 +19,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -57,6 +58,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+				<version>1.4</version>
 				<configuration>
 					<descriptionTemplate>${basedir}/../src/license/description_template.ftl</descriptionTemplate>
 				</configuration>

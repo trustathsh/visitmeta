@@ -64,32 +64,6 @@ public class InMemoryLink extends InternalLink {
 
 	}
 
-	/**
-	 * Creates a new InternalLink based on the original.
-	 * {@link InMemoryMetadata} is copied, but its {@link InMemoryIdentifier}
-	 * are set to null.
-	 * 
-	 * @param original
-	 *            The original identifier
-	 */
-	public InMemoryLink(InMemoryLink original) {
-		this();
-		mFirstIdentifier = null;
-		mSecondIdentifier = null;
-	}
-
-	/**
-	 * Returns a clone of the {@link InMemoryLink}, but sets its
-	 * {@link InMemoryIdentifier} to null.
-	 * 
-	 * @return An {@link InMemoryLink} Object with clones Metadate, but
-	 *         imcomplete since it does not have a start or end node.
-	 */
-	@Override
-	public InMemoryLink clone() {
-		return new InMemoryLink(this);
-	}
-
 	@Override
 	public InternalIdentifierPair getIdentifiers() {
 		return new InternalIdentifierPair(mFirstIdentifier, mSecondIdentifier);

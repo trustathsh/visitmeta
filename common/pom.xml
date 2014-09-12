@@ -8,10 +8,10 @@
 		<version>0.1.2</version>
 	</parent>
 
-	<groupId>de.hshannover.f4.trust.visitmeta</groupId>
-	<artifactId>common</artifactId>
+	<groupId>de.hshannover.f4.trust</groupId>
+	<artifactId>visitmeta-common</artifactId>
 	<packaging>jar</packaging>
-	<name>common</name>
+	<name>visitmeta-common</name>
 	<version>0.1.2</version>
 
 	<build>

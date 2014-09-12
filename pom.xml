@@ -107,8 +107,8 @@
 	<dependencyManagement>
 		<dependencies>
     		<dependency>
-				<groupId>de.hshannover.f4.trust.visitmeta</groupId>
-				<artifactId>common</artifactId>
+				<groupId>de.hshannover.f4.trust</groupId>
+				<artifactId>visitmeta-common</artifactId>
 				<version>0.1.2</version>
 			</dependency>
 			<dependency>

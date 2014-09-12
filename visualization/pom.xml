@@ -8,11 +8,11 @@
 		<version>0.1.2</version>
 	</parent>
 
-    <groupId>de.hshannover.f4.trust.visitmeta</groupId>
-    <artifactId>visualization</artifactId>
+    <groupId>de.hshannover.f4.trust</groupId>
+    <artifactId>visitmeta-visualization</artifactId>
     <version>0.1.2</version>
     <packaging>jar</packaging>
-    <name>visualization</name>
+    <name>visitmeta-visualization</name>
 
     <build>
         <plugins>
@@ -78,8 +78,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.hshannover.f4.trust.visitmeta</groupId>
-            <artifactId>common</artifactId>
+            <groupId>de.hshannover.f4.trust</groupId>
+            <artifactId>visitmeta-common</artifactId>
         </dependency>
         <dependency>
         	<groupId>com.sun.jersey</groupId>

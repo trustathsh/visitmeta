@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar visualization.jar
+java -jar visitmeta-visualization.jar

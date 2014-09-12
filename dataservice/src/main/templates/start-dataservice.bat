@@ -1,1 +1,1 @@
-java -Djava.library.path="%R_HOME%\library\rJava\jri\x64" -jar dataservice.jar
+java -jar visitmeta-dataservice.jar

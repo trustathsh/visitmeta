@@ -8,10 +8,10 @@
 		<version>0.1.2</version>
 	</parent>
 
-	<groupId>de.hshannover.f4.trust.visitmeta</groupId>
-	<artifactId>dataservice</artifactId>
+	<groupId>de.hshannover.f4.trust</groupId>
+	<artifactId>visitmeta-dataservice</artifactId>
 	<packaging>jar</packaging>
-	<name>dataservice</name>
+	<name>visitmeta-dataservice</name>
 	<version>0.1.2</version>
 
 	<build>
@@ -82,8 +82,8 @@
 			<artifactId>ifmapj</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.hshannover.f4.trust.visitmeta</groupId>
-			<artifactId>common</artifactId>
+			<groupId>de.hshannover.f4.trust</groupId>
+			<artifactId>visitmeta-common</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>

@@ -7,7 +7,7 @@
 		<version>0.1.2</version>
 	</parent>
 
-	<groupId>de.hshannover.f4.trust.visitmeta</groupId>
+	<groupId>de.hshannover.f4.trust</groupId>
 	<artifactId>visitmeta-distribution</artifactId>
 	<packaging>pom</packaging>
 	<name>visitmeta-distribution</name>

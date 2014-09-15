@@ -16,7 +16,7 @@ Ricklinger Stadtweg 118, 30459 Hannover, Germany
 Email: trust@f4-i.fh-hannover.de
 Website: http://trust.f4.hs-hannover.de/
 
-This file is part of ${project.parent.artifactId} ${project.name}, version ${project.version},
+This file is part of ${project.name}, version ${project.version},
 implemented by the Trust@HsH research group at the Hochschule Hannover.
 
 <#if addSvnKeyWords>

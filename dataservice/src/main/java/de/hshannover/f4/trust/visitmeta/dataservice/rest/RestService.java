@@ -38,45 +38,70 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
-
+/**
+ * A class that constructs a {@link HttpServer} for REST resources of the
+ * dataservice.
+ * 
+ * @author Bastian Hellman
+ * @author Marcel Reichenbach
+ * @author Ralf Steuerwald
+ * 
+ */
 public class RestService implements Runnable {
 
 	private static final Logger log = Logger.getLogger(RestService.class);
 
-	private final String url  = Application.getDSConfig().getProperty(ConfigParameter.DS_REST_URL);
+	private String mUrl;
 
-	private String[] mPackages;
-	
-	public static final String DEFAULT_DATASERVICE_REST_URI = "de.hshannover.f4.trust.visitmeta.dataservice.rest";
-	
-	public static final String[] DEFAULT_PACKAGE = new String[] {DEFAULT_DATASERVICE_REST_URI}; 
+	private Set<Class<?>> mClasses;
 
-	public RestService(String[] packages) {
-		this.mPackages = packages;
-	}
-	
-	public RestService() {
-		this(DEFAULT_PACKAGE);
+	/**
+	 * Creates a new {@link RestService} with a given URL and a set of classes
+	 * to load as REST resources. Adds the following classes to this set before
+	 * handling it over to a {@link GrizzlyServerFactory}:
+	 * <ul>
+	 * <li> {@link ConnectionResource}
+	 * <li> {@link GraphResource}
+	 * <li> {@link SubscribeResource}
+	 * </ul>
+	 * 
+	 * @param url
+	 *            the URL the REST service shall be running at
+	 * @param classes
+	 *            a {@link Set} of {@link Class} that contain REST resources
+	 */
+	public RestService(String url, Set<Class<?>> classes) {
+		this.mUrl = url;
+		this.mClasses = classes;
+		this.mClasses.add(ConnectionResource.class);
+		this.mClasses.add(GraphResource.class);
+		this.mClasses.add(SubscribeResource.class);
 	}
 
 	@Override
 	public void run() {
-		log.debug("run() ...");
+		log.trace("run() ...");
 
-		ResourceConfig resourceConfig = new PackagesResourceConfig(mPackages);
-		log.info("starting REST service on " + url + " ...");
+		ResourceConfig resourceConfig = new DefaultResourceConfig(mClasses);
+		log.info("Starting REST service on '" + mUrl + "'.");
+
+		log.debug("Using REST resources:");
+		for (Class<?> clazz : mClasses) {
+			log.debug(clazz.getPackage() + "." + clazz.getSimpleName());
+		}
 
 		try {
-			HttpServer server = GrizzlyServerFactory.createHttpServer(url, resourceConfig);
+			HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
+					resourceConfig);
 			if (server.isStarted()) {
 				log.debug("REST service running.");
 			} else {
@@ -88,13 +113,11 @@ public class RestService implements Runnable {
 		}
 
 		try {
-			synchronized (this){
+			synchronized (this) {
 				wait(); // FIXME
 			}
 		} catch (InterruptedException e) {
 			log.error(e.getMessage(), e);
 		}
-
-		log.debug("... run()");
 	}
 }

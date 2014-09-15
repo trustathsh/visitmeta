@@ -42,13 +42,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.DataserviceModuleConnector;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.ConfigParameter;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
@@ -103,13 +105,15 @@ public abstract class Application {
 		log.info("VisITMeta dataservice application v" + DATASERVICE_VERSION
 				+ " started.");
 
+		// Creates and initializes the ConnectionManager(Impl) instance
 		getConnectionManager();
 
 		initComponents();
 
-		List<DataserviceModule> loadedModules = loadModules();
-		List<DataserviceModule> initalizedModules = initModules(loadedModules);
-		startRestService(initalizedModules);
+		List<DataserviceModule> modules = DataserviceModuleConnector
+				.initializeModules(mManager);
+		log.info(modules.size() + " dataservice modules were loaded.");
+		startRestService(modules);
 
 		try {
 			loadPersistentConnections();
@@ -128,44 +132,18 @@ public abstract class Application {
 		log.info("dataservice started successfully");
 	}
 
+	/**
+	 * Returns an instance of a {@link ConnectionManager}. Creates a new
+	 * {@link ConnectionManagerImpl} when instance is empty.
+	 * 
+	 * @return a {@link ConnectionManager} instance
+	 */
 	public synchronized static ConnectionManager getConnectionManager() {
 		if (mManager == null) {
 			mManager = new ConnectionManagerImpl();
 		}
 
 		return mManager;
-	}
-
-	private static List<DataserviceModule> initModules(
-			List<DataserviceModule> loadedModules) {
-		List<DataserviceModule> initializedModules = new ArrayList<>();
-
-		boolean result;
-		int i = 1;
-		int num = loadedModules.size();
-		for (DataserviceModule module : loadedModules) {
-			module.setConnectionManager(mManager);
-			result = module.init();
-			if (result) {
-				initializedModules.add(module);
-				log.info("Module (" + i + "/" + num + ") '" + module.getName()
-						+ "' was initialized.");
-			} else {
-				log.info("Module (" + i + "/" + num + ") '" + module.getName()
-						+ "' could not be initialized.");
-			}
-			i++;
-		}
-
-		return initializedModules;
-	}
-
-	private static List<DataserviceModule> loadModules() {
-		List<DataserviceModule> loadedModules = new ArrayList<>();
-
-		// TODO load modules from jar-files
-
-		return loadedModules;
 	}
 
 	private static void startupConnect() throws ConnectionException {
@@ -191,25 +169,19 @@ public abstract class Application {
 	}
 
 	private static void startRestService(List<DataserviceModule> modules) {
-		log.info("start RestService");
+		log.info("Start RestService");
 
-		List<String> packages = getRestPackagesOfModules(modules);
-		packages.add(RestService.DEFAULT_DATASERVICE_REST_URI);
-		restService = new RestService(packages.toArray(new String[] {}));
+		String url = getDSConfig().getProperty(ConfigParameter.DS_REST_URL);
+
+		Set<Class<?>> classes = new HashSet<>();
+		for (DataserviceModule module : modules) {
+			classes.addAll(module.getRestClasses());
+		}
+
+		restService = new RestService(url, classes);
 
 		restServiceThread = new Thread(restService, "RestService-Thread");
 		restServiceThread.start();
-	}
-
-	private static List<String> getRestPackagesOfModules(
-			List<DataserviceModule> modules) {
-		List<String> result = new ArrayList<>();
-
-		for (DataserviceModule module : modules) {
-			result.addAll(module.getRestPackages());
-		}
-
-		return result;
 	}
 
 	public static void initComponents() {

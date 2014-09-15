@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
-import java.util.List;
+import java.util.Set;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
@@ -66,12 +66,19 @@ public interface DataserviceModule {
 	public boolean init();
 
 	/**
-	 * Returns a {@link List} of {@link String} that represent all packages that
-	 * contain REST resources.
+	 * Starts the module (if applicable).
 	 * 
-	 * @return a {@link List} of packages containing REST resources
+	 * @return true, if starting the module was successful
 	 */
-	public List<String> getRestPackages();
+	public boolean start();
+
+	/**
+	 * Returns a {@link Set} of {@link Class}es that contains all classes that
+	 * define REST resources.
+	 * 
+	 * @return a {@link Set} of {@link Class}es containing REST resources
+	 */
+	public Set<Class<?>> getRestClasses();
 
 	/**
 	 * Returns the name of this module.

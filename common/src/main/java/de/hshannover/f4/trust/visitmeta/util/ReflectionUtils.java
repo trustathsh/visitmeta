@@ -50,9 +50,9 @@ import org.apache.log4j.Logger;
 
 /**
  * Utility class for Reflection operations.
- *
+ * 
  * @author Bastian Hellmann
- *
+ * 
  */
 public class ReflectionUtils {
 
@@ -62,16 +62,23 @@ public class ReflectionUtils {
 	 * Checks a list of given class names if they implement a given interface
 	 * and loads it via reflection.
 	 * 
-	 * @param classLoader a given {@link ClassLoader} instance (configured with specific URLs for JARs etc.)
-	 * @param classNames a {@link List} of class names
-	 * @param t a {@link Class} that specifies a interface class
-	 * @return a fresh instance of the class type given as parameter; <b<null</b> if no class was found
+	 * @param classLoader
+	 *            a given {@link ClassLoader} instance (configured with specific
+	 *            URLs for JARs etc.)
+	 * @param classNames
+	 *            a {@link List} of class names
+	 * @param t
+	 *            a {@link Class} that specifies a interface class
+	 * @return a fresh instance of the class type given as parameter;
+	 *         <b<null</b> if no class was found
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T loadDevice(ClassLoader classLoader, List<String> classNames, Class<T> t) {
+	public static <T> T loadClass(ClassLoader classLoader,
+			List<String> classNames, Class<T> t) {
 		for (String className : classNames) {
 			try {
-				Class<?> classToLoad = Class.forName(className, true, classLoader);
+				Class<?> classToLoad = Class.forName(className, true,
+						classLoader);
 				Class<?>[] interfaces = classToLoad.getInterfaces();
 
 				boolean implementsInterface = false;
@@ -82,12 +89,15 @@ public class ReflectionUtils {
 				}
 
 				if (implementsInterface) {
-					logger.trace(className + " implements " + t.getCanonicalName());
+					logger.trace(className + " implements "
+							+ t.getCanonicalName());
 					return (T) classToLoad.newInstance();
 				} else {
-					logger.trace(className + " does not implement " + t.getCanonicalName());
+					logger.trace(className + " does not implement "
+							+ t.getCanonicalName());
 				}
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			} catch (ClassNotFoundException | InstantiationException
+					| IllegalAccessException e) {
 				logger.warn("could not load " + className + ": " + e);
 			}
 		}
@@ -98,26 +108,33 @@ public class ReflectionUtils {
 	/**
 	 * Creates a {@link List} of all classes within a given JAR file.
 	 * 
-	 * From: http://stackoverflow.com/questions/15720822/how-to-get-names-of-classes-inside-a-jar-file
+	 * From:
+	 * http://stackoverflow.com/questions/15720822/how-to-get-names-of-classes
+	 * -inside-a-jar-file
 	 * 
-	 * @param jarFile the JAR file to search for Classes
+	 * @param jarFile
+	 *            the JAR file to search for Classes
 	 * @return a {@link List} with all found classes
 	 * @throws IOException
 	 */
 	public static List<String> getClassNames(URL jarFile) throws IOException {
 		List<String> classNames = new ArrayList<String>();
-		ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile.getPath()));
-		for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+		ZipInputStream zip = new ZipInputStream(new FileInputStream(
+				jarFile.getPath()));
+		for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip
+				.getNextEntry()) {
 			if (entry.getName().endsWith(".class") && !entry.isDirectory()) {
-				// This ZipEntry represents a class. Now, what class does it represent?
+				// This ZipEntry represents a class. Now, what class does it
+				// represent?
 				StringBuilder className = new StringBuilder();
 				for (String part : entry.getName().split("/")) {
-					if(className.length() != 0) {
+					if (className.length() != 0) {
 						className.append(".");
 					}
 					className.append(part);
 					if (part.endsWith(".class")) {
-						className.setLength(className.length() - ".class".length());
+						className.setLength(className.length()
+								- ".class".length());
 					}
 				}
 				classNames.add(className.toString());

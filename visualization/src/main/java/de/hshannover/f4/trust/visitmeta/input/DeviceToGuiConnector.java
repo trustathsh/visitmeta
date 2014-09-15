@@ -50,15 +50,15 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.input.device.Device;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.util.FileUtils;
-import de.hshannover.f4.trust.visitmeta.util.OperatingSystemConstants;
+import de.hshannover.f4.trust.visitmeta.util.OperatingSystemUtils;
 import de.hshannover.f4.trust.visitmeta.util.ReflectionUtils;
 
 /**
- * Class that loads and initializes external input devices.
- * Devices where searched in a subfolder named <i>devices</i>.
+ * Class that loads and initializes external input {@link Device}.
+ * {@link Device}s will be searched in a subfolder named <i>devices</i>.
  * 
  * @author Bastian Hellmann
- *
+ * 
  */
 public class DeviceToGuiConnector {
 
@@ -69,35 +69,39 @@ public class DeviceToGuiConnector {
 	private static final String NATIVE_LIBS_FOLDER = "native-libs";
 
 	/**
-	 * Initializes external input devices.
-	 * Tries to load them from subfolders of <i>devices</i> inside the projects
-	 * root directory.
+	 * Initializes external input devices. Tries to load them from subfolders of
+	 * <i>devices</i> inside the projects root directory.
 	 * 
 	 * Inside each subdirectory,
 	 * <ul>
-	 * <li> native libraries are searched in <i>native-libs</i>,
-	 * with subdirectories for the operating system
+	 * <li>native libraries are searched in <i>native-libs</i>, with
+	 * subdirectories for the operating system
 	 * <ul>
-	 * <li> windows
-	 * <li> osx
-	 * <li> linux
+	 * <li>windows
+	 * <li>osx
+	 * <li>linux
 	 * </ul>
 	 * and inside them for the systems architecture
 	 * <ul>
-	 * <li> x64
-	 * <li> x86
+	 * <li>x64
+	 * <li>x86
 	 * </ul>
-	 * <li> external dependancies in <i>lib</i>
+	 * <li>external dependancies in <i>lib</i>
 	 * </ul>
 	 * For example, a device called <i>device-1</i> with native libraries for
 	 * Linux 64bit would have the path
 	 * <i>devices/device-1/native-libs/linux/x64/</i>
 	 * 
-	 * @param motionControllerHandler a {@link MotionControllerHandler} instance to be used by all {@link Device}s
-	 * @return a {@link List} of {@link Device} that were loaded, initialized and started
+	 * @param motionControllerHandler
+	 *            a {@link MotionControllerHandler} instance to be used by all
+	 *            {@link Device}s
+	 * @return a {@link List} of {@link Device} that were loaded, initialized
+	 *         and started
 	 */
-	public static List<Device> initializeDevices(MotionControllerHandler motionControllerHandler) {
-		List<File> deviceDirectories = FileUtils.listSubDirectories(DEVICE_FOLDER);
+	public static List<Device> initializeDevices(
+			MotionControllerHandler motionControllerHandler) {
+		List<File> deviceDirectories = FileUtils
+				.listSubDirectories(DEVICE_FOLDER);
 
 		List<Device> devices = new ArrayList<>();
 		List<Device> startedDevices = new ArrayList<>();
@@ -109,10 +113,13 @@ public class DeviceToGuiConnector {
 			String osArch = System.getProperty("os.arch");
 			String osVersion = System.getProperty("os.version");
 
-			String osNameFolder = getOperatingSystemNameFolder(osName);
-			String osArchFolder = getSystemArchitectureFolder(osArch);
+			String osNameFolder = OperatingSystemUtils
+					.getOperatingSystemNameFolder(osName);
+			String osArchFolder = OperatingSystemUtils
+					.getSystemArchitectureFolder(osArch);
 
-			logger.info("Operating system information: " + osName + " v" + osVersion + " (" + osArch + ")");
+			logger.info("Operating system information: " + osName + " v"
+					+ osVersion + " (" + osArch + ")");
 
 			for (File subDirectory : deviceDirectories) {
 				Device device = null;
@@ -120,46 +127,60 @@ public class DeviceToGuiConnector {
 				List<URL> jarFilesForClassloader = new ArrayList<>();
 				List<URL> subdirectoryJarFiles = new ArrayList<>();
 
-				File nativeLibsFolder= FileUtils.findDirectory(subDirectory, NATIVE_LIBS_FOLDER + File.separator + osNameFolder + File.separator + osArchFolder);
-				//				String platformSpecificPath = subDirectory.getAbsolutePath() + File.separator + NATIVE_LIBS_FOLDER + File.separator + osNameFolder + File.separator + osArchFolder;
-				//				FileUtils.appendToLibraryPath(platformSpecificPath);
+				String nativeLibsPath = NATIVE_LIBS_FOLDER + File.separator
+						+ osNameFolder + File.separator + osArchFolder;
+				File nativeLibsFolder = FileUtils.findDirectory(subDirectory,
+						nativeLibsPath);
 				if (nativeLibsFolder != null) {
-					FileUtils.appendToLibraryPath(nativeLibsFolder.getAbsolutePath());
+					FileUtils.appendToLibraryPath(nativeLibsFolder
+							.getAbsolutePath());
+				} else {
+					logger.warn("Did not found native-library folder for device '"
+							+ subDirectory + "'");
+				}
 
-					subdirectoryJarFiles = FileUtils.listJarFiles(subDirectory);
-					jarFilesForDevice.addAll(subdirectoryJarFiles);
-					jarFilesForClassloader.addAll(subdirectoryJarFiles);
+				subdirectoryJarFiles = FileUtils.listJarFiles(subDirectory);
+				jarFilesForDevice.addAll(subdirectoryJarFiles);
+				jarFilesForClassloader.addAll(subdirectoryJarFiles);
 
-					File libFolder = FileUtils.findDirectory(subDirectory, LIB_FOLDER);
-					if (libFolder != null) {
-						jarFilesForClassloader.addAll(FileUtils.listJarFiles(libFolder));
-					} else {
-						logger.warn("Did not found dependency-library folder for device '" + subDirectory + "'");
-					}
+				File libFolder = FileUtils.findDirectory(subDirectory,
+						LIB_FOLDER);
+				if (libFolder != null) {
+					jarFilesForClassloader.addAll(FileUtils
+							.listJarFiles(libFolder));
+				} else {
+					logger.warn("Did not found dependency-library folder for device '"
+							+ subDirectory + "'");
+				}
 
-					if (jarFilesForDevice.size() > 0) {
-						ClassLoader loader = URLClassLoader.newInstance(jarFilesForClassloader.toArray(new URL[] {}));
+				if (jarFilesForDevice.size() > 0) {
+					ClassLoader loader = URLClassLoader
+							.newInstance(jarFilesForClassloader
+									.toArray(new URL[] {}));
 
-						for (URL jarFile : jarFilesForDevice) {
-							device = loadDeviceFromJarFile(loader, jarFile);
+					for (URL jarFile : jarFilesForDevice) {
+						device = loadDeviceFromJarFile(loader, jarFile);
 
-							if (device != null) {
-								devices.add(device);
-								logger.debug("Device '" + device.getName() + "' was loaded.");
-							} else {
-								logger.warn("Could not instantiate device '" + subDirectory + "' from jar-file");
-							}
+						if (device != null) {
+							devices.add(device);
+							logger.debug("Device '" + device.getName()
+									+ "' was loaded from jar-file '" + jarFile
+									+ "'");
+						} else {
+							logger.warn("Could not instantiate device '"
+									+ subDirectory + "' from jar-file '"
+									+ jarFile + "'");
 						}
-					} else {
-						logger.warn("Did not found any jar-files for device '" + subDirectory + "'");
 					}
 				} else {
-					logger.warn("Did not found native-library folder for device '" + subDirectory + "'");
+					logger.warn("Did not found any jar-files for device '"
+							+ subDirectory + "'");
 				}
 			}
 
 			if (devices.size() > 0) {
-				startedDevices = initAndStartDevices(devices, motionControllerHandler);
+				startedDevices = initAndStartDevices(devices,
+						motionControllerHandler);
 			} else {
 				logger.warn("Did not found any device inside '" + DEVICE_FOLDER);
 			}
@@ -169,16 +190,24 @@ public class DeviceToGuiConnector {
 	}
 
 	/**
-	 * Tries to initialize and start the already loaded {@link Device}s, by calling
-	 * their corresponding interface methods.
+	 * Tries to initialize and start the already loaded {@link Device}s, by
+	 * calling their corresponding interface methods.
 	 * 
-	 * @param devices a {@link List} of {@link Device} that were loaded and instantiated via Java Reflection
-	 * @param motionControllerHandler a {@link MotionControllerHandler} instance to be used by all {@link Device}s
+	 * @param devices
+	 *            a {@link List} of {@link Device} that were loaded and
+	 *            instantiated via Java Reflection
+	 * @param motionControllerHandler
+	 *            a {@link MotionControllerHandler} instance to be used by all
+	 *            {@link Device}s
 	 * @return a {@link List} of {@link Device} that were successfully
-	 * initialized and started
+	 *         initialized and started
 	 */
-	private static List<Device> initAndStartDevices(List<Device> devices, MotionControllerHandler motionControllerHandler) {
+	private static List<Device> initAndStartDevices(List<Device> devices,
+			MotionControllerHandler motionControllerHandler) {
 		boolean initializationResult = false;
+
+		int i = 1;
+		int num = devices.size();
 
 		List<Device> startedDevices = new ArrayList<>();
 		for (Device device : devices) {
@@ -189,74 +218,36 @@ public class DeviceToGuiConnector {
 					device.start();
 					startedDevices.add(device);
 				} else {
-					logger.error("Could not initialize device '" + device.getName() + "'");
+					logger.error("Could not initialize device (" + i + "/"
+							+ num + ") '" + device.getName() + "'");
 				}
 			}
+
+			i++;
 		}
 
 		return startedDevices;
 	}
 
 	/**
-	 * Returns the folder name for a given OS architecture, to be used for
-	 * finding native-libraries.
-	 * 
-	 * @param osArch OS architecture string (e.g. by System.getProperty)
-	 * @return substring that represents the folder name for the given OS architecture
-	 * <ul>
-	 * <li> <i>x64</i> for 64bit operating systems
-	 * <li> <i>x86</i> for 32bit operating systems
-	 * </ul>
-	 */
-	private static String getSystemArchitectureFolder(String osArch) {
-		if (osArch.equals(OperatingSystemConstants.OS_ARCH_X86)) {
-			return "x86";
-		} else if (osArch.equals(OperatingSystemConstants.OS_ARCH_X64)) {
-			return "x64";
-		} else {
-			throw new IllegalArgumentException("Unsupported operating system architecture: " + osArch);
-		}
-	}
-
-	/**
-	 * Returns the folder name for a given OS name, to be used for
-	 * finding native-libraries.
-	 * 
-	 * @param osName OS name string (e.g. by System.getProperty)
-	 * @return substring that represents the folder name for the given OS name
-	 * <ul>
-	 * <li> <i>windows</i> for all Windows-based operating systems
-	 * <li> <i>linux</i> for all Linux-based operating systems
-	 * <li> <i>osx</i> for all Mac OSX-based operating systems
-	 * </ul>
-	 */
-	private static String getOperatingSystemNameFolder(String osName) {
-		if (osName.contains(OperatingSystemConstants.OS_NAME_MAC_OSX)) {
-			return "osx";
-		} else if (osName.contains(OperatingSystemConstants.OS_NAME_LINUX)) {
-			return "linux";
-		} else if (osName.contains(OperatingSystemConstants.OS_NAME_WINDOWS)) {
-			return "windows";
-		} else {
-			throw new IllegalArgumentException("Unsupported operation system: " + osName);
-		}
-	}
-
-	/**
 	 * Try to load a {@link Device} from a Jar-File with a given
-	 * {@link ClassLoader} and returns a fresh instance
-	 * of that class. If loading fails, <code>null</code> is returned.
+	 * {@link ClassLoader} and returns a fresh instance of that class. If
+	 * loading fails, <code>null</code> is returned.
 	 * 
-	 * @param classLoader a {@link ClassLoader} that contains all needed native
-	 * libraries and Java dependencies for loading a {@link Device} from the
-	 * JAR file
-	 * @param jarFile JAR file to load the {@link Device} from
+	 * @param classLoader
+	 *            a {@link ClassLoader} that contains all needed native
+	 *            libraries and Java dependencies for loading a {@link Device}
+	 *            from the JAR file
+	 * @param jarFile
+	 *            JAR file to load the {@link Device} from
 	 * @return a instance of {@link Device}, or null if loading fails
 	 */
-	private static Device loadDeviceFromJarFile(ClassLoader classLoader, URL jarFile) {
+	private static Device loadDeviceFromJarFile(ClassLoader classLoader,
+			URL jarFile) {
 		try {
 			List<String> classNames = ReflectionUtils.getClassNames(jarFile);
-			return ReflectionUtils.loadDevice(classLoader, classNames, Device.class);
+			return ReflectionUtils.loadClass(classLoader, classNames,
+					Device.class);
 		} catch (IOException | SecurityException | IllegalArgumentException e) {
 			logger.warn("Could not load device from " + jarFile + ": " + e);
 		}

@@ -1,6 +1,8 @@
+![VisITMeta logo](http://trust.f4.hs-hannover.de/img/logos/visitmeta_small.png)
+
 VisITMeta
 =========
-VisITMeta is an *experimental* [IF-MAP][1] 2.0/2.1 compliant MAP client written in Java
+VisITMeta is an *experimental* [IF-MAP][1] 2.2 compliant MAP client written in Java
 that visualizes metadata stored on a MAP server.
 It supports features like showing a history of all metadata stored on a MAPS, using
 filter and search techniques to navigate the metadata as well as some visualization

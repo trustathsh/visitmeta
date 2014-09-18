@@ -1,32 +1,78 @@
+VisITMeta Release 0.2.0 - 18.09.14
+
+* Support for "third-party" dataservice-modules
+* Selecting nodes shows detailed information about them
+* Fixed bug on update of singleValue metadata
+* Renamed Maven (sub)-modules of VisITMeta (e.g. common to visitmeta-common)
+
+VisITMeta Release 0.1.2 - 11.08.14
+
+* New bipartite layout
+* Layout selection from menu
+* Fixed transparency on glow effects
+* Fixed crash when unselecting live-view button after startup
+* Uses neo4j 2.1.2 instead of 1.8
+* Display information of extended-identifier's inner XML structure
+
+VisITMeta Release 0.1.1 - 06.08.14
+
+* application icon added
+* More information on identifier and metadata nodes
+* New detailed information view for metadata and identifier
+
+VisITMeta Release 0.1.0 - 17.07.14
+
+* Changed ifmapj from v1.0.0 to v2.2.0
+
+VisITMeta Release 0.0.7 - 17.07.14
+
+* Support for external motion control devices
+
+VisITMeta Release 0.0.6 - 19.06.14
+
+* Bugfix release
+* Logs version number on startup (both dataservice and GUI)
+
+VisITMeta Release 0.0.5 - 10.06.14
+
+* Support for multiple parallel IF-MAP connections, controllable by REST and GUI (alpha version)
+* Create and stop subscriptions via REST interface
+* Removed dump functionality
+* Configuration files in YAML format, parsing via snakeyaml
+* Fixed several bugs within dataservice and visualization
+
+VisITMeta Release 0.0.4 - 25.03.14
+
+* Connection management in the GUI
+* Bugfix for handling of circular graphs
+* Bugfix for incorrect insertion of metadata
+
 VisITMeta Release 0.0.3 - 18.12.13
 
-* Third protype version
-  - Refactors package names and structure to hs-hannover.de domain
-  - Updated to ifmapj 1.0.0
-  - Fixed bugs in metadata' equals method
-  - Support multiple subscriptions per connection
-  - Support for multiple connections
-  - Added dump functionality
-  - new REST interface for connection management
+* Refactors package names and structure to hs-hannover.de domain
+* Updated to ifmapj 1.0.0
+* Fixed bugs in metadata' equals method
+* Support multiple subscriptions per connection
+* Support for multiple connections
+* Added dump functionality
+* new REST interface for connection management
 
 VisITMeta Release 0.0.2 - 11.11.13
 
-* Second protype version
-  - minor tweaks (pom.xml)
+* minor tweaks (pom.xml)
 
 VisITMeta Release 0.0.1 - 28.06.13
 
 * First prototype version
-  - REST interface between dataservice and visualization
-  - Graph persistence with neo4j
-  - Graph layouting with Jung2
-  - Graph rendering with Piccolo2D
-  - history of MAP server
-  - live view of MAP server
-  - Coloring of metadata, according to its publisher ID
-  - Basic navigation (panning, zooming, auto-zoom)
+* REST interface between dataservice and visualization
+* Graph persistence with neo4j
+* Graph layouting with Jung2
+* Graph rendering with Piccolo2D
+* history of MAP server
+* live view of MAP server
+* Coloring of metadata, according to its publisher ID
+* Basic navigation (panning, zooming, auto-zoom)
 
-* Known Bugs:
-  - Visualization breaks when turning off 'live' mode while there are too many
-    metadata present
-  - Redraw-function in the GUI doesn't work correctly sometimes
+Known Bugs
+
+* check Issue tracker on projects website

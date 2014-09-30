@@ -41,13 +41,13 @@ package de.hshannover.f4.trust.visitmeta.util.properties;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlReader;
 
-public class PropertiesReader extends YamlReader {
-
-	private static final Logger log = Logger.getLogger(PropertiesReader.class);
+/**
+ * Class that encapsulates reading of Property-YAML-files.
+ * @author MR
+ */
+public class PropertiesReader {
 
 	private String mFileName;
 
@@ -55,18 +55,16 @@ public class PropertiesReader extends YamlReader {
 	 * Create a JyamlReader for application properties.
 	 * @param fileName The file name or the file path to the yml-file.
 	 */
-	public PropertiesReader(String fileName){
-		log.trace("new PropertiesReader()...");
+	public PropertiesReader(String fileName) {
 		mFileName = fileName;
 	}
 
 	/**
 	 * Load the application properties as Map<String, Object>.
 	 * @return A Map<String, Object> with property keys and values.
-	 * @throws IOException
+	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	public Map<String, Object> load() throws IOException {
-		log.trace("load()...");
-		return loadMap(mFileName);
+		return YamlReader.loadMap(mFileName);
 	}
 }

@@ -41,16 +41,17 @@ package de.hshannover.f4.trust.visitmeta.util.properties;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlWriter;
 
-public class PropertiesWriter extends YamlWriter {
-
-	private static final Logger log = Logger.getLogger(PropertiesWriter.class);
+/**
+ * Class that encapsulates writing of Property-YAML-files.
+ * @author MR
+ */
+public class PropertiesWriter {
 
 	public static final String TAG = "!Properties";
 
@@ -64,15 +65,14 @@ public class PropertiesWriter extends YamlWriter {
 	 * Create a JyamlWriter for application properties.
 	 * @param fileName The file name or the file path to the yml-file.
 	 */
-	public PropertiesWriter(String fileName){
-		log.trace("new PropertiesWriter()...");
+	public PropertiesWriter(String fileName) {
 		mFileName = fileName;
 		mOptions = buildDumperOptions();
 		mRepresenter = new Representer();
 		mRepresenter.addClassTag(Properties.class, new Tag(TAG));
 	}
 
-	private DumperOptions buildDumperOptions(){
+	private DumperOptions buildDumperOptions() {
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		return options;
@@ -81,10 +81,9 @@ public class PropertiesWriter extends YamlWriter {
 	/**
 	 * Save the Map<String, Object> to the yml-file.
 	 * @param propertiesData The Object to be stored.
-	 * @throws IOException
+	 * @throws IOException If the file could not open or is a directory.
 	 */
 	public void save(Map<String, Object> propertiesData) throws IOException {
-		log.trace("save()...");
-		persist(mFileName, propertiesData, mRepresenter, mOptions);
+		YamlWriter.persist(mFileName, propertiesData, mRepresenter, mOptions);
 	}
 }

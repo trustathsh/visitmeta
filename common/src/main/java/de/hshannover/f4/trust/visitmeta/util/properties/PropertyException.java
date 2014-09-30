@@ -38,25 +38,35 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.properties;
 
+/**
+ * For all Exceptions in the Properties.class.
+ * @author MR
+ *
+ */
 public class PropertyException extends Exception {
 
 	private static final long serialVersionUID = 5703896373482852374L;
 
 	private String mMsg;
 
-	public PropertyException(){
+	/**
+	 * A new PropertyException.
+	 */
+	public PropertyException() { }
 
-	}
-
-	public PropertyException(String msg){
+	/**
+	 * A new PropertyException with msg.
+	 * @param msg
+	 */
+	public PropertyException(String msg) {
 		mMsg = msg;
 	}
 
 	@Override
 	public String toString() {
-		if(mMsg != null){
+		if (mMsg != null) {
 			return this.getClass().getSimpleName() + "(" + mMsg + ")";
-		}else {
+		} else {
 			return this.getClass().getSimpleName();
 		}
 	}

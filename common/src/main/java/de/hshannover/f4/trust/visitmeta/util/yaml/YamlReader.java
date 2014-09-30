@@ -52,7 +52,16 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 
-public class YamlReader {
+/**
+ * Class that encapsulates reading of YAML-files.
+ * @author MR
+ */
+public final class YamlReader {
+
+	/**
+	 * Only static calls are allowed.
+	 */
+	private YamlReader() { }
 
 	/**
 	 * 
@@ -62,10 +71,11 @@ public class YamlReader {
 	 * @param clazz The returned data-type.
 	 * @param constructor A SnakeYAML BaseConstructor.
 	 * @return The yml-File as Class<T>.
-	 * @throws IOException
+	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	@SuppressWarnings("unchecked")
-	public static synchronized <T> T loadAs(String fileName, Class<T> clazz, BaseConstructor constructor) throws IOException{
+	public static synchronized <T> T loadAs(String fileName, Class<T> clazz, BaseConstructor constructor)
+			throws IOException {
 		NullCheck.check(fileName, "fileName is null");
 		NullCheck.check(clazz, "clazz is null");
 		NullCheck.check(constructor, "constructor is null");
@@ -108,12 +118,12 @@ public class YamlReader {
 	 * @param fileName The file name or the file path to the yml-file.
 	 * @param constructor A SnakeYAML BaseConstructor.
 	 * @return If the File exists but it is empty then returns a empty Map<String, Object>.
-	 * @throws IOException
+	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> loadMap(String fileName, BaseConstructor constructor) throws IOException {
 		Map<String, Object> ymlMap = loadAs(fileName, HashMap.class, constructor);
-		if(ymlMap == null){
+		if (ymlMap == null) {
 			// then the File is empty return a empty HashMap
 			return new HashMap<String, Object>();
 		}
@@ -124,7 +134,7 @@ public class YamlReader {
 	 * Load a yml-File as Map<String, Object>.
 	 * @param fileName
 	 * @return If the File exists but it is empty then returns a empty Map<String, Object>.
-	 * @throws IOException
+	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	public static Map<String, Object> loadMap(String fileName) throws IOException {
 		return loadMap(fileName, new Constructor());

@@ -56,7 +56,6 @@ import java.util.SortedMap;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -159,6 +158,12 @@ public class SimpleGraphServiceTest {
 		meta.setProperty(KEY_TIMESTAMP_PUBLISH, publishTimestamp);
 		meta.setProperty(KEY_TIMESTAMP_DELETE, deleteTimestamp);
 		meta.setProperty("/meta:" + name + "[@ifmap-cardinality]", "singleValue");
+
+		mTimestampManager.incrementCounter(publishTimestamp);
+		if (deleteTimestamp != InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP) {
+			mTimestampManager.incrementCounter(deleteTimestamp);
+		}
+
 		return meta;
 	}
 
@@ -267,15 +272,12 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		SortedMap<Long,Long> changesMap = sgs.getChangesMap();
 
 		assertEquals(2, changesMap.size());
 	}
 
-	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfUpdatesInCaseOfUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -285,15 +287,12 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(1, delta.getUpdates().size());
 	}
 
-	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectContentOfUpdatesInCaseOfUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -303,8 +302,6 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -329,8 +326,6 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -346,15 +341,12 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(0, delta.getUpdates().size());
 	}
 
-	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesInCaseOfDelete() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -364,15 +356,12 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(1, delta.getDeletes().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectContentOfDeletesInCaseOfDelete() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -382,8 +371,6 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -398,7 +385,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(1, delta.getDeletes().get(0).getIdentifiers().get(0).getLinks().get(0).getMetadata().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesAndUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -417,7 +403,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(1, delta.getDeletes().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnAIdentiferWithMetadataUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -436,7 +421,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(newMeta, delta.getUpdates().get(0).getIdentifiers().get(0).getMetadata().get(0).getTypeName());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnAIdentiferWithMetadataDeletes() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -446,8 +430,6 @@ public class SimpleGraphServiceTest {
 		insertIdentifierWithMultiValueMetadataDelete(
 				"ip-address", "event42", deletedMetadata,
 				firstTimestamp, secondTimestamp);
-		mTimestampManager.incrementCounter(firstTimestamp);
-		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -458,7 +440,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(deletedMetadata, delta.getDeletes().get(0).getIdentifiers().get(0).getMetadata().get(0).getTypeName());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTwoIdentifiersWithMetadataUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -478,7 +459,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(newMeta, delta.getUpdates().get(0).getIdentifiers().get(0).getLinks().get(0).getMetadata().get(0).getTypeName());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnCorrectResultsForUpdatesAndDeletes() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -519,7 +499,6 @@ public class SimpleGraphServiceTest {
 		assertEquals(deletedMeta, delta.getDeletes().get(0).getIdentifiers().get(0).getLinks().get(0).getMetadata().get(0).getTypeName());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldSwapTheTimestampsIntoProperOrder() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());

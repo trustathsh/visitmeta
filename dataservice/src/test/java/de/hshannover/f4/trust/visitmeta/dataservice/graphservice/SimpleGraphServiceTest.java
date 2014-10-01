@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.SortedMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -80,31 +81,29 @@ public class SimpleGraphServiceTest {
 	private Reader mReader;
 	private Executor mExecutor;
 	private GraphDatabaseService mGraphDb;
+	private Neo4JTimestampManager mTimestampManager;
+	private Neo4JConnection mDbConnection;
 
 	@Before
 	public void prepareTestDatabase() throws Exception {
 		mGraphDb = new TestGraphDatabaseFactory()
-				.newImpermanentDatabaseBuilder().newGraphDatabase();
+		.newImpermanentDatabaseBuilder().newGraphDatabase();
 
 		Neo4JConnection neo4jConnection = mock(Neo4JConnection.class);
 		when(neo4jConnection.getConnection()).thenReturn(mGraphDb);
 		Neo4JRepository repo = new Neo4JRepository(neo4jConnection,
 				MessageDigest.getInstance("MD5"));
-		Neo4JConnection dbConnection = mock(Neo4JConnection.class);
-		Neo4JTimestampManager timestampManager = new Neo4JTimestampManager(dbConnection);
-		when(dbConnection.getTimestampManager()).thenReturn(timestampManager);
-		when(dbConnection.getConnection()).thenReturn(mGraphDb);
-		mReader = new Neo4JReader(repo, dbConnection);
-		mExecutor = new Neo4JExecutor(dbConnection);
+		mDbConnection = mock(Neo4JConnection.class);
+		mTimestampManager = new Neo4JTimestampManager(mDbConnection);
+		when(mDbConnection.getTimestampManager()).thenReturn(mTimestampManager);
+		when(mDbConnection.getConnection()).thenReturn(mGraphDb);
+		mReader = new Neo4JReader(repo, mDbConnection);
+		mExecutor = new Neo4JExecutor(mDbConnection);
 	}
 
 	@After
 	public void destroyTestDatabase() {
 		mGraphDb.shutdown();
-	}
-
-	private void insertSimpleGraph(long publishTimestamp, long deleteTimestamp) {
-
 	}
 
 	private void insertLinkWithIdentifier(
@@ -113,18 +112,18 @@ public class SimpleGraphServiceTest {
 			String metadata,
 			long publishTimestamp,
 			long deleteTimestamp) {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		Node identifier1 = insertIdentifier(id1);
-		Node identifier2 = insertIdentifier(id2);
+			Node identifier1 = insertIdentifier(id1);
+			Node identifier2 = insertIdentifier(id2);
 
-		Node meta = insertMetadata(metadata, VALUE_META_CARDINALITY_SINGLE,
-				publishTimestamp,
-				deleteTimestamp);
-		insertLink(identifier1, identifier2, meta);
+			Node meta = insertMetadata(metadata, VALUE_META_CARDINALITY_SINGLE,
+					publishTimestamp,
+					deleteTimestamp);
+			insertLink(identifier1, identifier2, meta);
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	private void insertLinkWithMultiValueMetadataUpdate(
@@ -134,22 +133,21 @@ public class SimpleGraphServiceTest {
 			String secondMetadata,
 			long firstTimestamp,
 			long secondTimestamp) {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		Node identifier1 = insertIdentifier(id1);
-		Node identifier2 = insertIdentifier(id2);
+			Node identifier1 = insertIdentifier(id1);
+			Node identifier2 = insertIdentifier(id2);
 
-		Node firstMeta = insertMetadata(firstMetadata, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			Node firstMeta = insertMetadata(firstMetadata, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 
-		Node secondMeta = insertMetadata(secondMetadata, VALUE_META_CARDINALITY_MULTI,
-				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			Node secondMeta = insertMetadata(secondMetadata, VALUE_META_CARDINALITY_MULTI,
+					secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 
-		insertLink(identifier1, identifier2, firstMeta, secondMeta);
+			insertLink(identifier1, identifier2, firstMeta, secondMeta);
 
-		tx.success();
-		tx.finish();
-
+			tx.success();
+		}
 	}
 
 	private Node insertMetadata(
@@ -169,7 +167,6 @@ public class SimpleGraphServiceTest {
 		identifier.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		identifier.setProperty(KEY_TYPE_NAME, name);
 		identifier.setProperty("name", name);
-		identifier.addLabel(Neo4JTypeLabels.IDENTIFIER);
 		return identifier;
 	}
 
@@ -191,19 +188,19 @@ public class SimpleGraphServiceTest {
 			String secondMetadata,
 			long firstTimestamp,
 			long secondTimestamp) {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		Node identifier = insertIdentifier(id);
-		Node firstMeta = insertMetadata(firstMetadata, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		identifier.createRelationshipTo(firstMeta, LinkTypes.Meta);
+			Node identifier = insertIdentifier(id);
+			Node firstMeta = insertMetadata(firstMetadata, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			identifier.createRelationshipTo(firstMeta, LinkTypes.Meta);
 
-		Node secondMeta = insertMetadata(secondMetadata, VALUE_META_CARDINALITY_MULTI,
-				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		identifier.createRelationshipTo(secondMeta, LinkTypes.Meta);
+			Node secondMeta = insertMetadata(secondMetadata, VALUE_META_CARDINALITY_MULTI,
+					secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			identifier.createRelationshipTo(secondMeta, LinkTypes.Meta);
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	private void insertIdentifierWithMultiValueMetadataDelete(
@@ -212,40 +209,40 @@ public class SimpleGraphServiceTest {
 			String deletedMetadata,
 			long firstTimestamp,
 			long deleteTimestamp) {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		Node identifier = insertIdentifier(id);
-		Node firstMeta = insertMetadata(someMetadata, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		identifier.createRelationshipTo(firstMeta, LinkTypes.Meta);
+			Node identifier = insertIdentifier(id);
+			Node firstMeta = insertMetadata(someMetadata, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			identifier.createRelationshipTo(firstMeta, LinkTypes.Meta);
 
-		Node secondMeta = insertMetadata(deletedMetadata, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, deleteTimestamp);
-		identifier.createRelationshipTo(secondMeta, LinkTypes.Meta);
+			Node secondMeta = insertMetadata(deletedMetadata, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, deleteTimestamp);
+			identifier.createRelationshipTo(secondMeta, LinkTypes.Meta);
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	private void insertLinkWithMultiValueUpdatesAndDeletes(String id1,
 			String id2, String someMetadata, String updatedMeta, String deletedMeta,
 			long firstTimestamp, long secondTimestamp) {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		Node identifier1 = insertIdentifier(id1);
-		Node identifier2 = insertIdentifier(id2);
+			Node identifier1 = insertIdentifier(id1);
+			Node identifier2 = insertIdentifier(id2);
 
-		Node metaUnchanged = insertMetadata(someMetadata, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		Node updatedMetadata = insertMetadata(updatedMeta, VALUE_META_CARDINALITY_MULTI,
-				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		Node deletedMetadata = insertMetadata(deletedMeta, VALUE_META_CARDINALITY_MULTI,
-				firstTimestamp, secondTimestamp);
+			Node metaUnchanged = insertMetadata(someMetadata, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			Node updatedMetadata = insertMetadata(updatedMeta, VALUE_META_CARDINALITY_MULTI,
+					secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			Node deletedMetadata = insertMetadata(deletedMeta, VALUE_META_CARDINALITY_MULTI,
+					firstTimestamp, secondTimestamp);
 
-		insertLink(identifier1, identifier2, metaUnchanged, updatedMetadata, deletedMetadata);
+			insertLink(identifier1, identifier2, metaUnchanged, updatedMetadata, deletedMetadata);
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	@Test
@@ -254,13 +251,31 @@ public class SimpleGraphServiceTest {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
 		insertLinkWithIdentifier("device", "ip-address", "device-ip",
 				timestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+
 		Delta delta = sgs.getDelta(timestamp, timestamp);
 
 		assertEquals(0, delta.getDeletes().size());
 		assertEquals(0, delta.getUpdates().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
+	@Test
+	public void getChangesMapShouldReturnTheCorrectNumberOfUpdateTimestampsInCaseOfUpdates() {
+		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
+		final long firstTimestamp = 42;
+		final long secondTimestamp = 50;
+		insertLinkWithIdentifier("device", "ip-address", "device-ip",
+				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
+				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
+
+		SortedMap<Long,Long> changesMap = sgs.getChangesMap();
+
+		assertEquals(2, changesMap.size());
+	}
+
+	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfUpdatesInCaseOfUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -270,12 +285,15 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
+
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(1, delta.getUpdates().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
+	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectContentOfUpdatesInCaseOfUpdates() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -285,6 +303,9 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
+
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(1, delta.getUpdates().size());
@@ -308,6 +329,8 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -323,13 +346,15 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
 		assertEquals(0, delta.getUpdates().size());
 	}
 
-	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
+	//	@Ignore("Disabled due to latest GraphService refactoring (ChangeMap and tests are not compatible yet)")
 	@Test
 	public void getDeltaShouldReturnTheCorrectNumberOfDeletesInCaseOfDelete() {
 		SimpleGraphService sgs = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
@@ -339,6 +364,8 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -355,6 +382,8 @@ public class SimpleGraphServiceTest {
 				firstTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 		insertLinkWithIdentifier("mac-address", "access-request", "access-request-mac",
 				firstTimestamp, secondTimestamp);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 
@@ -383,6 +412,7 @@ public class SimpleGraphServiceTest {
 				secondTimestamp, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
+
 		assertEquals(1, delta.getUpdates().size());
 		assertEquals(1, delta.getDeletes().size());
 	}
@@ -416,6 +446,8 @@ public class SimpleGraphServiceTest {
 		insertIdentifierWithMultiValueMetadataDelete(
 				"ip-address", "event42", deletedMetadata,
 				firstTimestamp, secondTimestamp);
+		mTimestampManager.incrementCounter(firstTimestamp);
+		mTimestampManager.incrementCounter(secondTimestamp);
 
 		Delta delta = sgs.getDelta(firstTimestamp, secondTimestamp);
 

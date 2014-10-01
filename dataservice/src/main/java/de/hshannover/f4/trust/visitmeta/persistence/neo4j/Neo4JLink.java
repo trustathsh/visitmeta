@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,13 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -61,7 +60,7 @@ public class Neo4JLink extends InternalLink {
 
 	/**
 	 * Create a link node in the database.
-	 * 
+	 *
 	 * @param n
 	 *            The node in memory.
 	 * @param graph
@@ -69,8 +68,7 @@ public class Neo4JLink extends InternalLink {
 	 */
 	public Neo4JLink(Node n, Neo4JRepository graph) {
 		super();
-		Transaction tx = graph.beginTx();
-		try {
+		try (Transaction tx = graph.beginTx()) {
 			if (!n.hasLabel(Neo4JTypeLabels.LINK)) {
 				String msg = "Trying to construct Link without LINK Label"
 						+ ". We clearly disapprove and will die ungracefully now";
@@ -79,16 +77,13 @@ public class Neo4JLink extends InternalLink {
 			mMe = n;
 			mRepo = graph;
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	@Override
 	public InternalIdentifierPair getIdentifiers() {
-		Transaction tx = mRepo.beginTx();
 		InternalIdentifierPair result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			Iterator<Relationship> it = mMe.getRelationships(LinkTypes.Link)
 					.iterator();
 
@@ -97,14 +92,13 @@ public class Neo4JLink extends InternalLink {
 			InternalIdentifier id2 = mRepo.getIdentifier(it.next()
 					.getStartNode().getId());
 
-			if (id1.hashCode() > id2.hashCode())
+			if (id1.hashCode() > id2.hashCode()) {
 				result = new InternalIdentifierPair(id1, id2);
-			else
+			} else {
 				result = new InternalIdentifierPair(id2, id1);
+			}
 			tx.success();
 			return result;
-		} finally {
-			tx.finish();
 		}
 	}
 
@@ -114,8 +108,7 @@ public class Neo4JLink extends InternalLink {
 
 	@Override
 	public List<InternalMetadata> getMetadata() {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Meta)
 					.iterator();
 			List<InternalMetadata> lm = new ArrayList<>();
@@ -128,8 +121,6 @@ public class Neo4JLink extends InternalLink {
 			}
 			tx.success();
 			return lm;
-		} finally {
-			tx.finish();
 		}
 	}
 
@@ -139,7 +130,7 @@ public class Neo4JLink extends InternalLink {
 
 	/**
 	 * Adds a given Metadata to the Link
-	 * 
+	 *
 	 * @param Metadata
 	 *            to add
 	 */
@@ -151,7 +142,7 @@ public class Neo4JLink extends InternalLink {
 
 	/**
 	 * Removes a given Metadata from the Link
-	 * 
+	 *
 	 * @param Metadata
 	 *            to remove
 	 */
@@ -162,7 +153,7 @@ public class Neo4JLink extends InternalLink {
 
 	/**
 	 * Removes a given Metadata from the Link
-	 * 
+	 *
 	 * @param Metadata
 	 *            to remove
 	 * @param isSingleValueDependent
@@ -172,8 +163,7 @@ public class Neo4JLink extends InternalLink {
 	@Override
 	public void removeMetadata(InternalMetadata meta,
 			boolean isSingleValueDependent) {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo
 						.getMetadata(r.getEndNode().getId());
@@ -190,22 +180,19 @@ public class Neo4JLink extends InternalLink {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	/**
 	 * Updates the Metadata if it is a SingleValue Metadata and if (and only
 	 * if!) an old node exists in the graph.
-	 * 
+	 *
 	 * @param SingleValue
 	 *            Metadata that should be updated
 	 */
 	@Override
 	public void updateMetadata(InternalMetadata meta) {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
@@ -217,34 +204,28 @@ public class Neo4JLink extends InternalLink {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	public String getProperty(String name) {
-		Transaction tx = mRepo.beginTx();
 		String result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = (String) mMe.getProperty(name);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
 
 	/**
 	 * Check if this link has the given metadata connected to it.
-	 * 
+	 *
 	 * @param Metadata
 	 *            to check for
 	 */
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		Transaction tx = mRepo.beginTx();
 		boolean result = false;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo
 						.getMetadata(r.getEndNode().getId());
@@ -253,8 +234,6 @@ public class Neo4JLink extends InternalLink {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
@@ -264,14 +243,11 @@ public class Neo4JLink extends InternalLink {
 	 */
 	@Override
 	public void clearMetadata() {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				mRepo.remove(r.getEndNode().getId());
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 }

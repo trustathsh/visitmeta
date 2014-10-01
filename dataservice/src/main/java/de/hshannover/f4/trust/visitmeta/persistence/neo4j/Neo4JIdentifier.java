@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,8 +63,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 
 	public Neo4JIdentifier(Node n, Neo4JRepository graph) {
 		super();
-		Transaction tx = graph.beginTx();
-		try {
+		try (Transaction tx = graph.beginTx()) {
 			if (!n.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
 				String msg = "Trying to construct Identifier without IDENTIFIER Label"
 						+ ". We clearly disapprove and will die ungracefully now";
@@ -73,72 +72,57 @@ public class Neo4JIdentifier extends InternalIdentifier {
 			mMe = n;
 			mRepo = graph;
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	@Override
 	public List<String> getProperties() {
-		Transaction tx = mRepo.beginTx();
 		List<String> l = new ArrayList<>();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (String s : mMe.getPropertyKeys()) {
 				if (!s.startsWith(HIDDEN_PROPERTIES_KEY_PREFIX)) {
 					l.add(s);
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return l;
 	}
 
 	@Override
 	public boolean hasProperty(String p) {
-		Transaction tx = mRepo.beginTx();
 		boolean result = false;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = mMe.hasProperty(p);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
 
 	@Override
 	public String valueFor(String p) {
-		Transaction tx = mRepo.beginTx();
 		String result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = (String) mMe.getProperty(p);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
 
 	@Override
 	public String getTypeName() {
-		Transaction tx = mRepo.beginTx();
 		String result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = (String) mMe.getProperty(KEY_TYPE_NAME);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
 
 	@Override
 	public List<InternalLink> getLinks() {
-		Transaction tx = mRepo.beginTx();
 		List<InternalLink> ll = new ArrayList<>();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Link)
 					.iterator();
 
@@ -148,17 +132,14 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				ll.add(link);
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return ll;
 	}
 
 	@Override
 	public List<InternalMetadata> getMetadata() {
-		Transaction tx = mRepo.beginTx();
 		List<InternalMetadata> lm = new ArrayList<>();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			Iterator<Relationship> i = mMe.getRelationships(LinkTypes.Meta)
 					.iterator();
 
@@ -169,8 +150,6 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				lm.add(metadata);
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return lm;
 	}
@@ -180,20 +159,17 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	}
 
 	public String getHash() {
-		Transaction tx = mRepo.beginTx();
 		String result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = (String) mMe.getProperty(KEY_HASH);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
 
 	/**
 	 * Adds a given Metadata to the Identifier
-	 * 
+	 *
 	 * @param Metadata
 	 *            to add
 	 */
@@ -205,7 +181,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 
 	/**
 	 * Removes a given Metadata from the Identifier
-	 * 
+	 *
 	 * @param Metadata
 	 *            to remove
 	 */
@@ -216,7 +192,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 
 	/**
 	 * Removes a given Metadata from the Identifier
-	 * 
+	 *
 	 * @param Metadata
 	 *            to remove
 	 * @param isSingleValueDependent
@@ -226,8 +202,7 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	@Override
 	public void removeMetadata(InternalMetadata m,
 			boolean isSingleValueDependent) {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
@@ -244,22 +219,19 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	/**
 	 * Updates the Metadata if it is a SingleValue Metadata and if (and only
 	 * if!) an old node exists in the graph.
-	 * 
+	 *
 	 * @param SingleValue
 	 *            Metadata to update
 	 */
 	@Override
 	public void updateMetadata(InternalMetadata m) {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
@@ -271,22 +243,19 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	/**
 	 * Check if this link has the given metadata connected to it.
-	 * 
+	 *
 	 * @param Metadata
 	 *            to check for
 	 */
 	@Override
 	public boolean hasMetadata(InternalMetadata meta) {
-		Transaction tx = mRepo.beginTx();
 		boolean result = false;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
@@ -295,8 +264,6 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				}
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}
@@ -306,38 +273,31 @@ public class Neo4JIdentifier extends InternalIdentifier {
 	 */
 	@Override
 	public void clearMetadata() {
-		Transaction tx = mRepo.beginTx();
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				mRepo.remove(r.getEndNode().getId());
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	@Override
 	public void addProperty(String name, String value) {
-		Transaction tx = mRepo.beginTx();
-		try {
-
+		try (Transaction tx = mRepo.beginTx()) {
 			if (mMe.hasProperty(name)) {
 				logger.warn("property '" + name
 						+ "' already exists, overwriting with '" + value + "'");
 			}
 			mMe.setProperty(name, value);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
-
 	}
 
 	@Override
 	public void clearLinks() {
-		for (InternalLink l : getLinks())
+		for (InternalLink l : getLinks()) {
 			mRepo.remove(((Neo4JLink) l).getNode().getId());
+		}
 	}
 
 	@Override
@@ -352,13 +312,10 @@ public class Neo4JIdentifier extends InternalIdentifier {
 
 	@Override
 	public String getRawData() {
-		Transaction tx = mRepo.beginTx();
 		String result = null;
-		try {
+		try (Transaction tx = mRepo.beginTx()) {
 			result = (String) mMe.getProperty(KEY_RAW_DATA, "");
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
 	}

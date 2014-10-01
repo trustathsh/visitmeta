@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.Transaction;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
@@ -63,35 +62,33 @@ public abstract class AbstractWriter implements Writer {
 
 	protected abstract void submitDelete(int n);
 
-	protected abstract Transaction beginSubmit();
-
-	protected abstract void finishSubmit(Transaction tx);
-
 	@Override
 	public void submitPollResult(PollResult pr) {
 		beginTransaction();
 		for (ResultItem update : pr.getUpdates()) {
-			if (update.getId1() == null)
+			if (update.getId1() == null) {
 				submitUpdate(update.getId2(), update.getMetadata());
-			if (update.getId2() == null)
+			}
+			if (update.getId2() == null) {
 				submitUpdate(update.getId1(), update.getMetadata());
-			else
+			} else {
 				submitUpdate(update.getId1(), update.getId2(), update.getMetadata());
+			}
 		}
 		for (ResultItem delete : pr.getDeletes()) {
-			if (delete.getId1() == null)
+			if (delete.getId1() == null) {
 				submitDelete(delete.getId2(), delete.getMetadata());
-			if (delete.getId2() == null)
+			}
+			if (delete.getId2() == null) {
 				submitDelete(delete.getId1(), delete.getMetadata());
-			else
+			} else {
 				submitDelete(delete.getId1(), delete.getId2(), delete.getMetadata());
+			}
 		}
 		finishTransaction();
 	}
 
 	protected void submitUpdate(InternalIdentifier id, List<InternalMetadata> meta) {
-		Transaction tx = this.beginSubmit();
-
 		log.debug("Got update for a single identifier");
 		InternalIdentifier in = mRepo.findIdentifier(id);
 		List<InternalMetadata> unique = new ArrayList<InternalMetadata>();
@@ -116,13 +113,9 @@ public abstract class AbstractWriter implements Writer {
 		}
 		this.submitUpdate(unique);
 		log.trace("Added update for a single identifier");
-
-		this.finishSubmit(tx);
 	}
 
 	protected void submitUpdate(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
-		Transaction tx = this.beginSubmit();
-
 		log.debug("Persistance got update for two identifiers");
 		InternalIdentifier idGraph1 = mRepo.findIdentifier(id1);
 		InternalIdentifier idGraph2 = mRepo.findIdentifier(id2);
@@ -179,13 +172,9 @@ public abstract class AbstractWriter implements Writer {
 		}
 		this.submitUpdate(unique);
 		log.trace("Added update for two identifiers");
-
-		this.finishSubmit(tx);
 	}
 
 	protected void submitDelete(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
-		Transaction tx = this.beginSubmit();
-
 		log.debug("Persistance got delete for two identifiers");
 		InternalIdentifier idGraph1 = mRepo.findIdentifier(id1);
 		InternalIdentifier idGraph2 = null;
@@ -210,8 +199,8 @@ public abstract class AbstractWriter implements Writer {
 			}
 			if (linkToEdit.getMetadata().size() == 0) {
 				log.trace("Deleting link " + linkToEdit);
-				idGraph1 = (InternalIdentifier) linkToEdit.getIdentifiers().getFirst();
-				idGraph2 = (InternalIdentifier) linkToEdit.getIdentifiers().getSecond();
+				idGraph1 = linkToEdit.getIdentifiers().getFirst();
+				idGraph2 = linkToEdit.getIdentifiers().getSecond();
 				mRepo.disconnect(idGraph1, idGraph2);
 			}
 		} else {
@@ -220,13 +209,9 @@ public abstract class AbstractWriter implements Writer {
 		}
 		this.submitDelete(n);
 		log.trace("Performed delete for two identifiers");
-
-		this.finishSubmit(tx);
 	}
 
 	protected void submitDelete(InternalIdentifier id, List<InternalMetadata> meta) {
-		Transaction tx = this.beginSubmit();
-
 		log.debug("Got delete for single identifier");
 		InternalIdentifier idGraph = mRepo.findIdentifier(id);
 		int n = 0;
@@ -243,7 +228,5 @@ public abstract class AbstractWriter implements Writer {
 		}
 		this.submitDelete(n);
 		log.trace("Performed delete for a single identifier");
-
-		this.finishSubmit(tx);
 	}
 }

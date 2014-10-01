@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,11 +84,11 @@ public class Neo4JRepository implements Repository {
 		mConnection = db;
 		mMessageDigest = digest;
 	}
-/**
- * Search an identifier in the database using the hash of the given identifier
- * 
- * @param id
- */
+	/**
+	 * Search an identifier in the database using the hash of the given identifier
+	 *
+	 * @param id
+	 */
 	@Override
 	public InternalIdentifier findIdentifier(InternalIdentifier id) {
 		ReadableIndex<Node> ri =
@@ -103,15 +103,15 @@ public class Neo4JRepository implements Repository {
 		} else {
 			log.trace("Found Identifier in the database");
 			Neo4JIdentifier neoId = new Neo4JIdentifier(n, this);
-			return (InternalIdentifier) neoId;
+			return neoId;
 		}
 	}
-/**
- * Search for a link-node between two given identifier.
- * 
- * @param id1
- * @param id2
- */
+	/**
+	 * Search for a link-node between two given identifier.
+	 *
+	 * @param id1
+	 * @param id2
+	 */
 	@Override
 	public InternalLink findCommonLink(InternalIdentifier id1, InternalIdentifier id2) {
 		log.trace("Looking for a Link between Identifiers " +id1+ " and " +id2+ " ...");
@@ -203,18 +203,12 @@ public class Neo4JRepository implements Repository {
 	public InternalIdentifier insert(InternalIdentifier id) {
 		log.trace("Adding Identifier " +id+ " to the database");
 		Neo4JIdentifier neoI = null;
-		Transaction tx = beginTx();
-
-		try {
+		try (Transaction tx = beginTx()) {
 			Node n = mConnection.getConnection().createNode();
 			n.addLabel(Neo4JTypeLabels.IDENTIFIER);
 			n.setProperty(KEY_TYPE_NAME, id.getTypeName());
 			n.setProperty(KEY_HASH, calcHash(id));
 			n.setProperty(KEY_RAW_DATA, id.getRawData());
-
-			
-//			mConnection.getConnection().
-//				getReferenceNode().createRelationshipTo(n, LinkTypes.Creation);
 
 			Iterator<String> i = id.getProperties().iterator();
 			String keyProp;
@@ -224,8 +218,6 @@ public class Neo4JRepository implements Repository {
 			}
 			neoI = new Neo4JIdentifier(n, this);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 
 		return neoI;
@@ -235,9 +227,7 @@ public class Neo4JRepository implements Repository {
 	public InternalMetadata insert(InternalMetadata meta) {
 		log.trace("Adding Metadata " +meta+ " to the database");
 		Neo4JMetadata m = null;
-		Transaction tx = beginTx();
-
-		try {
+		try (Transaction tx = beginTx()) {
 			Node metaNode = mConnection.getConnection().createNode();
 			metaNode.addLabel(Neo4JTypeLabels.METADATA);
 			metaNode.setProperty(KEY_TYPE_NAME, meta.getTypeName());
@@ -255,21 +245,17 @@ public class Neo4JRepository implements Repository {
 			metaNode.setProperty(KEY_HASH, calcHash(meta));
 
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return m;
 	}
-/**
- * Create a link-node between two identifiers and return the created link-node.
- */
+	/**
+	 * Create a link-node between two identifiers and return the created link-node.
+	 */
 	@Override
 	public InternalLink connect(InternalIdentifier id1, InternalIdentifier id2) {
 		log.trace("Connecting Identifier " +id1+ " and " +id2);
 		Node linkNode = null;
-		Transaction tx = beginTx();
-		try {
-
+		try (Transaction tx = beginTx()) {
 			Node idGraph1 = ((Neo4JIdentifier) id1).getNode();
 			Node idGraph2 = ((Neo4JIdentifier) id2).getNode();
 
@@ -279,8 +265,6 @@ public class Neo4JRepository implements Repository {
 			idGraph1.createRelationshipTo(linkNode, LinkTypes.Link);
 			idGraph2.createRelationshipTo(linkNode, LinkTypes.Link);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 
 		return (getLink(linkNode.getId()));
@@ -289,7 +273,7 @@ public class Neo4JRepository implements Repository {
 	public void remove(long id) {
 		log.trace("Removing Node with the id " +id+ " from the database");
 		Node n = getNodeById(id);
-		
+
 		if(n.hasLabel(Neo4JTypeLabels.METADATA)) {
 			removeMetadata(n);
 		} else if (n.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
@@ -302,37 +286,30 @@ public class Neo4JRepository implements Repository {
 	}
 
 	public void removeMetadata(Node n) {
-		Transaction tx = beginTx();
-		try {
+		try (Transaction tx = beginTx()) {
 			long deleteTimestamp = mConnection.getTimestampManager().getLastTimestamp();
 
 			//Remove the Metadata node itself
 			n.setProperty(KEY_TIMESTAMP_DELETE, deleteTimestamp);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
-	
+
 	public InternalMetadata updateMetadata(InternalMetadata oldM, InternalMetadata newM) {
-		Transaction tx = beginTx();
 		InternalMetadata newN = null;
-		try {
+		try (Transaction tx = beginTx()) {
 			long deleteTimestamp = newM.getPublishTimestamp();
-			
+
 			Node oldNode = ((Neo4JMetadata) oldM).getNode();
 			oldNode.setProperty(KEY_TIMESTAMP_DELETE, deleteTimestamp);
 			newN = insert(newM);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return newN;
 	}
 
 	public void removeIdentifier(Node n) {
-		Transaction tx = beginTx();
-		try {
+		try (Transaction tx = beginTx()) {
 			// Remove all the Metadata
 			Iterator<Relationship> meta = n.getRelationships(LinkTypes.Meta)
 					.iterator();
@@ -348,23 +325,20 @@ public class Neo4JRepository implements Repository {
 				removeLink(r.getEndNode());
 			}
 			// Remove all the Creation relationships
-//			Iterator<Relationship> creations = n.getRelationships(LinkTypes.Creation)
-//					.iterator();
-//			while (creations.hasNext()) {
-//				Relationship r = creations.next();
-//				r.delete();
-//			}
+			//			Iterator<Relationship> creations = n.getRelationships(LinkTypes.Creation)
+			//					.iterator();
+			//			while (creations.hasNext()) {
+			//				Relationship r = creations.next();
+			//				r.delete();
+			//			}
 			//Remove the Identifier node itself
 			n.delete();
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	public void removeLink(Node n) {
-		Transaction tx = beginTx();
-		try {
+		try (Transaction tx = beginTx()) {
 			//Remove all the Metadata
 			Iterator<Relationship> meta = n.getRelationships(LinkTypes.Meta).iterator();
 			while (meta.hasNext()) {
@@ -381,24 +355,18 @@ public class Neo4JRepository implements Repository {
 			//Remove the Link node itself
 			n.delete();
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
 	@Override
 	public void connectMeta(InternalLink link, InternalMetadata meta) {
 		log.trace("Adding Metadata " +meta+ "to Link " +link);
-		Transaction tx = beginTx();
-
-		try {
+		try (Transaction tx = beginTx()) {
 			Node ln = ((Neo4JLink) link).getNode();
 			Node mn = ((Neo4JMetadata) meta).getNode();
 
 			ln.createRelationshipTo(mn, LinkTypes.Meta);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
@@ -408,13 +376,9 @@ public class Neo4JRepository implements Repository {
 		Node ln = ((Neo4JIdentifier) id).getNode();
 		Node mn = ((Neo4JMetadata) meta).getNode();
 
-		Transaction tx = beginTx();
-
-		try {
+		try (Transaction tx = beginTx()) {
 			ln.createRelationshipTo(mn, LinkTypes.Meta);
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 	}
 
@@ -425,9 +389,8 @@ public class Neo4JRepository implements Repository {
 	@Override
 	public InternalIdentifier getStartIdentifier() {
 		log.trace("Fetching (random) root Identifier from the database");
-		Transaction tx = beginTx();
 		InternalIdentifier result = null;
-		try {
+		try (Transaction tx = beginTx()) {
 			Iterator<Node> allNodes = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.IDENTIFIER).iterator();
 			if(allNodes.hasNext()) {
 				result =  new Neo4JIdentifier(allNodes.next(), this);
@@ -437,43 +400,24 @@ public class Neo4JRepository implements Repository {
 				result =  null;
 			}
 			tx.success();
-		} finally {
-			tx.finish();
 		}
 		return result;
-//		Node ref = new IntermConnection.getConnection().getReferenceNode();
-//		for (Relationship r : ref.getRelationships(LinkTypes.Creation)) {
-//			return new Neo4JIdentifier(r.getEndNode(), this);
-//		}
-//		log.warn("Seems there is no Identifier in the database that could be used as a root");
-//		return null;
 	}
 
 	public List<InternalIdentifier> getAllIdentifier(){
 		log.debug("Getting all the Identifier from the database");
-		Transaction tx = beginTx();
-		try {
+		try (Transaction tx = beginTx()) {
 			ArrayList<InternalIdentifier> allId = new ArrayList<>();
-	
+
 			Iterator<Node> allNodes = GlobalGraphOperations.at(mConnection.getConnection()).getAllNodesWithLabel(Neo4JTypeLabels.IDENTIFIER).iterator();
 			while(allNodes.hasNext()) {
 				allId.add(new Neo4JIdentifier(allNodes.next(), this));
 			}
-			
-			
-	//		for (Relationship r : getRoot().getRelationships(LinkTypes.Creation)) {
-	//			allId.add(new Neo4JIdentifier(r.getEndNode(), this));
-	//		}
+
 			tx.success();
 			return allId;
-		} finally {
-			tx.finish();
 		}
 	}
-
-//	protected Node getRoot() {
-//		return mConnection.getConnection().getReferenceNode();
-//	}
 
 	@Override
 	public void disconnect(InternalIdentifier id1, InternalIdentifier id2) {
@@ -481,4 +425,5 @@ public class Neo4JRepository implements Repository {
 		InternalLink l = findCommonLink(id1, id2);
 		remove(((Neo4JLink) l).getNode().getId());
 	}
+
 }

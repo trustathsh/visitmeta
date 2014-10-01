@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 
@@ -197,7 +198,12 @@ public class Properties {
 	 */
 	public String getString(String propertyPath, String defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
-		return o.toString();
+		if (o != null) {
+			return o.toString();
+		} else {
+			// if the defaultValue is null
+			return (String) o;
+		}
 	}
 
 	/**
@@ -267,6 +273,14 @@ public class Properties {
 	public boolean getBoolean(String propertyPath, boolean defaultValue) {
 		Object o =  getValue(propertyPath, defaultValue);
 		return Boolean.parseBoolean(o.toString());
+	}
+	
+	/**
+	 * Return all keys of this Properties
+	 * @return Set<String>
+	 */
+	public Set<String> getKeySet() {
+		return mApplicationConfigs.keySet();
 	}
 
 	/**

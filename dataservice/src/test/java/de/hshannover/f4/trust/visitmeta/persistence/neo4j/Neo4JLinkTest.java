@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,7 +67,7 @@ public class Neo4JLinkTest {
 	@Before
 	public void prepareTestDatabase() throws Exception {
 		mGraphDb = new TestGraphDatabaseFactory()
-				.newImpermanentDatabaseBuilder().newGraphDatabase();
+		.newImpermanentDatabaseBuilder().newGraphDatabase();
 
 		Neo4JConnection neo4jConnection = mock(Neo4JConnection.class);
 		when(neo4jConnection.getConnection()).thenReturn(mGraphDb);
@@ -78,26 +78,26 @@ public class Neo4JLinkTest {
 	}
 
 	private void insertTestData() {
-		Transaction tx = mGraphDb.beginTx();
-		mIpNode = mGraphDb.createNode();
-		mMacNode = mGraphDb.createNode();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			mIpNode = mGraphDb.createNode();
+			mMacNode = mGraphDb.createNode();
 
-		mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
-		mIpNode.setProperty("/ip-address/value", "10.1.1.1");
-		mIpNode.setProperty("/ip-address/type", "IPv4");
+			mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
+			mIpNode.setProperty("/ip-address/value", "10.1.1.1");
+			mIpNode.setProperty("/ip-address/type", "IPv4");
 
-		mMacNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		mMacNode.setProperty(KEY_TYPE_NAME, "mac-address");
-		mMacNode.setProperty("/mac-address/value", "ee:ee:ee:ee:ee:ee");
+			mMacNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			mMacNode.setProperty(KEY_TYPE_NAME, "mac-address");
+			mMacNode.setProperty("/mac-address/value", "ee:ee:ee:ee:ee:ee");
 
-		mIpID= new Neo4JIdentifier(mIpNode, mRepo);
-		mMacID = new Neo4JIdentifier(mMacNode, mRepo);
-		mLink = (Neo4JLink) mRepo.connect(mIpID, mMacID);
-		mLinkNode = mLink.getNode();
-		// TODO insert hash property
-		tx.success();
-		tx.finish();
+			mIpID= new Neo4JIdentifier(mIpNode, mRepo);
+			mMacID = new Neo4JIdentifier(mMacNode, mRepo);
+			mLink = (Neo4JLink) mRepo.connect(mIpID, mMacID);
+			mLinkNode = mLink.getNode();
+			// TODO insert hash property
+			tx.success();
+		}
 	}
 
 	@After

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,14 @@
 
 package de.hshannover.f4.trust.visitmeta.dataservice.persistence;
 
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_META_CARDINALITY;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_MULTI;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_SINGLE;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +60,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -64,10 +70,8 @@ import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
 import de.hshannover.f4.trust.visitmeta.persistence.Repository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.LinkTypes;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JConnection;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JLink;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTypeLabels;
-import static org.junit.Assert.*;
 
 public class AbstractReaderTest {
 
@@ -112,103 +116,99 @@ public class AbstractReaderTest {
 	}
 
 	private void insertTwoIdentifierWithOneMetadata() {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			Node id1 = mGraphDb.createNode();
+			id1.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			id1.setProperty(KEY_TYPE_NAME, "device");
+			id1.setProperty(KEY_HASH, "2f91feecc8e13d631e09b56f2c1d0110");
+			id1.setProperty("/device/name", "device99");
 
-		Node id1 = mGraphDb.createNode();
-		id1.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		id1.setProperty(KEY_TYPE_NAME, "device");
-		id1.setProperty(KEY_HASH, "2f91feecc8e13d631e09b56f2c1d0110");
-		id1.setProperty("/device/name", "device99");
-		
-		Node id2 = mGraphDb.createNode();
-		id2.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		id2.setProperty(KEY_TYPE_NAME, "access-request");
-		id2.setProperty(KEY_HASH, "4da768ebd34c7c1103bdcd5c5118b000");
-		id2.setProperty("/access-request[@name]", "111:33");
-		
-		Node link = mGraphDb.createNode();
-		link.addLabel(Neo4JTypeLabels.LINK);
+			Node id2 = mGraphDb.createNode();
+			id2.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			id2.setProperty(KEY_TYPE_NAME, "access-request");
+			id2.setProperty(KEY_HASH, "4da768ebd34c7c1103bdcd5c5118b000");
+			id2.setProperty("/access-request[@name]", "111:33");
 
-		id1.createRelationshipTo(link, LinkTypes.Link);
-		id2.createRelationshipTo(link, LinkTypes.Link);
+			Node link = mGraphDb.createNode();
+			link.addLabel(Neo4JTypeLabels.LINK);
 
-		Node meta = mGraphDb.createNode();
-		meta.addLabel(Neo4JTypeLabels.METADATA);
-		meta.setProperty(KEY_TYPE_NAME, "authenticated-by");
-		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_SINGLE);
-		meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
-		meta.setProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		meta.setProperty("/meta:authenticated-by[@ifmap-cardinality]", "singleValue");
-		meta.setProperty("/meta:authenticated-by[@ifmap-publisher-id]", "test--1052611423-1");
-		meta.setProperty("/meta:authenticated-by[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
-		meta.setProperty("/meta:authenticated-by[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
-		meta.setProperty(KEY_HASH, "a354ec5182fd4ee4a6fa523b2f181f03");
+			id1.createRelationshipTo(link, LinkTypes.Link);
+			id2.createRelationshipTo(link, LinkTypes.Link);
 
-		link.createRelationshipTo(meta, LinkTypes.Meta);
+			Node meta = mGraphDb.createNode();
+			meta.addLabel(Neo4JTypeLabels.METADATA);
+			meta.setProperty(KEY_TYPE_NAME, "authenticated-by");
+			meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_SINGLE);
+			meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
+			meta.setProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			meta.setProperty("/meta:authenticated-by[@ifmap-cardinality]", "singleValue");
+			meta.setProperty("/meta:authenticated-by[@ifmap-publisher-id]", "test--1052611423-1");
+			meta.setProperty("/meta:authenticated-by[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
+			meta.setProperty("/meta:authenticated-by[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
+			meta.setProperty(KEY_HASH, "a354ec5182fd4ee4a6fa523b2f181f03");
 
-		tx.success();
-		tx.finish();
+			link.createRelationshipTo(meta, LinkTypes.Meta);
+
+			tx.success();
+		}
 
 	}
 
 	private void insertSingleIdentifierWithMetadataAndNewerTimestamp() {
 		final long newTimetamp = PUBLISH_TIMESTAMP + 1;
 
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			Node id = mGraphDb.createNode();
+			id.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			id.setProperty(KEY_TYPE_NAME, "ip-address");
+			id.setProperty(KEY_HASH, "00000000000000000000000000000000");
+			id.setProperty("/ip-address[@value]", "10.1.1.1");
 
-		Node id = mGraphDb.createNode();
-		id.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		id.setProperty(KEY_TYPE_NAME, "ip-address");
-		id.setProperty(KEY_HASH, "00000000000000000000000000000000");
-		id.setProperty("/ip-address[@value]", "10.1.1.1");
+			Node meta = mGraphDb.createNode();
+			meta.addLabel(Neo4JTypeLabels.METADATA);
+			meta.setProperty(KEY_TYPE_NAME, "event");
+			meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
+			meta.setProperty(KEY_TIMESTAMP_PUBLISH, newTimetamp);
+			meta.setProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
+			meta.setProperty("/meta:event[@ifmap-cardinality]", "multiValue");
+			meta.setProperty("/meta:event[@ifmap-publisher-id]", "test--1052611423-1");
+			meta.setProperty("/meta:event[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
+			meta.setProperty("/meta:event[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
+			meta.setProperty(KEY_HASH, "00000000000000000000000000000000");
 
-		Node meta = mGraphDb.createNode();
-		meta.addLabel(Neo4JTypeLabels.METADATA);
-		meta.setProperty(KEY_TYPE_NAME, "event");
-		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
-		meta.setProperty(KEY_TIMESTAMP_PUBLISH, newTimetamp);
-		meta.setProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
-		meta.setProperty("/meta:event[@ifmap-cardinality]", "multiValue");
-		meta.setProperty("/meta:event[@ifmap-publisher-id]", "test--1052611423-1");
-		meta.setProperty("/meta:event[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
-		meta.setProperty("/meta:event[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
-		meta.setProperty(KEY_HASH, "00000000000000000000000000000000");
+			id.createRelationshipTo(meta, LinkTypes.Meta);
 
-		id.createRelationshipTo(meta, LinkTypes.Meta);
-
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 
 	}
 
 	private void insertSingleIdentifierWithMetadataAndEndTimestamp() {
 		final long endTimestamp = PUBLISH_TIMESTAMP + 1;
 
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			Node id = mGraphDb.createNode();
+			id.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			id.setProperty(KEY_TYPE_NAME, "ip-address");
+			id.setProperty(KEY_HASH, "00000000000000000000000000000000");
+			id.setProperty("/ip-address[@value]", "10.1.1.1");
 
-		Node id = mGraphDb.createNode();
-		id.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		id.setProperty(KEY_TYPE_NAME, "ip-address");
-		id.setProperty(KEY_HASH, "00000000000000000000000000000000");
-		id.setProperty("/ip-address[@value]", "10.1.1.1");
+			Node meta = mGraphDb.createNode();
+			meta.addLabel(Neo4JTypeLabels.METADATA);
+			meta.setProperty(KEY_TYPE_NAME, "event");
+			meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
+			meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
+			meta.setProperty(KEY_TIMESTAMP_DELETE, endTimestamp);
+			meta.setProperty("/meta:event[@ifmap-cardinality]", "multiValue");
+			meta.setProperty("/meta:event[@ifmap-publisher-id]", "test--1052611423-1");
+			meta.setProperty("/meta:event[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
+			meta.setProperty("/meta:event[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
+			meta.setProperty(KEY_HASH, "00000000000000000000000000000000");
 
+			id.createRelationshipTo(meta, LinkTypes.Meta);
 
-		Node meta = mGraphDb.createNode();
-		meta.addLabel(Neo4JTypeLabels.METADATA);
-		meta.setProperty(KEY_TYPE_NAME, "event");
-		meta.setProperty(KEY_META_CARDINALITY, VALUE_META_CARDINALITY_MULTI);
-		meta.setProperty(KEY_TIMESTAMP_PUBLISH, PUBLISH_TIMESTAMP);
-		meta.setProperty(KEY_TIMESTAMP_DELETE, endTimestamp);
-		meta.setProperty("/meta:event[@ifmap-cardinality]", "multiValue");
-		meta.setProperty("/meta:event[@ifmap-publisher-id]", "test--1052611423-1");
-		meta.setProperty("/meta:event[@ifmap-timestamp]", "2012-11-12T11:27:17+01:00");
-		meta.setProperty("/meta:event[@xmlns:meta]", "http://www.trustedcomputinggroup.org/2010/IFMAP-METADATA/2");
-		meta.setProperty(KEY_HASH, "00000000000000000000000000000000");
-
-		id.createRelationshipTo(meta, LinkTypes.Meta);
-
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 
 	}
 

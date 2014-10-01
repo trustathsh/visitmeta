@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,19 +82,19 @@ public class Neo4JMetadataTest {
 	}
 
 	private void insertTestData() {
-		Transaction tx = mGraphDb.beginTx();
-		mRoleNode = mGraphDb.createNode();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			mRoleNode = mGraphDb.createNode();
 
-		mRoleNode.addLabel(Neo4JTypeLabels.METADATA);
-		mRoleNode.setProperty(KEY_TYPE_NAME, "role");
-		mRoleNode.setProperty(KEY_META_CARDINALITY, "multiValue");
-		mRoleNode.setProperty("/role/name", "admin");
-		mRoleNode.setProperty("/role[@ifmap-timestamp]", "2010-04-20T12:00:05Z");
-		mRoleNode.setProperty("/role[@ifmap-publisher-id]", "42");
-		mRoleNode.setProperty("/role[@ifmap-cardinality]", "multiValue");
+			mRoleNode.addLabel(Neo4JTypeLabels.METADATA);
+			mRoleNode.setProperty(KEY_TYPE_NAME, "role");
+			mRoleNode.setProperty(KEY_META_CARDINALITY, "multiValue");
+			mRoleNode.setProperty("/role/name", "admin");
+			mRoleNode.setProperty("/role[@ifmap-timestamp]", "2010-04-20T12:00:05Z");
+			mRoleNode.setProperty("/role[@ifmap-publisher-id]", "42");
+			mRoleNode.setProperty("/role[@ifmap-cardinality]", "multiValue");
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	@After
@@ -129,20 +129,20 @@ public class Neo4JMetadataTest {
 
 	@Test
 	public void testEqualsFalseForNeo4jOnly() {
-		Transaction tx = mGraphDb.beginTx();
-		Node node = mGraphDb.createNode();
-		node.addLabel(Neo4JTypeLabels.METADATA);
-		node.setProperty(KEY_TYPE_NAME, "role");
-		node.setProperty(KEY_META_CARDINALITY, "multiValue");
-		node.setProperty("/role/name", "chef");
-		node.setProperty("/role[@ifmap-cardinality]", "multiValue");
-		tx.success();
-		tx.finish();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			Node node = mGraphDb.createNode();
+			node.addLabel(Neo4JTypeLabels.METADATA);
+			node.setProperty(KEY_TYPE_NAME, "role");
+			node.setProperty(KEY_META_CARDINALITY, "multiValue");
+			node.setProperty("/role/name", "chef");
+			node.setProperty("/role[@ifmap-cardinality]", "multiValue");
+			tx.success();
 
-		Neo4JMetadata neo4jMeta1 = new Neo4JMetadata(mRoleNode, mGraph);
-		Neo4JMetadata neo4jMeta2 = new Neo4JMetadata(node, mGraph);
-		assertFalse(neo4jMeta1.equals(neo4jMeta2));
-		assertFalse(neo4jMeta2.equals(neo4jMeta1));
+			Neo4JMetadata neo4jMeta1 = new Neo4JMetadata(mRoleNode, mGraph);
+			Neo4JMetadata neo4jMeta2 = new Neo4JMetadata(node, mGraph);
+			assertFalse(neo4jMeta1.equals(neo4jMeta2));
+			assertFalse(neo4jMeta2.equals(neo4jMeta1));
+		}
 	}
 
 	@Test

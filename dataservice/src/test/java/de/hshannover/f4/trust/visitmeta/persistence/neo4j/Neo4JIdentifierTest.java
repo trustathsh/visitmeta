@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,18 +86,18 @@ public class Neo4JIdentifierTest {
 	}
 
 	private void insertTestData() {
-		Transaction tx = mGraphDb.beginTx();
-		mIpNode = mGraphDb.createNode();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			mIpNode = mGraphDb.createNode();
 
-		mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
-		mIpNode.setProperty("/ip-address/value", "10.1.1.1");
-		mIpNode.setProperty("/ip-address/type", "IPv4");
+			mIpNode.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			mIpNode.setProperty(KEY_TYPE_NAME, "ip-address");
+			mIpNode.setProperty("/ip-address/value", "10.1.1.1");
+			mIpNode.setProperty("/ip-address/type", "IPv4");
 
-		// TODO insert hash property
+			// TODO insert hash property
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	@After
@@ -158,22 +158,21 @@ public class Neo4JIdentifierTest {
 
 	@Test
 	public void testEqualsFalseForNeo4jOnly() {
-		Transaction tx = mGraphDb.beginTx();
-		Node node = mGraphDb.createNode();
-		node.addLabel(Neo4JTypeLabels.IDENTIFIER);
-		node.setProperty(KEY_TYPE_NAME, "ip-address");
-		node.setProperty("/ip-address/value", "10.1.1.99");
-		node.setProperty("/ip-address/type", "IPv4");
-		tx.success();
-		tx.finish();
+		try (Transaction tx = mGraphDb.beginTx()) {
+			Node node = mGraphDb.createNode();
+			node.addLabel(Neo4JTypeLabels.IDENTIFIER);
+			node.setProperty(KEY_TYPE_NAME, "ip-address");
+			node.setProperty("/ip-address/value", "10.1.1.99");
+			node.setProperty("/ip-address/type", "IPv4");
+			tx.success();
 
-		Neo4JIdentifier neo4jId1 = new Neo4JIdentifier(mIpNode, mGraph);
-		Neo4JIdentifier neo4jId2 = new Neo4JIdentifier(node, mGraph);
-		assertFalse(neo4jId1.equals(neo4jId2));
-		assertFalse(neo4jId2.equals(neo4jId1));
-		assertNotSame(neo4jId1.hashCode(), neo4jId2.hashCode());
-		assertNotSame(neo4jId2.hashCode(), neo4jId1.hashCode());
-
+			Neo4JIdentifier neo4jId1 = new Neo4JIdentifier(mIpNode, mGraph);
+			Neo4JIdentifier neo4jId2 = new Neo4JIdentifier(node, mGraph);
+			assertFalse(neo4jId1.equals(neo4jId2));
+			assertFalse(neo4jId2.equals(neo4jId1));
+			assertNotSame(neo4jId1.hashCode(), neo4jId2.hashCode());
+			assertNotSame(neo4jId2.hashCode(), neo4jId1.hashCode());
+		}
 	}
 
 	@Test
@@ -236,12 +235,12 @@ public class Neo4JIdentifierTest {
 		public void removeMetadata(InternalMetadata meta) {
 			removeMetadata(meta, true);
 		}
-		
+
 		@Override
 		public void removeMetadata(InternalMetadata meta, boolean isSingleValueDependent) {
 			throw new UnsupportedOperationException("not implemented in test stub");
 		}
-		
+
 		@Override
 		public void updateMetadata(InternalMetadata meta) {
 			throw new UnsupportedOperationException("not implemented in test stub");

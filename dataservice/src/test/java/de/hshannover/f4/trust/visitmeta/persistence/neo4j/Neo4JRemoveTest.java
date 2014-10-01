@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,8 +45,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.MessageDigest;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +52,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -87,39 +84,39 @@ public class Neo4JRemoveTest {
 	}
 
 	private void insertTestData() {
-		Transaction tx = mGraphDb.beginTx();
+		try (Transaction tx = mGraphDb.beginTx()) {
 
-		mIdentityIdent = new InMemoryIdentifier("identity");
-		mIdentityIdent.addProperty("/identity/name", "John Smith");
+			mIdentityIdent = new InMemoryIdentifier("identity");
+			mIdentityIdent.addProperty("/identity/name", "John Smith");
 
-		mARIdent =  new InMemoryIdentifier("access-request");
-		mARIdent.addProperty("/access-request/name", "111:33");
+			mARIdent =  new InMemoryIdentifier("access-request");
+			mARIdent.addProperty("/access-request/name", "111:33");
 
-		mAuthAsMeta = new InMemoryMetadata("authenticated-as", true, 42);
+			mAuthAsMeta = new InMemoryMetadata("authenticated-as", true, 42);
 
-		mRoleMeta = new InMemoryMetadata("role", true, 42);
-		mRoleMeta.addProperty("/role/name", "admin");
+			mRoleMeta = new InMemoryMetadata("role", true, 42);
+			mRoleMeta.addProperty("/role/name", "admin");
 
-		mEventMeta = new InMemoryMetadata("event", false, 42);
-		mEventMeta.addProperty("/event/name", "xyz");
-		mEventMeta.addProperty("/event/cve", "34235");
+			mEventMeta = new InMemoryMetadata("event", false, 42);
+			mEventMeta.addProperty("/event/name", "xyz");
+			mEventMeta.addProperty("/event/cve", "34235");
 
-		id1 = (Neo4JIdentifier) mRepo.insert(mIdentityIdent);
-		id2 = (Neo4JIdentifier) mRepo.insert(mARIdent);
-		l1 = (Neo4JLink) mRepo.connect(id1, id2);
+			id1 = (Neo4JIdentifier) mRepo.insert(mIdentityIdent);
+			id2 = (Neo4JIdentifier) mRepo.insert(mARIdent);
+			l1 = (Neo4JLink) mRepo.connect(id1, id2);
 
-		m1 = (Neo4JMetadata) mRepo.insert(mAuthAsMeta);
-		m2 = (Neo4JMetadata) mRepo.insert(mRoleMeta);
-		m3 = (Neo4JMetadata) mRepo.insert(mEventMeta);
+			m1 = (Neo4JMetadata) mRepo.insert(mAuthAsMeta);
+			m2 = (Neo4JMetadata) mRepo.insert(mRoleMeta);
+			m3 = (Neo4JMetadata) mRepo.insert(mEventMeta);
 
-		mRepo.connectMeta(l1, m1);
-		mRepo.connectMeta(l1, m2);
-		mRepo.connectMeta(id1, m3);
+			mRepo.connectMeta(l1, m1);
+			mRepo.connectMeta(l1, m2);
+			mRepo.connectMeta(id1, m3);
 
-		// TODO insert hash property
+			// TODO insert hash property
 
-		tx.success();
-		tx.finish();
+			tx.success();
+		}
 	}
 
 	@After
@@ -173,10 +170,10 @@ public class Neo4JRemoveTest {
 	@Ignore("fails because of new 'remove semantics'")
 	@Test
 	public void testDeleteIdentifier() {
-//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
-//		Iterator<Relationship> it = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
-//		assertEquals(id2.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
-//		assertEquals(id1.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+		//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
+		//		Iterator<Relationship> it = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
+		//		assertEquals(id2.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+		//		assertEquals(id1.getTypeName(), it.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
 		mRepo.getIdentifier(id1.getNode().getId());
 		mRepo.getMetadata(m3.getNode().getId());
 		mRepo.getLink(l1.getNode().getId());
@@ -185,15 +182,15 @@ public class Neo4JRemoveTest {
 
 		mRepo.remove(id1.getNode().getId());
 
-//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
-//		Iterator<Relationship> it2 = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
-//		assertEquals(id2.getTypeName(), it2.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
-//		try {
-//			it2.next();
-//			assertFalse(true);
-//		} catch(Exception e) {
-//			assertEquals(NoSuchElementException.class, e.getClass());
-//		}
+		//		TODO: If ever fixed use something else since this fails since no Root node is available in Neo4j 2.x
+		//		Iterator<Relationship> it2 = mRepo.getRoot().getRelationships(LinkTypes.Creation).iterator();
+		//		assertEquals(id2.getTypeName(), it2.next().getEndNode().getProperty(Neo4JPropertyConstants.KEY_TYPE_NAME));
+		//		try {
+		//			it2.next();
+		//			assertFalse(true);
+		//		} catch(Exception e) {
+		//			assertEquals(NoSuchElementException.class, e.getClass());
+		//		}
 		try {
 			mRepo.getIdentifier(id1.getNode().getId());
 			assertFalse(true);

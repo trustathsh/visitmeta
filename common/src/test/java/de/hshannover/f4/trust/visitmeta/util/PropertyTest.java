@@ -41,6 +41,7 @@ package de.hshannover.f4.trust.visitmeta.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.Before;
@@ -68,7 +69,11 @@ public class PropertyTest {
 
 	@Before
 	public void setUp() {
-
+		File f = new File("src/test/resources/");
+		if (!f.exists()) {
+			// If it doens't exist, try to create it.
+			f.mkdir();
+		}
 	}
 
 	// ******************************

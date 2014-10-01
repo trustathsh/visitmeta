@@ -41,6 +41,7 @@ package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,11 @@ public class YamlTest {
 
 	@Before
 	public void setUp() {
-
+		File f = new File("src/test/resources/");
+		if (!f.exists()) {
+			// If it doens't exist, try to create it.
+			f.mkdir();
+		}
 	}
 
 	// ******************************

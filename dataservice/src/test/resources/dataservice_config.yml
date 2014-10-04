@@ -1,0 +1,35 @@
+dataservice:
+  rest:
+    url: http://127.0.0.1:8000/
+    enable: true
+  cache:
+    enable: true
+    size: 100
+
+neo4j:
+  db:
+    # path to the db directory
+    path: /tmp/visitmeta.db
+    # algorithm to calculate hashes for identifiers, needed for quick lookup in the db
+    hashalgo: MD5
+    # clear the database on the application's startup?
+    clear: true
+
+ifmap:
+  truststore:
+    path: /visitmeta.jks
+    pw: visitmeta
+  auth:
+    url: https://localhost:8443
+  user: visitmeta
+  pw: visitmeta
+  start:
+    connect: true
+  maxDepth: 1000
+  maxSize: 1000000000
+  subscription:
+    name: visitmeta-1
+  connection:
+    maxretry: 10
+    # in seconds
+    retryinterval: 10

@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.IfmapJ;
 import de.hshannover.f4.trust.ifmapj.channel.SSRC;
@@ -59,7 +58,6 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
@@ -68,11 +66,10 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedEx
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
-import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
-import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.OPTIONAL;
-import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
+import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 /**
  * An implementation of the {@link Connection} interface.
@@ -83,28 +80,6 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.YamlPersist.REQUIRED;
 public class ConnectionImpl implements Connection {
 
 	private static final Logger log = Logger.getLogger(Connection.class);
-
-	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
-
-	public static final String DEFAULT_TRUSTSTORE_PATH;
-
-	public static final String DEFAULT_TRUSTSTORE_PASS;
-
-	public static final int DEFAULT_MAX_POLL_RESULT_SIZE;
-
-	static {
-		try{
-			DEFAULT_TRUSTSTORE_PATH = Application.getConfig().getString("ifmap.truststore.path");
-			DEFAULT_TRUSTSTORE_PASS = Application.getConfig().getString("ifmap.truststore.pw");
-			DEFAULT_MAX_POLL_RESULT_SIZE = Application.getConfig().getInt("ifmap.maxsize");
-		} catch (PropertyException e) {
-			log.fatal(e.toString(), e);
-			throw new RuntimeException("could not load requested properties", e);
-		}
-	}
-
-	public static final boolean DEFAULT_STARTUP_CONNECT = false;
-
 
 	private Neo4JDatabase mNeo4JDb;
 	private UpdateService mUpdateService;
@@ -117,34 +92,16 @@ public class ConnectionImpl implements Connection {
 	private Set<String> activeSubscriptions;
 
 	// connection data
-	@REQUIRED
 	private String mConnectionName;
-
-	@REQUIRED
 	private String mUrl;
-
-	@REQUIRED
 	private String mUserName;
-
-	@REQUIRED
 	private String mUserPass;
-
-	@OPTIONAL("DEFAULT_AUTHENTICATION_BASIC")
 	private boolean mAuthenticationBasic;
-
-	@OPTIONAL("DEFAULT_TRUSTSTORE_PATH")
 	private String mTruststorePath;
-
-	@OPTIONAL("DEFAULT_TRUSTSTORE_PASS")
 	private String mTruststorePass;
-
-	@OPTIONAL("DEFAULT_MAX_POLL_RESULT_SIZE")
 	private int mMaxPollResultSize;
-
-	@OPTIONAL("DEFAULT_STARTUP_CONNECT")
 	private boolean mStartupConnect;
-
-	private List<JSONObject> mSubscribeList;
+	private List<Subscription> mSubscribeList;
 
 	/**
 	 * Represents an IF-MAP connection to a MAP server. If not changed by
@@ -167,12 +124,13 @@ public class ConnectionImpl implements Connection {
 		setUrl(url);
 		setUserName(userName);
 		setUserPass(userPass);
-		setAuthenticationBasic(DEFAULT_AUTHENTICATION_BASIC);
-		setTruststorePath(DEFAULT_TRUSTSTORE_PATH);
-		setTruststorePass(DEFAULT_TRUSTSTORE_PASS);
-		setMaxPollResultSize(DEFAULT_MAX_POLL_RESULT_SIZE);
-		setStartupConnect(DEFAULT_STARTUP_CONNECT);
-		mSubscribeList = new ArrayList<JSONObject>();
+		setAuthenticationBasic(ConnectionsProperties.DEFAULT_AUTHENTICATION_BASIC);
+		setTruststorePath(ConnectionsProperties.DEFAULT_TRUSTSTORE_PATH);
+		setTruststorePass(ConnectionsProperties.DEFAULT_TRUSTSTORE_PASS);
+		setMaxPollResultSize(ConnectionsProperties.DEFAULT_MAX_SIZE);
+		setStartupConnect(ConnectionsProperties.DEFAULT_STARTUP_CONNECT);
+
+		mSubscribeList = new ArrayList<Subscription>();
 
 		mNeo4JDb = new Neo4JDatabase(mConnectionName);
 		activeSubscriptions = new HashSet<String>();
@@ -492,12 +450,16 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void addSubscription(JSONObject json) {
-		mSubscribeList.add(json);
+	public void addSubscription(Subscription subscription) {
+		mSubscribeList.add(subscription);
+	}
+
+	public void setSubscribeList(List<Subscription> subscribtionList) {
+		mSubscribeList = subscribtionList;
 	}
 
 	@Override
-	public List<JSONObject> getSubscriptions() {
+	public List<Subscription> getSubscriptions() {
 		return mSubscribeList;
 	}
 }

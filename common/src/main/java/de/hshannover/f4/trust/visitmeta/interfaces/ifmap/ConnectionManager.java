@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces.ifmap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +49,8 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedEx
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 /**
  * An interface for {@link ConnectionManager} classes, that handle all
@@ -176,9 +177,10 @@ public interface ConnectionManager {
 	 * @param subscription
 	 *            a {@link JSONObject} representing the subscription
 	 * @throws IOException
+	 * @throws PropertyException
 	 */
-	public void storeSubscription(String connectionName, JSONObject subscription)
-			throws IOException;
+	public void storeSubscription(String connectionName, Subscription subscription)
+			throws IOException, PropertyException;
 
 	/**
 	 * Delete a saved {@link Connection}.

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -67,6 +66,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 @Path("/")
 public class ConnectionResource {
@@ -84,7 +84,7 @@ public class ConnectionResource {
 
 	/**
 	 * Delete a saved connection.
-	 * 
+	 *
 	 * Example-URL: <tt>http://example.com:8000/default</tt>
 	 */
 	@DELETE
@@ -226,8 +226,8 @@ public class ConnectionResource {
 
 		// persist connection in property
 		try {
-			Application.getConnectionPersister().persistConnections();
-		} catch (IOException e) {
+			Application.getConnections().persistConnections();
+		} catch (PropertyException e) {
 			log.error("error while connection persist", e);
 			return Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -242,11 +242,11 @@ public class ConnectionResource {
 
 	/**
 	 * Conneced the dataservice with connection default to a MAP-Server.
-	 * 
+	 *
 	 * Example-URL: <tt>http://example.com:8000/default/connect</tt>
-	 * 
+	 *
 	 * @throws HttpException
-	 * 
+	 *
 	 **/
 	@PUT
 	@Path("{connectionName}/connect")
@@ -268,9 +268,9 @@ public class ConnectionResource {
 
 	/**
 	 * Disconnected the default connection from a MAP-Server.
-	 * 
+	 *
 	 * Example-URL: <tt>http://example.com:8000/default/disconnect</tt>
-	 * 
+	 *
 	 **/
 	@PUT
 	@Path("{connectionName}/disconnect")
@@ -293,7 +293,7 @@ public class ConnectionResource {
 	/**
 	 * Returns a JSONObject with saved connections to a MAP-Server. Example-URL:
 	 * <tt>http://example.com:8000/</tt>
-	 * 
+	 *
 	 * You can set the onlyActive value of true. Example-URL:
 	 * <tt>http://example.com:8000/?onlyActive=true</tt>
 	 **/

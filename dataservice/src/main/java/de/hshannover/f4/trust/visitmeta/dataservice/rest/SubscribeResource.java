@@ -63,7 +63,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 /**
@@ -80,21 +79,6 @@ import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 public class SubscribeResource {
 
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
-
-	private static final Properties config = Application.getConfig();
-
-	private static final int MAX_DEPTH;
-	private static final int MAX_SIZE;
-
-	static {
-		try{
-			MAX_DEPTH = config.getInt("ifmap.maxdepth");
-			MAX_SIZE = config.getInt("ifmap.maxsize");
-		} catch (PropertyException e) {
-			log.fatal(e.toString(), e);
-			throw new RuntimeException("could not load requested properties", e);
-		}
-	}
 
 	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
 	public static final String JSON_KEY_IDENTIFIER = "identifier";
@@ -165,25 +149,22 @@ public class SubscribeResource {
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
 				try {
 
-					SubscribeRequest request = SubscriptionHelper
-							.buildRequest(moreSubscribes);
+					SubscribeRequest request = SubscriptionHelper.buildRequest(moreSubscribes);
 					manager.subscribe(name, request);
-					manager.storeSubscription(name, jObj);
+					manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(moreSubscribes));
 
-				} catch (ConnectionException | IOException e) {
+				} catch (ConnectionException | IOException | PropertyException e) {
 					log.error("error while multiple subscribeUpdate from " + name, e);
 					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
 		} catch (JSONException e) {
 			try {
-
-				SubscribeRequest request = SubscriptionHelper
-						.buildRequest(jObj);
+				SubscribeRequest request = SubscriptionHelper.buildRequest(jObj);
 				manager.subscribe(name, request);
-				manager.storeSubscription(name, jObj);
+				manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(jObj));
 
-			} catch (ConnectionException | IOException ee) {
+			} catch (ConnectionException | IOException | PropertyException ee) {
 				log.error("error while single subscribeUpdate from " + name, e);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(ee.toString()).build();

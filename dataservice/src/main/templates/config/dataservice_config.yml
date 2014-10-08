@@ -25,8 +25,8 @@ ifmap:
   pw: visitmeta
   start:
     connect: true
-  maxdepth: 1000
-  maxsize: 1000000000
+  maxDepth: 1000
+  maxSize: 1000000000
   subscription:
     name: visitmeta-1
   connection:

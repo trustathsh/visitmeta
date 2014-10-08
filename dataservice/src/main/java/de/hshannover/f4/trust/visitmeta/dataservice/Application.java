@@ -43,7 +43,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -57,7 +56,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
-import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionPersister;
+import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 /**
  * Application main class, also provides access to main interfaces. <i>Note:
@@ -80,7 +79,7 @@ public abstract class Application {
 	/**
 	 * Configuration class for persistent IF-MAPS Connections.
 	 */
-	private static ConnectionPersister mConnectionPersister;
+	private static ConnectionsProperties mConnections;
 
 	private static RestService restService;
 
@@ -145,11 +144,16 @@ public abstract class Application {
 
 	private static void loadPersistentConnections() throws IOException {
 		log.info("load persistent connections");
-		Map<String, Connection> connectionList = mConnectionPersister.load();
 
-		for (Connection c : connectionList.values()) {
+		for(String s: mConnections.getKeySet()){
+			Connection tmp = null;
 			try {
-				mManager.addConnection(c);
+				tmp = mConnections.buildConnection(s);
+			} catch (ConnectionException | PropertyException e) {
+				log.error("error while build new connection from Properties -> " + e.toString(), e);
+			}
+			try {
+				mManager.addConnection(tmp);
 			} catch (ConnectionException e) {
 				log.error(
 						"error while adding connection to the connection pool",
@@ -186,7 +190,7 @@ public abstract class Application {
 			String config = Application.class.getClassLoader().getResource("dataservice_config.yml").getPath();
 			String connections = Application.class.getClassLoader().getResource("dataservice_connections.yml").getPath();
 			mConfig = new Properties(config);
-			mConnectionPersister = new ConnectionPersister(mManager, connections);
+			mConnections = new ConnectionsProperties(mManager, connections);
 
 			log.info("components initialized");
 		} catch (PropertyException e) {
@@ -220,12 +224,12 @@ public abstract class Application {
 	/**
 	 * @return
 	 */
-	public static ConnectionPersister getConnectionPersister() {
-		if (mConnectionPersister == null) {
+	public static ConnectionsProperties getConnections() {
+		if (mConnections == null) {
 			throw new RuntimeException(
 					"ConnectionsConfig has not been initialized. This is not good!");
 		}
-		return mConnectionPersister;
+		return mConnections;
 	}
 
 }

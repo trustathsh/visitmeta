@@ -44,15 +44,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 /**
  * An implementation of the {@link ConnectionManager} interface.
@@ -96,15 +97,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	 */
 	private void executeInitialSubscription(Connection connection)
 			throws ConnectionException {
-		for (JSONObject json : connection.getSubscriptions()) {
-			// TODO [MR] NEXT RELEASE add startupSubscribe to SubscribeKey
-			if (json.optBoolean("startupSubscribe")) {
-				// TODO [MR] NEXT RELEASE use SubscribeKey's
-				log.debug("initial subscription("
-						+ json.optString("subscribeName") + ") for connection("
-						+ connection.getConnectionName() + ")...");
-				SubscribeRequest request = SubscriptionHelper
-						.buildRequest(json);
+		for (Subscription s: connection.getSubscriptions()) {
+			if (s.isStartupSubscribe()){
+				log.debug("initial subscription("+ s.getName() +") for connection("+ connection.getConnectionName() +")...");
+				SubscribeRequest request = SubscriptionHelper.buildRequest(s);
 				subscribe(connection.getConnectionName(), request);
 			}
 		}
@@ -199,10 +195,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void storeSubscription(String connectionName, JSONObject subscription)
-			throws IOException {
+	public void storeSubscription(String connectionName, Subscription subscription)
+			throws IOException, PropertyException {
 		mConnectionPool.get(connectionName).addSubscription(subscription);
-		Application.getConnectionPersister().persistConnections();
+		Application.getConnections().persistConnections();
 	}
 
 	@Override

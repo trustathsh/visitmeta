@@ -60,7 +60,6 @@ import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult.Type;
 import de.hshannover.f4.trust.ifmapj.metadata.StandardIfmapMetadataFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
@@ -79,7 +78,6 @@ public class PollTaskTest {
 
 	@Before
 	public void setup() {
-		Application.initComponents();
 		mConnection = mock(Connection.class);
 		mMetadataFactory = mock(InternalMetadataFactory.class);
 		mIfmapJHelper = new IfmapJHelper(new IdentifierFactoryStub());

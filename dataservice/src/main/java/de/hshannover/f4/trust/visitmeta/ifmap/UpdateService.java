@@ -98,8 +98,8 @@ public class UpdateService implements Runnable {
 		log.trace("new UpdateService() ...");
 
 		try{
-			MAX_DEPTH = config.getInt("ifmap.maxdepth");
-			MAX_SIZE = config.getInt("ifmap.maxsize");
+			MAX_DEPTH = config.getInt("ifmap.maxDepth");
+			MAX_SIZE = config.getInt("ifmap.maxSize");
 		} catch (PropertyException e) {
 			log.fatal(e.toString(), e);
 			throw new RuntimeException("could not load requested properties", e);

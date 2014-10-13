@@ -88,11 +88,11 @@ Inside the `config` directory, you find all needed configuration files.
 Most settings will work just fine in your environment (or when using our
 [irondemo environment][5]), but you maybe have to adjust at least the following entries:
 
-* config.properties
+* dataservice_connections.yml
 
-	* ifmap.auth.url = the URL of your MAP server (default: http://localhost:8443)
-	* ifmap.start.type = Type of the start identifier for VisITMeta
-	* ifmap.start.identifier = Value of the start idenfitier for VisITMeta
+	* default.url = The default URL of your MAP server (default: http://localhost:8443)
+	* default.identifierType = The default type of the start identifier for VisITMeta (default: device)
+	* default.identifier = The default value of the start identifier for VisITMeta (default: pdp)
 
 Running
 =======

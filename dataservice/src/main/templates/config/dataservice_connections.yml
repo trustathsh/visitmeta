@@ -1,9 +1,13 @@
+# the connection name
 default:
   userName: visitmeta
   userPass: visitmeta
-  startupConnect: true
-  url: https://localhost:8443
-  subscribeList:
+  # try to connect when the data service is started
+  useConnectionAsStartup: true
+  # url to the ifmap-server for this default connection
+  ifmapServerUrl: https://localhost:8443
+  subscrptions:
+    # the subscription name
     default:
       # identifierType is one of the following:
       # access-request, device, ip-address, mac-address
@@ -14,5 +18,6 @@ default:
       # IPv4,10.0.0.1
       # or
       # IPv6,...
-      identifier: pdp
-      startupSubscribe: true
+      identifier: ar:1
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: true

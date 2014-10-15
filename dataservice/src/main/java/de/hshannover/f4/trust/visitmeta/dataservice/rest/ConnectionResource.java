@@ -306,7 +306,7 @@ public class ConnectionResource {
 					.getSavedConnections().values()) {
 				Map<String, String> connectionMap = new HashMap<String, String>();
 
-				connectionMap.put(ConnectionKey.URL, c.getUrl());
+				connectionMap.put(ConnectionKey.URL, c.getIfmapServerUrl());
 				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
 				connectionMap.put(ConnectionKey.USER_PASSWORD,
 						c.getUserPassword());

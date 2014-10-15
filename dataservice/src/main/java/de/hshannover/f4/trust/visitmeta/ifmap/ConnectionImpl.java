@@ -96,6 +96,7 @@ public class ConnectionImpl implements Connection {
 	private String mUrl;
 	private String mUserName;
 	private String mUserPass;
+	// TODO the dataservice supports only basic authentication this value is not in use
 	private boolean mAuthenticationBasic;
 	private String mTruststorePath;
 	private String mTruststorePass;
@@ -127,7 +128,7 @@ public class ConnectionImpl implements Connection {
 		setAuthenticationBasic(ConnectionsProperties.DEFAULT_AUTHENTICATION_BASIC);
 		setTruststorePath(ConnectionsProperties.DEFAULT_TRUSTSTORE_PATH);
 		setTruststorePass(ConnectionsProperties.DEFAULT_TRUSTSTORE_PASS);
-		setMaxPollResultSize(ConnectionsProperties.DEFAULT_MAX_SIZE);
+		setMaxPollResultSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 		setStartupConnect(ConnectionsProperties.DEFAULT_STARTUP_CONNECT);
 
 		mSubscribeList = new ArrayList<Subscription>();
@@ -142,7 +143,7 @@ public class ConnectionImpl implements Connection {
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 
-		initSsrc(getUrl(), getUserName(), getUserPassword(), mTruststorePath,
+		initSsrc(getIfmapServerUrl(), getUserName(), getUserPassword(), mTruststorePath,
 				mTruststorePass);
 		initSession();
 	}
@@ -297,7 +298,7 @@ public class ConnectionImpl implements Connection {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Connection: ").append(mConnectionName).append(" | URL: ");
-		sb.append(getUrl()).append(" | User: ").append(getUserName());
+		sb.append(getIfmapServerUrl()).append(" | User: ").append(getUserName());
 
 		return sb.toString();
 	}
@@ -364,7 +365,7 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public String getUrl() {
+	public String getIfmapServerUrl() {
 		return mUrl;
 	}
 

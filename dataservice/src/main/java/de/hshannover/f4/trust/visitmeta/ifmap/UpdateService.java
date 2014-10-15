@@ -70,11 +70,6 @@ public class UpdateService implements Runnable {
 
 	protected Properties config = Application.getConfig();
 
-	protected final int MAX_DEPTH;
-	protected final int MAX_SIZE;
-	protected final int MAX_RETRY;
-	protected final int RETRY_INTERVAL;
-
 	private Connection mConnection;
 
 	protected Writer mWriter;
@@ -97,14 +92,6 @@ public class UpdateService implements Runnable {
 	public UpdateService(Connection connection, Writer writer, InternalIdentifierFactory identifierFactory, InternalMetadataFactory metadataFactory) {
 		log.trace("new UpdateService() ...");
 
-		try{
-			MAX_DEPTH = config.getInt("ifmap.maxDepth");
-			MAX_SIZE = config.getInt("ifmap.maxSize");
-		} catch (PropertyException e) {
-			log.fatal(e.toString(), e);
-			throw new RuntimeException("could not load requested properties", e);
-		}
-
 		if (writer == null) {
 			throw new IllegalArgumentException("writer cannot be null");
 		}
@@ -121,22 +108,6 @@ public class UpdateService implements Runnable {
 		mMetadataFactory = metadataFactory;
 
 		mIfmapJHelper = new de.hshannover.f4.trust.visitmeta.ifmap.IfmapJHelper(mIdentifierFactory);
-
-		int tmp = 0;
-		try {
-			tmp = config.getInt("ifmap.connection.maxretry");
-		} catch (PropertyException e) {
-			log.error(e.toString(), e);
-			tmp = DEFAULT_MAX_RETRY;
-		}
-		MAX_RETRY = tmp;
-		try {
-			tmp = config.getInt("ifmap.connection.retryinterval");
-		} catch (PropertyException e) {
-			log.error(e.toString(), e);
-			tmp = DEFAULT_RETRY_INTERVAL;
-		}
-		RETRY_INTERVAL = tmp;
 
 		log.trace("... new UpdateService() OK");
 	}

@@ -89,8 +89,8 @@ public class SubscriptionHelper {
 	public static Subscription buildSubscribtion(JSONObject jObj) {
 		Subscription subscribtion = new SubscriptionImpl();
 
-		subscribtion.setMaxDepth(ConnectionsProperties.DEFAULT_MAX_DEPTH);
-		subscribtion.setMaxSize(ConnectionsProperties.DEFAULT_MAX_SIZE);
+		subscribtion.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
+		subscribtion.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 
 		Iterator<String> i = jObj.keys();
 		while (i.hasNext()) {

@@ -85,10 +85,10 @@ public class Neo4JDatabase {
 		log.trace("new Neo4JDatabase() ...");
 
 		try {
-			mClearDatabase = mConfig.getBoolean("neo4j.db.clear");
-			mDbCaching = mConfig.getBoolean("dataservice.cache.enable");
-			mDbCachSize = mConfig.getInt("dataservice.cache.size");
-			mNeo4JdbPath = mConfig.getString("neo4j.db.path");
+			mClearDatabase = mConfig.getBoolean("database.erase");
+			mDbCaching = mConfig.getBoolean("database.cache.enable");
+			mDbCachSize = mConfig.getInt("database.cache.size");
+			mNeo4JdbPath = mConfig.getString("database.path");
 		} catch (PropertyException e) {
 			log.fatal(e.toString(), e);
 			throw new RuntimeException("could not load requested properties", e);

@@ -167,7 +167,7 @@ public abstract class Application {
 
 		String url = "";
 		try{
-			url  = Application.getConfig().getString("dataservice.rest.url");
+			url  = Application.getConfig().getString("restServiceUrl");
 		} catch (PropertyException e) {
 			log.fatal(e.toString(), e);
 			throw new RuntimeException("could not load requested properties", e);
@@ -202,7 +202,7 @@ public abstract class Application {
 
 	public static MessageDigest loadHashAlgorithm() {
 		try {
-			String algoname = mConfig.getString("neo4j.db.hashalgo");
+			String algoname = mConfig.getString("database.hashAlgorithm");
 			log.trace("try to load MessageDigest for '"+algoname+"'");
 			return MessageDigest.getInstance(algoname);
 		} catch (NoSuchAlgorithmException | PropertyException e) {

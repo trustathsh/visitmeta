@@ -173,7 +173,7 @@ public interface Connection {
 	 *
 	 * @return the URL of the MAP server
 	 */
-	public String getUrl();
+	public String getIfmapServerUrl();
 
 	/**
 	 * Returns the username for this {@link Connection}.

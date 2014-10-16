@@ -38,15 +38,16 @@
  */
 package de.hshannover.f4.trust.visitmeta.util;
 
-public class SubscribeKey {
+public class SubscriptionKey {
 
-	public static final String NAME = "name";
-	public static final String IDENTIFIER = "identifier";
-	public static final String IDENTIFIER_TYPE = "identifier.type";
-	public static final String FILTER_LINKS = "filter.links";
-	public static final String FILTER_RESULT = "filter.result";
-	public static final String TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierType";
-	public static final String MAX_DEPTH = "max.depth";
-	public static final String MAX_SIZE = "max.size";
+	public static final String SUBSCRIPTION_NAME = "subscriptionName";
+	public static final String START_IDENTIFIER = "startIdentifier";
+	public static final String IDENTIFIER_TYPE = "identifierType";
+	public static final String MATCH_LINKS_FILTER = "matchLinksFilter";
+	public static final String RESULT_FILTER = "resultFilter";
+	public static final String TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
+	public static final String MAX_DEPTH = "maxDepth";
+	public static final String MAX_SIZE = "maxSize";
+	public static final String USE_SUBSCRIPTION_AS_STARTUP = "useSubscriptionAsStartup";
 
 }

@@ -49,21 +49,12 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);
-
-	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
-	public static final String JSON_KEY_IDENTIFIER = "identifier";
-	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";
-	public static final String JSON_KEY_MAX_DEPTH = "maxDepth";
-	public static final String JSON_KEY_MAX_SIZE = "maxSize";
-	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
-	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
-	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
-	public static final String JSON_KEY_STARTUPSUBSCRIBE = "startupSubscribe";
 
 	public static SubscribeRequest buildRequest(Subscription subscribtion) {
 		SubscribeRequest request = Requests.createSubscribeReq();
@@ -97,16 +88,15 @@ public class SubscriptionHelper {
 			String jKey = i.next();
 
 			switch (jKey) {
-			// TODO [MR] NEXT RELEASE use SubscribeKey's
-			case JSON_KEY_SUBSCRIBE_NAME: subscribtion.setName(jObj.optString(jKey)); break;
-			case JSON_KEY_IDENTIFIER_TYPE: subscribtion.setIdentifierType(jObj.optString(jKey)); break;
-			case JSON_KEY_IDENTIFIER: subscribtion.setStartIdentifier(jObj.optString(jKey)); break;
-			case JSON_KEY_MAX_DEPTH: subscribtion.setMaxDepth(jObj.optInt(jKey)); break;
-			case JSON_KEY_MAX_SIZE: subscribtion.setMaxSize(jObj.optInt(jKey)); break;
-			case JSON_KEY_LINKS_FILTER: subscribtion.setMatchLinksFilter(jObj.optString(jKey)); break;
-			case JSON_KEY_RESULT_FILTER: subscribtion.setResultFilter(jObj.optString(jKey)); break;
-			case JSON_KEY_TERMINAL_IDENTIFIER_TYPES: subscribtion.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
-			case JSON_KEY_STARTUPSUBSCRIBE: subscribtion.setStartupSubscribe(jObj.optBoolean(jKey)); break;
+			case SubscriptionKey.SUBSCRIPTION_NAME: subscribtion.setName(jObj.optString(jKey)); break;
+			case SubscriptionKey.IDENTIFIER_TYPE: subscribtion.setIdentifierType(jObj.optString(jKey)); break;
+			case SubscriptionKey.START_IDENTIFIER: subscribtion.setStartIdentifier(jObj.optString(jKey)); break;
+			case SubscriptionKey.MAX_DEPTH: subscribtion.setMaxDepth(jObj.optInt(jKey)); break;
+			case SubscriptionKey.MAX_SIZE: subscribtion.setMaxSize(jObj.optInt(jKey)); break;
+			case SubscriptionKey.MATCH_LINKS_FILTER: subscribtion.setMatchLinksFilter(jObj.optString(jKey)); break;
+			case SubscriptionKey.RESULT_FILTER: subscribtion.setResultFilter(jObj.optString(jKey)); break;
+			case SubscriptionKey.TERMINAL_IDENTIFIER_TYPES: subscribtion.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
+			case SubscriptionKey.USE_SUBSCRIPTION_AS_STARTUP: subscribtion.setStartupSubscribe(jObj.optBoolean(jKey)); break;
 			default: log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions."); break;
 			}
 		}

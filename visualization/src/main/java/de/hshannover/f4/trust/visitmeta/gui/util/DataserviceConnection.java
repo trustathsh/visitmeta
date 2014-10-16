@@ -122,13 +122,13 @@ public class DataserviceConnection {
 				jsonConnection = jsonResponse.getJSONObject(connectionName);
 				RestConnection restConn = new RestConnection(this, connectionName);
 
-				restConn.setUrl(jsonConnection.getString(ConnectionKey.URL));
+				restConn.setUrl(jsonConnection.getString(ConnectionKey.IFMAP_SERVER_URL));
 				restConn.setUsername(jsonConnection.getString(ConnectionKey.USER_NAME));
 				restConn.setPassword(jsonConnection.getString(ConnectionKey.USER_PASSWORD));
 				restConn.setAuthenticationBasic(jsonConnection.getBoolean(ConnectionKey.AUTHENTICATION_BASIC));
 				restConn.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
-				restConn.setTruststorePass(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASS));
-				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.STARTUP_CONNECT));
+				restConn.setTruststorePass(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASSWORD));
+				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP));
 				restConn.setMaxPollResultSize(jsonConnection.getString(ConnectionKey.MAX_POLL_RESULT_SIZE));
 
 				connections.add(restConn);

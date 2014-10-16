@@ -80,15 +80,6 @@ public class SubscribeResource {
 
 	private static final Logger log = Logger.getLogger(SubscribeResource.class);
 
-	public static final String JSON_KEY_SUBSCRIBE_NAME = "subscribeName";
-	public static final String JSON_KEY_IDENTIFIER = "identifier";
-	public static final String JSON_KEY_IDENTIFIER_TYPE = "identifierType";
-	public static final String JSON_KEY_MAX_DEPTH = "maxDepth";
-	public static final String JSON_KEY_MAX_SIZE = "maxSize";
-	public static final String JSON_KEY_LINKS_FILTER = "linksFilter";
-	public static final String JSON_KEY_RESULT_FILTER = "resultFilter";
-	public static final String JSON_KEY_TERMINAL_IDENTIFIER_TYPES = "terminalIdentifierTypes";
-
 	@QueryParam("deleteAll")
 	@DefaultValue("false")
 	private boolean mDeleteAll = false;

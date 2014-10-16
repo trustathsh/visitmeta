@@ -143,8 +143,8 @@ public class ConnectionResource {
 			// get required values
 			log.trace("get required values");
 
-			connectionName = jObj.getString(ConnectionKey.NAME);
-			url = jObj.getString(ConnectionKey.URL);
+			connectionName = jObj.getString(ConnectionKey.CONNECTION_NAME);
+			url = jObj.getString(ConnectionKey.IFMAP_SERVER_URL);
 			userName = jObj.getString(ConnectionKey.USER_NAME);
 			userPassword = jObj.getString(ConnectionKey.USER_PASSWORD);
 
@@ -159,8 +159,8 @@ public class ConnectionResource {
 		boolean authenticationBasic = jObj
 				.optBoolean(ConnectionKey.AUTHENTICATION_BASIC);
 		String truststorePath = jObj.optString(ConnectionKey.TRUSTSTORE_PATH);
-		String truststorePass = jObj.optString(ConnectionKey.TRUSTSTORE_PASS);
-		boolean startupConnect = jObj.optBoolean(ConnectionKey.STARTUP_CONNECT);
+		String truststorePass = jObj.optString(ConnectionKey.TRUSTSTORE_PASSWORD);
+		boolean startupConnect = jObj.optBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP);
 		int maxPollResultSize = jObj.optInt(ConnectionKey.MAX_POLL_RESULT_SIZE);
 
 		// build new Connection
@@ -194,11 +194,11 @@ public class ConnectionResource {
 				newConnection.setTruststorePath(truststorePath);
 				break;
 
-			case ConnectionKey.TRUSTSTORE_PASS:
+			case ConnectionKey.TRUSTSTORE_PASSWORD:
 				newConnection.setTruststorePassword(truststorePass);
 				break;
 
-			case ConnectionKey.STARTUP_CONNECT:
+			case ConnectionKey.USE_CONNECTION_AS_STARTUP:
 				newConnection.setStartupConnect(startupConnect);
 				break;
 
@@ -306,7 +306,7 @@ public class ConnectionResource {
 					.getSavedConnections().values()) {
 				Map<String, String> connectionMap = new HashMap<String, String>();
 
-				connectionMap.put(ConnectionKey.URL, c.getIfmapServerUrl());
+				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL, c.getIfmapServerUrl());
 				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
 				connectionMap.put(ConnectionKey.USER_PASSWORD,
 						c.getUserPassword());
@@ -314,9 +314,9 @@ public class ConnectionResource {
 						String.valueOf(c.isAuthenticationBasic()));
 				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH,
 						c.getTruststorePath());
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PASS,
+				connectionMap.put(ConnectionKey.TRUSTSTORE_PASSWORD,
 						c.getTruststorePassword());
-				connectionMap.put(ConnectionKey.STARTUP_CONNECT,
+				connectionMap.put(ConnectionKey.USE_CONNECTION_AS_STARTUP,
 						String.valueOf(c.doesConnectOnStartup()));
 				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE,
 						String.valueOf(c.getMaxPollResultSize()));

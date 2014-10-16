@@ -40,15 +40,15 @@ package de.hshannover.f4.trust.visitmeta.util;
 
 public class ConnectionKey {
 
-	public static final String NAME = "name";
-	public static final String URL = "url";
-	public static final String USER_NAME = "user.name";
-	public static final String USER_PASSWORD = "user.password";
-	public static final String AUTHENTICATION_BASIC = "authentication.basic";
-	public static final String AUTHENTICATION_CERT = "authentication.cert";
-	public static final String TRUSTSTORE_PATH = "truststore.path";
-	public static final String TRUSTSTORE_PASS = "truststore.pw";
-	public static final String STARTUP_CONNECT = "startup.connect";
+	public static final String CONNECTION_NAME = "connectionName";
+	public static final String IFMAP_SERVER_URL = "ifmapServerUrl";
+	public static final String USER_NAME = "userName";
+	public static final String USER_PASSWORD = "userPassword";
+	public static final String AUTHENTICATION_BASIC = "authenticationBasic";
+	public static final String AUTHENTICATION_CERT = "authenticationCert";
+	public static final String TRUSTSTORE_PATH = "truststorePath";
+	public static final String TRUSTSTORE_PASSWORD = "truststorePassword";
+	public static final String USE_CONNECTION_AS_STARTUP = "useConnectionAsStartup";
 	public static final String MAX_POLL_RESULT_SIZE = "maxPollResultSize";
-
+	public static final String SUBSCRIPTIONS = "subscriptions";
 }

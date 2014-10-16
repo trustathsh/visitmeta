@@ -94,8 +94,8 @@ public class RestConnection {
 		JSONObject jObj = new JSONObject();
 
 		// save required values in JSONObject
-		jObj.put(ConnectionKey.NAME, connectionName);
-		jObj.put(ConnectionKey.URL, url);
+		jObj.put(ConnectionKey.CONNECTION_NAME, connectionName);
+		jObj.put(ConnectionKey.IFMAP_SERVER_URL, url);
 		jObj.put(ConnectionKey.USER_NAME, userName);
 		jObj.put(ConnectionKey.USER_PASSWORD, userPassword);
 
@@ -107,10 +107,10 @@ public class RestConnection {
 			jObj.put(ConnectionKey.TRUSTSTORE_PATH, truststorePath);
 		}
 		if(truststorePass != null && !truststorePass.isEmpty()){
-			jObj.put(ConnectionKey.TRUSTSTORE_PASS, truststorePass);
+			jObj.put(ConnectionKey.TRUSTSTORE_PASSWORD, truststorePass);
 		}
 		if(startupConnect){
-			jObj.put(ConnectionKey.STARTUP_CONNECT, startupConnect);
+			jObj.put(ConnectionKey.USE_CONNECTION_AS_STARTUP, startupConnect);
 		}
 		if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
 			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);

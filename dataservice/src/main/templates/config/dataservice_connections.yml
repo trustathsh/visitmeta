@@ -1,5 +1,5 @@
 # !EXAMPLE! for all possible values
-# If doesn't exist a value, used the default, see dataservice_config.yml
+# If a value doesn't exist, the default is used. See dataservice_config.yml for more information
 # [connectionName]
 #   [userName]
 #   [userPassword]

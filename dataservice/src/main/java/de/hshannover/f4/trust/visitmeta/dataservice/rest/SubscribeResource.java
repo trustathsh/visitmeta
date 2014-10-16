@@ -156,7 +156,7 @@ public class SubscribeResource {
 				manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(jObj));
 
 			} catch (ConnectionException | IOException | PropertyException ee) {
-				log.error("error while single subscribeUpdate from " + name, e);
+				log.error("error while single subscribeUpdate from " + name, ee);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(ee.toString()).build();
 			}

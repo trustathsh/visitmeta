@@ -6,21 +6,21 @@ public interface Subscription {
 
 	public void setName(String name);
 
-	public String getIdentifier();
+	public String getStartIdentifier();
 
-	public void setIdentifier(String identifier);
+	public void setStartIdentifier(String identifier);
 
 	public String getIdentifierType();
 
 	public void setIdentifierType(String identifierType);
 
-	public String getFilterLinks();
+	public String getMatchLinksFilter();
 
-	public void setFilterLinks(String filterLinks);
+	public void setMatchLinksFilter(String filterLinks);
 
-	public String getFilterResult();
+	public String getResultFilter();
 
-	public void setFilterResult(String filterResult);
+	public void setResultFilter(String filterResult);
 
 	public String getTerminalIdentifierTypes();
 

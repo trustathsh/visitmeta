@@ -127,7 +127,7 @@ public class ConnectionImpl implements Connection {
 		setUserPass(userPass);
 		setAuthenticationBasic(ConnectionsProperties.DEFAULT_AUTHENTICATION_BASIC);
 		setTruststorePath(ConnectionsProperties.DEFAULT_TRUSTSTORE_PATH);
-		setTruststorePass(ConnectionsProperties.DEFAULT_TRUSTSTORE_PASS);
+		setTruststorePassword(ConnectionsProperties.DEFAULT_TRUSTSTORE_PASSWORD);
 		setMaxPollResultSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 		setStartupConnect(ConnectionsProperties.DEFAULT_STARTUP_CONNECT);
 
@@ -416,7 +416,7 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void setTruststorePass(String truststorePass) {
+	public void setTruststorePassword(String truststorePass) {
 		mTruststorePass = truststorePass;
 	}
 

@@ -25,12 +25,12 @@ public class SubscriptionImpl implements Subscription {
 	}
 
 	@Override
-	public String getIdentifier() {
+	public String getStartIdentifier() {
 		return identifier;
 	}
 
 	@Override
-	public void setIdentifier(String identifier) {
+	public void setStartIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
 
@@ -45,22 +45,22 @@ public class SubscriptionImpl implements Subscription {
 	}
 
 	@Override
-	public String getFilterLinks() {
+	public String getMatchLinksFilter() {
 		return filterLinks;
 	}
 
 	@Override
-	public void setFilterLinks(String filterLinks) {
+	public void setMatchLinksFilter(String filterLinks) {
 		this.filterLinks = filterLinks;
 	}
 
 	@Override
-	public String getFilterResult() {
+	public String getResultFilter() {
 		return filterResult;
 	}
 
 	@Override
-	public void setFilterResult(String filterResult) {
+	public void setResultFilter(String filterResult) {
 		this.filterResult = filterResult;
 	}
 

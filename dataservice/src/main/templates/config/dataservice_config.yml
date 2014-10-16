@@ -19,10 +19,9 @@ database:
 ifmap:
   # default settings for all connections, each connection can set his own settings
   # has a connection no setting specifies then used this default settings
-  connection:
-    truststore:
-      path: /visitmeta.jks
-      pw: visitmeta
+  defaultConnectionSettings:
+    truststorePath: /visitmeta.jks
+    truststorePassword: visitmeta
     maxPollResultSize: 1000000000
     subscriptionMaxDepth: 1000
     # try to connect to the specified url for a connection when the data service is started

@@ -59,17 +59,17 @@ public class ConnectionsProperties extends Properties{
 	// TODO the dataservice supports only basic authentication this value is not in use
 	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
 
-	public static final boolean DEFAULT_STARTUP_CONNECT = mCONFIG.getBoolean("ifmap.connection.useConnectionAsStartup", false);
+	public static final boolean DEFAULT_STARTUP_CONNECT = mCONFIG.getBoolean("ifmap.defaultConnectionSettings.useConnectionAsStartup", false);
 
-	public static final boolean DEFAULT_STARTUP_SUBSCRIPTION = mCONFIG.getBoolean("ifmap.connection.useSubscriptionAsStartup", false);
+	public static final boolean DEFAULT_STARTUP_SUBSCRIPTION = mCONFIG.getBoolean("ifmap.defaultConnectionSettings.useSubscriptionAsStartup", false);
 
-	public static final String DEFAULT_TRUSTSTORE_PATH = mCONFIG.getString("ifmap.connection.truststore.path", "/visitmeta.jks");
+	public static final String DEFAULT_TRUSTSTORE_PATH = mCONFIG.getString("ifmap.defaultConnectionSettings.truststorePath", "/visitmeta.jks");
 
-	public static final String DEFAULT_TRUSTSTORE_PASS = mCONFIG.getString("ifmap.connection.truststore.pw", "visitmeta");
+	public static final String DEFAULT_TRUSTSTORE_PASSWORD = mCONFIG.getString("ifmap.defaultConnectionSettings.truststorePassword", "visitmeta");
 
-	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = mCONFIG.getInt("ifmap.connection.maxPollResultSize", 1000000000);
+	public static final int DEFAULT_MAX_POLL_RESULT_SIZE = mCONFIG.getInt("ifmap.defaultConnectionSettings.maxPollResultSize", 1000000000);
 
-	public static final int DEFAULT_SUBSCRIPTION_MAX_DEPTH = mCONFIG.getInt("ifmap.connection.subscriptionMaxDepth", 1000);
+	public static final int DEFAULT_SUBSCRIPTION_MAX_DEPTH = mCONFIG.getInt("ifmap.defaultConnectionSettings.subscriptionMaxDepth", 1000);
 
 	private ConnectionManager mManager;
 
@@ -82,16 +82,16 @@ public class ConnectionsProperties extends Properties{
 		// read values from property
 		String ifmapServerUrl = getPropertyIfmapServerUrl(connectionName);
 		String userName = getPropertyUserName(connectionName);
-		String userPass = getPropertyUserPass(connectionName);
+		String userPassword = getPropertyUserPassword(connectionName);
 
 		String truststorePath = getPropertyTruststorePath(connectionName);
-		String truststorePass = getPropertyTruststorePass(connectionName);
+		String truststorePassword = getPropertyTruststorePassword(connectionName);
 		boolean authenticationBasic = isPropertyAuthenticationBasic(connectionName);
 		boolean startupConnect = isPropertyStartupConnect(connectionName);
 		int maxPollResultSize = getPropertyMaxPollResultSize(connectionName);
 
 		// build connection
-		Connection newConnection = mManager.createConnection(connectionName, ifmapServerUrl, userName, userPass);
+		Connection newConnection = mManager.createConnection(connectionName, ifmapServerUrl, userName, userPassword);
 
 		// build/set subscription list, if exists
 		List<Subscription> subscribtionList = buildSubscribtion(connectionName);
@@ -103,7 +103,7 @@ public class ConnectionsProperties extends Properties{
 
 		// set other values
 		newConnection.setTruststorePath(truststorePath);
-		newConnection.setTruststorePass(truststorePass);
+		newConnection.setTruststorePassword(truststorePassword);
 		newConnection.setAuthenticationBasic(authenticationBasic);
 		newConnection.setStartupConnect(startupConnect);
 		newConnection.setMaxPollResultSize(maxPollResultSize);
@@ -128,11 +128,11 @@ public class ConnectionsProperties extends Properties{
 			Subscription subscribtion = new SubscriptionImpl();
 			// set required values
 			subscribtion.setName(subscribeName);
-			subscribtion.setIdentifier(getPropertySubscriptionIdentifier(connectionName, subscribeName));
+			subscribtion.setStartIdentifier(getPropertySubscriptionStartIdentifier(connectionName, subscribeName));
 			subscribtion.setIdentifierType(getPropertySubscriptionIdentifierType(connectionName, subscribeName));
 			// set optional values
-			subscribtion.setFilterLinks(getPropertySubscriptionFilterLinks(connectionName, subscribeName));
-			subscribtion.setFilterResult(getPropertySubscriptionFilterResult(connectionName, subscribeName));
+			subscribtion.setMatchLinksFilter(getPropertySubscriptionMatchLinksFilter(connectionName, subscribeName));
+			subscribtion.setResultFilter(getPropertySubscriptionResultFilter(connectionName, subscribeName));
 			subscribtion.setTerminalIdentifierTypes(getPropertySubscriptionTerminalIdentifierTypes(connectionName, subscribeName));
 			subscribtion.setMaxDepth(getPropertySubscriptionMaxDepth(connectionName, subscribeName));
 			subscribtion.setMaxSize(getPropertySubscriptionMaxSize(connectionName, subscribeName));
@@ -158,25 +158,25 @@ public class ConnectionsProperties extends Properties{
 		String name = connection.getConnectionName();
 		String ifmapServerUrl = connection.getIfmapServerUrl();
 		String userName = connection.getUserName();
-		String userPass = connection.getUserPassword();
+		String userPassword = connection.getUserPassword();
 
 		String truststorePath = connection.getTruststorePath();
-		String truststorePass = connection.getTruststorePassword();
+		String truststorePassword = connection.getTruststorePassword();
 		boolean authenticationBasic = connection.isAuthenticationBasic();
 		boolean startupConnect = connection.doesConnectOnStartup();
 		int maxPollResultSize = connection.getMaxPollResultSize();
 
 		// set required values
-		setPropertyUrl(name, ifmapServerUrl);
+		setPropertyIfmapServerUrl(name, ifmapServerUrl);
 		setPropertyUserName(name, userName);
-		setPropertyUserPass(name, userPass);
+		setPropertyuserPassword(name, userPassword);
 
 		// set Optional default values to connection, if value == default nothing to set
 		if(!Same.check(truststorePath, DEFAULT_TRUSTSTORE_PATH)){
 			setPropertyTruststorePath(name, truststorePath);
 		}
-		if(!Same.check(truststorePass, DEFAULT_TRUSTSTORE_PASS)){
-			setPropertyTruststorePass(name, truststorePass);
+		if(!Same.check(truststorePassword, DEFAULT_TRUSTSTORE_PASSWORD)){
+			setPropertyTruststorePassword(name, truststorePassword);
 		}
 		if(!Same.check(authenticationBasic, DEFAULT_AUTHENTICATION_BASIC)){
 			setPropertyAuthenticationBasic(name, authenticationBasic);
@@ -201,23 +201,23 @@ public class ConnectionsProperties extends Properties{
 		for(Subscription subscription: subscribeList){
 			// read values from Subscription
 			String subscriptionName = subscription.getName();
-			String identifier = subscription.getIdentifier();
+			String startIdentifier = subscription.getStartIdentifier();
 			String identifierType = subscription.getIdentifierType();
-			String filterLinks = subscription.getFilterLinks();
-			String filterResult = subscription.getFilterResult();
+			String matchLinksFilter = subscription.getMatchLinksFilter();
+			String resultFilter = subscription.getResultFilter();
 			String terminalIdentifierTypes = subscription.getTerminalIdentifierTypes();
 			boolean startupSubscribe = subscription.isStartupSubscribe();
 			int maxDepth = subscription.getMaxDepth();
 			int maxSize = subscription.getMaxSize();
 
-			setPropertySubscriptionIdentifier(connectionName, subscriptionName, identifier);
+			setPropertySubscriptionStartIdentifier(connectionName, subscriptionName, startIdentifier);
 			setPropertySubscriptionIdentifierType(connectionName, subscriptionName, identifierType);
 
-			if(filterLinks != null && !filterLinks.isEmpty()){
-				setPropertySubscriptionFilterLinks(connectionName, subscriptionName, filterLinks);
+			if(matchLinksFilter != null && !matchLinksFilter.isEmpty()){
+				setPropertySubscriptionMatchLinksFilter(connectionName, subscriptionName, matchLinksFilter);
 			}
-			if(filterResult != null){
-				setPropertySubscriptionFilterResult(connectionName, subscriptionName, filterResult);
+			if(resultFilter != null){
+				setPropertySubscriptionResultFilter(connectionName, subscriptionName, resultFilter);
 			}
 			if(terminalIdentifierTypes != null){
 				setPropertySubscriptionTerminalIdentifierTypes(connectionName, subscriptionName, terminalIdentifierTypes);
@@ -235,20 +235,20 @@ public class ConnectionsProperties extends Properties{
 	}
 	
 	/**
-	 * Get the sub-Properties(subscrptions) for connectionName.
+	 * Get the sub-Properties(subscriptions) for connectionName.
 	 * @param connectionName property key
 	 * @return Properties
 	 * @throws PropertyException
 	 */
 	private Properties getPropertySubscribeList(String connectionName) throws PropertyException {
-		return super.get(connectionName).get("subscrptions");
+		return super.get(connectionName).get("subscriptions");
 	}
 
 	private String getPropertyIfmapServerUrl(String connectionName) throws PropertyException{
 		return super.get(connectionName).getString("ifmapServerUrl");
 	}
 
-	private void setPropertyUrl(String connectionName, String ifmapServerUrl) throws PropertyException{
+	private void setPropertyIfmapServerUrl(String connectionName, String ifmapServerUrl) throws PropertyException{
 		super.set(connectionName + ".ifmapServerUrl", ifmapServerUrl);
 	}
 
@@ -260,12 +260,12 @@ public class ConnectionsProperties extends Properties{
 		super.set(connectionName + ".userName", userName);
 	}
 
-	private String getPropertyUserPass(String connectionName) throws PropertyException{
-		return super.get(connectionName).getString("userPass");
+	private String getPropertyUserPassword(String connectionName) throws PropertyException{
+		return super.get(connectionName).getString("userPassword");
 	}
 
-	private void setPropertyUserPass(String connectionName, String userPass) throws PropertyException{
-		super.set(connectionName + ".userPass", userPass);
+	private void setPropertyuserPassword(String connectionName, String userPassword) throws PropertyException{
+		super.set(connectionName + ".userPassword", userPassword);
 	}
 
 	private String getPropertyTruststorePath(String connectionName) throws PropertyException{
@@ -276,12 +276,12 @@ public class ConnectionsProperties extends Properties{
 		super.set(connectionName + ".truststorePath", truststorePath);
 	}
 
-	private String getPropertyTruststorePass(String connectionName) throws PropertyException{
-		return super.get(connectionName).getString("truststorePass", DEFAULT_TRUSTSTORE_PASS);
+	private String getPropertyTruststorePassword(String connectionName) throws PropertyException{
+		return super.get(connectionName).getString("truststorePassword", DEFAULT_TRUSTSTORE_PASSWORD);
 	}
 
-	private void setPropertyTruststorePass(String connectionName, String truststorePass) throws PropertyException{
-		super.set(connectionName + ".truststorePass", truststorePass);
+	private void setPropertyTruststorePassword(String connectionName, String truststorePassword) throws PropertyException{
+		super.set(connectionName + ".truststorePassword", truststorePassword);
 	}
 
 	private boolean isPropertyAuthenticationBasic(String connectionName) throws PropertyException{
@@ -308,12 +308,12 @@ public class ConnectionsProperties extends Properties{
 		super.set(connectionName + ".maxPollResultSize", maxPollResultSize);
 	}
 
-	private String getPropertySubscriptionIdentifier(String connectionName, String subscriptionName) throws PropertyException{
-		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("identifier");
+	private String getPropertySubscriptionStartIdentifier(String connectionName, String subscriptionName) throws PropertyException{
+		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("startIdentifier");
 	}
 
-	private void setPropertySubscriptionIdentifier(String connectionName, String subscriptionName, String identifier) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".identifier", identifier);
+	private void setPropertySubscriptionStartIdentifier(String connectionName, String subscriptionName, String startIdentifier) throws PropertyException{
+		set(connectionName + ".subscriptions." + subscriptionName + ".startIdentifier", startIdentifier);
 	}
 
 	private String getPropertySubscriptionIdentifierType(String connectionName, String subscriptionName) throws PropertyException{
@@ -321,23 +321,23 @@ public class ConnectionsProperties extends Properties{
 	}
 
 	private void setPropertySubscriptionIdentifierType(String connectionName, String subscriptionName, String identifierType) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".identifierType", identifierType);
+		set(connectionName + ".subscriptions." + subscriptionName + ".identifierType", identifierType);
 	}
 
-	private String getPropertySubscriptionFilterLinks(String connectionName, String subscriptionName) throws PropertyException{
-		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("filterLinks", null);
+	private String getPropertySubscriptionMatchLinksFilter(String connectionName, String subscriptionName) throws PropertyException{
+		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("matchLinksFilter", null);
 	}
 
-	private void setPropertySubscriptionFilterLinks(String connectionName, String subscriptionName, String filterLinks) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".filterLinks", filterLinks);
+	private void setPropertySubscriptionMatchLinksFilter(String connectionName, String subscriptionName, String matchLinksFilter) throws PropertyException{
+		set(connectionName + ".subscriptions." + subscriptionName + ".matchLinksFilter", matchLinksFilter);
 	}
 
-	private String getPropertySubscriptionFilterResult(String connectionName, String subscriptionName) throws PropertyException{
-		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("filterResult", null);
+	private String getPropertySubscriptionResultFilter(String connectionName, String subscriptionName) throws PropertyException{
+		return getPropertySubscribeList(connectionName).get(subscriptionName).getString("resultFilter", null);
 	}
 
-	private void setPropertySubscriptionFilterResult(String connectionName, String subscriptionName, String filterResult) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".filterResult", filterResult);
+	private void setPropertySubscriptionResultFilter(String connectionName, String subscriptionName, String resultFilter) throws PropertyException{
+		set(connectionName + ".subscriptions." + subscriptionName + ".resultFilter", resultFilter);
 	}
 
 	private String getPropertySubscriptionTerminalIdentifierTypes(String connectionName, String subscriptionName) throws PropertyException{
@@ -345,7 +345,7 @@ public class ConnectionsProperties extends Properties{
 	}
 
 	private void setPropertySubscriptionTerminalIdentifierTypes(String connectionName, String subscriptionName, String terminalIdentifierTypes) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".terminalIdentifierTypes", terminalIdentifierTypes);
+		set(connectionName + ".subscriptions." + subscriptionName + ".terminalIdentifierTypes", terminalIdentifierTypes);
 	}
 
 	private int getPropertySubscriptionMaxDepth(String connectionName, String subscriptionName) throws PropertyException{
@@ -353,7 +353,7 @@ public class ConnectionsProperties extends Properties{
 	}
 
 	private void setPropertySubscriptionMaxDepth(String connectionName, String subscriptionName, int maxDepth) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".maxDepth", maxDepth);
+		set(connectionName + ".subscriptions." + subscriptionName + ".maxDepth", maxDepth);
 	}
 
 	private int getPropertySubscriptionMaxSize(String connectionName, String subscriptionName) throws PropertyException{
@@ -361,7 +361,7 @@ public class ConnectionsProperties extends Properties{
 	}
 
 	private void setPropertySubscriptionMaxSize(String connectionName, String subscriptionName, int maxSize) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".maxSize", maxSize);
+		set(connectionName + ".subscriptions." + subscriptionName + ".maxSize", maxSize);
 	}
 
 	private boolean getPropertySubscriptionStartupSubscribe(String connectionName, String subscriptionName) throws PropertyException{
@@ -369,6 +369,6 @@ public class ConnectionsProperties extends Properties{
 	}
 
 	private void setPropertySubscriptionStartupSubscribe(String connectionName, String subscriptionName, boolean startupSubscribe) throws PropertyException{
-		set(connectionName + ".subscrptions." + subscriptionName + ".startupSubscribe", startupSubscribe);
+		set(connectionName + ".subscriptions." + subscriptionName + ".useSubscriptionAsStartup", startupSubscribe);
 	}
 }

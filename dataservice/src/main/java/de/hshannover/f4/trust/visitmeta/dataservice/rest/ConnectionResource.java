@@ -195,7 +195,7 @@ public class ConnectionResource {
 				break;
 
 			case ConnectionKey.TRUSTSTORE_PASS:
-				newConnection.setTruststorePass(truststorePass);
+				newConnection.setTruststorePassword(truststorePass);
 				break;
 
 			case ConnectionKey.STARTUP_CONNECT:

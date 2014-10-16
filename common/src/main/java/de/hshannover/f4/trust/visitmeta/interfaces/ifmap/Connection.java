@@ -227,7 +227,7 @@ public interface Connection {
 
 	public void setStartupConnect(boolean startupConnect);
 
-	public void setTruststorePass(String truststorePass);
+	public void setTruststorePassword(String truststorePass);
 
 	public void setTruststorePath(String truststorePath);
 

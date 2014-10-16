@@ -72,10 +72,10 @@ public class SubscriptionHelper {
 		subscribe.setName(subscribtion.getName());
 		subscribe.setMaxDepth(subscribtion.getMaxDepth());
 		subscribe.setMaxSize(subscribtion.getMaxSize());
-		subscribe.setMatchLinksFilter(subscribtion.getFilterLinks());
-		subscribe.setResultFilter(subscribtion.getFilterResult());
+		subscribe.setMatchLinksFilter(subscribtion.getMatchLinksFilter());
+		subscribe.setResultFilter(subscribtion.getResultFilter());
 		subscribe.setTerminalIdentifierTypes(subscribtion.getTerminalIdentifierTypes());
-		subscribe.setStartIdentifier(createStartIdentifier(subscribtion.getIdentifierType(), subscribtion.getIdentifier()));
+		subscribe.setStartIdentifier(createStartIdentifier(subscribtion.getIdentifierType(), subscribtion.getStartIdentifier()));
 
 		request.addSubscribeElement(subscribe);
 
@@ -100,11 +100,11 @@ public class SubscriptionHelper {
 			// TODO [MR] NEXT RELEASE use SubscribeKey's
 			case JSON_KEY_SUBSCRIBE_NAME: subscribtion.setName(jObj.optString(jKey)); break;
 			case JSON_KEY_IDENTIFIER_TYPE: subscribtion.setIdentifierType(jObj.optString(jKey)); break;
-			case JSON_KEY_IDENTIFIER: subscribtion.setIdentifier(jObj.optString(jKey)); break;
+			case JSON_KEY_IDENTIFIER: subscribtion.setStartIdentifier(jObj.optString(jKey)); break;
 			case JSON_KEY_MAX_DEPTH: subscribtion.setMaxDepth(jObj.optInt(jKey)); break;
 			case JSON_KEY_MAX_SIZE: subscribtion.setMaxSize(jObj.optInt(jKey)); break;
-			case JSON_KEY_LINKS_FILTER: subscribtion.setFilterLinks(jObj.optString(jKey)); break;
-			case JSON_KEY_RESULT_FILTER: subscribtion.setFilterResult(jObj.optString(jKey)); break;
+			case JSON_KEY_LINKS_FILTER: subscribtion.setMatchLinksFilter(jObj.optString(jKey)); break;
+			case JSON_KEY_RESULT_FILTER: subscribtion.setResultFilter(jObj.optString(jKey)); break;
 			case JSON_KEY_TERMINAL_IDENTIFIER_TYPES: subscribtion.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
 			case JSON_KEY_STARTUPSUBSCRIBE: subscribtion.setStartupSubscribe(jObj.optBoolean(jKey)); break;
 			default: log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions."); break;

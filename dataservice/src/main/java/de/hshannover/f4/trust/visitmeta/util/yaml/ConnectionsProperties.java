@@ -169,9 +169,9 @@ public class ConnectionsProperties extends Properties{
 		int maxPollResultSize = connection.getMaxPollResultSize();
 
 		// set required values
-		setPropertyIfmapServerUrl(name, ifmapServerUrl);
 		setPropertyUserName(name, userName);
 		setPropertyuserPassword(name, userPassword);
+		setPropertyIfmapServerUrl(name, ifmapServerUrl);
 
 		// set Optional default values to connection, if value == default nothing to set
 		if(!Same.check(truststorePath, DEFAULT_TRUSTSTORE_PATH)){

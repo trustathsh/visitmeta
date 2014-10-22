@@ -145,7 +145,14 @@ public abstract class Application {
 	private static void loadPersistentConnections() throws IOException {
 		log.info("load persistent connections");
 
-		for(String s: mConnections.getKeySet()){
+		Set<String> keySet = null;
+		try {
+			keySet = mConnections.getKeySet();
+		} catch (PropertyException e) {
+			log.error("error while getKeySet from ConnectionsProperties -> " + e.toString(), e);
+		}
+		
+		for(String s: keySet){
 			Connection tmp = null;
 			try {
 				tmp = mConnections.buildConnection(s);

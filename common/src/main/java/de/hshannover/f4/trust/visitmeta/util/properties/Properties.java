@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.util.properties;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +58,14 @@ public class Properties {
 	private PropertiesReader mReader;
 
 	private String mFileName;
+	
+	private String mPreFixPropertyPath = "";
 
-	private Map<String, Object> mApplicationConfigs;
-
-	private Properties(Properties context) {
-		mWriter = context.mWriter;
-		mReader = context.mReader;
-		mFileName = context.mFileName;
-		mApplicationConfigs = context.mApplicationConfigs;
+	private Properties(Properties propertyOriginal, String propertyKey) {
+		mWriter = propertyOriginal.mWriter;
+		mReader = propertyOriginal.mReader;
+		mFileName = propertyOriginal.mFileName;
+		mPreFixPropertyPath = addPath(propertyOriginal.mPreFixPropertyPath, propertyKey);
 	}
 
 	/**
@@ -72,21 +73,20 @@ public class Properties {
 	 * @param fileName The file name or the file path to the yml-file.
 	 * @throws PropertyException If the file could not open, create or is a directory.
 	 */
-	public Properties(String fileName) throws PropertyException {
+	public Properties(String fileName) {
 		NullCheck.check(fileName, "fileName is null");
 		mFileName = fileName;
 		mWriter = new PropertiesWriter(mFileName);
 		mReader = new PropertiesReader(mFileName);
-		load();
 	}
 
 	/**
 	 * Load the application properties as Map<String, Object>.
 	 * @throws PropertyException If the file could not open, create or is a directory.
 	 */
-	public void load() throws PropertyException {
+	public Map<String, Object> load() throws PropertyException {
 		try {
-			mApplicationConfigs = mReader.load();
+			return mReader.load();
 		} catch (IOException e) {
 			throw new PropertyException(e.getMessage());
 		}
@@ -96,9 +96,9 @@ public class Properties {
 	 * Save all properties in a YAML-files and override them.
 	 * @throws PropertyException If the file could not open or is a directory.
 	 */
-	public void save() throws PropertyException {
+	public void save(Map<String, Object> applicationConfigs) throws PropertyException {
 		try {
-			mWriter.save(mApplicationConfigs);
+			mWriter.save(applicationConfigs);
 		} catch (IOException e) {
 			throw new PropertyException(e.getMessage());
 		}
@@ -110,20 +110,10 @@ public class Properties {
 	 * @return Properties A new Property instance of the propertyKey.
 	 * @throws PropertyException If the propertyKey-param is not a property key or is a not part of a property path.
 	 */
-	@SuppressWarnings("unchecked")
 	public Properties get(String propertyKey) throws PropertyException {
 		NullCheck.check(propertyKey, "propertyKey is null");
-		Properties context = new Properties(this);
-		Object o = mApplicationConfigs.get(propertyKey);
-		if (o == null) {
-			throw new PropertyException(propertyKey + " is not a property key!");
-		}
-		if (o instanceof Map) {
-			context.mApplicationConfigs = (Map<String, Object>) o;
-		} else {
-			throw new PropertyException(propertyKey + " is not a part of a property path!");
-		}
-		return context;
+		Properties propertyCopy = new Properties(this, propertyKey);
+		return propertyCopy;
 	}
 
 	/**
@@ -134,19 +124,24 @@ public class Properties {
 	 */
 	@SuppressWarnings("unchecked")
 	public Object getValue(String propertyPath) throws PropertyException {
+		// add the PreFixPropertyPath if this Property is a copy deeper level
+		String fullPropertyPath = addPath(mPreFixPropertyPath, propertyPath);
+
 		// check propertyPath
-		NullCheck.check(propertyPath, "propertyPath is null");
+		NullCheck.check(fullPropertyPath, "propertyPath is null");
 
 		// split propertyPath
-		String[] propertyKeyArray = propertyPath.split("\\.");
+		String[] propertyKeyArray = fullPropertyPath.split("\\.");
 
+		// load the application properties
+		Map<String, Object> applicationConfigs = load();
+		
 		// iterate the root Map for every token
-		Map<String, Object> applicationConfigs = mApplicationConfigs;
 		for (int i = 0; i < propertyKeyArray.length; i++) {
 			Object tmp = applicationConfigs.get(propertyKeyArray[i]);
 			if (tmp == null) {
 				if (propertyKeyArray.length > 1) {
-					throw new PropertyException("property path[" + propertyPath + "] have not a property key["
+					throw new PropertyException("property path[" + fullPropertyPath + "] have not a property key["
 							+ propertyKeyArray[i] + "] !");
 				} else {
 					throw new PropertyException(propertyKeyArray[i] + "] is not a property key!");
@@ -278,18 +273,19 @@ public class Properties {
 	/**
 	 * Return all keys of this Properties
 	 * @return Set<String>
+	 * @throws PropertyException 
 	 */
-	public Set<String> getKeySet() {
-		return mApplicationConfigs.keySet();
+	public Set<String> getKeySet() throws PropertyException {
+		return load().keySet();
 	}
 
 	/**
 	 * 
 	 * Build a property path one level higher
-	 * Example:
-	 * @param foo.bar.property
+	 * @param propertyPath foo.bar.property
 	 * @return foo.bar
 	 */
+	@SuppressWarnings("unused")
 	private String removeLastToken(String propertyPath) {
 		String[] propertyKeyArray = propertyPath.split("\\.");
 
@@ -301,42 +297,118 @@ public class Properties {
 		sb.append(propertyKeyArray[propertyKeyArray.length - 2]);
 		return sb.toString();
 	}
+	
+	/**
+	 * 
+	 * Add a property path to an existing.
+	 * If propertyPath == null or an empty String then return pathToAdded.
+	 * @param propertyPath foo.bar
+	 * @param pathToAdded new.property
+	 * @return foo.bar.new.property
+	 */
+	private String addPath(String propertyPath, String pathToAdded) {
+		if (propertyPath == null || propertyPath.equals("")) {
+			return pathToAdded;
+		} else {
+			return new StringBuilder(propertyPath).append('.').append(pathToAdded).toString();
+		}
+	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> addRecursiveInExistingMap(String propertyPath, Object propertyValue)
+	private void addToRootMap(String propertyPath, Object propertyValue)
 			throws PropertyException {
 		// split propertyPath
 		String[] propertyKeyArray = propertyPath.split("\\.");
 
+		// load configMap from disk
+		Map<String, Object> configMap = load();
+
 		// if simple token add too root map
 		if (propertyKeyArray.length == 1) {
-			mApplicationConfigs.put(propertyPath, propertyValue);
-			return mApplicationConfigs;
+			configMap.put(propertyPath, propertyValue);
 		}
 
-		// the path one level higher
-		String newPath = removeLastToken(propertyPath);
-
-		// find the value for this new path
+		// add to root map
+		Map<String, Object> deeperNestedMap = configMap;
 		Object foundedValue = null;
-		try {
-			foundedValue = getValue(newPath);
-		} catch (PropertyException e) {
-			foundedValue = null;
+
+		// search the subMap with the key[i] without the last key
+		for(int i=0; i < propertyKeyArray.length - 1; i++){
+			foundedValue = deeperNestedMap.get(propertyKeyArray[i]);
+			if (foundedValue instanceof Map) {
+				// go deeper if something was found
+				deeperNestedMap = (Map<String, Object>) foundedValue;
+			} else {
+				// if foundedValue == null or not a Map
+				// then build from the i position new nested map(s)
+				String[] subArray = getCopyFrom(i+1, propertyKeyArray);
+				Map<String, Object> newNestedMap = buildNewNestedMap(subArray, propertyValue);
+
+				// add the newNestedMap map to the deeperNestedMap
+				deeperNestedMap.put(propertyKeyArray[i], newNestedMap);
+				break;
+			}
+			
+			if (i == propertyKeyArray.length - 2) {
+				deeperNestedMap.put(propertyKeyArray[propertyKeyArray.length - 1], propertyValue);
+			}
 		}
 
-		// If map founded the put new value, else call recursive with new path and new Map
-		Map<String, Object> foundedMap = null;
-		if (foundedValue instanceof Map) {
-			foundedMap = (Map<String, Object>) foundedValue;
-			foundedMap.put(propertyKeyArray[propertyKeyArray.length - 1], propertyValue);
-		} else {
-			Map<String, Object> newMap = new HashMap<String, Object>();
-			newMap.put(propertyKeyArray[propertyKeyArray.length - 1], propertyValue);
-			foundedMap = addRecursiveInExistingMap(newPath, newMap);
+		// save all
+		save(configMap);
+
+	}
+
+	/**
+	 * Only for private use an Tests
+	 * 
+	 * @param mapKeys
+	 * @param propertyValue
+	 * @return
+	 */
+	protected Map<String, Object> buildNewNestedMap(String[] mapKeys, Object propertyValue) {
+		Map<String, Object> rootMap = new HashMap<String, Object>();
+		Map<String, Object> higherNestedMap = new HashMap<String, Object>();
+		Map<String, Object> deeperNestedMap = new HashMap<String, Object>();
+
+		// if only on key, add to the rootMap and return
+		if (mapKeys.length - 1 == 0) {
+			rootMap.put(mapKeys[0], propertyValue);
+			return rootMap;
+		}
+		// after if we need min. one nestedMap
+
+		// add deeperNestedMap to the higherNestedMap with the first key
+		higherNestedMap.put(mapKeys[0], deeperNestedMap);
+
+		// add the first nested map to the root map
+		rootMap.putAll(higherNestedMap);
+
+		// switch the higherNestedMap to the deeperNestedMap
+		higherNestedMap = deeperNestedMap;
+
+		// if mapKeys.length > 1
+		for (int i=1; i <= mapKeys.length - 1; i++) {
+			if (i == mapKeys.length -1) {
+				higherNestedMap.put(mapKeys[i], propertyValue);
+				break;
+			}
+
+			// make a new deeperNestedMap
+			deeperNestedMap = new HashMap<String, Object>();
+
+			// add deeperNestedMap to the higherNestedMap with the first key[i]
+			higherNestedMap.put(mapKeys[i], deeperNestedMap);
+
+			// switch the higherNestedMap to the deeperNestedMap
+			higherNestedMap = deeperNestedMap;
 		}
 
-		return foundedMap;
+		return rootMap;
+	}
+
+	private String[] getCopyFrom(int from, String[] propertyKeyArray) {
+		return Arrays.copyOfRange(propertyKeyArray, from, propertyKeyArray.length);
 	}
 
 	/**
@@ -357,17 +429,21 @@ public class Properties {
 				&& !(propertyValue instanceof Map) && !(propertyValue instanceof List)) {
 			throw new PropertyException("Only String|int|double|boolean|Map|List can be set!");
 		}
+		
+		// add the mPreFixPropertyPath if this Property is a copy with a deeper level
+		String fullPropertyPath = addPath(mPreFixPropertyPath, propertyPath);
 
-		// add to root map
-		addRecursiveInExistingMap(propertyPath, propertyValue);
-
-		// save all
-		save();
+		// add propertyValue with the fullPropertyPath
+		addToRootMap(fullPropertyPath, propertyValue);
 	}
 
 
 	@Override
 	public String toString() {
-		return mApplicationConfigs.toString();
+		try {
+			return load().toString();
+		} catch (PropertyException e) {
+			return e.toString();
+		}
 	}
 }

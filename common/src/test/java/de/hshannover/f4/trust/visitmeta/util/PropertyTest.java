@@ -50,9 +50,9 @@ import org.junit.Test;
 import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
-public class PropertyTest {
+public class PropertyTest extends Properties{
 
-	private final String mFilePath_notExists = "src/test/resources/123456789/test.yml";
+	private final static String mFilePath_notExists = "src/test/resources/123456789/test.yml";
 	private final String mFilePath_EqualityTest = "src/test/resources/testEquality.yml";
 
 	private final String mKey_oneTokenKey = "foo1";
@@ -67,6 +67,11 @@ public class PropertyTest {
 
 	private final List<String> mCollectionsTest_List = Util.buildTestList();
 
+	
+	public PropertyTest() {
+		super(mFilePath_notExists);
+	}
+	
 	@Before
 	public void setUp() {
 		File f = new File("src/test/resources/");
@@ -87,7 +92,7 @@ public class PropertyTest {
 	 */
 	@Test(expected=PropertyException.class)
 	public void testPropertyException() throws PropertyException {
-		new Properties(mFilePath_notExists);
+		new Properties(mFilePath_notExists).load();
 	}
 
 	/**

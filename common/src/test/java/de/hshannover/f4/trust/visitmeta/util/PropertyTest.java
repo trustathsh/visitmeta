@@ -43,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -166,5 +167,150 @@ public class PropertyTest extends Properties{
 
 		// tests if exists and clean the system
 		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
+	}
+	
+	/**
+	 * 1. Tests whether existing values ​​are overwritten with new values. This new value is now a new Map.
+	 * Example:
+	 * foo:
+	 *   bar:
+	 *     fubar: test
+	 *     
+	 * The new value is:
+	 * foo:
+	 *   bar:
+	 *     fubar:
+	 *       baz: TEST
+	 * 
+	 * @throws PropertyException
+	 */
+	@Test
+	public void testForEquality_filledPropertiesAddNewMapProperty() throws PropertyException {
+
+		// clean the system
+		Util.deleteTestFile(mFilePath_EqualityTest);
+		testForEquality_filledPropertiesAddNewMapProperty_oneMap();
+		// tests if exists and clean the system
+		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
+
+		// clean the system
+		Util.deleteTestFile(mFilePath_EqualityTest);
+		testForEquality_filledPropertiesAddNewMapProperty_twoMaps();
+		// tests if exists and clean the system
+		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
+
+		// clean the system
+		Util.deleteTestFile(mFilePath_EqualityTest);
+		testForEquality_filledPropertiesAddNewMapProperty_manyMaps();
+		// tests if exists and clean the system
+		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
+
+	}
+	
+
+	private void testForEquality_filledPropertiesAddNewMapProperty_oneMap() throws PropertyException {
+		// setUp
+		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar", "baz"}, "TEST");
+		Properties properties = new Properties(mFilePath_EqualityTest);
+		properties.set("foo.bar.fubar", "test");
+
+		// add one Map
+		Properties properties2 = new Properties(mFilePath_EqualityTest);
+		properties2.set("foo.bar.fubar.baz", "TEST");
+
+		// equals
+		Properties equalsProperties = new Properties(mFilePath_EqualityTest);
+
+		// is the right value under foo.bar.fubar.baz
+		assertEquals("TEST", equalsProperties.getValue("foo.bar.fubar.baz"));
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
+		// is the Map right
+		assertEquals(true, fooSubMap.equals(equalsMap));
+
+	}
+
+	private void testForEquality_filledPropertiesAddNewMapProperty_twoMaps() throws PropertyException {
+		// setUp
+		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar", "baz", "qux"}, "TEST");
+		Properties properties = new Properties(mFilePath_EqualityTest);
+		properties.set("foo.bar.fubar", "test");
+
+		// add two Maps
+		Properties properties2 = new Properties(mFilePath_EqualityTest);
+		properties2.set("foo.bar.fubar.baz.qux", "TEST");
+
+		// equals
+		Properties equalsProperties = new Properties(mFilePath_EqualityTest);
+
+		// is the right value under foo.bar.fubar.baz.qux
+		assertEquals("TEST", equalsProperties.getValue("foo.bar.fubar.baz.qux"));
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
+		// is the Map right
+		assertEquals(true, fooSubMap.equals(equalsMap));
+
+	}
+	
+	private void testForEquality_filledPropertiesAddNewMapProperty_manyMaps() throws PropertyException {
+		// setUp
+		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar", "baz", "qux", "quux", "qux2", "quux2",}, "TEST");
+		Properties properties = new Properties(mFilePath_EqualityTest);
+		properties.set("foo.bar.fubar", "test");
+
+		// add many Maps
+		Properties properties2 = new Properties(mFilePath_EqualityTest);
+		properties2.set("foo.bar.fubar.baz.qux.quux.qux2.quux2", "TEST");
+
+		// equals
+		Properties equalsProperties = new Properties(mFilePath_EqualityTest);
+
+		// is the right value under foo.bar.fubar.baz.qux.quux.qux2.quux2
+		assertEquals("TEST", equalsProperties.getValue("foo.bar.fubar.baz.qux.quux.qux2.quux2"));
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
+		// is the Map right
+		assertEquals(true, fooSubMap.equals(equalsMap));
+		
+	}
+	
+	/**
+	 * 1. Tests the set(), when Properties is in a subMap
+	 * 
+	 * @throws PropertyException
+	 */
+	@Test
+	public void testForEquality_filledProperties_SetFromAGet() throws PropertyException {
+
+		// clean the system
+		Util.deleteTestFile(mFilePath_EqualityTest);
+
+		// setUp
+		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar"}, "TEST");
+		Properties properties = new Properties(mFilePath_EqualityTest);
+		properties.set("foo.bar.fubar", "test");
+		
+		// get and set
+		Properties properties2 = new Properties(mFilePath_EqualityTest);
+		// the set is called from a subMap foo.bar
+		properties2.get("foo").get("bar").set("fubar", "TEST");
+		
+		// equals
+		Properties equalsProperties = new Properties(mFilePath_EqualityTest);
+
+		// is the right value under foo.bar.fubar.baz.qux.quux.qux2.quux2
+		assertEquals("TEST", equalsProperties.getValue("foo.bar.fubar"));
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
+		// is the Map right
+		assertEquals(true, fooSubMap.equals(equalsMap));
+		
+		// tests if exists and clean the system
+		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
+
 	}
 }

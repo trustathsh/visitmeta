@@ -44,7 +44,6 @@ import java.io.IOException;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.representer.Representer;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 
@@ -53,6 +52,12 @@ import de.hshannover.f4.trust.visitmeta.util.NullCheck;
  * @author MR
  */
 public final class YamlWriter {
+
+	private static DumperOptions mOptions;
+
+	static{
+		mOptions = buildDumperOptions();
+	}
 
 	/**
 	 * Only static calls are allowed.
@@ -67,12 +72,9 @@ public final class YamlWriter {
 	 * @param options A SnakeYAML DumperOptions.
 	 * @throws IOException If the file could not open or is a directory.
 	 */
-	public static synchronized void persist(String fileName, Object object, Representer representer,
-			DumperOptions options) throws IOException {
+	public static synchronized void persist(String fileName, Object object) throws IOException {
 		NullCheck.check(fileName, "fileName is null");
 		NullCheck.check(object, "object is null");
-		NullCheck.check(representer, "representer is null");
-		NullCheck.check(options, "options is null");
 
 		FileWriter fileWriter = null;
 		File f = null;
@@ -88,41 +90,14 @@ public final class YamlWriter {
 			}
 		}
 
-		Yaml yaml = new Yaml(representer, options);
+		Yaml yaml = new Yaml(mOptions);
 		yaml.dump(object, fileWriter);
 		fileWriter.close();
 	}
 
-	/**
-	 * Save the obj to the yml-file.
-	 * @param fileName The file name or the file path to the yml-file.
-	 * @param obj The Object to be stored.
-	 * @throws IOException If the file could not open or is a directory.
-	 */
-	public static void persist(String fileName, Object obj) throws IOException {
-		persist(fileName, obj, new Representer(), new DumperOptions());
+	private static DumperOptions buildDumperOptions() {
+		DumperOptions options = new DumperOptions();
+		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		return options;
 	}
-
-	/**
-	 * Save the obj to the yml-file.
-	 * @param fileName The file name or the file path to the yml-file.
-	 * @param obj The Object to be stored.
-	 * @param representer A SnakeYAML Representer.
-	 * @throws IOException If the file could not open or is a directory.
-	 */
-	public static void persist(String fileName, Object obj, Representer representer) throws IOException {
-		persist(fileName, obj, representer, new DumperOptions());
-	}
-
-	/**
-	 * Save the obj to the yml-file.
-	 * @param fileName The file name or the file path to the yml-file.
-	 * @param obj The Object to be stored.
-	 * @param options A SnakeYAML DumperOptions.
-	 * @throws IOException If the file could not open or is a directory.
-	 */
-	public static void persist(String fileName, Object obj, DumperOptions options) throws IOException {
-		persist(fileName, obj, new Representer(), options);
-	}
-
 }

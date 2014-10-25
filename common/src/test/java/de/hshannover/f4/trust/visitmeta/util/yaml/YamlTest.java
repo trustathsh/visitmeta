@@ -49,9 +49,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.representer.Representer;
 
 import de.hshannover.f4.trust.visitmeta.util.Util;
 
@@ -73,8 +70,6 @@ public class YamlTest {
 	private final Map<String, Object> mCollectionsTest_Map = Util.buildTestMap();
 	private final List<String> mCollectionsTest_List = Util.buildTestList();
 	private final Set<String> mCollectionsTest_Set = Util.buildTestSet();
-
-	private Constructor mYamlConstructor = new Constructor();
 
 	@Before
 	public void setUp() {
@@ -106,7 +101,7 @@ public class YamlTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testYamlWriter_NullPointerException_parameter_filename() throws IOException {
-		YamlWriter.persist(null, mString_YamlWriterSaveObject, new Representer(), new DumperOptions());
+		YamlWriter.persist(null, mString_YamlWriterSaveObject);
 	}
 
 	/**
@@ -116,27 +111,7 @@ public class YamlTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testYamlWriter_NullPointerException_parameter_object() throws IOException {
-		YamlWriter.persist(mFilePath_notExists, null, new Representer(), new DumperOptions());
-	}
-
-	/**
-	 * 1. Tests the NullPointerException from YamlWriter when the Representer parameter is null.
-	 * 
-	 * @throws NullPointerException
-	 */
-	@Test(expected=NullPointerException.class)
-	public void testYamlWriter_NullPointerException_parameter_Representer() throws IOException {
-		YamlWriter.persist(mFilePath_notExists, mString_YamlWriterSaveObject, null, new DumperOptions());
-	}
-
-	/**
-	 * 1. Tests the NullPointerException from YamlWriter when the DumperOptions parameter is null.
-	 * 
-	 * @throws NullPointerException
-	 */
-	@Test(expected=NullPointerException.class)
-	public void testYamlWriter_NullPointerException_parameter_DumperOptions() throws IOException {
-		YamlWriter.persist(mFilePath_notExists, mString_YamlWriterSaveObject, new Representer(), null);
+		YamlWriter.persist(mFilePath_notExists, null);
 	}
 
 	/**
@@ -167,7 +142,7 @@ public class YamlTest {
 	 */
 	@Test(expected=IOException.class)
 	public void testYamlReader_IOException() throws IOException {
-		YamlReader.loadAs(mFilePath_notExists, String.class, mYamlConstructor);
+		YamlReader.loadAs(mFilePath_notExists, String.class);
 	}
 
 	/**
@@ -177,7 +152,7 @@ public class YamlTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testYamlReader_NullPointerException_parameter_filename() throws IOException {
-		YamlReader.loadAs(null, String.class, mYamlConstructor);
+		YamlReader.loadAs(null, String.class);
 	}
 
 	/**
@@ -187,17 +162,7 @@ public class YamlTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testYamlReader_NullPointerException_parameter_class() throws IOException {
-		YamlReader.loadAs(mFilePath_notExists, null, mYamlConstructor);
-	}
-
-	/**
-	 * 1. Tests the NullPointerException from YamlReader when the constructor parameter is null.
-	 * 
-	 * @throws NullPointerException
-	 */
-	@Test(expected=NullPointerException.class)
-	public void testYamlReader_NullPointerException_parameter_constructor() throws IOException {
-		YamlReader.loadAs(mFilePath_notExists, String.class, null);
+		YamlReader.loadAs(mFilePath_notExists, null);
 	}
 
 	/**
@@ -211,7 +176,7 @@ public class YamlTest {
 		Util.deleteTestFile(mFilePath_yamlReaderCreateNewFileTest);
 
 		// create the file
-		YamlReader.loadAs(mFilePath_yamlReaderCreateNewFileTest, String.class, mYamlConstructor);
+		YamlReader.loadAs(mFilePath_yamlReaderCreateNewFileTest, String.class);
 
 		// tests if exists and clean the system
 		Util.checkAndDeleteTestFile(mFilePath_yamlReaderCreateNewFileTest);
@@ -254,19 +219,19 @@ public class YamlTest {
 	public void testSimpleDatatyps() throws IOException {
 		// String Test
 		YamlWriter.persist(mFilePath_simpleDatatypsTest, mSimpleDatatypsTest_String);
-		assertEquals(mSimpleDatatypsTest_String, YamlReader.loadAs(mFilePath_simpleDatatypsTest, String.class, mYamlConstructor));
+		assertEquals(mSimpleDatatypsTest_String, YamlReader.loadAs(mFilePath_simpleDatatypsTest, String.class));
 
 		// int Test
 		YamlWriter.persist(mFilePath_simpleDatatypsTest, mSimpleDatatypsTest_Int);
-		assertEquals(mSimpleDatatypsTest_Int, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Integer.class, mYamlConstructor));
+		assertEquals(mSimpleDatatypsTest_Int, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Integer.class));
 
 		// double Test
 		YamlWriter.persist(mFilePath_simpleDatatypsTest, mSimpleDatatypsTest_Double);
-		assertEquals(mSimpleDatatypsTest_Double, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Double.class, mYamlConstructor));
+		assertEquals(mSimpleDatatypsTest_Double, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Double.class));
 
 		// boolean Test
 		YamlWriter.persist(mFilePath_simpleDatatypsTest, mSimpleDatatypsTest_Boolean);
-		assertEquals(mSimpleDatatypsTest_Boolean, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Boolean.class, mYamlConstructor));
+		assertEquals(mSimpleDatatypsTest_Boolean, YamlReader.loadAs(mFilePath_simpleDatatypsTest, Boolean.class));
 
 		Util.checkAndDeleteTestFile(mFilePath_simpleDatatypsTest);
 	}
@@ -282,15 +247,15 @@ public class YamlTest {
 	public void testCollections() throws IOException {
 		// List Test
 		YamlWriter.persist(mFilePath_collectionsTest, mCollectionsTest_List);
-		assertEquals(mCollectionsTest_List, YamlReader.loadAs(mFilePath_collectionsTest, List.class, mYamlConstructor));
+		assertEquals(mCollectionsTest_List, YamlReader.loadAs(mFilePath_collectionsTest, List.class));
 
 		// Set Test
 		YamlWriter.persist(mFilePath_collectionsTest, mCollectionsTest_Set);
-		assertEquals(mCollectionsTest_Set, YamlReader.loadAs(mFilePath_collectionsTest, Set.class, mYamlConstructor));
+		assertEquals(mCollectionsTest_Set, YamlReader.loadAs(mFilePath_collectionsTest, Set.class));
 
 		// Map Test
 		YamlWriter.persist(mFilePath_collectionsTest, mCollectionsTest_Map);
-		assertEquals(mCollectionsTest_Map, YamlReader.loadAs(mFilePath_collectionsTest, Map.class, mYamlConstructor));
+		assertEquals(mCollectionsTest_Map, YamlReader.loadAs(mFilePath_collectionsTest, Map.class));
 		assertEquals(mCollectionsTest_Map, YamlReader.loadMap(mFilePath_collectionsTest));
 
 		Util.checkAndDeleteTestFile(mFilePath_collectionsTest);

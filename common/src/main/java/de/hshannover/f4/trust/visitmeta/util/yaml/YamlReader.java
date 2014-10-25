@@ -69,16 +69,13 @@ public final class YamlReader {
 	 * Attention! If the File exists but it is empty then snakyaml returns null.
 	 * @param fileName The file name or the file path to the yml-file.
 	 * @param clazz The returned data-type.
-	 * @param constructor A SnakeYAML BaseConstructor.
 	 * @return The yml-File as Class<T>.
 	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	@SuppressWarnings("unchecked")
-	public static synchronized <T> T loadAs(String fileName, Class<T> clazz, BaseConstructor constructor)
-			throws IOException {
+	public static synchronized <T> T loadAs(String fileName, Class<T> clazz) throws IOException {
 		NullCheck.check(fileName, "fileName is null");
 		NullCheck.check(clazz, "clazz is null");
-		NullCheck.check(constructor, "constructor is null");
 
 		FileReader fileReader = null;
 		File f = null;
@@ -106,7 +103,7 @@ public final class YamlReader {
 			}
 		}
 
-		Yaml yaml = new Yaml(constructor);
+		Yaml yaml = new Yaml();
 		Object data = yaml.loadAs(fileReader, clazz);
 
 		fileReader.close();
@@ -116,28 +113,17 @@ public final class YamlReader {
 	/**
 	 * Load a yml-File as Map<String, Object>.
 	 * @param fileName The file name or the file path to the yml-file.
-	 * @param constructor A SnakeYAML BaseConstructor.
 	 * @return If the File exists but it is empty then returns a empty Map<String, Object>.
 	 * @throws IOException If the file could not open, create or is a directory.
 	 */
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> loadMap(String fileName, BaseConstructor constructor) throws IOException {
-		Map<String, Object> ymlMap = loadAs(fileName, HashMap.class, constructor);
+	public static Map<String, Object> loadMap(String fileName) throws IOException {
+		Map<String, Object> ymlMap = loadAs(fileName, HashMap.class);
 		if (ymlMap == null) {
 			// then the File is empty return a empty HashMap
 			return new HashMap<String, Object>();
 		}
 		return ymlMap;
-	}
-
-	/**
-	 * Load a yml-File as Map<String, Object>.
-	 * @param fileName
-	 * @return If the File exists but it is empty then returns a empty Map<String, Object>.
-	 * @throws IOException If the file could not open, create or is a directory.
-	 */
-	public static Map<String, Object> loadMap(String fileName) throws IOException {
-		return loadMap(fileName, new Constructor());
 	}
 
 }

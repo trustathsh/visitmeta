@@ -41,10 +41,6 @@ package de.hshannover.f4.trust.visitmeta.util.properties;
 import java.io.IOException;
 import java.util.Map;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
-
 import de.hshannover.f4.trust.visitmeta.util.yaml.YamlWriter;
 
 /**
@@ -53,13 +49,7 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.YamlWriter;
  */
 public class PropertiesWriter {
 
-	public static final String TAG = "!Properties";
-
 	private String mFileName;
-
-	private DumperOptions mOptions;
-
-	private Representer mRepresenter;
 
 	/**
 	 * Create a JyamlWriter for application properties.
@@ -67,15 +57,6 @@ public class PropertiesWriter {
 	 */
 	public PropertiesWriter(String fileName) {
 		mFileName = fileName;
-		mOptions = buildDumperOptions();
-		mRepresenter = new Representer();
-		mRepresenter.addClassTag(Properties.class, new Tag(TAG));
-	}
-
-	private DumperOptions buildDumperOptions() {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		return options;
 	}
 
 	/**
@@ -84,6 +65,6 @@ public class PropertiesWriter {
 	 * @throws IOException If the file could not open or is a directory.
 	 */
 	public void save(Map<String, Object> propertiesData) throws IOException {
-		YamlWriter.persist(mFileName, propertiesData, mRepresenter, mOptions);
+		YamlWriter.persist(mFileName, propertiesData);
 	}
 }

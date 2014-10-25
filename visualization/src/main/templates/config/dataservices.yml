@@ -1,5 +1,3 @@
----
-default: !Dataservice
-  name: default
+default:
+  dataserviceRestUrl: http://localhost:8000
   rawXml: true
-  url: http://localhost:8000

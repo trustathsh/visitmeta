@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
-import java.io.IOException;
-
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 
@@ -54,8 +52,8 @@ import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog.MapServerPan
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog.TabPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
-import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersisterException;
 
 public class CheckSavingJList<E> extends JList<E> {
 
@@ -88,7 +86,7 @@ public class CheckSavingJList<E> extends JList<E> {
 
 				try {
 					yesOption();
-				} catch (IOException | DataservicePersisterException | JSONException e) {
+				} catch (PropertyException | JSONException e) {
 					// logging already finished
 				}
 
@@ -104,24 +102,18 @@ public class CheckSavingJList<E> extends JList<E> {
 		super.fireSelectionValueChanged(firstIndex, lastIndex, isAdjusting);
 	}
 
-	public void yesOption() throws DataservicePersisterException, JSONException, JSONException, IOException {
+	public void yesOption() throws PropertyException, UniformInterfaceException, JSONException {
 		if(mJPanel instanceof DataServicePanel){
 			DataServicePanel panel = (DataServicePanel)mJPanel;
 			DataserviceConnection tmp = panel.mPreviousConnection.copy();	// for rollback
 			panel.updateDataserviceConnection(panel.mPreviousConnection);	// update the model
 			try {
 
-				mDataservicePersister.update(tmp.getName(), panel.mPreviousConnection);
+				mDataservicePersister.persist(panel.mPreviousConnection);
 				panel.mChanges = false;
 
-			} catch (IOException e) {
+			} catch (PropertyException e) {
 				log.error("Error while updating the Dataservice-Connection", e);
-				//rollBack
-				panel.mPreviousConnection.update(tmp);
-				resetSelection();
-				throw e;
-			} catch (DataservicePersisterException e) {
-				log.warn(e.toString());
 				//rollBack
 				panel.mPreviousConnection.update(tmp);
 				resetSelection();

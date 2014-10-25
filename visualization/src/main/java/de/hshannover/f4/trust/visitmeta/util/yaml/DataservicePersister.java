@@ -38,124 +38,61 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
-public class DataservicePersister {
-
-	private static final Logger log = Logger.getLogger(DataservicePersister.class);
-
-	public static final String DATASERVICE_TAG = "!Dataservice";
-
-
-	private String mFileName;
-
-	private boolean mMinimalOutput;
-
-
-	private DumperOptions mOptions;
-
-	private Representer mRepresenter;
-
-	private Constructor mConstructor;
+public class DataservicePersister extends Properties{
 
 	/**
-	 * Create a JyamlPersister for Dataservices with default minimalOutput = true
+	 * Create a JyamlPersister for data-services
 	 *
 	 * @param fileName
 	 * @param append
 	 */
 	public DataservicePersister(String fileName){
-		log.trace("new DataservicePersister()...");
-		mFileName = fileName;
-		mMinimalOutput = true;
-		mOptions = buildDumperOptions();
-		mRepresenter = new Representer();
-		mConstructor = new Constructor();
-		mConstructor.addTypeDescription(new TypeDescription(DataserviceConnection.class, DATASERVICE_TAG));
-		mRepresenter.addClassTag(DataserviceConnection.class, new Tag(DATASERVICE_TAG));
+		super(fileName);
 	}
 
-	private DumperOptions buildDumperOptions(){
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		options.setExplicitStart(true);
-		return options;
+	public void persist(DataserviceConnection connection) throws PropertyException {
+		String connectionName = connection.getName();
+		String dataserviceRestUrl = connection.getUrl();
+		boolean rawXml = connection.isRawXml();
+
+		setPropertyDataserviceRestUrl(connectionName, dataserviceRestUrl);
+		setPropertyRawXml(connectionName, rawXml);
 	}
 
-	public void add(DataserviceConnection connection) throws DataservicePersisterException, IOException {
-		Map<String, DataserviceConnection> dataserviceMap = load();
-		checkContains(connection, dataserviceMap);
-		dataserviceMap.put(connection.getName(), connection);
-		YamlWriter.persist(mFileName, dataserviceMap, mRepresenter, mOptions);
-	}
-
-	public void update(String oldDataserviceConnectionName, DataserviceConnection dataservice) throws DataservicePersisterException, IOException {
-		Map<String, DataserviceConnection> dataserviceMap = load();
-		DataserviceConnection oldDataservice = search(oldDataserviceConnectionName, dataserviceMap);
-		dataserviceMap.remove(oldDataserviceConnectionName);
-		if(oldDataservice != null){
-			oldDataservice.update(dataservice);
-			dataserviceMap.put(dataservice.getName(), dataservice);
-			YamlWriter.persist(mFileName, dataserviceMap, mRepresenter, mOptions);
+	public List<DataserviceConnection> loadDataserviceConnections() throws PropertyException {
+		List<DataserviceConnection> dataserviceConnectionList = new ArrayList<DataserviceConnection>();
+		for(String connectionName: getKeySet()){
+			// read values from property
+			String dataserviceRestUrl = getPropertyDataserviceRestUrl(connectionName);
+			boolean rawXml = getPropertyRawXml(connectionName);
+			DataserviceConnection tmpDataserviceConnection = new DataserviceConnection(connectionName, dataserviceRestUrl, rawXml);
+			dataserviceConnectionList.add(tmpDataserviceConnection);
 		}
+		return dataserviceConnectionList;
 	}
 
-	private DataserviceConnection search(String dataserviceName, Map<String, DataserviceConnection> dataserviceMap){
-		DataserviceConnection dataservice = dataserviceMap.get(dataserviceName);
-		if(dataservice != null){
-			return dataservice;
-		}else{
-			log.warn("Warn by search DataserviceConnection, is null.");
-		}
-		return null;
+	private boolean getPropertyRawXml(String connectionName) throws PropertyException {
+		return super.get(connectionName).getBoolean(ConnectionKey.RAW_XML);
 	}
 
-	public void remove(String dataserviceName) throws IOException{
-		Map<String, DataserviceConnection> dataserviceList = load();
-		dataserviceList.remove(search(dataserviceName, dataserviceList));
-		YamlWriter.persist(mFileName, dataserviceList, mRepresenter, mOptions);
+	private String getPropertyDataserviceRestUrl(String connectionName) throws PropertyException {
+		return super.get(connectionName).getString(ConnectionKey.DATASERVICE_REST_URL);
 	}
 
-	public Map<String, DataserviceConnection> load() throws IOException {
-		Map<String, DataserviceConnection> newMap = new HashMap<String, DataserviceConnection>();
-		Map<String, Object> map = YamlReader.loadMap(mFileName, mConstructor);
-		if(map != null){
-			for(Entry<String, Object> entry: map.entrySet()){
-				if(entry.getValue() instanceof DataserviceConnection){
-					newMap.put(entry.getKey(), (DataserviceConnection) entry.getValue());
-				}else{
-					log.warn("Warn by load DataserviceConnection Set. Object is not a DataserviceConnection.");
-				}
-			}
-		}
-		return newMap;
+	private void setPropertyRawXml(String connectionName, boolean rawXml) throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.RAW_XML, rawXml);
 	}
 
-	public void setMinimalOutput(boolean minimalOutput){
-		mMinimalOutput = minimalOutput;
+	private void setPropertyDataserviceRestUrl(String connectionName, String dataserviceRestUrl) throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.DATASERVICE_REST_URL, dataserviceRestUrl);
 	}
 
-	public boolean isMinimalOutput(){
-		return mMinimalOutput;
-	}
-
-	private void checkContains(DataserviceConnection connection, Map<String, DataserviceConnection> dataserviceMap) throws DataservicePersisterException {
-		for(DataserviceConnection data: dataserviceMap.values()){
-			if(data.equals(connection)){
-				throw new DataservicePersisterException("No duplicate Data service Connections allowed");
-			}
-		}
-	}
 }

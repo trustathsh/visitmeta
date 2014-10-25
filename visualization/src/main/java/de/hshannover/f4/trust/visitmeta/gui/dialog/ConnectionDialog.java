@@ -52,9 +52,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -91,8 +89,8 @@ import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
-import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersisterException;
 
 public class ConnectionDialog extends JDialog{
 
@@ -194,11 +192,11 @@ public class ConnectionDialog extends JDialog{
 
 		mJtpMain = new CheckSavingTabbedPane(){
 			@Override
-			public void yesOption(Component selectedComponent) throws IOException, DataservicePersisterException, UniformInterfaceException, JSONException {
+			public void yesOption(Component selectedComponent) throws PropertyException, UniformInterfaceException, JSONException {
 				try {
 					super.yesOption(selectedComponent);
 					saveEvent();
-				} catch (DataservicePersisterException | JSONException | IOException e) {
+				} catch (PropertyException | JSONException e) {
 					log.trace("Error whil saving, save-button name-textfield remains activated.");
 					throw e;
 				}
@@ -390,14 +388,14 @@ public class ConnectionDialog extends JDialog{
 		public void updateDataserviceComboBox(){
 			mJcbDataServiceConnection.removeAllItems();
 
-			Map<String, DataserviceConnection> dataserviceList = null;
+			List<DataserviceConnection> dataserviceList = null;
 			try {
-				dataserviceList = mDataservicePersister.load();
-			} catch (IOException e) {
+				dataserviceList = mDataservicePersister.loadDataserviceConnections();
+			} catch (PropertyException e) {
 				log.error("Error while update Dataservice-Combo-Box", e);
 			}
 
-			for(DataserviceConnection dc: dataserviceList.values()){
+			for(DataserviceConnection dc: dataserviceList){
 				mJcbDataServiceConnection.addItem(dc);
 			}
 		}
@@ -626,11 +624,11 @@ public class ConnectionDialog extends JDialog{
 
 				mJlMapServerConnections = new CheckSavingJList<RestConnection>(this){
 					@Override
-					public void yesOption() throws IOException, DataservicePersisterException, JSONException {
+					public void yesOption() throws PropertyException, JSONException {
 						try {
 							super.yesOption();
 							saveEvent();
-						} catch (IOException| DataservicePersisterException | JSONException e) {
+						} catch (PropertyException | JSONException e) {
 							log.trace("Error whil saving, save-button name-textfield remains activated.");
 							throw e;
 						}
@@ -684,6 +682,7 @@ public class ConnectionDialog extends JDialog{
 					if(param != null){
 						mParameterPanel.updatePanel(param);
 						mPreviousConnection = param;
+						mParameterPanel.mJtfName.setEditable(false);
 						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 					}
 				}
@@ -698,16 +697,15 @@ public class ConnectionDialog extends JDialog{
 
 					try {
 
-						mDataservicePersister.add(param);
+						mDataservicePersister.persist(param);
 						mListModelDataService.add(mListModelDataService.getSize(), param);
 						mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
+						mParameterPanel.mJtfName.setEditable(true);
 						setChanges(true);
 						switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, getParameterPanel(), mJlNoConnectionsYet, lblInsets);
 
-					} catch (IOException e) {
+					} catch (PropertyException e) {
 						log.error("Error while copy new Dataservice-Connection", e);
-					} catch (DataservicePersisterException e) {
-						log.warn(e.toString());
 					}
 				}
 			});
@@ -715,21 +713,21 @@ public class ConnectionDialog extends JDialog{
 			mJbDelete.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					int index = mJlDataServiceConnections.getSelectedIndex();
-					if (index >= 0) {
-						try {
-							mDataservicePersister.remove(mJlDataServiceConnections.getSelectedValue().getName());
-						} catch (IOException e) {
-							log.error("Error while remove Dataservice-Connection(" + mJlDataServiceConnections.getSelectedValue().getName() + ")", e);
-						}
-						mListModelDataService.remove(index);
-						if (!mListModelDataService.isEmpty()) {
-							index = (index == 0) ? 0 : index - 1;
-							mJlDataServiceConnections.setSelectedIndex(index);
-						} else {
-							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), lblInsets);
-						}
-					}
+					//					int index = mJlDataServiceConnections.getSelectedIndex();
+					//					if (index >= 0) {
+					//						try {
+					//							mDataservicePersister.remove(mJlDataServiceConnections.getSelectedValue().getName());
+					//						} catch (PropertyException e) {
+					//							log.error("Error while remove Dataservice-Connection(" + mJlDataServiceConnections.getSelectedValue().getName() + ")", e);
+					//						}
+					//						mListModelDataService.remove(index);
+					//						if (!mListModelDataService.isEmpty()) {
+					//							index = (index == 0) ? 0 : index - 1;
+					//							mJlDataServiceConnections.setSelectedIndex(index);
+					//						} else {
+					//							switchJPanel(0, 0, 1, 1, 1.0, 0.0, mJpConnectionParameter, mJlNoConnectionsYet, getParameterPanel(), lblInsets);
+					//						}
+					//					}
 				}
 			});
 
@@ -741,14 +739,12 @@ public class ConnectionDialog extends JDialog{
 						DataserviceConnection param =  mJlDataServiceConnections.getSelectedValue().clone();
 
 						try {
-							mDataservicePersister.add(param);
+							mDataservicePersister.persist(param);
 							mListModelDataService.add(mListModelDataService.getSize(), param);
 							mJlDataServiceConnections.setSelectedIndex(mListModelDataService.getSize() - 1);
 							setChanges(true);
-						} catch (IOException e) {
+						} catch (PropertyException e) {
 							log.error("Error while copy new Dataservice-Connection", e);
-						} catch (DataservicePersisterException e) {
-							log.warn(e.toString());
 						}
 					}
 				}
@@ -761,22 +757,18 @@ public class ConnectionDialog extends JDialog{
 					if(mJtpMain.getSelectedComponent() == mConnectionPanelDataService){
 						// update selectedValue
 						DataserviceConnection param = mJlDataServiceConnections.getSelectedValue();
-						String oldDataserviceConnection = null;
 						if(param != null){
-							oldDataserviceConnection = param.getName();
 							updateDataserviceConnection(param);
 						}
 
 						try {
-							mDataservicePersister.update(oldDataserviceConnection, param);
+							mDataservicePersister.persist(param);
 
 							saveEvent();
 							mChanges = false;
 							log.info("DataService Connections was persist");
-						} catch (IOException e) {
+						} catch (PropertyException e) {
 							log.error("Error while update the Dataservice-Connection(" + param.getName() + ")", e);
-						} catch (DataservicePersisterException e) {
-							log.warn(e.toString());
 						}
 					}
 				}
@@ -810,13 +802,13 @@ public class ConnectionDialog extends JDialog{
 		}
 
 		private void loadDataserviceConnections(){
-			Map<String, DataserviceConnection> dataserviceSet = null;
+			List<DataserviceConnection> dataserviceSet = null;
 			try {
-				dataserviceSet = mDataservicePersister.load();
-			} catch (IOException e) {
+				dataserviceSet = mDataservicePersister.loadDataserviceConnections();
+			} catch (PropertyException e) {
 				log.error("Error while load persisted Dataservice-Connections", e);
 			}
-			for(DataserviceConnection dc: dataserviceSet.values()){
+			for(DataserviceConnection dc: dataserviceSet){
 				addDataserviceConnection(dc);
 			}
 		}
@@ -850,11 +842,11 @@ public class ConnectionDialog extends JDialog{
 				mListModelDataService = new DefaultListModel<DataserviceConnection>();
 				mJlDataServiceConnections = new CheckSavingJList<DataserviceConnection>(this){
 					@Override
-					public void yesOption() throws IOException, DataservicePersisterException, JSONException {
+					public void yesOption() throws PropertyException, JSONException {
 						try {
 							super.yesOption();
 							saveEvent();
-						} catch (IOException| DataservicePersisterException | JSONException e) {
+						} catch (PropertyException | JSONException e) {
 							log.trace("Error whil saving, mJbSave-button remains activated.");
 							throw e;
 						}
@@ -976,6 +968,7 @@ public class ConnectionDialog extends JDialog{
 
 			mJtfUrl = new JTextField();
 			mJtfName = new JTextField();
+			mJtfName.setEditable(false);
 
 			mJcbRawXML = new JCheckBox();
 

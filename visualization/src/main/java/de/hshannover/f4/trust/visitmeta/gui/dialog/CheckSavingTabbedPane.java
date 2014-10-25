@@ -39,7 +39,6 @@
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.Component;
-import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -55,8 +54,8 @@ import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog.MapServerPan
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog.TabPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
-import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersisterException;
 
 public class CheckSavingTabbedPane extends JTabbedPane {
 
@@ -79,7 +78,7 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 				if (n == JOptionPane.YES_OPTION){
 					try{
 						yesOption(panel);
-					} catch (IOException | DataservicePersisterException | JSONException e) {
+					} catch (PropertyException | JSONException e) {
 						// logging already finished
 					}
 				}else if(n == JOptionPane.NO_OPTION){
@@ -93,7 +92,7 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 		super.setSelectedIndex(index);
 	}
 
-	public void yesOption(Component selectedComponent) throws DataservicePersisterException, UniformInterfaceException, JSONException, IOException {
+	public void yesOption(Component selectedComponent) throws PropertyException, UniformInterfaceException, JSONException {
 		if(selectedComponent instanceof DataServicePanel){
 			DataServicePanel panel = (DataServicePanel)selectedComponent;
 
@@ -101,15 +100,10 @@ public class CheckSavingTabbedPane extends JTabbedPane {
 			panel.updateDataserviceConnection(panel.mPreviousConnection);
 
 			try {
-				mDataservicePersister.update(tmp.getName(), panel.mPreviousConnection);
+				mDataservicePersister.persist(panel.mPreviousConnection);
 				panel.mChanges = false;
-			} catch (IOException e) {
+			} catch (PropertyException e) {
 				log.error("Error while updating the Dataservice-Connection(" + tmp.getName() + ")", e);
-				//rollBack
-				panel.mPreviousConnection.update(tmp);
-				throw e;
-			} catch (DataservicePersisterException e) {
-				log.warn(e.toString());
 				//rollBack
 				panel.mPreviousConnection.update(tmp);
 				throw e;

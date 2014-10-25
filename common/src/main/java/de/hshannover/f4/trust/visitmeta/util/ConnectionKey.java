@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.util;
 
 public class ConnectionKey {
 
+	// for dataservice
 	public static final String CONNECTION_NAME = "connectionName";
 	public static final String IFMAP_SERVER_URL = "ifmapServerUrl";
 	public static final String USER_NAME = "userName";
@@ -51,4 +52,8 @@ public class ConnectionKey {
 	public static final String USE_CONNECTION_AS_STARTUP = "useConnectionAsStartup";
 	public static final String MAX_POLL_RESULT_SIZE = "maxPollResultSize";
 	public static final String SUBSCRIPTIONS = "subscriptions";
+
+	// for visualization
+	public static final String DATASERVICE_REST_URL = "dataserviceRestUrl";
+	public static final String RAW_XML = "rawXml";
 }

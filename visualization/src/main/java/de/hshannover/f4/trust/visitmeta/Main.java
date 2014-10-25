@@ -39,9 +39,7 @@
 package de.hshannover.f4.trust.visitmeta;
 
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -89,10 +87,10 @@ public final class Main {
 
 		initComponents();
 
-		Map<String, DataserviceConnection> dataserviceConnections = null;
+		List<DataserviceConnection> dataserviceConnections = null;
 		try {
-			dataserviceConnections = getDataservicePersister().load();
-		} catch (IOException e) {
+			dataserviceConnections = getDataservicePersister().loadDataserviceConnections();
+		} catch (PropertyException e) {
 			LOGGER.error("error while load persistent dataservices", e);
 		}
 
@@ -111,7 +109,7 @@ public final class Main {
 		LOGGER.info(devices.size() + " devices were loaded.");
 
 		if(vConnectionType == ConnectionType.REST && dataserviceConnections != null){
-			for(DataserviceConnection dc : dataserviceConnections.values()) {
+			for(DataserviceConnection dc : dataserviceConnections) {
 				gui.addDataserviceConnection(dc);
 			}
 			gui.show();
@@ -119,18 +117,10 @@ public final class Main {
 	}
 
 	public static void initComponents() {
-
 		String config = Main.class.getClassLoader().getResource("visualization_config.yml").getPath();
 		String dataservicePath = Main.class.getClassLoader().getResource("dataservices.yml").getPath();
 
-		try{
-			mConfig = new Properties(config);
-		} catch (PropertyException e) {
-			String msg = "Error while reading the config files";
-			LOGGER.fatal(msg);
-			throw new RuntimeException(msg, e);
-		}
-
+		mConfig = new Properties(config);
 		mDataservicePersister = new DataservicePersister(dataservicePath);
 
 		LOGGER.info("components initialized");

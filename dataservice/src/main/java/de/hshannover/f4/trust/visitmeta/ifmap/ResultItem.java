@@ -56,12 +56,14 @@ public class ResultItem {
 	private final List<InternalMetadata> mMetadata;
 
 	private final boolean mIsLinkUpdate;
+	private final boolean mIsUpdate;
 
-	public ResultItem(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> metadata) {
+	public ResultItem(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> metadata, boolean isUpdate) {
 		super();
 		mId1 = id1;
 		mId2 = id2;
 		mMetadata = metadata;
+		mIsUpdate = isUpdate;
 
 		if (id1 == null) {
 			throw new IllegalArgumentException("id1 cannot be null");
@@ -84,6 +86,10 @@ public class ResultItem {
 
 	public List<InternalMetadata> getMetadata() {
 		return mMetadata;
+	}
+	
+	public boolean isUpdate() {
+		return mIsUpdate;
 	}
 
 	@Override

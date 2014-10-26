@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,19 +48,37 @@ import java.util.List;
  */
 public class PollResult {
 
-	private final List<ResultItem> mUpdates;
-	private final List<ResultItem> mDeletes;
+	private final List<ResultItem> mResults;
 
-	public PollResult(List<ResultItem> updates, List<ResultItem> deletes) {
-		mUpdates = updates;
-		mDeletes = deletes;
+	public PollResult(List<ResultItem> results) {
+		mResults = results;
 	}
 
-	public List<ResultItem> getDeletes() {
-		return mDeletes;
+	public List<ResultItem> getResults() {
+		return mResults;
 	}
-
+	
+	@Deprecated
 	public List<ResultItem> getUpdates() {
-		return mUpdates;
+		List<ResultItem> tmp = new ArrayList<ResultItem>();
+		
+		for(ResultItem item : mResults) {
+			if (item.isUpdate()) {
+				tmp.add(item);
+			}
+		}
+		return tmp;
 	}
-}
+	
+	@Deprecated
+	public List<ResultItem> getDeletes() {
+		List<ResultItem> tmp = new ArrayList<ResultItem>();
+		
+		for(ResultItem item : mResults) {
+			if (!item.isUpdate()) {
+				tmp.add(item);
+			}
+		}
+		return tmp;
+	}
+} 

@@ -65,26 +65,26 @@ public abstract class AbstractWriter implements Writer {
 	@Override
 	public void submitPollResult(PollResult pr) {
 		beginTransaction();
-		for (ResultItem update : pr.getUpdates()) {
-			if (update.getId1() == null) {
-				submitUpdate(update.getId2(), update.getMetadata());
-			}
-			if (update.getId2() == null) {
-				submitUpdate(update.getId1(), update.getMetadata());
+		for (ResultItem resultItem : pr.getResults()) {
+			if (resultItem.isUpdate()) {
+				if (resultItem.getId1() == null) {
+					submitUpdate(resultItem.getId2(), resultItem.getMetadata());
+				} else if (resultItem.getId2() == null) {
+					submitUpdate(resultItem.getId1(), resultItem.getMetadata());
+				} else {
+					submitUpdate(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
+				}
 			} else {
-				submitUpdate(update.getId1(), update.getId2(), update.getMetadata());
+				if (resultItem.getId1() == null) {
+					submitDelete(resultItem.getId2(), resultItem.getMetadata());
+				} else if (resultItem.getId2() == null) {
+					submitDelete(resultItem.getId1(), resultItem.getMetadata());
+				} else {
+					submitDelete(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
+				}
 			}
 		}
-		for (ResultItem delete : pr.getDeletes()) {
-			if (delete.getId1() == null) {
-				submitDelete(delete.getId2(), delete.getMetadata());
-			}
-			if (delete.getId2() == null) {
-				submitDelete(delete.getId1(), delete.getMetadata());
-			} else {
-				submitDelete(delete.getId1(), delete.getId2(), delete.getMetadata());
-			}
-		}
+
 		finishTransaction();
 	}
 

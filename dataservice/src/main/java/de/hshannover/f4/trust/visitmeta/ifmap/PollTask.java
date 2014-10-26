@@ -95,8 +95,10 @@ class PollTask implements Callable<PollResult> {
 
 	/**
 	 * Executes one single poll request and returns the received data.
+	 * 
 	 * @throws ConnectionException
-	 * @throws PollException if something goes wrong while polling for new results
+	 * @throws PollException
+	 *             if something goes wrong while polling for new results
 	 */
 	@Override
 	public PollResult call() throws ConnectionException {
@@ -104,21 +106,20 @@ class PollTask implements Callable<PollResult> {
 
 		de.hshannover.f4.trust.ifmapj.messages.PollResult pollResult = mConnection.poll();
 
-		List<ResultItem> updates = new ArrayList<>();
-		List<ResultItem> deletes = new ArrayList<>();
+		List<ResultItem> results = new ArrayList<>();
 		for (SearchResult searchResult : pollResult.getResults()) {
 			switch (searchResult.getType()) {
 			case updateResult:
 				log.debug("processing search list ...");
-				updates.addAll(transformResultItems(searchResult.getResultItems()));
+				results.addAll(transformResultItems(searchResult.getResultItems(), true));
 				break;
 			case searchResult:
 				log.debug("processing update list ...");
-				updates.addAll(transformResultItems(searchResult.getResultItems()));
+				results.addAll(transformResultItems(searchResult.getResultItems(), true));
 				break;
 			case deleteResult:
 				log.debug("processing delete list ...");
-				deletes.addAll(transformResultItems(searchResult.getResultItems()));
+				results.addAll(transformResultItems(searchResult.getResultItems(), false));
 				break;
 			default:
 				// TODO ignore notify updates?
@@ -127,21 +128,22 @@ class PollTask implements Callable<PollResult> {
 			}
 		}
 		log.debug("finish poll request.");
-		return new PollResult(updates, deletes);
+		return new PollResult(results);
 
 	}
 
 	/**
-	 * Maps a list of ifmapj {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem}s items
-	 * to a list of internal {@link ResultItem}s.
+	 * Maps a list of ifmapj
+	 * {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem}s items to a
+	 * list of internal {@link ResultItem}s.
 	 */
-	List<ResultItem> transformResultItems(
-			List<de.hshannover.f4.trust.ifmapj.messages.ResultItem> ifmapjResultItems) {
+	List<ResultItem> transformResultItems(List<de.hshannover.f4.trust.ifmapj.messages.ResultItem> ifmapjResultItems,
+			boolean isUpdate) {
 		List<ResultItem> items = new ArrayList<>();
 		for (de.hshannover.f4.trust.ifmapj.messages.ResultItem item : ifmapjResultItems) {
-			log.debug("processing result item '"+item+"'");
+			log.debug("processing result item '" + item + "'");
 
-			ResultItem resultItem = transformResultItem(item);
+			ResultItem resultItem = transformResultItem(item, isUpdate);
 			if (resultItem.getMetadata().size() > 0) {
 				items.add(resultItem);
 			}
@@ -150,11 +152,11 @@ class PollTask implements Callable<PollResult> {
 	}
 
 	/**
-	 * Transforms a ifmapj {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem}
-	 * into a internal {@link ResultItem}.
+	 * Transforms a ifmapj
+	 * {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem} into a internal
+	 * {@link ResultItem}.
 	 */
-	ResultItem transformResultItem(
-			de.hshannover.f4.trust.ifmapj.messages.ResultItem ifmapjResultItem) {
+	ResultItem transformResultItem(de.hshannover.f4.trust.ifmapj.messages.ResultItem ifmapjResultItem, boolean isUpdate) {
 		List<Document> metadataDocuments = ifmapjResultItem.getMetadata();
 
 		List<InternalMetadata> metadata = new ArrayList<>(metadataDocuments.size());
@@ -164,14 +166,14 @@ class PollTask implements Callable<PollResult> {
 		}
 
 		if (ifmapjResultItem.holdsLink()) {
-			InternalIdentifier id1 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(
-					ifmapjResultItem.getIdentifier1());
-			InternalIdentifier id2 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(
-					ifmapjResultItem.getIdentifier2());
-			return new ResultItem(id1, id2, metadata);
+			InternalIdentifier id1 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(ifmapjResultItem
+					.getIdentifier1());
+			InternalIdentifier id2 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(ifmapjResultItem
+					.getIdentifier2());
+			return new ResultItem(id1, id2, metadata, isUpdate);
 		} else {
 			InternalIdentifier id = mIfmapJHelper.extractSingleIdentifier(ifmapjResultItem);
-			return new ResultItem(id, null, metadata);
+			return new ResultItem(id, null, metadata, isUpdate);
 		}
 	}
 }

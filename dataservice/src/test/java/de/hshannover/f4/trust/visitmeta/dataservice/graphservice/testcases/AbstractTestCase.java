@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,11 +40,16 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
@@ -52,6 +57,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.factories.Neo4JTestDatabaseFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.JsonMarshaller;
@@ -65,27 +71,35 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JExecutor;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JReader;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTimestampManager;
+import de.hshannover.f4.trust.visitmeta.util.yaml.YamlReader;
 
 public abstract class AbstractTestCase {
 
 	private Reader mReader;
 	private Executor mExecutor;
-	private GraphDatabaseService mGraphDb;
-	private Neo4JTimestampManager mTimestampManager;
 	private Neo4JConnection mDbConnection;
 	private JsonMarshaller mJsonMarshaller;
 
+	protected GraphDatabaseService mGraphDb;
+	protected Neo4JTimestampManager mTimestampManager;
 	protected GraphService mService;
+
+	protected final String TESTCASES_DIRECTORY = "src/test/resources/testcases";
+
+	private final Logger logger = Logger.getLogger(AbstractTestCase.class);
 
 	@Before
 	public void setUp() throws Exception {
-		mGraphDb = initGraphDB();
+		mGraphDb = Neo4JTestDatabaseFactory.createGraphDB();
+		assumeNotNull(mGraphDb);
 
 		mDbConnection = mock(Neo4JConnection.class);
 		when(mDbConnection.getConnection()).thenReturn(mGraphDb);
 
 		mTimestampManager = new Neo4JTimestampManager(mDbConnection);
 		when(mDbConnection.getTimestampManager()).thenReturn(mTimestampManager);
+
+		loadTestcaseIntoGraphDB();
 
 		Neo4JRepository repo = new Neo4JRepository(mDbConnection,
 				MessageDigest.getInstance("MD5"));
@@ -98,25 +112,42 @@ public abstract class AbstractTestCase {
 
 	@After
 	public void tearDown() {
-		mGraphDb.shutdown();
+		if (mGraphDb != null) {
+			mGraphDb.shutdown();
+		}
 	}
 
-	public abstract GraphDatabaseService initGraphDB();
+	public abstract String getTestcaseFilename();
+
+	private void loadTestcaseIntoGraphDB() {
+		try {
+			String testcaseFilename = getTestcaseFilename();
+			if (testcaseFilename != null) {
+				Map<String, Object> testcase = YamlReader.loadMap(testcaseFilename);
+				assumeTrue(!testcase.isEmpty());
+				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(testcase, mGraphDb, mTimestampManager);
+			} else {
+				logger.info("Testcase filename was null, using empty graph database for tests.");
+			}
+		} catch (IOException e) {
+			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping tests");
+		}
+	}
 
 	@Test
-	public abstract void testGetInitialGraph();
+	public abstract void getInitialGraph();
 
 	@Test
-	public abstract void testGetGraphAt();
+	public abstract void getGraphAt();
 
 	@Test
-	public abstract void testGetCurrentGraph();
+	public abstract void getCurrentGraph();
 
 	@Test
-	public abstract void testGetDelta();
+	public abstract void getDelta();
 
 	@Test
-	public abstract void testGetChangesMap();
+	public abstract void getChangesMap();
 
 	public JSONObject toJson(SortedMap<Long,Long> changesMap) {
 		return new JSONObject(changesMap);

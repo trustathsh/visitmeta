@@ -41,6 +41,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -50,36 +51,57 @@ import org.codehaus.jettison.json.JSONObject;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
-public class EmptyGraphTestCase extends AbstractTestCase {
+public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends
+AbstractTestCase {
+
+	private final String TESTCASE_FILENAME = TESTCASES_DIRECTORY + File.separator + "singleValueMetadataInsertUpdateAndDelete.yml";
 
 	@Override
 	public String getTestcaseFilename() {
-		return null;
+		return TESTCASE_FILENAME;
 	}
 
 	@Override
 	public void getInitialGraph() {
 		List<IdentifierGraph> initialGraph = mService.getInitialGraph();
 
-		assertTrue(initialGraph.isEmpty());
+		assertEquals(1, initialGraph.size());
 
 		JSONArray actual = toJson(initialGraph);
-		JSONArray expected = new JSONArray();
-
-		assertTrue(equalsJsonArray(expected, actual));
 	}
 
 	@Override
 	public void getGraphAt() {
+		getGraphAt0();
+		getGraphAt1();
+		getGraphAt2();
+	}
+
+	private void getGraphAt2() {
+		long timestamp = 2;
+		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
+
+		assertEquals(0, graphAt.size());
+
+		JSONArray actual = toJson(graphAt);
+	}
+
+	private void getGraphAt1() {
+		long timestamp = 1;
+		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
+
+		assertEquals(1, graphAt.size());
+
+		JSONArray actual = toJson(graphAt);
+	}
+
+	private void getGraphAt0() {
 		long timestamp = 0;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		assertTrue(graphAt.isEmpty());
+		assertEquals(1, graphAt.size());
 
 		JSONArray actual = toJson(graphAt);
-		JSONArray expected = new JSONArray();
-
-		assertTrue(equalsJsonArray(expected, actual));
 	}
 
 	@Override
@@ -89,37 +111,69 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		assertTrue(currentGraph.isEmpty());
 
 		JSONArray actual = toJson(currentGraph);
-		JSONArray expected = new JSONArray();
-
-		assertTrue(equalsJsonArray(expected, actual));
 	}
 
 	@Override
 	public void getDelta() {
+		getDeltaFrom0To1();
+		getDeltaFrom1To2();
+		getDeltaFrom0To2();
+	}
+
+	private void getDeltaFrom0To2() {
 		long t1 = 0;
-		long t2 = 0;
+		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		assertTrue(deletes.isEmpty());
-		assertTrue(updates.isEmpty());
+		assertEquals(1, deletes.size());
+		assertEquals(0, updates.size());
 
 		JSONObject actual = toJson(delta);
-		String expected = "{\"updates\":[],\"deletes\":[]}";
 
-		assertEquals(expected, actual.toString());
+	}
+
+	private void getDeltaFrom1To2() {
+		long t1 = 1;
+		long t2 = 2;
+		Delta delta = mService.getDelta(t1, t2);
+		List<IdentifierGraph> deletes = delta.getDeletes();
+		List<IdentifierGraph> updates = delta.getUpdates();
+
+		assertEquals(1, deletes.size());
+		assertEquals(0, updates.size());
+
+		JSONObject actual = toJson(delta);
+	}
+
+	private void getDeltaFrom0To1() {
+		long t1 = 0;
+		long t2 = 1;
+		Delta delta = mService.getDelta(t1, t2);
+		List<IdentifierGraph> deletes = delta.getDeletes();
+		List<IdentifierGraph> updates = delta.getUpdates();
+
+		assertEquals(1, deletes.size());
+		assertEquals(1, updates.size());
+
+		JSONObject actual = toJson(delta);
 	}
 
 	@Override
-	public void getChangesMap(){
+	public void getChangesMap() {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
-		assertTrue(changesMap.isEmpty());
+		long t0 = 0;
+		long t1 = 1;
+		long t2 = 2;
+
+		assertTrue(changesMap.size() == 3);
+
+		assertEquals(1, (long) changesMap.get(t0));
+		assertEquals(2, (long) changesMap.get(t1));
+		assertEquals(1, (long) changesMap.get(t2));
 
 		JSONObject actual = toJson(changesMap);
-		JSONObject expected = new JSONObject();
-
-		assertTrue(equalsJsonObject(expected, actual));
 	}
 }

@@ -1,0 +1,42 @@
+link1:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  second:
+    type: ip-address
+    rawData: ip-address1
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+  metadata:
+    meta1:
+      type: device-ip
+      singleValue: true
+      pubStamp: 0
+      delStamp: 1
+      rawData: device-ip1
+      properties:
+        dhcp-server: dhcp
+link2:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  second:
+    type: ip-address
+    rawData: ip-address1
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+  metadata:
+    meta1:
+      type: device-ip
+      singleValue: true
+      pubStamp: 1
+      delStamp: 2
+      rawData: device-ip1
+      properties:
+        dhcp-server: dhcp2

@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 
 /**
@@ -53,12 +55,14 @@ import de.hshannover.f4.trust.visitmeta.util.NullCheck;
  */
 public class Properties {
 
+	private static final Logger mLog = Logger.getLogger(Properties.class);
+
 	private PropertiesWriter mWriter;
 
 	private PropertiesReader mReader;
 
 	private String mFileName;
-	
+
 	private String mPreFixPropertyPath = "";
 
 	private Properties(Properties propertyOriginal, String propertyKey) {
@@ -117,7 +121,7 @@ public class Properties {
 	}
 
 	/**
-	 * Get the value from the property path.
+	 * Get the value from the property path. If the property path a empty String return the full root map.
 	 * @param propertyPath foo.bar.property
 	 * @return Object The value from the propertyPath.
 	 * @throws PropertyException If the propertyKey-Path is not a property key or is a not part of a property path.
@@ -135,7 +139,12 @@ public class Properties {
 
 		// load the application properties
 		Map<String, Object> applicationConfigs = load();
-		
+
+		// return the full root map
+		if(fullPropertyPath.equals("")){
+			return applicationConfigs;
+		}
+
 		// iterate the root Map for every token
 		for (int i = 0; i < propertyKeyArray.length; i++) {
 			Object tmp = applicationConfigs.get(propertyKeyArray[i]);
@@ -269,18 +278,18 @@ public class Properties {
 		Object o =  getValue(propertyPath, defaultValue);
 		return Boolean.parseBoolean(o.toString());
 	}
-	
+
 	/**
 	 * Return all keys of this Properties
 	 * @return Set<String>
-	 * @throws PropertyException 
+	 * @throws PropertyException
 	 */
 	public Set<String> getKeySet() throws PropertyException {
 		return load().keySet();
 	}
 
 	/**
-	 * 
+	 *
 	 * Build a property path one level higher
 	 * @param propertyPath foo.bar.property
 	 * @return foo.bar
@@ -297,9 +306,9 @@ public class Properties {
 		sb.append(propertyKeyArray[propertyKeyArray.length - 2]);
 		return sb.toString();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Add a property path to an existing.
 	 * If propertyPath == null or an empty String then return pathToAdded.
 	 * @param propertyPath foo.bar
@@ -348,7 +357,7 @@ public class Properties {
 				deeperNestedMap.put(propertyKeyArray[i], newNestedMap);
 				break;
 			}
-			
+
 			if (i == propertyKeyArray.length - 2) {
 				deeperNestedMap.put(propertyKeyArray[propertyKeyArray.length - 1], propertyValue);
 			}
@@ -361,7 +370,7 @@ public class Properties {
 
 	/**
 	 * Only for private use an Tests
-	 * 
+	 *
 	 * @param mapKeys
 	 * @param propertyValue
 	 * @return
@@ -429,12 +438,14 @@ public class Properties {
 				&& !(propertyValue instanceof Map) && !(propertyValue instanceof List)) {
 			throw new PropertyException("Only String|int|double|boolean|Map|List can be set!");
 		}
-		
+
 		// add the mPreFixPropertyPath if this Property is a copy with a deeper level
 		String fullPropertyPath = addPath(mPreFixPropertyPath, propertyPath);
 
 		// add propertyValue with the fullPropertyPath
 		addToRootMap(fullPropertyPath, propertyValue);
+
+		mLog.debug("Set the property value: " + propertyValue + " on key: " + fullPropertyPath);
 	}
 
 

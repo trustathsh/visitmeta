@@ -46,9 +46,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.BaseConstructor;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import de.hshannover.f4.trust.visitmeta.util.NullCheck;
 
@@ -57,6 +56,8 @@ import de.hshannover.f4.trust.visitmeta.util.NullCheck;
  * @author MR
  */
 public final class YamlReader {
+
+	private static final Logger mLog = Logger.getLogger(YamlReader.class);
 
 	/**
 	 * Only static calls are allowed.
@@ -89,6 +90,7 @@ public final class YamlReader {
 			} else if (f.isFile()) {
 				throw new IOException("Could not open " + fileName + ": " + e.getMessage());
 			} else {
+				mLog.debug("File: " + fileName + " doens't exist and it's not a directory, try to create it.");
 				// If it doens't exist and it's not a directory, try to create it.
 				try {
 					new FileWriter(fileName).close();

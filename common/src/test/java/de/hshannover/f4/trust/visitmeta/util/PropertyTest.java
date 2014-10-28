@@ -68,11 +68,11 @@ public class PropertyTest extends Properties{
 
 	private final List<String> mCollectionsTest_List = Util.buildTestList();
 
-	
+
 	public PropertyTest() {
 		super(mFilePath_notExists);
 	}
-	
+
 	@Before
 	public void setUp() {
 		File f = new File("src/test/resources/");
@@ -168,14 +168,14 @@ public class PropertyTest extends Properties{
 		// tests if exists and clean the system
 		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
 	}
-	
+
 	/**
 	 * 1. Tests whether existing values ​​are overwritten with new values. This new value is now a new Map.
 	 * Example:
 	 * foo:
 	 *   bar:
 	 *     fubar: test
-	 *     
+	 * 
 	 * The new value is:
 	 * foo:
 	 *   bar:
@@ -206,11 +206,11 @@ public class PropertyTest extends Properties{
 		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
 
 	}
-	
+
 
 	private void testForEquality_filledPropertiesAddNewMapProperty_oneMap() throws PropertyException {
 		// setUp
-		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar", "baz"}, "TEST");
+		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"foo", "bar", "fubar", "baz"}, "TEST");
 		Properties properties = new Properties(mFilePath_EqualityTest);
 		properties.set("foo.bar.fubar", "test");
 
@@ -225,7 +225,8 @@ public class PropertyTest extends Properties{
 		assertEquals("TEST", equalsProperties.getValue("foo.bar.fubar.baz"));
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
+		// get root map
+		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("");
 		// is the Map right
 		assertEquals(true, fooSubMap.equals(equalsMap));
 
@@ -253,7 +254,7 @@ public class PropertyTest extends Properties{
 		assertEquals(true, fooSubMap.equals(equalsMap));
 
 	}
-	
+
 	private void testForEquality_filledPropertiesAddNewMapProperty_manyMaps() throws PropertyException {
 		// setUp
 		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar", "baz", "qux", "quux", "qux2", "quux2",}, "TEST");
@@ -274,9 +275,9 @@ public class PropertyTest extends Properties{
 		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
 		// is the Map right
 		assertEquals(true, fooSubMap.equals(equalsMap));
-		
+
 	}
-	
+
 	/**
 	 * 1. Tests the set(), when Properties is in a subMap
 	 * 
@@ -292,12 +293,12 @@ public class PropertyTest extends Properties{
 		Map<String, Object> equalsMap = super.buildNewNestedMap(new String[]{"bar", "fubar"}, "TEST");
 		Properties properties = new Properties(mFilePath_EqualityTest);
 		properties.set("foo.bar.fubar", "test");
-		
+
 		// get and set
 		Properties properties2 = new Properties(mFilePath_EqualityTest);
 		// the set is called from a subMap foo.bar
 		properties2.get("foo").get("bar").set("fubar", "TEST");
-		
+
 		// equals
 		Properties equalsProperties = new Properties(mFilePath_EqualityTest);
 
@@ -308,7 +309,7 @@ public class PropertyTest extends Properties{
 		Map<String, Object> fooSubMap = (Map<String, Object>) equalsProperties.getValue("foo");
 		// is the Map right
 		assertEquals(true, fooSubMap.equals(equalsMap));
-		
+
 		// tests if exists and clean the system
 		Util.checkAndDeleteTestFile(mFilePath_EqualityTest);
 

@@ -38,19 +38,21 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -178,6 +180,90 @@ public abstract class AbstractTestCase {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Equals the properties-JSONObject from the metadata with the expected properties from yaml-file.
+	 * @param metadataProperties JSONObject with the metadata properties
+	 * @param expected properties from yaml-file
+	 * @return properties JSONObject
+	 */
+	protected boolean equalsMetadataProperties(JSONObject metadataProperties, Map<String, Object> expected) {
+		JSONObject expectedJSON = new JSONObject(expected);
+		return metadataProperties.toString().equals(expectedJSON.toString());
+	}
+
+	/**
+	 * Extracted from jArray the properties-JSONObject from the metadata.
+	 * Have the metadata no properties returns an empty JSONObject.
+	 * @param jArray the JSONArray from List<IdentifierGraph>
+	 * @param arrayIndex is the position of the JSONObject
+	 * @param linkIndex is the link position of the JSONObject, to be used
+	 * @return properties JSONObject
+	 */
+	protected JSONObject getPropertiesFromMetadata(JSONArray jArray, int arrayIndex, int linkIndex) {
+		JSONObject properties = null;
+		try {
+
+			JSONObject jObj = jArray.getJSONObject(arrayIndex);
+			JSONArray links = jObj.getJSONArray("links");
+			JSONObject link = links.getJSONObject(linkIndex);
+			JSONObject metadata = link.getJSONObject("metadata");
+
+			try {
+				properties = metadata.getJSONObject("properties");
+			} catch (JSONException e) {
+				logger.debug("No properties found in metadata[" + metadata + "]", e);
+			}
+
+		} catch (JSONException e) {
+			logger.debug("Could not extracted the metadata from JSONArray[" + jArray + "] arrayIndex[" + arrayIndex + "] -> links["+linkIndex+"] -> metadata", e);
+		}
+
+
+		// return JSONObject, if is null return an empty JSONObject
+		if(properties != null){
+			return properties;
+		} else {
+			return new JSONObject();
+		}
+	}
+
+	/**
+	 * Load the test case file and extracted the properties-Map from the metadata.
+	 * Have the metadata no properties returns an empty Map.
+	 * @param sLink represents the link from yaml-File
+	 * @param sMetadata represents the metadata from yaml-File
+	 * @return properties Map<String, Object>
+	 */
+	@SuppressWarnings("unchecked")
+	protected Map<String, Object> getPropertiesFromMetadata(String sLink, String sMetadata) {
+
+		// load yaml file
+		Map<String, Object> expectedDB = null;
+		try {
+
+			expectedDB = YamlReader.loadMap(getTestcaseFilename());
+
+		} catch (IOException e) {
+			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping test ");
+		}
+
+		// load properties Map from Metadata sMetadata and sLink
+		Map<String, Object> properties = null;
+		if(expectedDB != null) {
+			Map<String, Object> link = (Map<String, Object>) expectedDB.get(sLink);
+			Map<String, Object> metadata = (Map<String, Object>) link.get("metadata");
+			Map<String, Object> meta = (Map<String, Object>) metadata.get(sMetadata);
+			properties = (Map<String, Object>) meta.get("properties");
+		}
+
+		// return map, if is null return an empty Map
+		if(properties != null){
+			return properties;
+		} else {
+			return new HashMap<String, Object>();
 		}
 	}
 }

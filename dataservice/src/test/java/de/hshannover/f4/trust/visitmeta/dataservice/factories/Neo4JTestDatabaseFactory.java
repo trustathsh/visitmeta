@@ -233,8 +233,10 @@ public class Neo4JTestDatabaseFactory {
 			meta.setProperty(KEY_TIMESTAMP_DELETE, map.get("delStamp"));
 			meta.setProperty(KEY_RAW_DATA, map.get("rawData"));
 			HashMap<String, Object> properties = (HashMap<String, Object>) map.get("properties");
-			for (String key : properties.keySet()) {
-				meta.setProperty(key, properties.get(key));
+			if(properties != null){
+				for (String key : properties.keySet()) {
+					meta.setProperty(key, properties.get(key));
+				}
 			}
 			tx.success();
 

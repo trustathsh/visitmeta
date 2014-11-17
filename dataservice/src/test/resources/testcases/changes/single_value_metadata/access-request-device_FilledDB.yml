@@ -1,0 +1,102 @@
+link1:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: administrative-domainTEST
+      name: arNameTEST
+    rawData: administrative-domainTEST arNameTEST
+  second:
+    type: device
+    properties:
+      name: deviceNameTEST
+    rawData: deviceNameTEST
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 0
+      delStamp: 1
+      rawData: access-request-deviceTEST
+link2:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: administrative-domainTEST
+      name: arNameTEST
+    rawData: administrative-domainTEST arNameTEST
+  second:
+    type: device
+    properties:
+      name: deviceNameTEST
+    rawData: deviceNameTEST
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 1
+      delStamp: 2
+      rawData: access-request-deviceTEST
+      properties:
+        test: TEST
+link3:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: administrative-domainTEST
+      name: arNameTEST
+    rawData: administrative-domainTEST arNameTEST
+  second:
+    type: device
+    properties:
+      name: deviceNameTEST
+    rawData: deviceNameTEST
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 2
+      delStamp: 3
+      rawData: access-request-deviceTEST
+link4:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: administrative-domainTEST
+      name: arNameTEST
+    rawData: administrative-domainTEST arNameTEST
+  second:
+    type: device
+    properties:
+      name: deviceNameTEST
+    rawData: deviceNameTEST
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 3
+      delStamp: 4
+      rawData: access-request-deviceTEST
+      properties:
+        test: TEST2
+        test2: TEST2_2
+link5:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: administrative-domainTEST
+      name: arNameTEST
+    rawData: administrative-domainTEST arNameTEST
+  second:
+    type: device
+    properties:
+      name: deviceNameTEST
+    rawData: deviceNameTEST
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 5
+      delStamp: -1
+      rawData: access-request-deviceTEST
+      properties:
+        test: TEST

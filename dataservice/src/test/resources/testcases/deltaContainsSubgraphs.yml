@@ -1,0 +1,62 @@
+link1:
+  first:
+    type: mac-address
+    properties:
+      value: aa:bb:cc:dd:ee:ff
+    rawData: mac-address1
+  second:
+    type: ip-address
+    rawData: ip-address1
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+  metadata:
+    meta1:
+      type: ip-mac
+      singleValue: true
+      pubStamp: 0
+      delStamp: -1
+      rawData: ip-mac1
+      properties:
+        dhcp-server: dhcp
+link2:
+  first:
+    type: mac-address
+    properties:
+      value: aa:bb:cc:dd:ee:ff
+    rawData: mac-address1
+  second:
+    type: access-request
+    rawData: access-request1
+    properties:
+      value: ar:1
+  metadata:
+    meta2:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 1
+      delStamp: -1
+      rawData: access-request-device1
+      properties:
+        dhcp-server: dhcp2
+link3:
+  first:
+    type: ip-address
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+    rawData: ip-address1
+  second:
+    type: device
+    rawData: device1
+    properties:
+      name: device1
+  metadata:
+    meta3:
+      type: ip-device
+      singleValue: true
+      pubStamp: 2
+      delStamp: -1
+      rawData: ip-device1
+      properties:
+        dhcp-server: dhcp2

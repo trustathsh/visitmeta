@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
@@ -46,6 +47,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -65,6 +67,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphServ
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.JsonMarshaller;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
@@ -266,4 +269,57 @@ public abstract class AbstractTestCase {
 			return new HashMap<String, Object>();
 		}
 	}
+
+	protected void testGraphListSize(List<IdentifierGraph> list, int expectedGraphListSize) {
+		assertEquals(expectedGraphListSize, list.size());
+	}
+
+	protected void testIdentifierCount(IdentifierGraph graph, int expectedIdentifierCount) {
+		List<Identifier> identifiers = graph.getIdentifiers();
+		assertEquals(expectedIdentifierCount, identifiers.size());
+	}
+
+	protected void testDeltaSize(Delta delta, int expectedUpdateGraphSize, int expectedDeleteGraphSize) {
+		List<IdentifierGraph> updates = delta.getUpdates();
+		List<IdentifierGraph> deletes = delta.getDeletes();
+
+		assertEquals(expectedUpdateGraphSize, updates.size());
+		assertEquals(expectedDeleteGraphSize, deletes.size());
+	}
+
+	protected void testChangesMap(Map<Long, Long> expectedValues, Map<Long, Long> changesMap) {
+		assertEquals(expectedValues.size(), changesMap.size());
+
+		Iterator<Long> iterator = expectedValues.keySet().iterator();
+		while (iterator.hasNext()) {
+			Long key = iterator.next();
+			assertEquals(expectedValues.get(key), changesMap.get(key));
+		}
+	}
+
+	protected void testChangesMapJSON(Map<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) {
+		String actual = toJson(changesMap).toString();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+
+		Iterator<Long> iterator = changesMap.keySet().iterator();
+		while (iterator.hasNext()) {
+			Long key = iterator.next();
+			Long expectedValue = expectedValues.get(key);
+			sb.append("\"");
+			sb.append(key);
+			sb.append("\":");
+			sb.append(expectedValue);
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+		String expected = sb.toString();
+
+		assertEquals(expected, actual);
+	}
+
 }

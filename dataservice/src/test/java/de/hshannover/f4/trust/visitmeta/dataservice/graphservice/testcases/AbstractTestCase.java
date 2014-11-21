@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -184,6 +185,207 @@ public abstract class AbstractTestCase {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Equals JSONObjects or JSONArrays rekursive.
+	 * @param obj1
+	 * @param obj2
+	 * @return true if the JSONObject are same, false otherwise
+	 * @throws JSONException
+	 */
+	protected boolean jsonsEqual(Object obj1, Object obj2) throws JSONException {
+		// ### equals the classes ###
+		if ( !obj1.getClass().equals(obj2.getClass()) ) {
+			return false;
+		}
+
+		if ( obj1 instanceof JSONObject ) {
+			// ### equals JSONObjects ###
+
+			JSONObject jsonObj1 = (JSONObject) obj1;
+			JSONObject jsonObj2 = (JSONObject) obj2;
+
+			JSONArray keyNames = jsonObj1.names();
+			JSONArray keyNames2 = jsonObj2.names();
+
+			// ### equals keys ###
+			if (keyNames == null || keyNames2 == null) {
+				if (keyNames == null && keyNames2 == null) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			if (keyNames.length() != keyNames2.length()){
+				return false;
+			}
+
+			// equals the value from key (the sequence does not matter)
+			for (int i=0; i < keyNames.length(); i++) {
+				Object obj1FieldValue = jsonObj1.get((String)keyNames.get(i));
+				Object obj2FieldValue = jsonObj2.get((String)keyNames.get(i));
+
+				// rekursive call
+				if (!jsonsEqual(obj1FieldValue, obj2FieldValue)){
+					return false;
+				}
+			}
+
+		} else if ( obj1 instanceof JSONArray ){
+			// ### equals JSONArrays ###
+
+			JSONArray obj1Array = (JSONArray) obj1;
+			JSONArray obj2Array = (JSONArray) obj2;
+
+			// ### equals the arrays ###
+			if (obj1Array.length() != obj2Array.length()){
+				return false;
+			}
+
+			// ### equals the objects from the arrays (the sequence does not matter) ###
+			for (int i = 0; i < obj1Array.length(); i++){
+				boolean matchFound = false;
+
+				for (int j = 0; j < obj2Array.length(); j++){
+					// rekursive call
+					if (jsonsEqual(obj1Array.get(i), obj2Array.get(j))){
+						matchFound = true;
+						break;
+					}
+				}
+
+				if ( !matchFound ){
+					return false;
+				}
+			}
+		} else {
+			// ### equals Objects ###
+
+			if ( !obj1.equals(obj2) ){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Builds a JSONArray to equals this with JsonMarshaller.toJson().
+	 * Load the data from the yaml file.
+	 * @param link
+	 * @return JSONArray from the yaml testcase filename
+	 * @throws JSONException
+	 */
+	@SuppressWarnings("unchecked")
+	protected JSONArray buildJSONFromYamlFile(String link, Long timestamp) throws JSONException {
+
+		// ### load the expected from yaml file ###
+		Map<String, Object> expectedDB = null;
+		try {
+
+			expectedDB = YamlReader.loadMap(getTestcaseFilename());
+
+		} catch (IOException e) {
+			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping test ");
+		}
+
+		// ### extract first // second // metadata
+		Map<String, Object> expectedLink = (Map<String, Object>) expectedDB.get(link);
+		Map<String, Object> first = (Map<String, Object>) expectedLink.get("first");
+		Map<String, Object> second = (Map<String, Object>) expectedLink.get("second");
+		Map<String, Object> metadata = (Map<String, Object>) expectedLink.get("metadata");
+
+		JSONArray expectedJSONArray = new JSONArray();
+		JSONObject expectedJSONObject = new JSONObject();
+		JSONArray linksJSONArray = new JSONArray();
+		JSONObject linkJSONObject = new JSONObject();
+		JSONArray identifiersJSONArray = new JSONArray();
+
+		// ### build link object ###
+		expectedJSONObject.put("timestamp", timestamp);
+		expectedJSONObject.put("links", linksJSONArray);
+
+
+		// ### build first Identifier ###
+		JSONObject firstIdentifierJSONObject = buildJSONObjectFromMap(first);
+		identifiersJSONArray.put(firstIdentifierJSONObject);
+
+		// ### build second Identifier ###
+		if(second != null){
+			JSONObject secondIdentifierJSONObject = buildJSONObjectFromMap(second);
+
+			identifiersJSONArray.put(secondIdentifierJSONObject);
+			linkJSONObject.put("identifiers", identifiersJSONArray);
+
+		} else {
+			linkJSONObject.put("identifiers", firstIdentifierJSONObject);
+		}
+
+		// ### build metadata for the link object ###
+		JSONArray metadataJSONArray = buildMetadataJSONArray(metadata);
+
+		if(metadataJSONArray.length() == 1){
+			// only one -> add simple JSONObject
+			linkJSONObject.put("metadata", metadataJSONArray.get(0));
+
+		}else if(metadataJSONArray.length() > 1){
+			// more as one add the full array
+			linkJSONObject.put("metadata", metadataJSONArray);
+
+		} else {
+			linkJSONObject.put("metadata", new JSONObject());
+		}
+
+		// ### add the link object to the links array ###
+		linksJSONArray.put(linkJSONObject);
+
+		// ### add the expected-JSONObject object to the root array ###
+		expectedJSONArray.put(expectedJSONObject);
+
+		return expectedJSONArray;
+	}
+
+	@SuppressWarnings("unchecked")
+	private JSONArray buildMetadataJSONArray(Map<String, Object> metadata) throws JSONException {
+		JSONArray metadataJSONArray = new JSONArray();
+		for(Entry<String, Object> metadataEntry: metadata.entrySet()){
+
+			Object tmp = metadataEntry.getValue();
+			if(tmp instanceof HashMap){
+				HashMap<String, Object> metaTmp = (HashMap<String, Object>) tmp;
+				JSONObject metadataJSONObject = buildJSONObjectFromMap(metaTmp);
+
+				metadataJSONArray.put(metadataJSONObject);
+			} else {
+				logger.error("The metadata-entry-set value is not a HashMap");
+			}
+		}
+		return metadataJSONArray;
+	}
+
+	/**
+	 * Build a JSONObject for identifiers or metadata
+	 * @param valueMap
+	 * @return JSONObject
+	 * @throws JSONException
+	 */
+	@SuppressWarnings("unchecked")
+	private JSONObject buildJSONObjectFromMap(Map<String, Object> valueMap) throws JSONException {
+		Map<String, Object> properties = (Map<String, Object>) valueMap.get("properties");
+
+		JSONObject propertiesJSONObject = new JSONObject();
+		if (properties != null) {
+			for(Entry<String, Object> e: properties.entrySet()){
+				propertiesJSONObject.put(e.getKey(), e.getValue());
+			}
+		}
+
+		JSONObject valueJSONObject = new JSONObject();
+		valueJSONObject.put("typename", valueMap.get("type"));
+		valueJSONObject.put("properties", propertiesJSONObject);
+		return valueJSONObject;
 	}
 
 	/**

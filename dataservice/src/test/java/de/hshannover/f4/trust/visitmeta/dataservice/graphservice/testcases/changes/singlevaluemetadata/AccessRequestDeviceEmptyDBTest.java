@@ -38,16 +38,17 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.changes.singlevaluemetadata;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.AbstractTestCase;
@@ -73,31 +74,30 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 	}
 
 	@Override
-	public void getInitialGraph() {
+	public void getInitialGraph() throws JSONException {
 		List<IdentifierGraph> initialGraph = mService.getInitialGraph();
-
 		JSONArray actual = toJson(initialGraph);
 
-		// check IdentifierGraph size
-		assertEquals(1, initialGraph.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(initialGraph, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = initialGraph.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link1", "meta1");
-
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
+		assertTrue(jsonsEqual(actual, expected));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
 	}
 
 	@Override
-	public void getGraphAt() {
+	public void getGraphAt() throws JSONException {
 
 		getGraphAt0();
 		getGraphAt1();
@@ -109,184 +109,192 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 	}
 
-	private void getGraphAt6() {
+	private void getGraphAt6() throws JSONException {
 		long timestamp = 6;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(0, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 0);
 
-		// check metadata properties
+		// ### check Identifiers size ###
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check metadata properties ###
 		// nothing to check, size must be 0
 
-		// check JSON-String
-		String expected = "[]";
-		assertEquals(expected, actual.toString());
+		// ### check Identifiers size ###
+		// nothing to check, size must be 0
+
+		// ### check JSON-String ###
+		JSONArray expected = new JSONArray();
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt5() {
+	private void getGraphAt5() throws JSONException {
 		long timestamp = 5;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(1, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = graphAt.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link5", "meta1");
 
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
-		// nothing to check, size must be 0
-
-		// check JSON-String
-		// TODO [MR]
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link5", 5L);
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt4() {
+	private void getGraphAt4() throws JSONException {
 		long timestamp = 4;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(0, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 0);
 
-		// check metadata properties
+		// ### check Identifiers size ###
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check metadata properties ###
 		// nothing to check, size must be 0
 
-		// check JSON-String
-		String expected = "[]";
-		assertEquals(expected, actual.toString());
+		// ### check JSON-String ###
+		JSONArray expected = new JSONArray();
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt3() {
+	private void getGraphAt3() throws JSONException {
 		long timestamp = 3;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(1, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = graphAt.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link4", "meta1");
 
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link4", 3L);
+		assertTrue(jsonsEqual(actual, expected));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
 	}
 
-	private void getGraphAt2() {
+	private void getGraphAt2() throws JSONException {
 		long timestamp = 2;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(1, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = graphAt.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link3", "meta1");
 
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
-		// nothing to check, size must be 0
-
-		// check JSON-String
-		// TODO [MR]
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link3", 2L);
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt1() {
+	private void getGraphAt1() throws JSONException {
 		long timestamp = 1;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(1, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = graphAt.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link2", "meta1");
 
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
-
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link2", 1L);
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt0() {
+	private void getGraphAt0() throws JSONException {
 		long timestamp = 0;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		JSONArray actual = toJson(graphAt);
 
-		// check IdentifierGraph size
-		assertEquals(1, graphAt.size());
+		// ### check IdentifierGraph size ###
+		testGraphListSize(graphAt, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		IdentifierGraph graph = graphAt.get(0);
+		testIdentifierCount(graph, 2);
+
+		// ### check metadata properties ###
 		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
 		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link1", "meta1");
 
 		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
-		// check Identifiers size
-
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// ### check JSON-String ###
+		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
-	public void getCurrentGraph() {
+	public void getCurrentGraph() throws JSONException {
 		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
 
 		JSONArray actual = toJson(currentGraph);
 
-		// check IdentifierGraph size
+		// ### check IdentifierGraph size ###
 		assertTrue(currentGraph.isEmpty());
 
-		// check metadata properties
+		// ### check Identifiers size ###
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check metadata properties ###
 		// nothing to check, size must be 0
 
-		// check JSON-String
-		String expected = "[]";
-		assertEquals(expected, actual.toString());
+		// ### check JSON-String ###
+		JSONArray expected = new JSONArray();
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
-	public void getDelta() {
+	public void getDelta() throws JSONException {
 		//										x Δ x -> x= the property number
 		getDeltaFrom0To1();		//				0 Δ 1
 		getDeltaFrom0To2();		//				0 Δ 0
@@ -305,22 +313,28 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 	/**
 	 * Delta from a graph with one metadata without properties and a empty graph
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom0To4() {
+	private void getDeltaFrom0To4() throws JSONException {
 		long t1 = 0;
 		long t2 = 4;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
 		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(0, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 0, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		// nothing to check, size must be 0
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
@@ -330,20 +344,20 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		// check updates
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 4L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
-
+		// check updates
+		// nothing to check, size must be 0
 	}
 
 	/**
 	 * Delta from a graph with one metadata without properties and a graph with one metadata and two properties
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom0To3() {
+	private void getDeltaFrom0To3() throws JSONException {
 		long t1 = 0;
 		long t2 = 3;
 		Delta delta = mService.getDelta(t1, t2);
@@ -353,11 +367,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
@@ -370,20 +392,21 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 3L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
-
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 3L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata without properties and a graph with metadata without properties, too
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom0To2() {
+	private void getDeltaFrom0To2() throws JSONException {
 		long t1 = 0;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
@@ -393,34 +416,34 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(0, deletes.size());
-		assertEquals(0, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 0, 0);
 
-		// check metadata properties
+		// ### check metadata properties ###
 		// check deletes
 		// nothing to check, size must be 0
 
 		// check updates
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check Identifiers size ###
 		// nothing to check, size must be 0
 
-		// check JSON-String
+		// ### check JSON-String ###
 		// check deletes
-		String expectedDeletes = "[]";
-		assertEquals(expectedDeletes, actualDeletes.toString());
+		JSONArray expectedDeletes = new JSONArray();
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		String expectedUpdates = "[]";
-		assertEquals(expectedUpdates, actualUpdates.toString());
+		JSONArray expectedUpdates = new JSONArray();
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata without properties and a graph with one metadata and one property
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom0To1() {
+	private void getDeltaFrom0To1() throws JSONException {
 		long t1 = 0;
 		long t2 = 1;
 		Delta delta = mService.getDelta(t1, t2);
@@ -430,11 +453,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
@@ -447,19 +478,21 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 1L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link2", 1L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata and one property and a graph with one metadata and one property, too
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom1To5() {
+	private void getDeltaFrom1To5() throws JSONException {
 		long t1 = 1;
 		long t2 = 5;
 		Delta delta = mService.getDelta(t1, t2);
@@ -469,44 +502,53 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(0, deletes.size());
-		assertEquals(0, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 0, 0);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// nothing to check, size must be 0
+
+		// ### check metadata properties ###
 		// check deletes
 		// nothing to check, size must be 0
 
 		// check updates
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = new JSONArray();
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = new JSONArray();
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata and one property and a empty graph
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom1To4() {
+	private void getDeltaFrom1To4() throws JSONException {
 		long t1 = 1;
 		long t2 = 4;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
 		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(0, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 0, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		// nothing to check, size must be 0
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
@@ -516,19 +558,20 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		// check updates
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 4L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		// nothing to check, size must be 0
 	}
 
 	/**
 	 * Delta from a graph with one metadata and one property and a graph with metadata and two properties
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom1To3() {
+	private void getDeltaFrom1To3() throws JSONException {
 		long t1 = 1;
 		long t2 = 3;
 		Delta delta = mService.getDelta(t1, t2);
@@ -538,11 +581,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
@@ -555,19 +606,21 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 3L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 3L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata and one property and a graph with metadata without properties
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom1To2() {
+	private void getDeltaFrom1To2() throws JSONException {
 		long t1 = 1;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
@@ -577,11 +630,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
@@ -594,33 +655,40 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 2L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link3", 2L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata without properties and a empty graph
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom2To4() {
+	private void getDeltaFrom2To4() throws JSONException {
 		long t1 = 2;
 		long t2 = 4;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
 		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(0, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 0, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		// nothing to check, size must be 0
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link3", "meta1");
@@ -630,19 +698,20 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		// check updates
 		// nothing to check, size must be 0
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link3", 4L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		// nothing to check, size must be 0
 	}
 
 	/**
 	 * Delta from a graph with one metadata without properties and a graph with metadata with two properties
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom2To3() {
+	private void getDeltaFrom2To3() throws JSONException {
 		long t1 = 2;
 		long t2 = 3;
 		Delta delta = mService.getDelta(t1, t2);
@@ -652,11 +721,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link3", "meta1");
@@ -669,19 +746,21 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link3", 3L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 3L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a graph with one metadata and two properties and a graph with metadata with one property
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom3To5() {
+	private void getDeltaFrom3To5() throws JSONException {
 		long t1 = 3;
 		long t2 = 5;
 		Delta delta = mService.getDelta(t1, t2);
@@ -691,11 +770,19 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 1);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		IdentifierGraph deletegraph = deletes.get(0);
+		testIdentifierCount(deletegraph, 2);
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
 		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link4", "meta1");
@@ -708,33 +795,40 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
+		JSONArray expectedDeletes = buildJSONFromYamlFile("link4", 5L);
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link5", 5L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	/**
 	 * Delta from a empty graph and a graph with one metadata and one property
+	 * @throws JSONException
 	 */
-	private void getDeltaFrom4To5() {
+	private void getDeltaFrom4To5() throws JSONException {
 		long t1 = 4;
 		long t2 = 5;
 		Delta delta = mService.getDelta(t1, t2);
-		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
 		JSONArray actualUpdates = toJson(updates);
 
-		// check Delta sizes for deletes and updates
-		assertEquals(0, deletes.size());
-		assertEquals(1, updates.size());
+		// ### check Delta sizes for deletes and updates ###
+		testDeltaSize(delta, 1, 0);
 
-		// check metadata properties
+		// ### check Identifiers size ###
+		// check deletes
+		// nothing to check, size must be 0
+
+		// check updates
+		IdentifierGraph updategraph = updates.get(0);
+		testIdentifierCount(updategraph, 2);
+
+		// ### check metadata properties ###
 		// check deletes
 		// nothing to check, size must be 0
 
@@ -744,38 +838,29 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 
 		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
-		// check Identifiers size
+		// ### check JSON-String ###
+		// check deletes
 
-		// TODO [MR]
-
-		// check JSON-String
-
-		// TODO [MR]
+		// check updates
+		JSONArray expectedUpdates = buildJSONFromYamlFile("link5", 5L);
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
 	@Override
 	public void getChangesMap() {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
-		long t0 = 0;
-		long t1 = 1;
-		long t2 = 2;
-		long t3 = 3;
-		long t4 = 4;
-		long t5 = 5;
-		long t6 = 6;
+		Map<Long,Long> expectedChanges = new HashMap<Long,Long>();
+		expectedChanges.put(0L, 1L);	// t0
+		expectedChanges.put(1L, 2L);	// t1
+		expectedChanges.put(2L, 2L);	// t2
+		expectedChanges.put(3L, 2L);	// t3
+		expectedChanges.put(4L, 1L);	// t4
+		expectedChanges.put(5L, 1L);	// t5
+		expectedChanges.put(6L, 1L);	// t6
 
-		assertTrue(changesMap.size() == 7);
-
-		assertEquals(1, (long) changesMap.get(t0));
-		assertEquals(2, (long) changesMap.get(t1));
-		assertEquals(2, (long) changesMap.get(t2));
-		assertEquals(2, (long) changesMap.get(t3));
-		assertEquals(1, (long) changesMap.get(t4));
-		assertEquals(1, (long) changesMap.get(t5));
-		assertEquals(1, (long) changesMap.get(t6));
-
-		JSONObject actual = toJson(changesMap);
+		testChangesMap(expectedChanges, changesMap);
+		testChangesMapJSON(expectedChanges, changesMap);
 	}
 
 }

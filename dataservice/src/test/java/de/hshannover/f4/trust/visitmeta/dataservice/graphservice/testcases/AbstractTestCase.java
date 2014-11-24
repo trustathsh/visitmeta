@@ -141,16 +141,16 @@ public abstract class AbstractTestCase {
 	}
 
 	@Test
-	public abstract void getInitialGraph();
+	public abstract void getInitialGraph() throws Exception;
 
 	@Test
-	public abstract void getGraphAt();
+	public abstract void getGraphAt() throws Exception;
 
 	@Test
-	public abstract void getCurrentGraph();
+	public abstract void getCurrentGraph() throws Exception;
 
 	@Test
-	public abstract void getDelta();
+	public abstract void getDelta() throws Exception;
 
 	@Test
 	public abstract void getChangesMap();

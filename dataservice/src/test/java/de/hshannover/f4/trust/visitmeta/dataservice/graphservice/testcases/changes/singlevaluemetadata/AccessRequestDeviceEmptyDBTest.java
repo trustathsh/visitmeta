@@ -847,7 +847,7 @@ public class AccessRequestDeviceEmptyDBTest extends AbstractTestCase {
 	}
 
 	@Override
-	public void getChangesMap() {
+	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
 		Map<Long,Long> expectedChanges = new HashMap<Long,Long>();

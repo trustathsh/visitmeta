@@ -153,10 +153,14 @@ public abstract class AbstractTestCase {
 	public abstract void getDelta() throws Exception;
 
 	@Test
-	public abstract void getChangesMap();
+	public abstract void getChangesMap() throws Exception;
 
-	public JSONObject toJson(SortedMap<Long,Long> changesMap) {
-		return new JSONObject(changesMap);
+	public JSONObject toJson(Map<Long,Long> changesMap) throws JSONException {
+		JSONObject newJSONObject = new JSONObject();
+		for(Entry<Long,Long> entry: changesMap.entrySet()){
+			newJSONObject.put(entry.getKey().toString(), entry.getValue());
+		}
+		return newJSONObject;
 	}
 
 	public JSONObject toJson(Delta delta) {
@@ -508,7 +512,7 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	protected void testChangesMapJSON(Map<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) {
+	protected void testChangesMapJSON(Map<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) throws JSONException {
 		String actual = toJson(changesMap).toString();
 
 		StringBuilder sb = new StringBuilder();

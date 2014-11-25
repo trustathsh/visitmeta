@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
@@ -112,7 +113,7 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void getChangesMap(){
+	public void getChangesMap() throws JSONException{
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
 		assertTrue(changesMap.isEmpty());

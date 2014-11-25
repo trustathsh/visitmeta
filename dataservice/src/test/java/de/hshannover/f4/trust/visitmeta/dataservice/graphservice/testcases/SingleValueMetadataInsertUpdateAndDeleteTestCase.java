@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
@@ -185,7 +186,7 @@ AbstractTestCase {
 	}
 
 	@Override
-	public void getChangesMap() {
+	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
 		long t0 = 0;

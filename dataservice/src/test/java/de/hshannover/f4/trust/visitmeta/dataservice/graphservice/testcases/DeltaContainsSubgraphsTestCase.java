@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.codehaus.jettison.json.JSONException;
+
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
@@ -160,7 +162,7 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void getChangesMap() {
+	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
 		Map<Long,Long> changes = new HashMap<Long,Long>();

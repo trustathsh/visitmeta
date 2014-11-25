@@ -209,7 +209,7 @@ public abstract class AbstractTestCase {
 			JSONArray keyNames = jsonObj1.names();
 			JSONArray keyNames2 = jsonObj2.names();
 
-			// ### equals keys ###
+			// check keys of null
 			if (keyNames == null || keyNames2 == null) {
 				if (keyNames == null && keyNames2 == null) {
 					return true;
@@ -218,14 +218,22 @@ public abstract class AbstractTestCase {
 				}
 			}
 
+			// check keys length
 			if (keyNames.length() != keyNames2.length()){
 				return false;
 			}
 
+			// check keys Class of String
+			for(int i= 0; i<keyNames.length(); i++) {
+				if(!keyNames.get(i).getClass().equals(String.class) || !keyNames2.get(i).getClass().equals(String.class)){
+					throw new JSONException("The key from the JSONObject must be a String");
+				}
+			}
+
 			// equals the value from key (the sequence does not matter)
 			for (int i=0; i < keyNames.length(); i++) {
-				Object obj1FieldValue = jsonObj1.get((String)keyNames.get(i));
-				Object obj2FieldValue = jsonObj2.get((String)keyNames.get(i));
+				Object obj1FieldValue = jsonObj1.get(keyNames.getString(i));
+				Object obj2FieldValue = jsonObj2.get(keyNames.getString(i));
 
 				// rekursive call
 				if (!jsonsEqual(obj1FieldValue, obj2FieldValue)){
@@ -393,10 +401,11 @@ public abstract class AbstractTestCase {
 	 * @param metadataProperties JSONObject with the metadata properties
 	 * @param expected properties from yaml-file
 	 * @return properties JSONObject
+	 * @throws JSONException
 	 */
-	protected boolean equalsMetadataProperties(JSONObject metadataProperties, Map<String, Object> expected) {
+	protected boolean equalsMetadataProperties(JSONObject metadataProperties, Map<String, Object> expected) throws JSONException {
 		JSONObject expectedJSON = new JSONObject(expected);
-		return metadataProperties.toString().equals(expectedJSON.toString());
+		return jsonsEqual(expectedJSON, metadataProperties);
 	}
 
 	/**

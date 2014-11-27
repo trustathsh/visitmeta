@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,6 +42,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.SortedMap;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -107,14 +108,14 @@ public class GraphResource {
 	@Path("changes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getChangesMap(@PathParam("connectionName") String name) {
-		JSONObject changes;
+		SortedMap<Long, Long> changes;
 		try{
-			changes = new JSONObject(Application.getConnectionManager().getGraphService(name).getChangesMap());
+			changes = Application.getConnectionManager().getGraphService(name).getChangesMap();
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
-		return changes;
+		return jsonMarshaller().toJson(changes);
 	}
 
 	/**

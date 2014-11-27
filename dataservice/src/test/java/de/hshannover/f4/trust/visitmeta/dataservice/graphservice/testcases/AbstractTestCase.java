@@ -156,11 +156,7 @@ public abstract class AbstractTestCase {
 	public abstract void getChangesMap() throws Exception;
 
 	public JSONObject toJson(Map<Long,Long> changesMap) throws JSONException {
-		JSONObject newJSONObject = new JSONObject();
-		for(Entry<Long,Long> entry: changesMap.entrySet()){
-			newJSONObject.put(entry.getKey().toString(), entry.getValue());
-		}
-		return newJSONObject;
+		return mJsonMarshaller.toJson(changesMap);
 	}
 
 	public JSONObject toJson(Delta delta) {

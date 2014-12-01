@@ -37,27 +37,9 @@ link2:
       delStamp: 2
       rawData: access-request-deviceTEST
       properties:
-        test: TEST
+        test: TEST2
+        test2: TEST2_2
 link3:
-  first:
-    type: access-request
-    properties:
-      administrative-domain: administrative-domainTEST
-      name: arNameTEST
-    rawData: administrative-domainTEST arNameTEST
-  second:
-    type: device
-    properties:
-      name: deviceNameTEST
-    rawData: deviceNameTEST
-  metadata:
-    meta1:
-      type: access-request-device
-      singleValue: true
-      pubStamp: 2
-      delStamp: 3
-      rawData: access-request-deviceTEST
-link4:
   first:
     type: access-request
     properties:
@@ -77,9 +59,8 @@ link4:
       delStamp: 4
       rawData: access-request-deviceTEST
       properties:
-        test: TEST2
-        test2: TEST2_2
-link5:
+        test: TEST
+link4:
   first:
     type: access-request
     properties:

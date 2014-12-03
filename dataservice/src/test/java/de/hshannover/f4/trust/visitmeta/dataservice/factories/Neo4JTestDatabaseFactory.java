@@ -110,8 +110,15 @@ public class Neo4JTestDatabaseFactory {
 						System.out.println(key + ": " + tmp.getProperty(key));
 					}
 					System.out.println("/METADATA--------------------");
+				} else if(tmp.hasLabel(Neo4JTypeLabels.CHANGE)) {
+					System.out.println("CHANGESMAP-------------------");
+					System.out.println("ID: " + tmp.getId());
+					for(String key : tmp.getPropertyKeys()) {
+						System.out.println(key + ": " + tmp.getProperty(key));
+					}
+					System.out.println("/CHANGESMAP------------------");
 				} else {
-					System.out.println("unknown node");
+					System.out.println("UNKNOWN----------------------");
 				}
 			}
 		}
@@ -232,6 +239,7 @@ public class Neo4JTestDatabaseFactory {
 			meta.setProperty(KEY_TIMESTAMP_PUBLISH, map.get("pubStamp"));
 			meta.setProperty(KEY_TIMESTAMP_DELETE, map.get("delStamp"));
 			meta.setProperty(KEY_RAW_DATA, map.get("rawData"));
+			meta.setProperty(KEY_HASH, map.get("rawData"));
 			HashMap<String, Object> properties = (HashMap<String, Object>) map.get("properties");
 			if(properties != null){
 				for (String key : properties.keySet()) {

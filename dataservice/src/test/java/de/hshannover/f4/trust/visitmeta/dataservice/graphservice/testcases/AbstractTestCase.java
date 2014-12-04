@@ -47,6 +47,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -87,6 +88,7 @@ public abstract class AbstractTestCase {
 	private static final String KEY_YAML_METADATA = "metadata";
 	private static final String KEY_YAML_TYPENAME = "type";
 	private static final String KEY_YAML_PROPERTIES = "properties";
+	private static final String KEY_YAML_RAWDATA = "rawData";
 
 	private static final String KEY_JSON_IDENTIFIERS = "identifiers";
 	private static final String KEY_JSON_LINKS = "links";
@@ -108,6 +110,8 @@ public abstract class AbstractTestCase {
 
 	private final Logger logger = Logger.getLogger(AbstractTestCase.class);
 	private Map<String, Object> mTestcase;
+	protected Map<String, JSONObject> mIdentifier;
+	protected Map<String, JSONObject> mMetadata;
 
 	@Before
 	public void setUp() throws Exception {
@@ -122,8 +126,7 @@ public abstract class AbstractTestCase {
 
 		loadTestcaseIntoGraphDB();
 
-		Neo4JRepository repo = new Neo4JRepository(mDbConnection,
-				MessageDigest.getInstance("MD5"));
+		Neo4JRepository repo = new Neo4JRepository(mDbConnection, MessageDigest.getInstance("MD5"));
 		mReader = new Neo4JReader(repo, mDbConnection);
 		mExecutor = new Neo4JExecutor(mDbConnection);
 
@@ -140,12 +143,13 @@ public abstract class AbstractTestCase {
 
 	public abstract String getTestcaseFilename();
 
-	private void loadTestcaseIntoGraphDB() {
+	private void loadTestcaseIntoGraphDB() throws JSONException {
 		try {
 			String testcaseFilename = getTestcaseFilename();
 			if (testcaseFilename != null) {
 				mTestcase = YamlReader.loadMap(testcaseFilename);
 				assumeTrue(!mTestcase.isEmpty());
+				parseYamlMap();
 				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(mTestcase, mGraphDb, mTimestampManager);
 			} else {
 				logger.info("Testcase filename was null, using empty graph database for tests.");
@@ -153,6 +157,105 @@ public abstract class AbstractTestCase {
 		} catch (IOException e) {
 			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping tests");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void parseYamlMap() throws JSONException {
+		mIdentifier = new HashMap<String, JSONObject>();
+		mMetadata = new HashMap<String, JSONObject>();
+
+		for (String linkKey : mTestcase.keySet()) {
+			Map<String, Object> link = (Map<String, Object>) mTestcase.get(linkKey);
+			Map<String, Object> first = (Map<String, Object>) link.get(KEY_YAML_FIRST_IDENTIFIER);
+			Map<String, Object> second = (Map<String, Object>) link.get(KEY_YAML_SECOND_IDENTIFIER);
+			Map<String, Object> metadata = (Map<String, Object>) link.get(KEY_YAML_METADATA);
+
+			if (!mIdentifier.containsKey(first.get(KEY_YAML_RAWDATA))) {
+				mIdentifier.put((String) first.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(first));
+			}
+			if (!mIdentifier.containsKey(second.get(KEY_YAML_RAWDATA))) {
+				mIdentifier.put((String) second.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(second));
+			}
+
+			for (String metaKey : metadata.keySet()) {
+				Map<String, Object> meta = (Map<String, Object>) metadata.get(metaKey);
+				mMetadata.put((String) meta.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(meta));
+
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param timestamp
+	 *            of the subgraph
+	 * @param objects
+	 *            List of Identifier-Metadata connections contained in the
+	 *            subgraph
+	 * @return JSONObject containing the subgraph
+	 * @throws JSONException
+	 */
+	protected JSONObject createJSON(long timestamp, List<JSONObject> objects) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("timestamp", timestamp);
+
+		JSONArray linksWrapperArray = new JSONArray();
+		json.put("links", linksWrapperArray);
+
+		for (JSONObject obj : objects) {
+			linksWrapperArray.put(obj);
+		}
+
+		return json;
+	}
+
+	protected JSONObject createJSON(long timestamp, JSONObject object) throws JSONException {
+		ArrayList<JSONObject> objects = new ArrayList<JSONObject>();
+		objects.add(object);
+		return createJSON(timestamp, objects);
+	}
+
+	/**
+	 *
+	 * @param first
+	 *            key for the first Identifier (rawData)
+	 * @param second
+	 *            key for the second Identifier (rawData) (second may be null)
+	 * @param metadata
+	 *            List of keys for metadata (rawData)
+	 * @return JSONObject containing Identifier-Metadata connection.
+	 * @throws JSONException
+	 */
+	protected JSONObject createJSONIdentifierMetadataConnection(String first, String second, List<String> metadata)
+			throws JSONException {
+		JSONObject l = new JSONObject();
+		JSONArray identifiers = new JSONArray();
+		l.put("identifiers", identifiers);
+		identifiers.put(mIdentifier.get(first));
+		if (second != null) {
+			identifiers.put(mIdentifier.get(second));
+		}
+		for (String metaKey : metadata) {
+			l.put("metadata", mMetadata.get(metaKey));
+		}
+
+		return l;
+	}
+
+	protected JSONObject createJSONIdentifierMetadataConnection(String first, List<String> metadata)
+			throws JSONException {
+		return createJSONIdentifierMetadataConnection(first, null, metadata);
+	}
+
+	protected JSONObject createJSONIdentifierMetadataConnection(String first, String second, String metadata)
+			throws JSONException {
+		ArrayList<String> meta = new ArrayList<String>();
+		meta.add(metadata);
+		return createJSONIdentifierMetadataConnection(first, second, meta);
+	}
+
+	protected JSONObject createJSONIdentifierMetadataConnection(String first, String metadata) throws JSONException {
+		return createJSONIdentifierMetadataConnection(first, null, metadata);
 	}
 
 	@Test
@@ -170,7 +273,7 @@ public abstract class AbstractTestCase {
 	@Test
 	public abstract void getChangesMap() throws Exception;
 
-	public JSONObject toJson(Map<Long,Long> changesMap) throws JSONException {
+	public JSONObject toJson(Map<Long, Long> changesMap) throws JSONException {
 		return mJsonMarshaller.toJson(changesMap);
 	}
 
@@ -188,6 +291,7 @@ public abstract class AbstractTestCase {
 
 	/**
 	 * Equals JSONObjects or JSONArrays rekursive.
+	 * 
 	 * @param obj1
 	 * @param obj2
 	 * @return true if the JSONObject are same, false otherwise
@@ -195,11 +299,11 @@ public abstract class AbstractTestCase {
 	 */
 	protected boolean jsonsEqual(Object obj1, Object obj2) throws JSONException {
 		// ### equals the classes ###
-		if ( !obj1.getClass().equals(obj2.getClass()) ) {
+		if (!obj1.getClass().equals(obj2.getClass())) {
 			return false;
 		}
 
-		if ( obj1 instanceof JSONObject ) {
+		if (obj1 instanceof JSONObject) {
 			// ### equals JSONObjects ###
 
 			JSONObject jsonObj1 = (JSONObject) obj1;
@@ -218,59 +322,61 @@ public abstract class AbstractTestCase {
 			}
 
 			// check keys length
-			if (keyNames.length() != keyNames2.length()){
+			if (keyNames.length() != keyNames2.length()) {
 				return false;
 			}
 
 			// check keys Class of String
-			for(int i= 0; i<keyNames.length(); i++) {
-				if(!keyNames.get(i).getClass().equals(String.class) || !keyNames2.get(i).getClass().equals(String.class)){
+			for (int i = 0; i < keyNames.length(); i++) {
+				if (!keyNames.get(i).getClass().equals(String.class)
+						|| !keyNames2.get(i).getClass().equals(String.class)) {
 					throw new JSONException("The key from the JSONObject must be a String");
 				}
 			}
 
 			// equals the value from key (the sequence does not matter)
-			for (int i=0; i < keyNames.length(); i++) {
+			for (int i = 0; i < keyNames.length(); i++) {
 				Object obj1FieldValue = jsonObj1.get(keyNames.getString(i));
 				Object obj2FieldValue = jsonObj2.get(keyNames.getString(i));
 
 				// rekursive call
-				if (!jsonsEqual(obj1FieldValue, obj2FieldValue)){
+				if (!jsonsEqual(obj1FieldValue, obj2FieldValue)) {
 					return false;
 				}
 			}
 
-		} else if ( obj1 instanceof JSONArray ){
+		} else if (obj1 instanceof JSONArray) {
 			// ### equals JSONArrays ###
 
 			JSONArray obj1Array = (JSONArray) obj1;
 			JSONArray obj2Array = (JSONArray) obj2;
 
 			// ### equals the arrays ###
-			if (obj1Array.length() != obj2Array.length()){
+			if (obj1Array.length() != obj2Array.length()) {
 				return false;
 			}
 
-			// ### equals the objects from the arrays (the sequence does not matter) ###
-			for (int i = 0; i < obj1Array.length(); i++){
+			// ### equals the objects from the arrays (the sequence does not
+			// matter) ###
+			for (int i = 0; i < obj1Array.length(); i++) {
 				boolean matchFound = false;
 
-				for (int j = 0; j < obj2Array.length(); j++){
+				for (int j = 0; j < obj2Array.length(); j++) {
 					// rekursive call
-					if (jsonsEqual(obj1Array.get(i), obj2Array.get(j))){
+					if (jsonsEqual(obj1Array.get(i), obj2Array.get(j))) {
 						matchFound = true;
 						break;
 					}
 				}
 
-				if ( !matchFound ){
+				if (!matchFound) {
 					return false;
 				}
 			}
 		} else {
 			// ### equals Objects ###
 
-			if ( !obj1.equals(obj2) ){
+			if (!obj1.equals(obj2)) {
 				return false;
 			}
 		}
@@ -279,8 +385,9 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Builds a JSONArray to equals this with JsonMarshaller.toJson().
-	 * Load the data from the yaml file.
+	 * Builds a JSONArray to equals this with JsonMarshaller.toJson(). Load the
+	 * data from the yaml file.
+	 * 
 	 * @param link
 	 * @return JSONArray from the yaml testcase filename
 	 * @throws JSONException
@@ -303,7 +410,6 @@ public abstract class AbstractTestCase {
 		// ### build link object ###
 		expectedJSONObject.put(KEY_JSON_TIMESTAMP, timestamp);
 		expectedJSONObject.put(KEY_JSON_LINKS, linksJSONArray);
-
 
 		// ### build first Identifier ###
 		JSONObject firstIdentifierJSONObject = buildJSONObjectFromMap(first);
@@ -347,10 +453,10 @@ public abstract class AbstractTestCase {
 	@SuppressWarnings("unchecked")
 	private JSONArray buildMetadataJSONArray(Map<String, Object> metadata) throws JSONException {
 		JSONArray metadataJSONArray = new JSONArray();
-		for(Entry<String, Object> metadataEntry: metadata.entrySet()){
+		for (Entry<String, Object> metadataEntry : metadata.entrySet()) {
 
 			Object tmp = metadataEntry.getValue();
-			if(tmp instanceof HashMap){
+			if (tmp instanceof HashMap) {
 				HashMap<String, Object> metaTmp = (HashMap<String, Object>) tmp;
 				JSONObject metadataJSONObject = buildJSONObjectFromMap(metaTmp);
 
@@ -364,6 +470,7 @@ public abstract class AbstractTestCase {
 
 	/**
 	 * Build a JSONObject for identifiers or metadata
+	 * 
 	 * @param valueMap
 	 * @return JSONObject
 	 * @throws JSONException
@@ -374,7 +481,7 @@ public abstract class AbstractTestCase {
 
 		JSONObject propertiesJSONObject = new JSONObject();
 		if (properties != null) {
-			for(Entry<String, Object> e: properties.entrySet()){
+			for (Entry<String, Object> e : properties.entrySet()) {
 				propertiesJSONObject.put(e.getKey(), e.getValue());
 			}
 		}
@@ -386,23 +493,32 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Equals the properties-JSONObject from the metadata with the expected properties from yaml-file.
-	 * @param metadataProperties JSONObject with the metadata properties
-	 * @param expected properties from yaml-file
+	 * Equals the properties-JSONObject from the metadata with the expected
+	 * properties from yaml-file.
+	 * 
+	 * @param metadataProperties
+	 *            JSONObject with the metadata properties
+	 * @param expected
+	 *            properties from yaml-file
 	 * @return properties JSONObject
 	 * @throws JSONException
 	 */
-	protected boolean equalsMetadataProperties(JSONObject metadataProperties, Map<String, Object> expected) throws JSONException {
+	protected boolean equalsMetadataProperties(JSONObject metadataProperties, Map<String, Object> expected)
+			throws JSONException {
 		JSONObject expectedJSON = new JSONObject(expected);
 		return jsonsEqual(expectedJSON, metadataProperties);
 	}
 
 	/**
-	 * Extracted from jArray the properties-JSONObject from the metadata.
-	 * Have the metadata no properties returns an empty JSONObject.
-	 * @param jArray the JSONArray from List<IdentifierGraph>
-	 * @param arrayIndex is the position of the JSONObject
-	 * @param linkIndex is the link position of the JSONObject, to be used
+	 * Extracted from jArray the properties-JSONObject from the metadata. Have
+	 * the metadata no properties returns an empty JSONObject.
+	 * 
+	 * @param jArray
+	 *            the JSONArray from List<IdentifierGraph>
+	 * @param arrayIndex
+	 *            is the position of the JSONObject
+	 * @param linkIndex
+	 *            is the link position of the JSONObject, to be used
 	 * @return properties JSONObject
 	 */
 	protected JSONObject getPropertiesFromMetadata(JSONArray jArray, int arrayIndex, int linkIndex) {
@@ -421,12 +537,12 @@ public abstract class AbstractTestCase {
 			}
 
 		} catch (JSONException e) {
-			logger.debug("Could not extracted the metadata from JSONArray[" + jArray + "] arrayIndex[" + arrayIndex + "] -> links["+linkIndex+"] -> metadata", e);
+			logger.debug("Could not extracted the metadata from JSONArray[" + jArray + "] arrayIndex[" + arrayIndex
+					+ "] -> links[" + linkIndex + "] -> metadata", e);
 		}
 
-
 		// return JSONObject, if is null return an empty JSONObject
-		if(properties != null){
+		if (properties != null) {
 			return properties;
 		} else {
 			return new JSONObject();
@@ -434,10 +550,13 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Load the test case file and extracted the properties-Map from the metadata.
-	 * Have the metadata no properties returns an empty Map.
-	 * @param sLink represents the link from yaml-File
-	 * @param sMetadata represents the metadata from yaml-File
+	 * Load the test case file and extracted the properties-Map from the
+	 * metadata. Have the metadata no properties returns an empty Map.
+	 * 
+	 * @param sLink
+	 *            represents the link from yaml-File
+	 * @param sMetadata
+	 *            represents the metadata from yaml-File
 	 * @return properties Map<String, Object>
 	 */
 	@SuppressWarnings("unchecked")
@@ -450,7 +569,7 @@ public abstract class AbstractTestCase {
 		properties = (Map<String, Object>) meta.get("properties");
 
 		// return map, if is null return an empty Map
-		if(properties != null){
+		if (properties != null) {
 			return properties;
 		} else {
 			return new HashMap<String, Object>();
@@ -484,7 +603,8 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	protected void testChangesMapJSON(SortedMap<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) throws JSONException {
+	protected void testChangesMapJSON(SortedMap<Long, Long> expectedValues, SortedMap<Long, Long> changesMap)
+			throws JSONException {
 		JSONObject actual = toJson(changesMap);
 		JSONObject expected = toJson(expectedValues);
 

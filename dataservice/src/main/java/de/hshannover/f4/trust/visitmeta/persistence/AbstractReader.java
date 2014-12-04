@@ -125,7 +125,7 @@ public abstract class AbstractReader implements Reader {
 							((pair.getFirst().equals(current)) ? pair.getSecond() : pair.getFirst());
 
 					if (seen.contains(other)) {
-						if (other.isValidAt(timestamp)) {
+						if (l.isValidAt(timestamp)) {
 							InternalIdentifier detachedOther = graph.findIdentifier(other);
 							InternalLink link = graph.connect(detachedCurrent, detachedOther);
 							detachLinkMetadata(l, link, graph, timestamp);

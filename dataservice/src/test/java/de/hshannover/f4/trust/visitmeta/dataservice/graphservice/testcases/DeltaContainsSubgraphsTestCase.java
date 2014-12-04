@@ -41,10 +41,9 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONException;
 
@@ -134,6 +133,7 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 
 		List<Identifier> updateIdentifiers = delta.getUpdates().get(0).getIdentifiers();
 		assertEquals(2, updateIdentifiers.size());
+
 	}
 
 	private void getDeltaFrom1To2() {
@@ -165,7 +165,7 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
-		Map<Long,Long> changes = new HashMap<Long,Long>();
+		SortedMap<Long,Long> changes = new TreeMap<Long,Long>();
 		changes.put(0L, 1L);	// t0
 		changes.put(1L, 1L);	// t1
 		changes.put(2L, 1L);	// t2

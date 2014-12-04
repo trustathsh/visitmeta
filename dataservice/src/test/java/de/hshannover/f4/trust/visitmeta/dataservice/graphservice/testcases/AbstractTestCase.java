@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
@@ -81,6 +82,19 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.YamlReader;
 
 public abstract class AbstractTestCase {
 
+	private static final String KEY_YAML_FIRST_IDENTIFIER = "first";
+	private static final String KEY_YAML_SECOND_IDENTIFIER = "second";
+	private static final String KEY_YAML_METADATA = "metadata";
+	private static final String KEY_YAML_TYPENAME = "type";
+	private static final String KEY_YAML_PROPERTIES = "properties";
+
+	private static final String KEY_JSON_IDENTIFIERS = "identifiers";
+	private static final String KEY_JSON_LINKS = "links";
+	private static final String KEY_JSON_METADATA = "metadata";
+	private static final String KEY_JSON_TIMESTAMP = "timestamp";
+	private static final String KEY_JSON_TYPENAME = "typename";
+	private static final String KEY_JSON_PROPERTIES = "properties";
+
 	private Reader mReader;
 	private Executor mExecutor;
 	private Neo4JConnection mDbConnection;
@@ -93,6 +107,7 @@ public abstract class AbstractTestCase {
 	protected final String TESTCASES_DIRECTORY = "src/test/resources/testcases";
 
 	private final Logger logger = Logger.getLogger(AbstractTestCase.class);
+	private Map<String, Object> mTestcase;
 
 	@Before
 	public void setUp() throws Exception {
@@ -129,9 +144,9 @@ public abstract class AbstractTestCase {
 		try {
 			String testcaseFilename = getTestcaseFilename();
 			if (testcaseFilename != null) {
-				Map<String, Object> testcase = YamlReader.loadMap(testcaseFilename);
-				assumeTrue(!testcase.isEmpty());
-				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(testcase, mGraphDb, mTimestampManager);
+				mTestcase = YamlReader.loadMap(testcaseFilename);
+				assumeTrue(!mTestcase.isEmpty());
+				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(mTestcase, mGraphDb, mTimestampManager);
 			} else {
 				logger.info("Testcase filename was null, using empty graph database for tests.");
 			}
@@ -169,22 +184,6 @@ public abstract class AbstractTestCase {
 
 	public JSONObject toJson(IdentifierGraph graph) {
 		return mJsonMarshaller.toJson(graph);
-	}
-
-	public boolean equalsJsonObject(JSONObject expected, JSONObject actual) {
-		if (actual.toString().equals(expected.toString())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean equalsJsonArray(JSONArray expected, JSONArray actual) {
-		if (actual.toString().equals(expected.toString())) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	/**
@@ -288,22 +287,12 @@ public abstract class AbstractTestCase {
 	 */
 	@SuppressWarnings("unchecked")
 	protected JSONArray buildJSONFromYamlFile(String link, Long timestamp) throws JSONException {
-
-		// ### load the expected from yaml file ###
-		Map<String, Object> expectedDB = null;
-		try {
-
-			expectedDB = YamlReader.loadMap(getTestcaseFilename());
-
-		} catch (IOException e) {
-			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping test ");
-		}
-
 		// ### extract first // second // metadata
-		Map<String, Object> expectedLink = (Map<String, Object>) expectedDB.get(link);
-		Map<String, Object> first = (Map<String, Object>) expectedLink.get("first");
-		Map<String, Object> second = (Map<String, Object>) expectedLink.get("second");
-		Map<String, Object> metadata = (Map<String, Object>) expectedLink.get("metadata");
+		Map<String, Object> expectedLink = (Map<String, Object>) mTestcase.get(link);
+
+		Map<String, Object> first = (Map<String, Object>) expectedLink.get(KEY_YAML_FIRST_IDENTIFIER);
+		Map<String, Object> second = (Map<String, Object>) expectedLink.get(KEY_YAML_SECOND_IDENTIFIER);
+		Map<String, Object> metadata = (Map<String, Object>) expectedLink.get(KEY_YAML_METADATA);
 
 		JSONArray expectedJSONArray = new JSONArray();
 		JSONObject expectedJSONObject = new JSONObject();
@@ -312,8 +301,8 @@ public abstract class AbstractTestCase {
 		JSONArray identifiersJSONArray = new JSONArray();
 
 		// ### build link object ###
-		expectedJSONObject.put("timestamp", timestamp);
-		expectedJSONObject.put("links", linksJSONArray);
+		expectedJSONObject.put(KEY_JSON_TIMESTAMP, timestamp);
+		expectedJSONObject.put(KEY_JSON_LINKS, linksJSONArray);
 
 
 		// ### build first Identifier ###
@@ -321,29 +310,29 @@ public abstract class AbstractTestCase {
 		identifiersJSONArray.put(firstIdentifierJSONObject);
 
 		// ### build second Identifier ###
-		if(second != null){
+		if (second != null) {
 			JSONObject secondIdentifierJSONObject = buildJSONObjectFromMap(second);
 
 			identifiersJSONArray.put(secondIdentifierJSONObject);
-			linkJSONObject.put("identifiers", identifiersJSONArray);
+			linkJSONObject.put(KEY_JSON_IDENTIFIERS, identifiersJSONArray);
 
 		} else {
-			linkJSONObject.put("identifiers", firstIdentifierJSONObject);
+			linkJSONObject.put(KEY_JSON_IDENTIFIERS, firstIdentifierJSONObject);
 		}
 
 		// ### build metadata for the link object ###
 		JSONArray metadataJSONArray = buildMetadataJSONArray(metadata);
 
-		if(metadataJSONArray.length() == 1){
+		if (metadataJSONArray.length() == 1) {
 			// only one -> add simple JSONObject
-			linkJSONObject.put("metadata", metadataJSONArray.get(0));
+			linkJSONObject.put(KEY_JSON_METADATA, metadataJSONArray.get(0));
 
-		}else if(metadataJSONArray.length() > 1){
+		} else if (metadataJSONArray.length() > 1) {
 			// more as one add the full array
-			linkJSONObject.put("metadata", metadataJSONArray);
+			linkJSONObject.put(KEY_JSON_METADATA, metadataJSONArray);
 
 		} else {
-			linkJSONObject.put("metadata", new JSONObject());
+			linkJSONObject.put(KEY_JSON_METADATA, new JSONObject());
 		}
 
 		// ### add the link object to the links array ###
@@ -381,7 +370,7 @@ public abstract class AbstractTestCase {
 	 */
 	@SuppressWarnings("unchecked")
 	private JSONObject buildJSONObjectFromMap(Map<String, Object> valueMap) throws JSONException {
-		Map<String, Object> properties = (Map<String, Object>) valueMap.get("properties");
+		Map<String, Object> properties = (Map<String, Object>) valueMap.get(KEY_YAML_PROPERTIES);
 
 		JSONObject propertiesJSONObject = new JSONObject();
 		if (properties != null) {
@@ -391,8 +380,8 @@ public abstract class AbstractTestCase {
 		}
 
 		JSONObject valueJSONObject = new JSONObject();
-		valueJSONObject.put("typename", valueMap.get("type"));
-		valueJSONObject.put("properties", propertiesJSONObject);
+		valueJSONObject.put(KEY_JSON_TYPENAME, valueMap.get(KEY_YAML_TYPENAME));
+		valueJSONObject.put(KEY_JSON_PROPERTIES, propertiesJSONObject);
 		return valueJSONObject;
 	}
 
@@ -421,12 +410,12 @@ public abstract class AbstractTestCase {
 		try {
 
 			JSONObject jObj = jArray.getJSONObject(arrayIndex);
-			JSONArray links = jObj.getJSONArray("links");
+			JSONArray links = jObj.getJSONArray(KEY_JSON_LINKS);
 			JSONObject link = links.getJSONObject(linkIndex);
-			JSONObject metadata = link.getJSONObject("metadata");
+			JSONObject metadata = link.getJSONObject(KEY_JSON_METADATA);
 
 			try {
-				properties = metadata.getJSONObject("properties");
+				properties = metadata.getJSONObject(KEY_JSON_PROPERTIES);
 			} catch (JSONException e) {
 				logger.debug("No properties found in metadata[" + metadata + "]", e);
 			}
@@ -453,25 +442,12 @@ public abstract class AbstractTestCase {
 	 */
 	@SuppressWarnings("unchecked")
 	protected Map<String, Object> getPropertiesFromMetadata(String sLink, String sMetadata) {
-
-		// load yaml file
-		Map<String, Object> expectedDB = null;
-		try {
-
-			expectedDB = YamlReader.loadMap(getTestcaseFilename());
-
-		} catch (IOException e) {
-			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping test ");
-		}
-
 		// load properties Map from Metadata sMetadata and sLink
 		Map<String, Object> properties = null;
-		if(expectedDB != null) {
-			Map<String, Object> link = (Map<String, Object>) expectedDB.get(sLink);
-			Map<String, Object> metadata = (Map<String, Object>) link.get("metadata");
-			Map<String, Object> meta = (Map<String, Object>) metadata.get(sMetadata);
-			properties = (Map<String, Object>) meta.get("properties");
-		}
+		Map<String, Object> link = (Map<String, Object>) mTestcase.get(sLink);
+		Map<String, Object> metadata = (Map<String, Object>) link.get("metadata");
+		Map<String, Object> meta = (Map<String, Object>) metadata.get(sMetadata);
+		properties = (Map<String, Object>) meta.get("properties");
 
 		// return map, if is null return an empty Map
 		if(properties != null){
@@ -508,29 +484,11 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	protected void testChangesMapJSON(Map<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) throws JSONException {
-		String actual = toJson(changesMap).toString();
+	protected void testChangesMapJSON(SortedMap<Long, Long> expectedValues, SortedMap<Long, Long> changesMap) throws JSONException {
+		JSONObject actual = toJson(changesMap);
+		JSONObject expected = toJson(expectedValues);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("{");
-
-		Iterator<Long> iterator = changesMap.keySet().iterator();
-		while (iterator.hasNext()) {
-			Long key = iterator.next();
-			Long expectedValue = expectedValues.get(key);
-			sb.append("\"");
-			sb.append(key);
-			sb.append("\":");
-			sb.append(expectedValue);
-			if (iterator.hasNext()) {
-				sb.append(",");
-			}
-		}
-
-		sb.append("}");
-		String expected = sb.toString();
-
-		assertEquals(expected, actual);
+		assertTrue(jsonsEqual(expected, actual));
 	}
 
 }

@@ -59,7 +59,7 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void getInitialGraph() {
+	public void getInitialGraph() throws JSONException {
 		List<IdentifierGraph> initialGraph = mService.getInitialGraph();
 
 		assertTrue(initialGraph.isEmpty());
@@ -67,11 +67,11 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		JSONArray actual = toJson(initialGraph);
 		JSONArray expected = new JSONArray();
 
-		assertTrue(equalsJsonArray(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
-	public void getGraphAt() {
+	public void getGraphAt() throws JSONException {
 		long timestamp = 0;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
@@ -80,11 +80,11 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		JSONArray actual = toJson(graphAt);
 		JSONArray expected = new JSONArray();
 
-		assertTrue(equalsJsonArray(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
-	public void getCurrentGraph() {
+	public void getCurrentGraph() throws JSONException {
 		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
 
 		assertTrue(currentGraph.isEmpty());
@@ -92,7 +92,7 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		JSONArray actual = toJson(currentGraph);
 		JSONArray expected = new JSONArray();
 
-		assertTrue(equalsJsonArray(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
@@ -121,6 +121,6 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		JSONObject actual = toJson(changesMap);
 		JSONObject expected = new JSONObject();
 
-		assertTrue(equalsJsonObject(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 }

@@ -41,10 +41,10 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.chan
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -944,7 +944,7 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
-		Map<Long,Long> expectedChanges = new HashMap<Long,Long>();
+		SortedMap<Long,Long> expectedChanges = new TreeMap<Long,Long>();
 		expectedChanges.put(0L, 1L);	// t0
 		expectedChanges.put(1L, 2L);	// t1
 		expectedChanges.put(2L, 1L);	// t2

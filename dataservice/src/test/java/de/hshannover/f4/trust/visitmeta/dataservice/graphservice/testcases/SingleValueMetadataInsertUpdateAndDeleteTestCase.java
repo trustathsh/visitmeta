@@ -40,17 +40,16 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
-import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends
@@ -64,65 +63,63 @@ AbstractTestCase {
 	}
 
 	@Override
-	public void getInitialGraph() {
+	public void getInitialGraph() throws JSONException {
 		List<IdentifierGraph> initialGraph = mService.getInitialGraph();
 
-		assertEquals(1, initialGraph.size());
+		testGraphListSize(initialGraph, 1);
 
-		String actual = toJson(initialGraph).toString();
-		String expected = "[{\"timestamp\":0,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]";
-		assertEquals(expected, actual);
+		JSONArray actual = toJson(initialGraph);
+		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
+		assertTrue(jsonsEqual(expected, actual));
 	}
 
 	@Override
-	public void getGraphAt() {
+	public void getGraphAt() throws JSONException {
 		getGraphAt0();
 		getGraphAt1();
 		getGraphAt2();
 	}
 
-	private void getGraphAt2() {
+	private void getGraphAt2() throws JSONException {
 		long timestamp = 2;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		assertEquals(0, graphAt.size());
+		testGraphListSize(graphAt, 0);
 
 		JSONArray actual = toJson(graphAt);
 		JSONArray expected = new JSONArray();
 
-		assertTrue(equalsJsonArray(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt1() {
+	private void getGraphAt1() throws JSONException {
 		long timestamp = 1;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		assumeTrue(graphAt.size() == 1);
+		testGraphListSize(graphAt, 1);
 
-		List<Identifier> identifiers = graphAt.get(0).getIdentifiers();
-		assertEquals(2, identifiers.size());
+		testIdentifierCount(graphAt.get(0), 2);
 
-		String actual = toJson(graphAt).toString();
-		String expected = "[{\"timestamp\":1,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp2\"}}}]}]";
-		assertEquals(expected, actual);
+		JSONArray actual = toJson(graphAt);
+		JSONArray expected = buildJSONFromYamlFile("link2", timestamp);
+		assertTrue(jsonsEqual(expected, actual));
 	}
 
-	private void getGraphAt0() {
+	private void getGraphAt0() throws JSONException {
 		long timestamp = 0;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		assumeTrue(graphAt.size() == 1);
+		testGraphListSize(graphAt, 1);
 
-		List<Identifier> identifiers = graphAt.get(0).getIdentifiers();
-		assertEquals(2, identifiers.size());
+		testIdentifierCount(graphAt.get(0), 2);
 
-		String actual = toJson(graphAt).toString();
-		String expected = "[{\"timestamp\":0,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]";
-		assertEquals(expected, actual);
+		JSONArray actual = toJson(graphAt);
+		JSONArray expected = buildJSONFromYamlFile("link1", timestamp);
+		assertTrue(jsonsEqual(expected, actual));
 	}
 
 	@Override
-	public void getCurrentGraph() {
+	public void getCurrentGraph() throws JSONException {
 		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
 
 		assertTrue(currentGraph.isEmpty());
@@ -130,7 +127,7 @@ AbstractTestCase {
 		JSONArray actual = toJson(currentGraph);
 		JSONArray expected = new JSONArray();
 
-		assertTrue(equalsJsonArray(expected, actual));
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
@@ -144,11 +141,8 @@ AbstractTestCase {
 		long t1 = 0;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
-		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
-		assertEquals(1, deletes.size());
-		assertEquals(0, updates.size());
+		testDeltaSize(delta, 0, 1);
 
 		String actual = toJson(delta).toString();
 		String expected = "{\"updates\":[],\"deletes\":[{\"timestamp\":2,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]}";
@@ -159,11 +153,8 @@ AbstractTestCase {
 		long t1 = 1;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
-		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
-		assertEquals(1, deletes.size());
-		assertEquals(0, updates.size());
+		testDeltaSize(delta, 0, 1);
 
 		String actual = toJson(delta).toString();
 		String expected = "{\"updates\":[],\"deletes\":[{\"timestamp\":2,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp2\"}}}]}]}";
@@ -174,11 +165,8 @@ AbstractTestCase {
 		long t1 = 0;
 		long t2 = 1;
 		Delta delta = mService.getDelta(t1, t2);
-		List<IdentifierGraph> deletes = delta.getDeletes();
-		List<IdentifierGraph> updates = delta.getUpdates();
 
-		assertEquals(1, deletes.size());
-		assertEquals(1, updates.size());
+		testDeltaSize(delta, 1, 1);
 
 		String actual = toJson(delta).toString();
 		String expected = "{\"updates\":[{\"timestamp\":1,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp2\"}}}]}],\"deletes\":[{\"timestamp\":1,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]}";
@@ -189,18 +177,12 @@ AbstractTestCase {
 	public void getChangesMap() throws JSONException {
 		SortedMap<Long,Long> changesMap = mService.getChangesMap();
 
-		long t0 = 0;
-		long t1 = 1;
-		long t2 = 2;
+		SortedMap<Long, Long> changes = new TreeMap<Long, Long>();
+		changes.put(0L, 1L);	// t0
+		changes.put(1L, 2L);	// t1
+		changes.put(2L, 1L);	// t2
 
-		assertTrue(changesMap.size() == 3);
-
-		assertEquals(1, (long) changesMap.get(t0));
-		assertEquals(2, (long) changesMap.get(t1));
-		assertEquals(1, (long) changesMap.get(t2));
-
-		String actual = toJson(changesMap).toString();
-		String expected = "{\"0\":1,\"1\":2,\"2\":1}";
-		assertEquals(expected, actual);
+		testChangesMap(changes, changesMap);
+		testChangesMapJSON(changes, changesMap);
 	}
 }

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,6 +41,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -71,7 +72,7 @@ public class SimpleGraphService implements GraphService {
 	private Reader mReader;
 
 	private GraphCache mCache;
-	
+
 	private Executor mExecutor;
 
 	private SimpleGraphService() {
@@ -222,19 +223,90 @@ public class SimpleGraphService implements GraphService {
 		List<InternalIdentifierGraph> newGraphs = getInternalGraphAt(to);
 		List<InternalIdentifierGraph> oldGraphs = getInternalGraphAt(from);
 
+		/**
+		 * Warning!
+		 * This may create separated subgraphs, which is against the overall assumption
+		 * that IdentifierGraphs always contain a complete, non-separated graph.
+		 */
 		List<InternalIdentifier> allOldIdentifier = mergeToList(oldGraphs);
 		for (InternalIdentifierGraph newGraph : newGraphs) {
 			removeIdentifiersFromGraph(allOldIdentifier, newGraph);
 		}
 
-		List<IdentifierGraph> updateResults = new ArrayList<>();
+		/**
+		 * This expands every possible subgraph to a single InteralIdentifierGraph,
+		 * so that the assumption is fullfilled "again".
+		 */
+		List<InternalIdentifierGraph> expandedNewGraph = new ArrayList<InternalIdentifierGraph>();
 		for (InternalIdentifierGraph g : newGraphs) {
+			expandedNewGraph.addAll(expandGraph(g, to));
+		}
+
+		List<IdentifierGraph> updateResults = new ArrayList<>();
+		for (InternalIdentifierGraph g : expandedNewGraph) {
 			if (!g.getIdentifiers().isEmpty()) {
 				updateResults.add(GraphHelper.internalToExternalGraph(g));
 			}
 		}
 
 		return updateResults;
+	}
+
+	private List<InternalIdentifierGraph> expandGraph(InternalIdentifierGraph graph, long timestamp) {
+		ArrayList<InternalIdentifierGraph> result = new ArrayList<InternalIdentifierGraph>();
+		HashSet<InternalIdentifier> seen = new HashSet<InternalIdentifier>();
+		while (seen.size() != graph.getIdentifiers().size()) {
+			InternalIdentifier id = null;
+			for (InternalIdentifier i : graph.getIdentifiers()) {
+				id = i;
+				if (!seen.contains(id)) {
+					break;
+				}
+			}
+			HashSet<InternalIdentifier> idsToVisit = new HashSet<InternalIdentifier>();
+			InMemoryIdentifierGraph subgraph = new InMemoryIdentifierGraph(timestamp);
+			idsToVisit.add(id);
+			expandNode(idsToVisit, seen, subgraph);
+			result.add(subgraph);
+		}
+		return result;
+	}
+
+	private void expandNode(HashSet<InternalIdentifier> idsToVisit, HashSet<InternalIdentifier> seen,
+			InMemoryIdentifierGraph subgraph) {
+		if (idsToVisit.size() > 0) {
+			InternalIdentifier id = idsToVisit.iterator().next();
+			InternalIdentifier insertedId = subgraph.findIdentifier(id);
+			if (insertedId == null) {
+				insertedId = subgraph.insert(id);
+
+				for (InternalMetadata m : id.getMetadata()) {
+					subgraph.connectMeta(insertedId, subgraph.insert(m));
+				}
+			}
+			seen.add(id);
+			for (InternalLink l : id.getLinks()) {
+				InternalIdentifier other = l.getIdentifiers().getFirst().equals(id)
+						? l.getIdentifiers().getSecond() : l.getIdentifiers().getFirst();
+						if (!seen.contains(other)) {
+							InternalIdentifier insertedOther = subgraph.findIdentifier(other);
+							if (insertedOther == null) {
+								insertedOther = subgraph.insert(other);
+
+								for (InternalMetadata m : other.getMetadata()) {
+									subgraph.connectMeta(insertedOther, subgraph.insert(m));
+								}
+							}
+							InternalLink insertedLink = subgraph.connect(insertedId, insertedOther);
+							for (InternalMetadata m : l.getMetadata()) {
+								subgraph.connectMeta(insertedLink, subgraph.insert(m));
+							}
+							idsToVisit.add(other);
+						}
+			}
+			idsToVisit.remove(id);
+			expandNode(idsToVisit, seen, subgraph);
+		}
 	}
 
 	private void removeIdentifiersFromGraph(

@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
@@ -103,41 +103,8 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray expectedDeletes = new JSONArray();
-
-		{
-			JSONObject wrapper = new JSONObject();
-			wrapper.put("timestamp", 1l);
-			JSONObject linksWrapper = new JSONObject();
-			JSONArray linksWrapperArray = new JSONArray();
-			linksWrapperArray.put(linksWrapper);
-			wrapper.put("links", linksWrapperArray);
-			JSONArray identifiers = new JSONArray();
-			linksWrapper.put("identifiers", identifiers);
-			JSONObject first = new JSONObject();
-			identifiers.put(first);
-			JSONObject second = new JSONObject();
-			identifiers.put(second);
-			JSONObject metadata = new JSONObject();
-			linksWrapper.put("metadata", metadata);
-
-			first.put("typename", "device");
-			JSONObject firstProps = new JSONObject();
-			first.put("properties", firstProps);
-			firstProps.put("name", "device1");
-
-			second.put("typename", "ip-address");
-			JSONObject secondProbs = new JSONObject();
-			second.put("properties", secondProbs);
-			secondProbs.put("value", "10.0.0.1");
-			secondProbs.put("type", "IPv4");
-
-			metadata.put("typename", "device-ip");
-			JSONObject metadataProbs = new JSONObject();
-			metadata.put("properties", metadataProbs);
-			metadataProbs.put("dhcp-server", "dhcp");
-
-			expectedDeletes.put(wrapper);
-		}
+		expectedDeletes.put(createJSON(1,
+				createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
 
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
@@ -154,41 +121,8 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualUpdates = toJson(updates);
 		JSONArray expectedUpdates = new JSONArray();
-
-		{
-			JSONObject wrapper = new JSONObject();
-			wrapper.put("timestamp", 2l);
-			JSONObject linksWrapper = new JSONObject();
-			JSONArray linksWrapperArray = new JSONArray();
-			linksWrapperArray.put(linksWrapper);
-			wrapper.put("links", linksWrapperArray);
-			JSONArray identifiers = new JSONArray();
-			linksWrapper.put("identifiers", identifiers);
-			JSONObject first = new JSONObject();
-			identifiers.put(first);
-			JSONObject second = new JSONObject();
-			identifiers.put(second);
-			JSONObject metadata = new JSONObject();
-			linksWrapper.put("metadata", metadata);
-
-			first.put("typename", "device");
-			JSONObject firstProps = new JSONObject();
-			first.put("properties", firstProps);
-			firstProps.put("name", "device1");
-
-			second.put("typename", "ip-address");
-			JSONObject secondProbs = new JSONObject();
-			second.put("properties", secondProbs);
-			secondProbs.put("value", "10.0.0.1");
-			secondProbs.put("type", "IPv4");
-
-			metadata.put("typename", "device-ip");
-			JSONObject metadataProbs = new JSONObject();
-			metadata.put("properties", metadataProbs);
-			metadataProbs.put("dhcp-server", "dhcp");
-
-			expectedUpdates.put(wrapper);
-		}
+		expectedUpdates.put(createJSON(2,
+				createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
 
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 
@@ -218,23 +152,13 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 	@Override
 	public void getChangesMap() throws JSONException {
 		SortedMap<Long, Long> changesMap = mService.getChangesMap();
+		SortedMap<Long, Long> expected = new TreeMap<Long, Long>();
+		expected.put(0l, 1l);
+		expected.put(1l, 1l);
+		expected.put(2l, 1l);
 
-		long t0 = 0;
-		long t1 = 1;
-		long t2 = 2;
-
-		assertTrue(changesMap.size() == 3);
-
-		assertEquals(1, (long) changesMap.get(t0));
-		assertEquals(1, (long) changesMap.get(t1));
-		assertEquals(1, (long) changesMap.get(t2));
-
-		JSONObject actual = toJson(changesMap);
-		JSONObject expected = new JSONObject();
-		expected.put("0", 1l);
-		expected.put("1", 1l);
-		expected.put("2", 1l);
-		assertTrue(jsonsEqual(actual, expected));
+		testChangesMap(expected, changesMap);
+		testChangesMapJSON(expected, changesMap);
 	}
 
 }

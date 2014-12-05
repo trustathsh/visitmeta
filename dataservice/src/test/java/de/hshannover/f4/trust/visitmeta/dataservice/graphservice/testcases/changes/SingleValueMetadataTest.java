@@ -42,13 +42,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.AbstractTestCase;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
@@ -78,11 +76,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// ### check Identifiers size ###
 		IdentifierGraph graph = initialGraph.get(0);
 		testIdentifierCount(graph, 2);
-
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link1", "meta1");
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
@@ -114,12 +107,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// ### check Identifiers size ###
 		IdentifierGraph graph = graphAt.get(0);
 		testIdentifierCount(graph, 2);
-
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link4", 5L);
@@ -158,12 +145,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// ### check Identifiers size ###
 		IdentifierGraph graph = graphAt.get(0);
 		testIdentifierCount(graph, 2);
-
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link3", "meta1");
-
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link3", 3L);
@@ -204,12 +185,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph graph = graphAt.get(0);
 		testIdentifierCount(graph, 2);
 
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
-
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link2", 1L);
 		assertTrue(jsonsEqual(actual, expected));
@@ -228,12 +203,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph graph = graphAt.get(0);
 		testIdentifierCount(graph, 2);
 
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
-
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
 		assertTrue(jsonsEqual(actual, expected));
@@ -251,12 +220,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// ### check Identifiers size ###
 		IdentifierGraph graph = currentGraph.get(0);
 		testIdentifierCount(graph, 2);
-
-		// ### check metadata properties ###
-		JSONObject properties = getPropertiesFromMetadata(actual, 0, 0);
-		Map<String, Object> expectedProperties = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(properties, expectedProperties));
 
 		// ### check JSON-String ###
 		JSONArray expected = buildJSONFromYamlFile("link4", 5L);
@@ -314,19 +277,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 5L);
@@ -356,16 +306,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 		IdentifierGraph deletegraph = deletes.get(0);
 		testIdentifierCount(deletegraph, 2);
-
-		// check updates
-		// nothing to check, size must be 0
-
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
 
 		// check updates
 		// nothing to check, size must be 0
@@ -405,19 +345,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link3", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 3L);
@@ -447,16 +374,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 		IdentifierGraph deletegraph = deletes.get(0);
 		testIdentifierCount(deletegraph, 2);
-
-		// check updates
-		// nothing to check, size must be 0
-
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
 
 		// check updates
 		// nothing to check, size must be 0
@@ -496,19 +413,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link1", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 1L);
@@ -545,19 +449,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 5L);
@@ -587,16 +478,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 		IdentifierGraph deletegraph = deletes.get(0);
 		testIdentifierCount(deletegraph, 2);
-
-		// check updates
-		// nothing to check, size must be 0
-
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
 
 		// check updates
 		// nothing to check, size must be 0
@@ -636,19 +517,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link3", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 3L);
@@ -678,16 +546,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 		IdentifierGraph deletegraph = deletes.get(0);
 		testIdentifierCount(deletegraph, 2);
-
-		// check updates
-		// nothing to check, size must be 0
-
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link2", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
 
 		// check updates
 		// nothing to check, size must be 0
@@ -723,16 +581,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check updates
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
-
-		// ### check metadata properties ###
-		// check deletes
-		// nothing to check, size must be 0
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
 		// ### check JSON-String ###
 		// check deletes
@@ -802,16 +650,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
 
-		// ### check metadata properties ###
-		// check deletes
-		// nothing to check, size must be 0
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link3", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
-
 		// ### check JSON-String ###
 		// check deletes
 
@@ -880,16 +718,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check updates
 		// nothing to check, size must be 0
 
-		// ### check metadata properties ###
-		// check deletes
-		JSONObject propertiesDeletes = getPropertiesFromMetadata(actualDeletes, 0, 0);
-		Map<String, Object> expectedPropertiesDeletes = getPropertiesFromMetadata("link3", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesDeletes, expectedPropertiesDeletes));
-
-		// check updates
-		// nothing to check, size must be 0
-
 		// ### check JSON-String ###
 		// check deletes
 		JSONArray expectedDeletes = buildJSONFromYamlFile("link3", 4L);
@@ -921,16 +749,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check updates
 		IdentifierGraph updategraph = updates.get(0);
 		testIdentifierCount(updategraph, 2);
-
-		// ### check metadata properties ###
-		// check deletes
-		// nothing to check, size must be 0
-
-		// check updates
-		JSONObject propertiesUpdates = getPropertiesFromMetadata(actualUpdates, 0, 0);
-		Map<String, Object> expectedPropertiesUpdates = getPropertiesFromMetadata("link4", "meta1");
-
-		assertTrue(equalsMetadataProperties(propertiesUpdates, expectedPropertiesUpdates));
 
 		// ### check JSON-String ###
 		// check deletes

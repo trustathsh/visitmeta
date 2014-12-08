@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.changes;
+package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
 import static org.junit.Assert.assertTrue;
 
@@ -48,18 +48,12 @@ import java.util.TreeMap;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 
-import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases.AbstractTestCase;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 
-	private final String METADATA_CHANGES_DIRECTORY = TESTCASES_DIRECTORY + File.separator + "changes";
-
-	private final String SINGLE_VALUE_METADATA_CHANGES_DIRECTORY = METADATA_CHANGES_DIRECTORY + File.separator + "single_value_metadata";
-
-	private final String FILENAME = SINGLE_VALUE_METADATA_CHANGES_DIRECTORY + File.separator + "MultiValueMetadataSimple.yml";
-
+	private final String FILENAME = TESTCASES_DIRECTORY + File.separator + "MultiValueMetadataSimple.yml";
 
 	@Override
 	public String getTestcaseFilename() {
@@ -341,8 +335,7 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
 
 		expectedDeletes = buildJSONFromYamlFile("link1", 2L);
-		System.out.println("actualDeletes: "+actualDeletes);
-		System.out.println("expectedDelet: "+expectedDeletes);
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates

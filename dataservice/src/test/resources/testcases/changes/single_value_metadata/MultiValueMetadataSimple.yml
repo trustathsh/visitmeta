@@ -1,0 +1,34 @@
+link1:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: TEST_access-request_administrative-domain
+      name: TEST_access-request_name
+    rawData: access-request_rawData1
+  metadata:
+    meta1:
+      type: capability
+      singleValue: true
+      properties:
+        name: TEST_capability_domain_name
+        administrative-domain: TEST_capability_administrative_domain
+      pubStamp: 1
+      delStamp: 2
+      rawData: capability_rawData1
+link2:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: TEST_access-request_administrative-domain
+      name: TEST_access-request_name
+    rawData: access-request_rawData1
+  metadata:
+    meta1:
+      type: capability
+      singleValue: true
+      properties:
+        name: TEST2_capability_domain_name
+        administrative-domain: TEST2_capability_administrative_domain
+      pubStamp: 2
+      delStamp: 3
+      rawData: capability_rawData2

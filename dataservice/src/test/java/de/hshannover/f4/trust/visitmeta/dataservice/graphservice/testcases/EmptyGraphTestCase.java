@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -96,7 +95,7 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void getDelta() {
+	public void getDelta() throws JSONException {
 		long t1 = 0;
 		long t2 = 0;
 		Delta delta = mService.getDelta(t1, t2);
@@ -106,10 +105,13 @@ public class EmptyGraphTestCase extends AbstractTestCase {
 		assertTrue(deletes.isEmpty());
 		assertTrue(updates.isEmpty());
 
-		JSONObject actual = toJson(delta);
-		String expected = "{\"updates\":[],\"deletes\":[]}";
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedUpdates = new JSONArray();
+		JSONArray expectedDeletes = new JSONArray();
 
-		assertEquals(expected, actual.toString());
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
 	@Override

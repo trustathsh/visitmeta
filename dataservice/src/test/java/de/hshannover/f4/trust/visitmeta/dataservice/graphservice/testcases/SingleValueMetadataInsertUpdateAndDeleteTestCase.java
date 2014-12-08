@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -52,8 +51,7 @@ import org.codehaus.jettison.json.JSONException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
-public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends
-AbstractTestCase {
+public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends AbstractTestCase {
 
 	private final String TESTCASE_FILENAME = TESTCASES_DIRECTORY + File.separator + "singleValueMetadataInsertUpdateAndDelete.yml";
 
@@ -131,46 +129,62 @@ AbstractTestCase {
 	}
 
 	@Override
-	public void getDelta() {
+	public void getDelta() throws JSONException {
 		getDeltaFrom0To1();
 		getDeltaFrom1To2();
 		getDeltaFrom0To2();
 	}
 
-	private void getDeltaFrom0To2() {
+	private void getDeltaFrom0To2() throws JSONException {
 		long t1 = 0;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
 
 		testDeltaSize(delta, 0, 1);
 
-		String actual = toJson(delta).toString();
-		String expected = "{\"updates\":[],\"deletes\":[{\"timestamp\":2,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]}";
-		assertEquals(expected, actual);
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(t2,  createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
-	private void getDeltaFrom1To2() {
+	private void getDeltaFrom1To2() throws JSONException {
 		long t1 = 1;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
 
 		testDeltaSize(delta, 0, 1);
 
-		String actual = toJson(delta).toString();
-		String expected = "{\"updates\":[],\"deletes\":[{\"timestamp\":2,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp2\"}}}]}]}";
-		assertEquals(expected, actual);
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(t2, createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2")));
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
-	private void getDeltaFrom0To1() {
+	private void getDeltaFrom0To1() throws JSONException {
 		long t1 = 0;
 		long t2 = 1;
 		Delta delta = mService.getDelta(t1, t2);
 
 		testDeltaSize(delta, 1, 1);
 
-		String actual = toJson(delta).toString();
-		String expected = "{\"updates\":[{\"timestamp\":1,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp2\"}}}]}],\"deletes\":[{\"timestamp\":1,\"links\":[{\"identifiers\":[{\"typename\":\"device\",\"properties\":{\"name\":\"device1\"}},{\"typename\":\"ip-address\",\"properties\":{\"value\":\"10.0.0.1\",\"type\":\"IPv4\"}}],\"metadata\":{\"typename\":\"device-ip\",\"properties\":{\"dhcp-server\":\"dhcp\"}}}]}]}";
-		assertEquals(expected, actual);
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(t2, createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2")));
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(t2, createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
 	@Override

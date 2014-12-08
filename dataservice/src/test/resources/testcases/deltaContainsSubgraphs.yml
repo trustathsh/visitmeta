@@ -32,11 +32,11 @@ link2:
       value: ar:1
   metadata:
     meta2:
-      type: access-request-device
+      type: access-request-mac
       singleValue: true
       pubStamp: 1
       delStamp: -1
-      rawData: access-request-device1
+      rawData: access-request-mac1
       properties:
         dhcp-server: dhcp2
 link3:
@@ -53,10 +53,10 @@ link3:
       name: device1
   metadata:
     meta3:
-      type: ip-device
+      type: device-ip
       singleValue: true
       pubStamp: 2
       delStamp: -1
-      rawData: ip-device1
+      rawData: device-ip1
       properties:
         dhcp-server: dhcp2

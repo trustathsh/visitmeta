@@ -37,6 +37,6 @@ link2:
       singleValue: true
       pubStamp: 1
       delStamp: 2
-      rawData: device-ip1
+      rawData: device-ip2
       properties:
         dhcp-server: dhcp2

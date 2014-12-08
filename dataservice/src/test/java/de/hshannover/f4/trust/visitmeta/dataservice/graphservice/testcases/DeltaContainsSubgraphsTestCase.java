@@ -39,13 +39,17 @@
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice.testcases;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
@@ -61,33 +65,38 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void getInitialGraph() {
+	public void getInitialGraph() throws JSONException {
 		List<IdentifierGraph> initialGraph = mService.getInitialGraph();
 
-		testGraphListSize(initialGraph, 1);
-
-		IdentifierGraph graph = initialGraph.get(0);
-		testIdentifierCount(graph, 2);
+		testGraphAt0(initialGraph);
 	}
 
 	@Override
-	public void getGraphAt() {
+	public void getGraphAt() throws JSONException {
 		getGraphAt0();
 		getGraphAt1();
 		getGraphAt2();
 	}
 
-	private void getGraphAt0() {
+	private void getGraphAt0() throws JSONException {
 		long timestamp = 0;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		testGraphListSize(graphAt, 1);
-
-		IdentifierGraph graph = graphAt.get(0);
-		testIdentifierCount(graph, 2);
+		testGraphAt0(graphAt);
 	}
 
-	private void getGraphAt1() {
+	private void testGraphAt0(List<IdentifierGraph> graphs) throws JSONException {
+		testGraphListSize(graphs, 1);
+
+		IdentifierGraph graph = graphs.get(0);
+		testIdentifierCount(graph, 2);
+
+		JSONArray actual = toJson(graphs);
+		JSONArray expected = buildJSONFromYamlFile("link1", 0l);
+		assertTrue(jsonsEqual(actual, expected));
+	}
+
+	private void getGraphAt1() throws JSONException {
 		long timestamp = 1;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
@@ -95,36 +104,58 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 
 		IdentifierGraph graph = graphAt.get(0);
 		testIdentifierCount(graph, 3);
+
+		JSONArray actual = toJson(graphAt);
+		JSONArray expected = new JSONArray();
+		List<JSONObject> jsonElements = new ArrayList<JSONObject>();
+		jsonElements.add(createJSONIdentifierMetadataConnection("ip-address1", "mac-address1", "ip-mac1"));
+		jsonElements.add(createJSONIdentifierMetadataConnection("access-request1", "mac-address1", "access-request-mac1"));
+		expected.put(createJSON(timestamp, jsonElements));
+
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
-	private void getGraphAt2() {
+	private void getGraphAt2() throws JSONException {
 		long timestamp = 2;
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
-		testGraphListSize(graphAt, 1);
+		testGraphAt2(graphAt);
+	}
 
-		IdentifierGraph graph = graphAt.get(0);
+	private void testGraphAt2(List<IdentifierGraph> graphs) throws JSONException {
+		long timestamp = 2;
+
+		testGraphListSize(graphs, 1);
+
+		IdentifierGraph graph = graphs.get(0);
 		testIdentifierCount(graph, 4);
+
+		JSONArray actual = toJson(graphs);
+		JSONArray expected = new JSONArray();
+		List<JSONObject> jsonElements = new ArrayList<JSONObject>();
+		jsonElements.add(createJSONIdentifierMetadataConnection("mac-address1", "ip-address1", "ip-mac1"));
+		jsonElements.add(createJSONIdentifierMetadataConnection("mac-address1", "access-request1", "access-request-mac1"));
+		jsonElements.add(createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1"));
+		expected.put(createJSON(timestamp, jsonElements));
+
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
-	public void getCurrentGraph() {
+	public void getCurrentGraph() throws JSONException {
 		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
 
-		testGraphListSize(currentGraph, 1);
-
-		IdentifierGraph graph = currentGraph.get(0);
-		testIdentifierCount(graph, 4);
+		testGraphAt2(currentGraph);
 	}
 
 	@Override
-	public void getDelta() {
+	public void getDelta() throws JSONException {
 		getDeltaFrom0To1();
 		getDeltaFrom1To2();
 		//		getDeltaFrom0To2();	// FIXME this test currently fails, because delta calculation is wrong
 	}
 
-	private void getDeltaFrom0To1() {
+	private void getDeltaFrom0To1() throws JSONException {
 		long t1 = 0;
 		long t2 = 1;
 		Delta delta = mService.getDelta(t1, t2);
@@ -134,9 +165,17 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 		List<Identifier> updateIdentifiers = delta.getUpdates().get(0).getIdentifiers();
 		assertEquals(2, updateIdentifiers.size());
 
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(t2, createJSONIdentifierMetadataConnection("mac-address1", "access-request1", "access-request-mac1")));
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
-	private void getDeltaFrom1To2() {
+	private void getDeltaFrom1To2() throws JSONException {
 		long t1 = 1;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
@@ -145,9 +184,18 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 
 		List<Identifier> updateIdentifiers = delta.getUpdates().get(0).getIdentifiers();
 		assertEquals(2, updateIdentifiers.size());
+
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(t2, createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1")));
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
-	private void getDeltaFrom0To2() {
+	private void getDeltaFrom0To2() throws JSONException {
 		long t1 = 0;
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
@@ -159,6 +207,19 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 
 		List<Identifier> updateIdentifiers2 = delta.getUpdates().get(1).getIdentifiers();
 		assertEquals(2, updateIdentifiers2.size());
+
+		JSONArray actualUpdates = toJson(delta.getUpdates());
+		JSONArray expectedUpdates = new JSONArray();
+		List<JSONObject> jsonObjects = new ArrayList<JSONObject>();
+		jsonObjects.add(createJSONIdentifierMetadataConnection("mac-address1", "access-request1", "access-request-mac1"));
+		jsonObjects.add(createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1"));
+		expectedUpdates.put(createJSON(t2, jsonObjects));
+
+		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
+
+		JSONArray actualDeletes = toJson(delta.getDeletes());
+		JSONArray expectedDeletes = new JSONArray();
+		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
 	@Override

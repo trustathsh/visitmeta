@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.2.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -120,18 +120,19 @@ public abstract class AbstractReader implements Reader {
 				seen.add(current);
 
 				for (InternalLink l : current.getLinks()) {
-					InternalIdentifierPair pair = l.getIdentifiers();
-					InternalIdentifier other = (InternalIdentifier)
-							((pair.getFirst().equals(current)) ? pair.getSecond() : pair.getFirst());
+					if (l.isValidAt(timestamp)) {
+						InternalIdentifierPair pair = l.getIdentifiers();
+						InternalIdentifier other = (pair.getFirst().equals(current)) ? pair.getSecond() : pair.getFirst();
 
-					if (seen.contains(other)) {
-						if (l.isValidAt(timestamp)) {
-							InternalIdentifier detachedOther = graph.findIdentifier(other);
-							InternalLink link = graph.connect(detachedCurrent, detachedOther);
-							detachLinkMetadata(l, link, graph, timestamp);
+						if (seen.contains(other)) {
+							if (other.isValidAt(timestamp)) {
+								InternalIdentifier detachedOther = graph.findIdentifier(other);
+								InternalLink link = graph.connect(detachedCurrent, detachedOther);
+								detachLinkMetadata(l, link, graph, timestamp);
+							}
+						} else {
+							detachIdentifierSingleGraph(other, seen, graph, timestamp);
 						}
-					} else {
-						detachIdentifierSingleGraph(other, seen, graph, timestamp);
 					}
 				}
 			}
@@ -153,7 +154,7 @@ public abstract class AbstractReader implements Reader {
 			) {
 
 		for (InternalMetadata m : from.getMetadata()) {
-			if (((InternalMetadata)m).isValidAt(timestamp)) {
+			if (m.isValidAt(timestamp)) {
 				InternalMetadata loadedMeta = graph.insert(m);
 				graph.connectMeta(to, loadedMeta);
 			}
@@ -175,7 +176,7 @@ public abstract class AbstractReader implements Reader {
 			) {
 
 		for (InternalMetadata m : from.getMetadata()) {
-			if ((m.isValidAt(timestamp))) {
+			if (m.isValidAt(timestamp)) {
 				InternalMetadata loadedMeta = graph.insert(m);
 				graph.connectMeta(to, loadedMeta);
 			}

@@ -173,7 +173,7 @@ public abstract class AbstractTestCase {
 			if (!mIdentifier.containsKey(first.get(KEY_YAML_RAWDATA))) {
 				mIdentifier.put((String) first.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(first));
 			}
-			if (!mIdentifier.containsKey(second.get(KEY_YAML_RAWDATA))) {
+			if (second != null && !mIdentifier.containsKey(second.get(KEY_YAML_RAWDATA))) {
 				mIdentifier.put((String) second.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(second));
 			}
 

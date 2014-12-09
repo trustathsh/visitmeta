@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
@@ -29,7 +30,12 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 		assertEquals(2, initialGraph.get(0).getIdentifiers().size());
 
 		JSONArray actual = toJson(initialGraph);
-		JSONArray expected = buildJSONFromYamlFile("link1", 0l);
+		JSONArray expected = new JSONArray();
+		{
+			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+			JSONObject subGraph = createJSON(0l, idPair1);
+			expected.put(subGraph);
+		}
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -46,7 +52,12 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 		assertEquals(2, graphAt.get(0).getIdentifiers().size());
 
 		JSONArray actual = toJson(graphAt);
-		JSONArray expected = buildJSONFromYamlFile("link1", 0l);
+		JSONArray expected = new JSONArray();
+		{
+			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+			JSONObject subGraph = createJSON(0l, idPair1);
+			expected.put(subGraph);
+		}
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -66,7 +77,12 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 		assertEquals(2, graphAt.get(0).getIdentifiers().size());
 
 		JSONArray actual = toJson(graphAt);
-		JSONArray expected = buildJSONFromYamlFile("link2", 2l);
+		JSONArray expected = new JSONArray();
+		{
+			JSONObject idPair = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
+			JSONObject subGraph1 = createJSON(2l, idPair);
+			expected.put(subGraph1);
+		}
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -76,7 +92,12 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 		assertEquals(2, currentGraph.get(0).getIdentifiers().size());
 
 		JSONArray actual = toJson(currentGraph);
-		JSONArray expected = buildJSONFromYamlFile("link2", 2l);
+		JSONArray expected = new JSONArray();
+		{
+			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
+			JSONObject subGraph1 = createJSON(2l, idPair1);
+			expected.put(subGraph1);
+		}
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -103,9 +124,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray expectedDeletes = new JSONArray();
-		expectedDeletes.put(createJSON(1,
-				createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
-
+		{
+			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+			JSONObject subGraph1 = createJSON(1l, idPair1);
+			expectedDeletes.put(subGraph1);
+		}
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
@@ -121,9 +144,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualUpdates = toJson(updates);
 		JSONArray expectedUpdates = new JSONArray();
-		expectedUpdates.put(createJSON(2,
-				createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1")));
-
+		{
+			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+			JSONObject subGraph1 = createJSON(2l, idPair1);
+			expectedUpdates.put(subGraph1);
+		}
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 
 		JSONArray actualDeletes = toJson(deletes);

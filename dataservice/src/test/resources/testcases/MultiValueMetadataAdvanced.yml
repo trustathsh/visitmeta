@@ -1,0 +1,52 @@
+link1:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: TEST_access-request_administrative-domain
+      name: TEST_access-request_name
+    rawData: access-request_rawData1
+  metadata:
+    meta1:
+      type: capability
+      singleValue: false
+      properties:
+        name: TEST_capability1_domain_name
+        administrative-domain: TEST_capability1_administrative_domain
+      pubStamp: 0
+      delStamp: 1
+      rawData: capability1_rawData1
+    meta2:
+      type: capability
+      singleValue: false
+      properties:
+        name: TEST_capability2_domain_name
+        administrative-domain: TEST_capability2_administrative_domain
+      pubStamp: 0
+      delStamp: 1
+      rawData: capability2_rawData1
+link2:
+  first:
+    type: access-request
+    properties:
+      administrative-domain: TEST_access-request_administrative-domain
+      name: TEST_access-request_name
+    rawData: access-request_rawData1
+  metadata:
+    meta1:
+      type: capability
+      singleValue: false
+      properties:
+        name: TEST2_capability1_domain_name
+        administrative-domain: TEST2_capability1_administrative_domain
+      pubStamp: 1
+      delStamp: 2
+      rawData: capability1_rawData2
+    meta2:
+      type: capability
+      singleValue: false
+      properties:
+        name: TEST2_capability2_domain_name
+        administrative-domain: TEST2_capability2_administrative_domain
+      pubStamp: 1
+      delStamp: 2
+      rawData: capability2_rawData2

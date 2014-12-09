@@ -1,0 +1,59 @@
+link1:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  second:
+    type: ip-address
+    rawData: ip-address1
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+  metadata:
+    meta1:
+      type: device-ip
+      singleValue: true
+      pubStamp: 0
+      delStamp: -1
+      rawData: device-ip1
+      properties:
+link2:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  second:
+    type: access-request
+    rawData: ar1
+    properties:
+      name: ar1
+  metadata:
+    meta1:
+      type: access-request-device
+      singleValue: true
+      pubStamp: 1
+      delStamp: -1
+      rawData: ar-device1
+      properties:
+link3:
+  first:
+    type: ip-address
+    rawData: ip-address1
+    properties:
+      type: IPv4
+      value: 10.0.0.1
+  second:
+    type: access-request
+    rawData: ar1
+    properties:
+      name: ar1
+  metadata:
+    meta1:
+      type: access-request-ip
+      singleValue: true
+      pubStamp: 2
+      delStamp: -1
+      rawData: ar-ip1
+      properties:

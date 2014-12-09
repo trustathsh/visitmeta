@@ -229,15 +229,25 @@ public abstract class AbstractTestCase {
 	protected JSONObject createJSONIdentifierMetadataConnection(String first, String second, List<String> metadata)
 			throws JSONException {
 		JSONObject l = new JSONObject();
-		JSONArray identifiers = new JSONArray();
+		Object identifiers;
+		if(second != null) {
+			identifiers = new JSONArray();
+			((JSONArray)identifiers).put(mIdentifier.get(first));
+			((JSONArray)identifiers).put(mIdentifier.get(second));
+		} else {
+			identifiers = mIdentifier.get(first);
+		}
 		l.put("identifiers", identifiers);
-		identifiers.put(mIdentifier.get(first));
-		if (second != null) {
-			identifiers.put(mIdentifier.get(second));
+		Object meta;
+		if(metadata.size() > 1) {
+			meta = new JSONArray();
+			for (String metaKey : metadata) {
+				((JSONArray)meta).put(mMetadata.get(metaKey));
+			}
+		} else {
+			meta = mMetadata.get(metadata.get(0));
 		}
-		for (String metaKey : metadata) {
-			l.put("metadata", mMetadata.get(metaKey));
-		}
+		l.put("metadata", meta);
 
 		return l;
 	}

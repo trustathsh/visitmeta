@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,7 +64,7 @@ public class ConnectionTab extends JPanel {
 	private GraphContainer mConnection = null;
 	private GraphConnection mGraphConnection = null;
 
-	private PanelTimeLine mTimeLine = null;
+	private PanelHistoryNavigation mTimeLine = null;
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
@@ -79,7 +79,7 @@ public class ConnectionTab extends JPanel {
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
-	 * 
+	 *
 	 * @param name
 	 *            Name of the Connection
 	 * @param connection
@@ -87,7 +87,8 @@ public class ConnectionTab extends JPanel {
 	 */
 	public ConnectionTab(GraphContainer connection, JFrame window) {
 		super();
-		LOGGER.trace("Init ConnectionTab for the Connection " + connection.getName());
+		LOGGER.trace("Init ConnectionTab for the Connection "
+				+ connection.getName());
 
 		mName = connection.getName();
 		mConnected = true;
@@ -95,7 +96,9 @@ public class ConnectionTab extends JPanel {
 		mDataserviceConnection = mConnection.getDataserviceConnection();
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
-		mTimeLine = new PanelTimeLine(mConnection.getTimeHolder());
+
+		mTimeLine = new PanelHistoryNavigation(mConnection.getTimeHolder(),
+				mConnection.getRestUrl());
 		this.setLayout(new GridLayout());
 
 		initPanels();
@@ -115,7 +118,8 @@ public class ConnectionTab extends JPanel {
 		mLowerPanel.setLayout(new BorderLayout());
 
 		mGraphPanel = mGraphConnection.getGraphPanel();
-		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
+		mMotionInformationPane = new MotionInformationPane(
+				mGraphPanel.getPanel());
 		mPanelXmlTree = new PanelXmlTree();
 
 		mUpperPanel.add(mMotionInformationPane);
@@ -144,7 +148,7 @@ public class ConnectionTab extends JPanel {
 
 	/**
 	 * Method to determine the connection-status
-	 * 
+	 *
 	 * @return boolean value whether the connection is established or not
 	 */
 	public boolean isConnected() {
@@ -213,18 +217,18 @@ public class ConnectionTab extends JPanel {
 	}
 
 	/**
-	 * Shows the information of the given {@link Propable} object
-	 * by filling the {@link PanelXmlTree}.
-	 * 
-	 * @param propable the {@link Propable} objects, whose information shall be
-	 * shown
+	 * Shows the information of the given {@link Propable} object by filling the
+	 * {@link PanelXmlTree}.
+	 *
+	 * @param propable
+	 *            the {@link Propable} objects, whose information shall be shown
 	 */
 	public void showPropertiesOfNode(final Propable propable) {
 		mPanelXmlTree.fill(propable);
 		mPanelXmlTree.repaint();
 	}
 
-	public DataserviceConnection getDataserviceConnection(){
+	public DataserviceConnection getDataserviceConnection() {
 		return mDataserviceConnection;
 	}
 

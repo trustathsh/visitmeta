@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,9 +53,9 @@ import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 /**
  * This class is a container class, holding the needed information about a
  * connection to a graph.
- * 
+ *
  * @author oelsner
- * 
+ *
  */
 public class GraphContainer {
 	private String mName = null;
@@ -71,19 +71,23 @@ public class GraphContainer {
 	private TimeManagerCreation mTimeManagerCreation = null;
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
+	private String mRestUrl;
 
 	/**
 	 * The constructor initializes and connects all classes needed for a
 	 * connection to a given graph.
-	 * 
+	 *
 	 * @param restConnectionName
 	 *            is the name of the selected graph
 	 * @param dataserviceConnection
 	 *            is the connection to the selected dataservice
 	 */
-	public GraphContainer(String restConnectionName, DataserviceConnection dataserviceConnection) {
+	public GraphContainer(String restConnectionName,
+			DataserviceConnection dataserviceConnection) {
 		mName = dataserviceConnection.getName() + ":" + restConnectionName;
 		mRestConnectionName = restConnectionName;
+		mRestUrl = dataserviceConnection.getUrl() + "/" + restConnectionName
+				+ "/graph";
 		mTimeHolder = new TimeHolder();
 		mGraphPool = new GraphPool();
 		mSettingManager = new SettingManager(this);
@@ -92,7 +96,8 @@ public class GraphContainer {
 
 		mDataserviceConnection = dataserviceConnection;
 
-		mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
+		mConnection = FactoryConnection
+				.getConnection(ConnectionType.REST, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
@@ -154,6 +159,10 @@ public class GraphContainer {
 
 	public DataserviceConnection getDataserviceConnection() {
 		return mDataserviceConnection;
+	}
+
+	public String getRestUrl() {
+		return mRestUrl;
 	}
 
 	@Override

@@ -4,38 +4,38 @@ link1:
     properties:
       administrative-domain: administrative-domainTEST
       name: arNameTEST
-    rawData: administrative-domainTEST arNameTEST
+    rawData: access-request_rawData1
   second:
     type: device
     properties:
       name: deviceNameTEST
-    rawData: deviceNameTEST
+    rawData: device_rawData1
   metadata:
     meta1:
       type: access-request-device
       singleValue: true
       pubStamp: 0
       delStamp: 1
-      rawData: access-request-deviceTEST
+      rawData: access-request-device1_rawData1
 link2:
   first:
     type: access-request
     properties:
       administrative-domain: administrative-domainTEST
       name: arNameTEST
-    rawData: administrative-domainTEST arNameTEST
+    rawData: access-request_rawData1
   second:
     type: device
     properties:
       name: deviceNameTEST
-    rawData: deviceNameTEST
+    rawData: device_rawData1
   metadata:
     meta1:
       type: access-request-device
       singleValue: true
       pubStamp: 1
       delStamp: 2
-      rawData: access-request-deviceTEST
+      rawData: access-request-device2_rawData1
       properties:
         test: TEST2
         test2: TEST2_2
@@ -45,19 +45,19 @@ link3:
     properties:
       administrative-domain: administrative-domainTEST
       name: arNameTEST
-    rawData: administrative-domainTEST arNameTEST
+    rawData: access-request_rawData1
   second:
     type: device
     properties:
       name: deviceNameTEST
-    rawData: deviceNameTEST
+    rawData: device_rawData1
   metadata:
     meta1:
       type: access-request-device
       singleValue: true
       pubStamp: 3
       delStamp: 4
-      rawData: access-request-deviceTEST
+      rawData: access-request-device3_rawData1
       properties:
         test: TEST
 link4:
@@ -66,18 +66,18 @@ link4:
     properties:
       administrative-domain: administrative-domainTEST
       name: arNameTEST
-    rawData: administrative-domainTEST arNameTEST
+    rawData: access-request_rawData1
   second:
     type: device
     properties:
       name: deviceNameTEST
-    rawData: deviceNameTEST
+    rawData: device_rawData1
   metadata:
     meta1:
       type: access-request-device
       singleValue: true
       pubStamp: 5
       delStamp: -1
-      rawData: access-request-deviceTEST
+      rawData: access-request-device3_rawData1
       properties:
         test: TEST

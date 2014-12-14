@@ -73,7 +73,10 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		JSONArray actual = toJson(initialGraph);
-		JSONArray expected = buildJSONFromYamlFile("link1", 1L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(1L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -121,13 +124,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expected.put(createJSON(1L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData1")));
 
-		//		System.out.println("actualDeletes: "+actual);
-		//		System.out.println("expectedDelet: "+expected);
-
-		//		assertTrue(jsonsEqual(actual, expected)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expected = buildJSONFromYamlFile("link1", 1L);
-		//		System.out.println("expectedDelet: "+expected);
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -149,9 +145,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expected.put(createJSON(2L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData2")));
 
-		//		assertTrue(jsonsEqual(actual, expected)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expected = buildJSONFromYamlFile("link2", 2L);
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -232,9 +225,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedUpdates.put(createJSON(1L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData1")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedUpdates = buildJSONFromYamlFile("link1", 1L);
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -269,9 +259,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedUpdates.put(createJSON(2L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData2")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedUpdates = buildJSONFromYamlFile("link2", 2L);
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -332,10 +319,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedDeletes.put(createJSON(2L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData1")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedDeletes = buildJSONFromYamlFile("link1", 2L);
-
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -344,9 +327,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedUpdates.put(createJSON(2L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData2")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedUpdates = buildJSONFromYamlFile("link2", 2L);
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -375,9 +355,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedDeletes.put(createJSON(3L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData1")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedDeletes = buildJSONFromYamlFile("link1", 3L);
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -412,9 +389,6 @@ public class MultiValueMetadataSimpleTest extends AbstractTestCase {
 		expectedDeletes.put(createJSON(3L,
 				createJSONIdentifierMetadataConnection("access-request_rawData1", "capability_rawData2")));
 
-		//		assertTrue(jsonsEqual(actualUpdates, expectedUpdates)); // TODO [MR] Wenn createJSONIdentifierMetadataConnection() richtig baut wieder rein schreiben (Wenn es nur ein Identifier ist darf es kein array sein)
-
-		expectedDeletes = buildJSONFromYamlFile("link2", 3L);
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates

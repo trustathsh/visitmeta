@@ -73,9 +73,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
-		assertTrue(jsonsEqual(actual, expected));
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(0L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
 
+		assertTrue(jsonsEqual(actual, expected));
 	}
 
 	@Override
@@ -104,7 +105,9 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link4", 5L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(5L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -142,7 +145,9 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link3", 3L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(3L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 
 	}
@@ -181,7 +186,9 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link2", 1L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(1L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -199,7 +206,9 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(0L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -217,7 +226,9 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		// ### check JSON-String ###
-		JSONArray expected = buildJSONFromYamlFile("link4", 5L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(5L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -257,9 +268,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 1);
 
@@ -274,11 +282,18 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 5L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(5L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 5L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(5L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -291,8 +306,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		long t2 = 4;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-
-		JSONArray actualDeletes = toJson(deletes);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 1);
@@ -307,7 +320,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 4L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(4L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -325,9 +341,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 1);
 
@@ -342,11 +355,18 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 3L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(3L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link3", 3L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(3L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -359,8 +379,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-
-		JSONArray actualDeletes = toJson(deletes);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 1);
@@ -375,7 +393,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 2L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(2L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -393,9 +414,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 1);
 
@@ -410,11 +428,18 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link1", 1L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(1L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device1_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link2", 1L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(1L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -429,9 +454,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 1);
 
@@ -446,11 +468,18 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 5L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(5L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 5L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(5L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -463,8 +492,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		long t2 = 4;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-
-		JSONArray actualDeletes = toJson(deletes);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 1);
@@ -479,7 +506,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 4L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(4L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -497,9 +527,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 1);
 
@@ -514,11 +541,18 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 3L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(3L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link3", 3L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(3L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -531,8 +565,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		long t2 = 2;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
-
-		JSONArray actualDeletes = toJson(deletes);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 1);
@@ -547,7 +579,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link2", 2L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(2L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device2_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -564,8 +599,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 0);
 
@@ -581,7 +614,11 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 5L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(5L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -596,9 +633,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 0);
 
@@ -614,10 +648,12 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
+		JSONArray actualDeletes = toJson(deletes);
 		JSONArray expectedDeletes = new JSONArray();
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
+		JSONArray actualUpdates = toJson(updates);
 		JSONArray expectedUpdates = new JSONArray();
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
@@ -631,8 +667,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		long t2 = 3;
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> updates = delta.getUpdates();
-
-		JSONArray actualUpdates = toJson(updates);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 0);
@@ -649,7 +683,11 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link3", 3L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(3L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 
@@ -663,9 +701,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
 		List<IdentifierGraph> updates = delta.getUpdates();
-
-		JSONArray actualDeletes = toJson(deletes);
-		JSONArray actualUpdates = toJson(updates);
 
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 0);
@@ -682,10 +717,12 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
+		JSONArray actualDeletes = toJson(deletes);
 		JSONArray expectedDeletes = new JSONArray();
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
+		JSONArray actualUpdates = toJson(updates);
 		JSONArray expectedUpdates = new JSONArray();
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
@@ -700,8 +737,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> deletes = delta.getDeletes();
 
-		JSONArray actualDeletes = toJson(deletes);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 0, 1);
 
@@ -715,7 +750,10 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 
 		// ### check JSON-String ###
 		// check deletes
-		JSONArray expectedDeletes = buildJSONFromYamlFile("link3", 4L);
+		JSONArray actualDeletes = toJson(deletes);
+		JSONArray expectedDeletes = new JSONArray();
+		expectedDeletes.put(createJSON(4L,createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 
 		// check updates
@@ -732,8 +770,6 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		Delta delta = mService.getDelta(t1, t2);
 		List<IdentifierGraph> updates = delta.getUpdates();
 
-		JSONArray actualUpdates = toJson(updates);
-
 		// ### check Delta sizes for deletes and updates ###
 		testDeltaSize(delta, 1, 0);
 
@@ -749,7 +785,11 @@ public class SingleValueMetadataTest extends AbstractTestCase {
 		// check deletes
 
 		// check updates
-		JSONArray expectedUpdates = buildJSONFromYamlFile("link4", 5L);
+		JSONArray actualUpdates = toJson(updates);
+		JSONArray expectedUpdates = new JSONArray();
+		expectedUpdates.put(createJSON(5L,
+				createJSONIdentifierMetadataConnection("access-request_rawData1", "device_rawData1", "access-request-device3_rawData1")));
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 	}
 

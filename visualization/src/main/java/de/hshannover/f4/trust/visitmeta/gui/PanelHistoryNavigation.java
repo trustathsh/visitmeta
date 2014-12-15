@@ -1,5 +1,6 @@
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
@@ -45,6 +47,7 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 	private static final int INDEX_DELTA_VIEW = 2;
 
 	private static final long TIMESTAMP_NOT_INITIALIZED = -1;
+	private static final int INDEX_NOT_INITIALIZED = -1;
 
 	private static final int DELTA_TIMESTAMP_START = 0;
 	private static final int DELTA_TIMESTAMP_END = 1;
@@ -85,6 +88,7 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 	private JButton mDeltaViewStartForwardButton;
 	private JButton mDeltaViewEndBackwardButton;
 	private JButton mDeltaViewEndForwardButton;
+	private int mChangesMapSize;
 
 	public PanelHistoryNavigation(TimeHolder timeHolder, String restUrl) {
 		super();
@@ -99,6 +103,7 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		mDeltaViewSelectedEndTimestamp = TIMESTAMP_NOT_INITIALIZED;
 
 		mMinimumTimestampIndex = 0;
+		mChangesMapSize = 0;
 
 		mTimeHolder = timeHolder;
 		mRestUrl = restUrl;
@@ -118,8 +123,10 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 
 		// initialize values for the first time and initialize the live view tab
 		updateValues();
+		switchTabEnableState();
 		updateLiveView();
 
+		createListeners();
 		addListeners();
 		mTimeHolder.addObserver(this);
 	}
@@ -129,10 +136,12 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		liveViewPanel.setLayout(new BoxLayout(liveViewPanel, BoxLayout.Y_AXIS));
 
 		mLiveViewTimestampLabel = new JLabel();
+		mLiveViewTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel());
 		liveViewPanel.add(mLiveViewTimestampLabel);
 
 		mLiveViewRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_LIVE_VIEW));
+		mLiveViewRestUrlLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mLiveViewRestUrlLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		registerLinkHandler(mLiveViewRestUrlLabel);
 		liveViewPanel.add(mLiveViewRestUrlLabel);
@@ -145,15 +154,18 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		historyViewPanel.setLayout(new BoxLayout(historyViewPanel, BoxLayout.Y_AXIS));
 
 		mHistoryViewSelectedTimestampLabel = new JLabel();
+		mHistoryViewSelectedTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mHistoryViewSelectedTimestampLabel.setText(createHistoryViewSelectedTimestampLabel());
 		historyViewPanel.add(mHistoryViewSelectedTimestampLabel);
 
 		mHistoryViewSelectedTimestampRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_HISTORY_VIEW));
+		mHistoryViewSelectedTimestampRestUrlLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mHistoryViewSelectedTimestampRestUrlLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		registerLinkHandler(mHistoryViewSelectedTimestampRestUrlLabel);
 		historyViewPanel.add(mHistoryViewSelectedTimestampRestUrlLabel);
 
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mHistoryViewBackwardButton = new JButton("previous");
 		mHistoryViewForwardButton = new JButton("next");
 		buttonPanel.add(mHistoryViewBackwardButton);
@@ -161,6 +173,7 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		historyViewPanel.add(buttonPanel);
 
 		mHistoryViewSlider = new JSlider(0, 1, 0);
+		mHistoryViewSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mHistoryViewSlider.setMajorTickSpacing(5);
 		mHistoryViewSlider.setMinorTickSpacing(1);
 		mHistoryViewSlider.setPaintTicks(true);
@@ -176,19 +189,23 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		deltaViewPanel.setLayout(new BoxLayout(deltaViewPanel, BoxLayout.Y_AXIS));
 
 		mDeltaViewSelectedStartTimestampLabel = new JLabel();
+		mDeltaViewSelectedStartTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mDeltaViewSelectedStartTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
 		deltaViewPanel.add(mDeltaViewSelectedStartTimestampLabel);
 
 		mDeltaViewSelectedEndTimestampLabel = new JLabel();
+		mDeltaViewSelectedEndTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mDeltaViewSelectedEndTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
 		deltaViewPanel.add(mDeltaViewSelectedEndTimestampLabel);
 
 		mDeltaViewRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_DELTA_VIEW));
+		mDeltaViewRestUrlLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mDeltaViewRestUrlLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		registerLinkHandler(mDeltaViewRestUrlLabel);
 		deltaViewPanel.add(mDeltaViewRestUrlLabel);
 
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		mDeltaViewStartBackwardButton = new JButton("<");
 		mDeltaViewStartForwardButton = new JButton(">");
@@ -203,7 +220,6 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		buttonPanel.add(mDeltaViewEndForwardButton);
 		deltaViewPanel.add(buttonPanel);
 
-
 		return deltaViewPanel;
 	}
 
@@ -212,7 +228,9 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		if (o instanceof TimeHolder) {
 			int selectedIndex = mTabbedPane.getSelectedIndex();
 
+			removeListeners();
 			updateValues();
+			switchTabEnableState();
 
 			switch (selectedIndex) {
 			case INDEX_LIVE_VIEW:
@@ -227,6 +245,8 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 			default:
 				break;
 			}
+
+			addListeners();
 		}
 	}
 
@@ -234,36 +254,42 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		mChangesMap = mTimeHolder.getChangesMap();
 
 		if (mChangesMap != null) {
-			mNewestTime = mChangesMap.lastKey();
-			mOldestTime = mChangesMap.firstKey();
+			int newChangesMapSize = mChangesMap.size();
 
-			mMaximumTimestampIndex = mChangesMap.size();
+			if (mChangesMapSize < newChangesMapSize) {
+				mChangesMapSize = newChangesMapSize;
 
-			if (mHistoryViewSelectedTimestamp == TIMESTAMP_NOT_INITIALIZED) {
-				mHistoryViewSelectedTimestamp = mOldestTime;
+				mNewestTime = mChangesMap.lastKey();
+				mOldestTime = mChangesMap.firstKey();
+
+				mMaximumTimestampIndex = mChangesMap.size();
+
+				if (mHistoryViewSelectedTimestamp == TIMESTAMP_NOT_INITIALIZED) {
+					mHistoryViewSelectedTimestamp = mOldestTime;
+				}
+
+				if (mDeltaViewSelectedStartTimestamp == TIMESTAMP_NOT_INITIALIZED) {
+					mDeltaViewSelectedStartTimestamp = mOldestTime;
+				}
+
+				if (mDeltaViewSelectedEndTimestamp == TIMESTAMP_NOT_INITIALIZED) {
+					mDeltaViewSelectedEndTimestamp = mNewestTime;
+				}
+
+				mHistoryViewSelectedTimestampIndex = findIndexToTimestamp(mHistoryViewSelectedTimestamp, mChangesMap);
+				mDeltaViewSelectedStartTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedStartTimestamp, mChangesMap);
+				mDeltaViewSelectedEndTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedEndTimestamp, mChangesMap);
 			}
-
-			if (mDeltaViewSelectedStartTimestamp == TIMESTAMP_NOT_INITIALIZED) {
-				mDeltaViewSelectedStartTimestamp = mOldestTime;
-			}
-
-			if (mDeltaViewSelectedEndTimestamp == TIMESTAMP_NOT_INITIALIZED) {
-				mDeltaViewSelectedEndTimestamp = mNewestTime;
-			}
-
-			mHistoryViewSelectedTimestampIndex = findIndexToTimestamp(mHistoryViewSelectedTimestamp, mChangesMap);
-			mDeltaViewSelectedStartTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedStartTimestamp, mChangesMap);
-			mDeltaViewSelectedEndTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedEndTimestamp, mChangesMap);
 		} else {
 			mMaximumTimestampIndex = 0;
-			mHistoryViewSelectedTimestampIndex = 0;
-			mDeltaViewSelectedStartTimestampIndex = 0;
-			mDeltaViewSelectedEndTimestampIndex = 0;
+			mHistoryViewSelectedTimestampIndex = INDEX_NOT_INITIALIZED;
+			mDeltaViewSelectedStartTimestampIndex = INDEX_NOT_INITIALIZED;
+			mDeltaViewSelectedEndTimestampIndex = INDEX_NOT_INITIALIZED;
 		}
 	}
 
 	private void updateLiveView() {
-		mTimeHolder.setLiveView(true, true);
+		mTimeHolder.setLiveView(true, false);
 
 		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel());
 	}
@@ -271,36 +297,60 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 	private void updateHistoryView() {
 		mTimeHolder.setLiveView(false, false);
 
-		if (mHistoryViewSelectedTimestamp != TIMESTAMP_NOT_INITIALIZED) {
+		if (mHistoryViewSelectedTimestamp != TIMESTAMP_NOT_INITIALIZED
+				&& mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED) {
 			mHistoryViewSelectedTimestampRestUrlLabel.setText(createRestUrlLabel(INDEX_HISTORY_VIEW));
 
 			mHistoryViewSlider.setMinimum(mMinimumTimestampIndex + 1);
 			mHistoryViewSlider.setMaximum(mMaximumTimestampIndex);
 			mHistoryViewSlider.setValue(mHistoryViewSelectedTimestampIndex + 1);
 			mHistoryViewSlider.setLabelTable(createHistoryViewSliderLabelTable());
+			mHistoryViewSlider.setEnabled(true);
+
+			mHistoryViewBackwardButton.setEnabled(true);
+			mHistoryViewForwardButton.setEnabled(true);
+
+			mHistoryViewSelectedTimestampLabel.setText(createHistoryViewSelectedTimestampLabel());
 
 			mTimeHolder.setDeltaTimeStart(mHistoryViewSelectedTimestamp, false);
 			mTimeHolder.setDeltaTimeEnd(mHistoryViewSelectedTimestamp, false);
 			mTimeHolder.notifyObservers();
-
-			mHistoryViewSelectedTimestampLabel.setText(createHistoryViewSelectedTimestampLabel());
+		} else {
+			mHistoryViewSlider.setEnabled(false);
+			mHistoryViewBackwardButton.setEnabled(false);
+			mHistoryViewForwardButton.setEnabled(false);
 		}
 	}
 
 	private void updateDeltaView() {
 		mTimeHolder.setLiveView(false, false);
 
-		mDeltaViewRestUrlLabel.setText(createRestUrlLabel(INDEX_DELTA_VIEW));
+		if (mDeltaViewSelectedStartTimestamp != TIMESTAMP_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestamp != TIMESTAMP_NOT_INITIALIZED
+				&& mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED) {
+			mDeltaViewRestUrlLabel.setText(createRestUrlLabel(INDEX_DELTA_VIEW));
 
-		mTimeHolder.setDeltaTimeStart(mDeltaViewSelectedStartTimestamp, false);
-		mTimeHolder.setDeltaTimeEnd(mDeltaViewSelectedEndTimestamp, false);
-		mTimeHolder.notifyObservers();
+			mDeltaViewStartForwardButton.setEnabled(true);
+			mDeltaViewStartBackwardButton.setEnabled(true);
+			mDeltaViewEndForwardButton.setEnabled(true);
+			mDeltaViewEndBackwardButton.setEnabled(true);
 
-		mDeltaViewSelectedStartTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
-		mDeltaViewSelectedEndTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+			mDeltaViewSelectedStartTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
+			mDeltaViewSelectedEndTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+
+			mTimeHolder.setDeltaTimeStart(mDeltaViewSelectedStartTimestamp, false);
+			mTimeHolder.setDeltaTimeEnd(mDeltaViewSelectedEndTimestamp, false);
+			mTimeHolder.notifyObservers();
+		} else {
+			mDeltaViewStartForwardButton.setEnabled(false);
+			mDeltaViewStartBackwardButton.setEnabled(false);
+			mDeltaViewEndForwardButton.setEnabled(false);
+			mDeltaViewEndBackwardButton.setEnabled(false);
+		}
 	}
 
-	private void addListeners() {
+	private void createListeners() {
 		mTabbedPaneChangeListener = new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -321,7 +371,6 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 				}
 			}
 		};
-		mTabbedPane.addChangeListener(mTabbedPaneChangeListener);
 
 		mHistoryViewForwardButtonActionListener = new ActionListener() {
 			@Override
@@ -330,7 +379,6 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 				updateHistoryView();
 			}
 		};
-		mHistoryViewForwardButton.addActionListener(mHistoryViewForwardButtonActionListener);
 
 		mHistoryViewBackwardButtonActionListener = new ActionListener() {
 			@Override
@@ -339,7 +387,6 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 				updateHistoryView();
 			}
 		};
-		mHistoryViewBackwardButton.addActionListener(mHistoryViewBackwardButtonActionListener);
 
 		mHistoryViewSliderChangeListener = new ChangeListener() {
 			@Override
@@ -351,7 +398,20 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 				}
 			}
 		};
+	}
+
+	private void addListeners() {
+		mTabbedPane.addChangeListener(mTabbedPaneChangeListener);
+		mHistoryViewForwardButton.addActionListener(mHistoryViewForwardButtonActionListener);
+		mHistoryViewBackwardButton.addActionListener(mHistoryViewBackwardButtonActionListener);
 		mHistoryViewSlider.addChangeListener(mHistoryViewSliderChangeListener);
+	}
+
+	private void removeListeners() {
+		mTabbedPane.removeChangeListener(mTabbedPaneChangeListener);
+		mHistoryViewForwardButton.removeActionListener(mHistoryViewForwardButtonActionListener);
+		mHistoryViewBackwardButton.removeActionListener(mHistoryViewBackwardButtonActionListener);
+		mHistoryViewSlider.removeChangeListener(mHistoryViewSliderChangeListener);
 	}
 
 	private String createLiveViewTimestampLabel() {
@@ -382,12 +442,20 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	private Dictionary<Integer, JLabel> createHistoryViewSliderLabelTable() {
-		@SuppressWarnings("unchecked")
-		Dictionary<Integer, JLabel> table = mHistoryViewSlider.createStandardLabels(5, 5);
+		Dictionary<Integer, JLabel> table;
+		if (mMaximumTimestampIndex >= 5) {
+			table = mHistoryViewSlider.createStandardLabels(5, 5);
+		} else {
+			table = new Hashtable<Integer, JLabel>();
+		}
+
 		table.put(new Integer(mMinimumTimestampIndex + 1), new JLabel(Integer.toString(mMinimumTimestampIndex + 1)));
-		table.put(new Integer(mMaximumTimestampIndex), new JLabel(Integer.toString(mMaximumTimestampIndex)));
-		mHistoryViewSlider.setLabelTable(table);
+
+		if (mMaximumTimestampIndex % 5 != 0) {
+			table.put(new Integer(mMaximumTimestampIndex), new JLabel(Integer.toString(mMaximumTimestampIndex)));
+		}
 		return table;
 	}
 
@@ -455,15 +523,29 @@ public class PanelHistoryNavigation extends JPanel implements Observer {
 		});
 	}
 
+	private void switchTabEnableState() {
+		if (mChangesMapSize == 0) {
+			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, false);
+			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW, "<html><font color=gray>History view</font></html>");
+			mTabbedPane.setEnabledAt(INDEX_DELTA_VIEW, false);
+			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW, "<html><font color=gray>Delta view</font></html>");
+		} else {
+			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, true);
+			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW, "History view");
+			mTabbedPane.setEnabledAt(INDEX_DELTA_VIEW, true);
+			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW, "Delta view");
+		}
+	}
+
 	private void incrementSelectedHistoryTimestamp() {
-		if (mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
+		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED && mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
 			mHistoryViewSelectedTimestampIndex++;
 			mHistoryViewSelectedTimestamp = findTimestampToIndex(mHistoryViewSelectedTimestampIndex, mChangesMap);
 		}
 	}
 
 	private void decrementSelectedHistoryTimestamp() {
-		if (mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
+		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED && mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
 			mHistoryViewSelectedTimestampIndex--;
 			mHistoryViewSelectedTimestamp = findTimestampToIndex(mHistoryViewSelectedTimestampIndex, mChangesMap);
 		}

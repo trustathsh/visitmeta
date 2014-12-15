@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -123,7 +123,8 @@ public class Piccolo2DPanel implements GraphPanel {
 	private Propable mSelectedNode = null;
 
 	public Piccolo2DPanel(GraphConnection connection) {
-		mNodeTranslationDuration = connection.getSettingManager().getNodeTranslationDuration();
+		mNodeTranslationDuration = connection.getSettingManager()
+				.getNodeTranslationDuration();
 
 		mPanel.setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 		mPanel.setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
@@ -142,11 +143,14 @@ public class Piccolo2DPanel implements GraphPanel {
 		mPanel.setZoomEventHandler(new ZoomEventHandler(this));
 		mPanel.addInputEventListener(new NodeEventHandler(connection, this));
 
-		String vColorBackground = mConfig.getString("color.background", "0xFFFFFF");
+		String vColorBackground = mConfig.getString("color.background",
+				"0xFFFFFF");
 		String vColorEdge = mConfig.getString("color.edge", "0x000000");
 		String vColorNewNode = mConfig.getString("color.node.new", "0xC5D931");
-		String vColorDeleteNode = mConfig.getString("color.node.delete", "0x82150F");
-		String vColorSelectedNode = mConfig.getString("color.node.selected", "0xFFF687");
+		String vColorDeleteNode = mConfig.getString("color.node.delete",
+				"0x82150F");
+		String vColorSelectedNode = mConfig.getString("color.node.selected",
+				"0xFFF687");
 		mColorNewNode = Color.decode(vColorNewNode);
 		mColorBackground = Color.decode(vColorBackground);
 		mColorEdge = Color.decode(vColorEdge);
@@ -154,16 +158,22 @@ public class Piccolo2DPanel implements GraphPanel {
 		mColorSelectedNode = Color.decode(vColorSelectedNode);
 		mPanel.setBackground(mColorBackground);
 
-		String nodeInformationStyle = mConfig.getString("visualization.identifier.text.style", "SINGLE_LINE");
-		mIdentifierInformationStrategy = IdentifierInformationStrategyFactory.create(IdentifierInformationStrategyType.valueOf(nodeInformationStyle));
+		String nodeInformationStyle = mConfig.getString(
+				"visualization.identifier.text.style", "SINGLE_LINE");
+		mIdentifierInformationStrategy = IdentifierInformationStrategyFactory
+				.create(IdentifierInformationStrategyType
+						.valueOf(nodeInformationStyle));
 
-		String metadataInformationStyle = mConfig.getString("visualization.metadata.text.style", "SINGLE_LINE");
-		mMetadataInformationStrategy = MetadataInformationStrategyFactory.create(MetadataInformationStrategyType.valueOf(metadataInformationStyle));
+		String metadataInformationStyle = mConfig.getString(
+				"visualization.metadata.text.style", "SINGLE_LINE");
+		mMetadataInformationStrategy = MetadataInformationStrategyFactory
+				.create(MetadataInformationStrategyType
+						.valueOf(metadataInformationStyle));
 	}
 
 	/**
 	 * Create a gradient color depending on the node size.
-	 * 
+	 *
 	 * @param pNode
 	 *            the node.
 	 * @param pColorInside
@@ -172,8 +182,10 @@ public class Piccolo2DPanel implements GraphPanel {
 	 *            the color outside of the gradient.
 	 * @return the gradient color.
 	 */
-	private Paint createGradientColor(PPath pNode, Color pColorInside, Color pColorOutside) {
-		LOGGER.trace("Method createGradientColor(" + pNode + ", " + pColorInside + ", " + pColorOutside + ") called.");
+	private Paint createGradientColor(PPath pNode, Color pColorInside,
+			Color pColorOutside) {
+		LOGGER.trace("Method createGradientColor(" + pNode + ", "
+				+ pColorInside + ", " + pColorOutside + ") called.");
 		Color[] colors = { pColorInside, pColorOutside };
 		float[] dist = { 0.0f, 0.5f };
 		float radius = (float) pNode.getWidth();
@@ -182,22 +194,22 @@ public class Piccolo2DPanel implements GraphPanel {
 		AffineTransform vTransformation = AffineTransform.getScaleInstance(1.0, // x
 				// scaling
 				pNode.getHeight() / pNode.getWidth() // y scaling
-				);
+		);
 		vTransformation.translate(center.getX(), // x center
 				center.getY() * (pNode.getWidth() / pNode.getHeight()) // y
-				// center
-				// *
-				// invert
-				// scaling
+		// center
+		// *
+		// invert
+		// scaling
 				);
-		return new RadialGradientPaint(zero, radius, zero, dist, colors, RadialGradientPaint.CycleMethod.NO_CYCLE,
+		return new RadialGradientPaint(zero, radius, zero, dist, colors,
+				RadialGradientPaint.CycleMethod.NO_CYCLE,
 				RadialGradientPaint.ColorSpaceType.SRGB, vTransformation);
 	}
 
-
 	/**
 	 * Get the color for an identifier node.
-	 * 
+	 *
 	 * @param pNode
 	 *            the identifier node.
 	 * @return the color.
@@ -212,16 +224,22 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vIdentifierInside = mConfig.getString("color.identifier." + typeName + ".inside", "0x9999FF");
-			vIdentifierOutside = mConfig.getString("color.identifier." + typeName + ".outside", "0x9999FF");
+			vIdentifierInside = mConfig.getString("color.identifier."
+					+ typeName + ".inside", "0x9999FF");
+			vIdentifierOutside = mConfig.getString("color.identifier."
+					+ typeName + ".outside", "0x9999FF");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
+				IdentifierWrapper wrapper = IdentifierHelper
+						.identifier(identifier);
+				String type = wrapper.getValueForXpathExpression("@"
+						+ IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vIdentifierInside = mConfig.getString("color.identifier.extended.inside", "0x9999FF");
-					vIdentifierOutside = mConfig.getString("color.identifier.extended.outside", "0x9999FF");
+					vIdentifierInside = mConfig.getString(
+							"color.identifier.extended.inside", "0x9999FF");
+					vIdentifierOutside = mConfig.getString(
+							"color.identifier.extended.outside", "0x9999FF");
 				}
 			}
 		}
@@ -233,21 +251,23 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * Get the text color for a metadata node.
-	 * 
+	 *
 	 * @param pPublisher
 	 *            the publisher of the metadata.
 	 * @return the text color.
 	 */
 	private Paint getColorText(String pPublisher) {
 		LOGGER.trace("Method getColorText(" + pPublisher + ") called.");
-		String vDefaultText = mConfig.getString("color.metadata.text", "0x000000");
-		String vText = mConfig.getString("color." + pPublisher + ".text", vDefaultText);
+		String vDefaultText = mConfig.getString("color.metadata.text",
+				"0x000000");
+		String vText = mConfig.getString("color." + pPublisher + ".text",
+				vDefaultText);
 		return Color.decode(vText);
 	}
 
 	/**
 	 * Get the text color for an identifier node.
-	 * 
+	 *
 	 * @return the text color.
 	 */
 	private Color getColorIdentifierText(NodeIdentifier pNode) {
@@ -258,14 +278,18 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vColor = mConfig.getString("color.identifier." + typeName + ".text", "0x000000");
+			vColor = mConfig.getString(
+					"color.identifier." + typeName + ".text", "0x000000");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
+				IdentifierWrapper wrapper = IdentifierHelper
+						.identifier(identifier);
+				String type = wrapper.getValueForXpathExpression("@"
+						+ IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vColor = mConfig.getString("color.identifier.extended.text", "0x000000");
+					vColor = mConfig.getString(
+							"color.identifier.extended.text", "0x000000");
 				}
 			}
 		}
@@ -275,7 +299,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * Get the stroke color for an identifier node.
-	 * 
+	 *
 	 * @return the stroke color.
 	 */
 	private Color getColorIdentifierStroke(NodeIdentifier pNode) {
@@ -286,14 +310,18 @@ public class Piccolo2DPanel implements GraphPanel {
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vOutside = mConfig.getString("color.identifier." + typeName + ".border", "0x000000");
+			vOutside = mConfig.getString("color.identifier." + typeName
+					+ ".border", "0x000000");
 
 			// Special case: extended identifier
 			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@" + IfmapStrings.IDENTITY_ATTR_TYPE);
+				IdentifierWrapper wrapper = IdentifierHelper
+						.identifier(identifier);
+				String type = wrapper.getValueForXpathExpression("@"
+						+ IfmapStrings.IDENTITY_ATTR_TYPE);
 				if (type != null && type.equals("other")) {
-					vOutside = mConfig.getString("color.identifier.extended.border", "0x000000");
+					vOutside = mConfig.getString(
+							"color.identifier.extended.border", "0x000000");
 				}
 			}
 		}
@@ -303,21 +331,24 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * Get the stroke color for a metadata node.
-	 * 
+	 *
 	 * @param pPublisher
 	 *            the publisher of the metadata.
 	 * @return the stroke color.
 	 */
 	private Color getColorMetadataStroke(String pPublisher) {
-		LOGGER.trace("Method getColorMetadataStroke(" + pPublisher + ") called.");
-		String vDefaultStroke = mConfig.getString("color.metadata.border", "0x000000");
-		String vStroke = mConfig.getString("color." + pPublisher + ".border", vDefaultStroke);
+		LOGGER.trace("Method getColorMetadataStroke(" + pPublisher
+				+ ") called.");
+		String vDefaultStroke = mConfig.getString("color.metadata.border",
+				"0x000000");
+		String vStroke = mConfig.getString("color." + pPublisher + ".border",
+				vDefaultStroke);
 		return Color.decode(vStroke);
 	}
 
 	/**
 	 * Get the color for a metadata node.
-	 * 
+	 *
 	 * @param pPublisher
 	 *            the publisher of the metadata.
 	 * @param pNode
@@ -325,12 +356,17 @@ public class Piccolo2DPanel implements GraphPanel {
 	 * @return the color.
 	 */
 	private Paint getColor(String pPublisher, PPath pNode) {
-		LOGGER.trace("Method getColor(" + pPublisher + ", " + pNode + ") called.");
+		LOGGER.trace("Method getColor(" + pPublisher + ", " + pNode
+				+ ") called.");
 
-		String vDefaultInside = mConfig.getString("color.metadata.inside", "0xFF9966");
-		String vDefaultOutside = mConfig.getString("color.metadata.outside", "0xFF9966");
-		String vInside = mConfig.getString("color." + pPublisher + ".inside", vDefaultInside);
-		String vOutside = mConfig.getString("color." + pPublisher + ".outside", vDefaultOutside);
+		String vDefaultInside = mConfig.getString("color.metadata.inside",
+				"0xFF9966");
+		String vDefaultOutside = mConfig.getString("color.metadata.outside",
+				"0xFF9966");
+		String vInside = mConfig.getString("color." + pPublisher + ".inside",
+				vDefaultInside);
+		String vOutside = mConfig.getString("color." + pPublisher + ".outside",
+				vDefaultOutside);
 		Color vColorInside = Color.decode(vInside);
 		Color vColorOutside = Color.decode(vOutside);
 		return createGradientColor(pNode, vColorInside, vColorOutside);
@@ -346,14 +382,17 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void addIdentifier(NodeIdentifier pNode) {
 		LOGGER.trace("Method addIdentifier(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			PText vText = new PText(mIdentifierInformationStrategy.getText(pNode.getIdentifier()));
+			PText vText = new PText(
+					mIdentifierInformationStrategy.getText(pNode
+							.getIdentifier()));
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorIdentifierText(pNode));
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
-			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
+			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F
+					* (float) vText.getHeight());
 
-			final PPath vNode = PPath.createRoundRectangle(
-					-5 - 0.5F * (float) vText.getWidth(), // x
+			final PPath vNode = PPath.createRoundRectangle(-5 - 0.5F
+					* (float) vText.getWidth(), // x
 					-5 - 0.5F * (float) vText.getHeight(), // y
 					(float) vText.getWidth() + 10, // width TODO Add offset
 					(float) vText.getHeight() + 10, // height TODO Add offset
@@ -369,7 +408,7 @@ public class Piccolo2DPanel implements GraphPanel {
 			vCom.setOffset( // Set position
 					mAreaOffsetX + pNode.getX() * mAreaWidth, // x
 					mAreaOffsetY + pNode.getY() * mAreaHeight // y
-					);
+			);
 			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
@@ -390,16 +429,19 @@ public class Piccolo2DPanel implements GraphPanel {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
 			String vType = pNode.getMetadata().getTypeName();
-			final String vPublisher = pNode.getMetadata().valueFor("/meta:" + vType + "[@ifmap-publisher-id]");
+			final String vPublisher = pNode.getMetadata().valueFor(
+					"/meta:" + vType + "[@ifmap-publisher-id]");
 			if (!mPublisher.contains(vPublisher)) {
 				mPublisher.add(vPublisher);
 			}
 			/* Text */
-			PText vText = new PText(mMetadataInformationStrategy.getText(pNode.getMetadata()));
+			PText vText = new PText(mMetadataInformationStrategy.getText(pNode
+					.getMetadata()));
 			vText.setHorizontalAlignment(Component.CENTER_ALIGNMENT);
 			vText.setTextPaint(getColorText(vPublisher));
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
-			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F * (float) vText.getHeight());
+			vText.setOffset(-0.5F * (float) vText.getWidth(), -0.5F
+					* (float) vText.getHeight());
 
 			/* Rectangle */
 			final PPath vNode = PPath.createRectangle(
@@ -414,7 +456,8 @@ public class Piccolo2DPanel implements GraphPanel {
 			final PComposite vCom = new PComposite();
 			vCom.addChild(vNode);
 			vCom.addChild(vText);
-			vCom.setOffset(mAreaOffsetX + pNode.getX() * mAreaWidth, mAreaOffsetY + pNode.getY() * mAreaHeight);
+			vCom.setOffset(mAreaOffsetX + pNode.getX() * mAreaWidth,
+					mAreaOffsetY + pNode.getY() * mAreaHeight);
 			vCom.addAttribute("type", NodeType.METADATA);
 			vCom.addAttribute("publisher", vPublisher);
 			vCom.addAttribute("position", pNode);
@@ -434,14 +477,16 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	@Override
 	public void addMetadata(NodeIdentifier pIdentifier, NodeMetadata pMetadata) {
-		LOGGER.trace("Method addMetadata(" + pIdentifier + ", " + pMetadata + ") called.");
+		LOGGER.trace("Method addMetadata(" + pIdentifier + ", " + pMetadata
+				+ ") called.");
 		addMetadata(pMetadata);
 		addEdge(pMetadata, pIdentifier, pMetadata);
 	}
 
 	@Override
 	public void addMetadata(ExpandedLink pLink, NodeMetadata pMetadata) {
-		LOGGER.trace("Method addMetadata(" + pLink + ", " + pMetadata + ") called.");
+		LOGGER.trace("Method addMetadata(" + pLink + ", " + pMetadata
+				+ ") called.");
 		addMetadata(pMetadata);
 		/* Edges form Identifier to Metadata. */
 		addEdge(pMetadata, pLink.getFirst(), pMetadata);
@@ -451,7 +496,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * Add an edge to the graph.
-	 * 
+	 *
 	 * @param pKey
 	 *            a key to group the edge.
 	 * @param pNodeFirst
@@ -460,18 +505,20 @@ public class Piccolo2DPanel implements GraphPanel {
 	 *            the node where the edge ends.
 	 */
 	@SuppressWarnings("unchecked")
-	private void addEdge(NodeMetadata pKey, Position pNodeFirst, Position pNodeSecond) {
-		LOGGER.trace("Method addEdge(" + pKey + ", " + pNodeFirst + ", " + pNodeSecond + ") called.");
+	private void addEdge(NodeMetadata pKey, Position pNodeFirst,
+			Position pNodeSecond) {
+		LOGGER.trace("Method addEdge(" + pKey + ", " + pNodeFirst + ", "
+				+ pNodeSecond + ") called.");
 		PPath vEdge = new PPath();
 		PComposite vNodeFirst = mMapNode.get(pNodeFirst);
 		PComposite vNodeSecond = mMapNode.get(pNodeSecond);
 		/* Add Edge to Node. */
-		((ArrayList<PPath>)vNodeFirst.getAttribute("edges")).add(vEdge);
-		((ArrayList<PPath>)vNodeSecond.getAttribute("edges")).add(vEdge);
+		((ArrayList<PPath>) vNodeFirst.getAttribute("edges")).add(vEdge);
+		((ArrayList<PPath>) vNodeSecond.getAttribute("edges")).add(vEdge);
 		/* Add Node to Edge. */
 		vEdge.addAttribute("nodes", new ArrayList<PComposite>());
-		((ArrayList<PComposite>)vEdge.getAttribute("nodes")).add(vNodeFirst);
-		((ArrayList<PComposite>)vEdge.getAttribute("nodes")).add(vNodeSecond);
+		((ArrayList<PComposite>) vEdge.getAttribute("nodes")).add(vNodeFirst);
+		((ArrayList<PComposite>) vEdge.getAttribute("nodes")).add(vNodeSecond);
 		/* Add edge to layer. */
 		mLayerEdge.addChild(vEdge);
 		/* Add edge to HashMap. */
@@ -490,7 +537,8 @@ public class Piccolo2DPanel implements GraphPanel {
 		/* Remove edge from layer */
 		mLayerEdge.removeChild(pEdge);
 		/* Remove edge from node */
-		for (PComposite vNode : ((ArrayList<PComposite>) pEdge.getAttribute("nodes"))) {
+		for (PComposite vNode : ((ArrayList<PComposite>) pEdge
+				.getAttribute("nodes"))) {
 			((ArrayList<PPath>) vNode.getAttribute("edges")).remove(pEdge);
 		}
 	}
@@ -511,7 +559,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * The the position of a node and its edges.
-	 * 
+	 *
 	 * @param pNode
 	 *            the node in the graph.
 	 */
@@ -526,46 +574,58 @@ public class Piccolo2DPanel implements GraphPanel {
 				public void run() {
 					if (mNodeTranslationDuration > 0) {
 						final PComposite vNode = mMapNode.get(pNode);
-						final PAffineTransform vDestTransform = vNode.getTransform();
-						vDestTransform.setOffset(vX, vY);
-						final PTransformActivity.Target vTarget = new PTransformActivity.Target() {
-							@Override
-							public void setTransform(final AffineTransform pTransform) {
-								vNode.setTransform(pTransform);
-								synchronized (vNode) {
-									PPath vShadow = (PPath) vNode.getAttribute("glow");
-									if (vShadow != null) {
-										vShadow.setTransform(pTransform);
+						if (vNode != null) {
+							final PAffineTransform vDestTransform = vNode
+									.getTransform();
+							vDestTransform.setOffset(vX, vY);
+							final PTransformActivity.Target vTarget = new PTransformActivity.Target() {
+								@Override
+								public void setTransform(
+										final AffineTransform pTransform) {
+									vNode.setTransform(pTransform);
+									synchronized (vNode) {
+										PPath vShadow = (PPath) vNode
+												.getAttribute("glow");
+										if (vShadow != null) {
+											vShadow.setTransform(pTransform);
+										}
 									}
 								}
-							}
 
-							@Override
-							public void getSourceMatrix(final double[] aSource) {
-								vNode.getTransformReference(true).getMatrix(aSource);
-							}
-						};
-						PActivity vNodeTranslation = new PTransformActivity(mNodeTranslationDuration,
-								PUtil.DEFAULT_ACTIVITY_STEP_RATE, vTarget, vDestTransform) {
-							@Override
-							protected void activityStep(long time) {
-								/* Set position of the node. */
-								super.activityStep(time);
-								/* Redraw edges. */
-								ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
-								for(PPath vEdge : vEdges) {
-									updateEdge(vEdge);
+								@Override
+								public void getSourceMatrix(
+										final double[] aSource) {
+									vNode.getTransformReference(true)
+											.getMatrix(aSource);
 								}
-							}
-						};
-						mMapNode.get(pNode).addAttribute("activity", vNodeTranslation);
-						/* Add node activity */
-						vNode.addActivity(vNodeTranslation);
+							};
+							PActivity vNodeTranslation = new PTransformActivity(
+									mNodeTranslationDuration,
+									PUtil.DEFAULT_ACTIVITY_STEP_RATE, vTarget,
+									vDestTransform) {
+								@Override
+								protected void activityStep(long time) {
+									/* Set position of the node. */
+									super.activityStep(time);
+									/* Redraw edges. */
+									ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode
+											.getAttribute("edges");
+									for (PPath vEdge : vEdges) {
+										updateEdge(vEdge);
+									}
+								}
+							};
+							mMapNode.get(pNode).addAttribute("activity",
+									vNodeTranslation);
+							/* Add node activity */
+							vNode.addActivity(vNodeTranslation);
+						}
 					} else {
 						final PComposite vNode = mMapNode.get(pNode);
 						vNode.setOffset(vX, vY);
-						ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
-						for(PPath vEdge : vEdges) {
+						ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode
+								.getAttribute("edges");
+						for (PPath vEdge : vEdges) {
 							updateEdge(vEdge);
 						}
 					}
@@ -576,7 +636,7 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	/**
 	 * Redraw a edge with the new position on the panel.
-	 * 
+	 *
 	 * @param pEdge
 	 *            the edge to redraw.
 	 */
@@ -584,10 +644,12 @@ public class Piccolo2DPanel implements GraphPanel {
 	public void updateEdge(PPath pEdge) {
 		LOGGER.trace("Method updateEdge(" + pEdge + ") called.");
 		synchronized (pEdge) {
-			PNode       vNode1  = ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(0);
-			PNode       vNode2  = ((ArrayList<PComposite>)pEdge.getAttribute("nodes")).get(1);
-			Point2D     vStart  = vNode1.getFullBoundsReference().getCenter2D();
-			Point2D     vEnd    = vNode2.getFullBoundsReference().getCenter2D();
+			PNode vNode1 = ((ArrayList<PComposite>) pEdge.getAttribute("nodes"))
+					.get(0);
+			PNode vNode2 = ((ArrayList<PComposite>) pEdge.getAttribute("nodes"))
+					.get(1);
+			Point2D vStart = vNode1.getFullBoundsReference().getCenter2D();
+			Point2D vEnd = vNode2.getFullBoundsReference().getCenter2D();
 			pEdge.reset();
 			/* Set edge color */
 			pEdge.setStrokePaint(mColorEdge);
@@ -633,7 +695,8 @@ public class Piccolo2DPanel implements GraphPanel {
 				if (vNode != null) {
 					addGlow(vNode, mColorNewNode);
 				} else {
-					LOGGER.debug("Coundn't find " + pPosition + " to mark as new.");
+					LOGGER.debug("Coundn't find " + pPosition
+							+ " to mark as new.");
 				}
 			}
 		});
@@ -649,7 +712,8 @@ public class Piccolo2DPanel implements GraphPanel {
 				if (vNode != null) {
 					addGlow(vNode, mColorDeleteNode);
 				} else {
-					LOGGER.debug("Coundn't find " + pPosition + " to mark as delete.");
+					LOGGER.debug("Coundn't find " + pPosition
+							+ " to mark as delete.");
 				}
 			}
 		});
@@ -666,10 +730,12 @@ public class Piccolo2DPanel implements GraphPanel {
 				public void run() {
 					synchronized (vNode) {
 						/* Remove Shadow */
-						final PPath vShadow = (PPath) vNode.getAttribute("glow");
+						final PPath vShadow = (PPath) vNode
+								.getAttribute("glow");
 						if (vShadow != null) {
 							vNode.addAttribute("glow", null);
-							PActivity vFading = vShadow.animateToTransparency(0.0f, 500); // TODO
+							PActivity vFading = vShadow.animateToTransparency(
+									0.0f, 500); // TODO
 							// Use
 							// SettingManager
 							PActivity vRemove = new PActivity(0) {
@@ -685,7 +751,8 @@ public class Piccolo2DPanel implements GraphPanel {
 				}
 			});
 		} else {
-			LOGGER.debug("Coundn't find " + pPosition + " to clear its highlights.");
+			LOGGER.debug("Coundn't find " + pPosition
+					+ " to clear its highlights.");
 		}
 	}
 
@@ -694,23 +761,21 @@ public class Piccolo2DPanel implements GraphPanel {
 		PBounds vBound = pNode.getFullBoundsReference();
 		float vShadowWidth = (float) (1.1 * vBound.getWidth() + mGlowWidth);
 		float vShadowHeight = (float) (vBound.getHeight() + mGlowHeight);
-		PPath vShadow = PPath.createEllipse(
-				-0.5F * vShadowWidth, // x
+		PPath vShadow = PPath.createEllipse(-0.5F * vShadowWidth, // x
 				-0.5F * vShadowHeight, // y
 				vShadowWidth, // width
 				vShadowHeight // height
 				);
 		vShadow.setOffset((float) (vPosition.getX()), // x
 				(float) (vPosition.getY()) // y
-				);
+		);
 		vShadow.setStroke(null);
-		Color opaqueHighlight = new Color(pHighlight.getRed(), pHighlight.getGreen(), pHighlight.getBlue(), 255);
-		Color transparentHighlight = new Color(pHighlight.getRed(), pHighlight.getGreen(), pHighlight.getBlue(), 0);
-		vShadow.setPaint(createGradientColor(
-				vShadow,
-				opaqueHighlight,
-				transparentHighlight
-				));
+		Color opaqueHighlight = new Color(pHighlight.getRed(),
+				pHighlight.getGreen(), pHighlight.getBlue(), 255);
+		Color transparentHighlight = new Color(pHighlight.getRed(),
+				pHighlight.getGreen(), pHighlight.getBlue(), 0);
+		vShadow.setPaint(createGradientColor(vShadow, opaqueHighlight,
+				transparentHighlight));
 		vShadow.setTransparency(0.0f);
 		synchronized (pNode) {
 			mLayerGlow.addChild(vShadow);
@@ -738,7 +803,8 @@ public class Piccolo2DPanel implements GraphPanel {
 		int vNumberOfChars = 0;
 		if (vNumberOfNodes > 0) {
 			for (PComposite vNode : mMapNode.values()) {
-				vNumberOfChars += ((PText) vNode.getChild(1)).getText().length();
+				vNumberOfChars += ((PText) vNode.getChild(1)).getText()
+						.length();
 			}
 			double vAverage = vNumberOfChars / vNumberOfNodes;
 			double vSize = (Math.sqrt(vNumberOfNodes) + vAverage) * 50;
@@ -772,8 +838,8 @@ public class Piccolo2DPanel implements GraphPanel {
 				}
 			}
 			int vOffset = 50;
-			final PBounds vBounds = new PBounds(xMin - vOffset, yMin - vOffset, xMax - xMin + 2 * vOffset, yMax - yMin
-					+ 2 * vOffset);
+			final PBounds vBounds = new PBounds(xMin - vOffset, yMin - vOffset,
+					xMax - xMin + 2 * vOffset, yMax - yMin + 2 * vOffset);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -785,13 +851,15 @@ public class Piccolo2DPanel implements GraphPanel {
 
 	@Override
 	public void repaintNodes(NodeType pType, String pPublisher) {
-		LOGGER.trace("Method repaintNodes(" + pType + ", " + pPublisher + ") called.");
+		LOGGER.trace("Method repaintNodes(" + pType + ", " + pPublisher
+				+ ") called.");
 		for (Object key : mMapNode.keySet()) {
 			PComposite vCom = mMapNode.get(key);
 			PPath vNode = (PPath) vCom.getChild(0);
 			PText vText = (PText) vCom.getChild(1);
 			/* Check if node is highlighted */
-			boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
+			boolean isHighlighted = vNode.getStrokePaint()
+					.equals(mColorNewNode)
 					|| vNode.getStrokePaint().equals(mColorDeleteNode);
 			boolean isSelected;
 			if (pType == NodeType.IDENTIFIER) {
@@ -831,7 +899,8 @@ public class Piccolo2DPanel implements GraphPanel {
 						 * Default color was changed, repaint each node with its
 						 * own color
 						 */
-						String vPublisher = (String) vCom.getAttribute("publisher");
+						String vPublisher = (String) vCom
+								.getAttribute("publisher");
 						if (isSelected) {
 							vNode.setPaint(mColorSelectedNode);
 						} else {
@@ -925,8 +994,9 @@ public class Piccolo2DPanel implements GraphPanel {
 	/**
 	 * Triggers repainting the nodes according to the type of a given
 	 * {@link Propable} object.
-	 * 
-	 * @param propable a {@link Propable} instance
+	 *
+	 * @param propable
+	 *            a {@link Propable} instance
 	 */
 	private void triggerRepaint(Propable propable) {
 		LOGGER.trace("Method triggerRepaint(" + propable + ") called.");
@@ -934,17 +1004,19 @@ public class Piccolo2DPanel implements GraphPanel {
 		if (propable instanceof Identifier) {
 			repaintNodes(NodeType.IDENTIFIER, "");
 		} else if (propable instanceof Metadata) {
-			repaintNodes(NodeType.METADATA, extractPublisherId((Metadata) propable));
+			repaintNodes(NodeType.METADATA,
+					extractPublisherId((Metadata) propable));
 		}
 	}
 
 	/**
-	 * Tries to extract the IF-MAP publisher id of a {@link Metadata}
-	 * object.
-	 * 
-	 * @param propable a {@link Metadata} object
+	 * Tries to extract the IF-MAP publisher id of a {@link Metadata} object.
+	 *
+	 * @param propable
+	 *            a {@link Metadata} object
 	 * @return the IF-MAP publisher id for the given {@link Metadata} object, if
-	 * it is found in the properties; otherweise, a empty string is returned
+	 *         it is found in the properties; otherweise, a empty string is
+	 *         returned
 	 */
 	private String extractPublisherId(Metadata metadata) {
 		LOGGER.trace("Method extractPublisherId(" + metadata + ") called.");

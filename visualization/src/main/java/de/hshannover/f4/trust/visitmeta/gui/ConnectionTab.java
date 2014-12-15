@@ -49,13 +49,20 @@ import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
+import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategy;
+import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyFactory;
+import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionInformationPane;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 
 public class ConnectionTab extends JPanel {
+	private static final Properties mConfig = Main.getConfig();
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(ConnectionTab.class);
 
@@ -64,7 +71,7 @@ public class ConnectionTab extends JPanel {
 	private GraphContainer mConnection = null;
 	private GraphConnection mGraphConnection = null;
 
-	private PanelHistoryNavigation mTimeLine = null;
+	private HistoryNavigationStrategy mHistoryNavigationStrategy = null;
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
@@ -97,8 +104,11 @@ public class ConnectionTab extends JPanel {
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
 
-		mTimeLine = new PanelHistoryNavigation(mConnection.getTimeHolder(),
-				mConnection.getRestUrl());
+		String historyNavigationType = mConfig.getString(
+				"visualization.history.navigation", "TAB_BASED_NAVIGATION");
+		mHistoryNavigationStrategy = HistoryNavigationStrategyFactory.create(
+				HistoryNavigationStrategyType.valueOf(historyNavigationType),
+				mConnection);
 		this.setLayout(new GridLayout());
 
 		initPanels();
@@ -123,7 +133,8 @@ public class ConnectionTab extends JPanel {
 		mPanelXmlTree = new PanelXmlTree();
 
 		mUpperPanel.add(mMotionInformationPane);
-		mLowerPanel.add(mTimeLine, BorderLayout.NORTH);
+		mLowerPanel.add(mHistoryNavigationStrategy.getJPanel(),
+				BorderLayout.NORTH);
 		mLowerPanel.add(mPanelXmlTree, BorderLayout.CENTER);
 		mLowerPanel.setPreferredSize(new Dimension(this.getWidth(), 200));
 

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.gui;
+package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -65,8 +65,10 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
  * and handling historic instances of a given map-server.
  *
  */
-public class PanelTimeLine extends JPanel implements Observer {
-	private static final long serialVersionUID = 1L;
+public class RangeSliderBasedHistoryNavigation implements Observer,
+		HistoryNavigationStrategy {
+	private JPanel mPanel = null;
+
 	private static final String TIMEFORMAT = "yyyy-MM-FF HH:mm:ss";
 
 	private SortedMap<Long, Long> mChangesMap = null;
@@ -88,22 +90,24 @@ public class PanelTimeLine extends JPanel implements Observer {
 
 	/**
 	 * Constructor that initializes the TimeLine Panel.
-	 * 
+	 *
 	 * @param timeHolder
 	 *            Manages the timestamps for the historic view.
 	 */
-	public PanelTimeLine(TimeHolder timeHolder) {
-		super();
-		setPreferredSize(new Dimension(400, 33));
-		setMinimumSize(new Dimension(400, 0));
+	public RangeSliderBasedHistoryNavigation(TimeHolder timeHolder) {
+		mPanel = new JPanel();
+		mPanel.setPreferredSize(new Dimension(400, 33));
+		mPanel.setMinimumSize(new Dimension(400, 0));
 		mTimeHolder = timeHolder;
 		mSpringLayout = new SpringLayout();
 
-		mSpinnerTimeStartDateModel = new SpinnerDateModel(new Date(0L), null, null, Calendar.SECOND);
+		mSpinnerTimeStartDateModel = new SpinnerDateModel(new Date(0L), null,
+				null, Calendar.SECOND);
 		mSpinnerTimeStart = new JSpinner();
 		mSpinnerTimeStart.setToolTipText("Start Time");
 		mSpinnerTimeStart.setModel(mSpinnerTimeStartDateModel);
-		mSpinnerTimeStart.setEditor(new JSpinner.DateEditor(mSpinnerTimeStart, TIMEFORMAT));
+		mSpinnerTimeStart.setEditor(new JSpinner.DateEditor(mSpinnerTimeStart,
+				TIMEFORMAT));
 		mSpinnerTimeStart.setEnabled(false);
 
 		mSlider = new RangeSlider();
@@ -114,11 +118,13 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mSlider.setEnabledLowerDragging(false);
 		mSlider.setEnabledUpperDragging(false);
 
-		mSpinnerTimeEndDateModel = new SpinnerDateModel(new Date(0L), null, null, Calendar.SECOND);
+		mSpinnerTimeEndDateModel = new SpinnerDateModel(new Date(0L), null,
+				null, Calendar.SECOND);
 		mSpinnerTimeEnd = new JSpinner();
 		mSpinnerTimeEnd.setToolTipText("End Time");
 		mSpinnerTimeEnd.setModel(mSpinnerTimeEndDateModel);
-		mSpinnerTimeEnd.setEditor(new JSpinner.DateEditor(mSpinnerTimeEnd, TIMEFORMAT));
+		mSpinnerTimeEnd.setEditor(new JSpinner.DateEditor(mSpinnerTimeEnd,
+				TIMEFORMAT));
 		mSpinnerTimeEnd.setEnabled(false);
 
 		mChckbxLive = new JCheckBox("Live");
@@ -126,25 +132,34 @@ public class PanelTimeLine extends JPanel implements Observer {
 		mChckbxLive.setSelected(true);
 		mChckbxLive.setEnabled(false);
 
-		setLayout(mSpringLayout);
+		mPanel.setLayout(mSpringLayout);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeStart, 6, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.WEST, mSpinnerTimeStart, 15, SpringLayout.WEST, this);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeStart, 6,
+				SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mSpinnerTimeStart, 15,
+				SpringLayout.WEST, mPanel);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSlider, 8, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.WEST, mSlider, 8, SpringLayout.EAST, mSpinnerTimeStart);
-		mSpringLayout.putConstraint(SpringLayout.EAST, mSlider, -8, SpringLayout.WEST, mSpinnerTimeEnd);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSlider, 8,
+				SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.WEST, mSlider, 8,
+				SpringLayout.EAST, mSpinnerTimeStart);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mSlider, -8,
+				SpringLayout.WEST, mSpinnerTimeEnd);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeEnd, 6, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.EAST, mSpinnerTimeEnd, -8, SpringLayout.WEST, mChckbxLive);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mSpinnerTimeEnd, 6,
+				SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mSpinnerTimeEnd, -8,
+				SpringLayout.WEST, mChckbxLive);
 
-		mSpringLayout.putConstraint(SpringLayout.NORTH, mChckbxLive, 4, SpringLayout.NORTH, this);
-		mSpringLayout.putConstraint(SpringLayout.EAST, mChckbxLive, -15, SpringLayout.EAST, this);
+		mSpringLayout.putConstraint(SpringLayout.NORTH, mChckbxLive, 4,
+				SpringLayout.NORTH, mPanel);
+		mSpringLayout.putConstraint(SpringLayout.EAST, mChckbxLive, -15,
+				SpringLayout.EAST, mPanel);
 
-		add(mSpinnerTimeStart);
-		add(mSlider);
-		add(mSpinnerTimeEnd);
-		add(mChckbxLive);
+		mPanel.add(mSpinnerTimeStart);
+		mPanel.add(mSlider);
+		mPanel.add(mSpinnerTimeEnd);
+		mPanel.add(mChckbxLive);
 
 		addListener();
 		mTimeHolder.addObserver(this);
@@ -172,8 +187,10 @@ public class PanelTimeLine extends JPanel implements Observer {
 			@Override
 			public void stateChanged(ChangeEvent pE) {
 				Object[] vTimes = mChangesMap.keySet().toArray();
-				mSpinnerTimeStartDateModel.setValue(new Date((long) vTimes[mSlider.getValue()]));
-				mSpinnerTimeEndDateModel.setValue(new Date((long) vTimes[mSlider.getUpperValue()]));
+				mSpinnerTimeStartDateModel.setValue(new Date(
+						(long) vTimes[mSlider.getValue()]));
+				mSpinnerTimeEndDateModel.setValue(new Date(
+						(long) vTimes[mSlider.getUpperValue()]));
 			}
 		};
 		mListenerChckbxLive = new ChangeListener() {
@@ -185,7 +202,7 @@ public class PanelTimeLine extends JPanel implements Observer {
 					mSlider.setEnabledUpperDragging(false);
 					mSpinnerTimeStart.setEnabled(false);
 					mSpinnerTimeEnd.setEnabled(false);
-					
+
 				} else {
 					mSlider.setEnabled(true);
 					mSlider.setEnabledLowerDragging(true);
@@ -202,12 +219,18 @@ public class PanelTimeLine extends JPanel implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
 				mTimeHolder.setLiveView(mChckbxLive.isSelected(), false);
-				if(mTimeHolder.isLiveView()) {
-					mTimeHolder.setDeltaTimeStart(mTimeHolder.getNewestTime(), false);
-					mTimeHolder.setDeltaTimeEnd(mTimeHolder.getNewestTime(), false);
+				if (mTimeHolder.isLiveView()) {
+					mTimeHolder.setDeltaTimeStart(mTimeHolder.getNewestTime(),
+							false);
+					mTimeHolder.setDeltaTimeEnd(mTimeHolder.getNewestTime(),
+							false);
 				} else {
-					mTimeHolder.setDeltaTimeStart(((Date) mSpinnerTimeStart.getValue()).getTime(), false);
-					mTimeHolder.setDeltaTimeEnd(((Date) mSpinnerTimeEnd.getValue()).getTime(), false);
+					mTimeHolder.setDeltaTimeStart(
+							((Date) mSpinnerTimeStart.getValue()).getTime(),
+							false);
+					mTimeHolder.setDeltaTimeEnd(
+							((Date) mSpinnerTimeEnd.getValue()).getTime(),
+							false);
 				}
 				mTimeHolder.notifyObservers();
 			}
@@ -231,15 +254,20 @@ public class PanelTimeLine extends JPanel implements Observer {
 			mChckbxLive.setEnabled(true);
 			mChangesMap = mTimeHolder.getChangesMap();
 			mSlider.setMaximum(mChangesMap.size() - 1);
-			mSpinnerTimeStartDateModel.setStart(new Date(tmpHolder.getBigBang()));
-			mSpinnerTimeStartDateModel.setEnd(new Date(tmpHolder.getNewestTime()));
+			mSpinnerTimeStartDateModel
+					.setStart(new Date(tmpHolder.getBigBang()));
+			mSpinnerTimeStartDateModel.setEnd(new Date(tmpHolder
+					.getNewestTime()));
 			mSpinnerTimeEndDateModel.setStart(new Date(tmpHolder.getBigBang()));
-			mSpinnerTimeEndDateModel.setEnd(new Date(tmpHolder.getNewestTime()));
+			mSpinnerTimeEndDateModel
+					.setEnd(new Date(tmpHolder.getNewestTime()));
 
 			if (mTimeHolder.isLiveView()) {
 				mSlider.setUpperValue(mChangesMap.size() - 1);
-				mSpinnerTimeStartDateModel.setValue(new Date(mTimeHolder.getBigBang()));
-				mSpinnerTimeEndDateModel.setValue(new Date(mTimeHolder.getNewestTime()));
+				mSpinnerTimeStartDateModel.setValue(new Date(mTimeHolder
+						.getBigBang()));
+				mSpinnerTimeEndDateModel.setValue(new Date(mTimeHolder
+						.getNewestTime()));
 			}
 
 			mSpinnerTimeStart.addChangeListener(mListenerSpinnerTimeStart);
@@ -247,5 +275,10 @@ public class PanelTimeLine extends JPanel implements Observer {
 			mSlider.addChangeListener(mListenerSlider);
 			mChckbxLive.addChangeListener(mListenerChckbxLive);
 		}
+	}
+
+	@Override
+	public JPanel getJPanel() {
+		return mPanel;
 	}
 }

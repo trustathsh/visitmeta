@@ -92,7 +92,8 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 		testIdentifierCount(graph, 2);
 
 		JSONArray actual = toJson(graphs);
-		JSONArray expected = buildJSONFromYamlFile("link1", 0l);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(0, createJSONIdentifierMetadataConnection("ip-address1", "mac-address1", "ip-mac1")));
 		assertTrue(jsonsEqual(actual, expected));
 	}
 

@@ -90,10 +90,6 @@ public abstract class AbstractTestCase {
 	private static final String KEY_YAML_PROPERTIES = "properties";
 	private static final String KEY_YAML_RAWDATA = "rawData";
 
-	private static final String KEY_JSON_IDENTIFIERS = "identifiers";
-	private static final String KEY_JSON_LINKS = "links";
-	private static final String KEY_JSON_METADATA = "metadata";
-	private static final String KEY_JSON_TIMESTAMP = "timestamp";
 	private static final String KEY_JSON_TYPENAME = "typename";
 	private static final String KEY_JSON_PROPERTIES = "properties";
 
@@ -301,7 +297,7 @@ public abstract class AbstractTestCase {
 
 	/**
 	 * Equals JSONObjects or JSONArrays rekursive.
-	 * 
+	 *
 	 * @param obj1
 	 * @param obj2
 	 * @return true if the JSONObject are same, false otherwise
@@ -395,92 +391,8 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Builds a JSONArray to equals this with JsonMarshaller.toJson(). Load the
-	 * data from the yaml file.
-	 * 
-	 * @param link
-	 * @return JSONArray from the yaml testcase filename
-	 * @throws JSONException
-	 */
-	@SuppressWarnings("unchecked")
-	protected JSONArray buildJSONFromYamlFile(String link, Long timestamp) throws JSONException {
-		// ### extract first // second // metadata
-		Map<String, Object> expectedLink = (Map<String, Object>) mTestcase.get(link);
-
-		Map<String, Object> first = (Map<String, Object>) expectedLink.get(KEY_YAML_FIRST_IDENTIFIER);
-		Map<String, Object> second = (Map<String, Object>) expectedLink.get(KEY_YAML_SECOND_IDENTIFIER);
-		Map<String, Object> metadata = (Map<String, Object>) expectedLink.get(KEY_YAML_METADATA);
-
-		JSONArray expectedJSONArray = new JSONArray();
-		JSONObject expectedJSONObject = new JSONObject();
-		JSONArray linksJSONArray = new JSONArray();
-		JSONObject linkJSONObject = new JSONObject();
-		JSONArray identifiersJSONArray = new JSONArray();
-
-		// ### build link object ###
-		expectedJSONObject.put(KEY_JSON_TIMESTAMP, timestamp);
-		expectedJSONObject.put(KEY_JSON_LINKS, linksJSONArray);
-
-		// ### build first Identifier ###
-		JSONObject firstIdentifierJSONObject = buildJSONObjectFromMap(first);
-		identifiersJSONArray.put(firstIdentifierJSONObject);
-
-		// ### build second Identifier ###
-		if (second != null) {
-			JSONObject secondIdentifierJSONObject = buildJSONObjectFromMap(second);
-
-			identifiersJSONArray.put(secondIdentifierJSONObject);
-			linkJSONObject.put(KEY_JSON_IDENTIFIERS, identifiersJSONArray);
-
-		} else {
-			linkJSONObject.put(KEY_JSON_IDENTIFIERS, firstIdentifierJSONObject);
-		}
-
-		// ### build metadata for the link object ###
-		JSONArray metadataJSONArray = buildMetadataJSONArray(metadata);
-
-		if (metadataJSONArray.length() == 1) {
-			// only one -> add simple JSONObject
-			linkJSONObject.put(KEY_JSON_METADATA, metadataJSONArray.get(0));
-
-		} else if (metadataJSONArray.length() > 1) {
-			// more as one add the full array
-			linkJSONObject.put(KEY_JSON_METADATA, metadataJSONArray);
-
-		} else {
-			linkJSONObject.put(KEY_JSON_METADATA, new JSONObject());
-		}
-
-		// ### add the link object to the links array ###
-		linksJSONArray.put(linkJSONObject);
-
-		// ### add the expected-JSONObject object to the root array ###
-		expectedJSONArray.put(expectedJSONObject);
-
-		return expectedJSONArray;
-	}
-
-	@SuppressWarnings("unchecked")
-	private JSONArray buildMetadataJSONArray(Map<String, Object> metadata) throws JSONException {
-		JSONArray metadataJSONArray = new JSONArray();
-		for (Entry<String, Object> metadataEntry : metadata.entrySet()) {
-
-			Object tmp = metadataEntry.getValue();
-			if (tmp instanceof HashMap) {
-				HashMap<String, Object> metaTmp = (HashMap<String, Object>) tmp;
-				JSONObject metadataJSONObject = buildJSONObjectFromMap(metaTmp);
-
-				metadataJSONArray.put(metadataJSONObject);
-			} else {
-				logger.error("The metadata-entry-set value is not a HashMap");
-			}
-		}
-		return metadataJSONArray;
-	}
-
-	/**
 	 * Build a JSONObject for identifiers or metadata
-	 * 
+	 *
 	 * @param valueMap
 	 * @return JSONObject
 	 * @throws JSONException

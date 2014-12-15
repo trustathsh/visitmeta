@@ -67,7 +67,8 @@ public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends AbstractTe
 		testGraphListSize(initialGraph, 1);
 
 		JSONArray actual = toJson(initialGraph);
-		JSONArray expected = buildJSONFromYamlFile("link1", 0L);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(0, createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1")));
 		assertTrue(jsonsEqual(expected, actual));
 	}
 
@@ -99,7 +100,8 @@ public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends AbstractTe
 		testIdentifierCount(graphAt.get(0), 2);
 
 		JSONArray actual = toJson(graphAt);
-		JSONArray expected = buildJSONFromYamlFile("link2", timestamp);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(timestamp, createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip2")));
 		assertTrue(jsonsEqual(expected, actual));
 	}
 
@@ -112,7 +114,8 @@ public class SingleValueMetadataInsertUpdateAndDeleteTestCase extends AbstractTe
 		testIdentifierCount(graphAt.get(0), 2);
 
 		JSONArray actual = toJson(graphAt);
-		JSONArray expected = buildJSONFromYamlFile("link1", timestamp);
+		JSONArray expected = new JSONArray();
+		expected.put(createJSON(timestamp, createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1")));
 		assertTrue(jsonsEqual(expected, actual));
 	}
 

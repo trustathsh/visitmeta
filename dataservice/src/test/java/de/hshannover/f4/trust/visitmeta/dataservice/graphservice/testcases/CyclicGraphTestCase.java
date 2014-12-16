@@ -43,7 +43,7 @@ public class CyclicGraphTestCase extends AbstractTestCase {
 	@Override
 	public void getGraphAt() throws JSONException {
 		getGraphAt0();
-//		getGraphAt1();
+		getGraphAt1();
 		getGraphAt2();
 	}
 
@@ -126,7 +126,7 @@ public class CyclicGraphTestCase extends AbstractTestCase {
 
 	@Override
 	public void getDelta() throws JSONException {
-//		getDelta0to1();
+		getDelta0to1();
 		getDelta0to2();
 		getDelta1to2();
 	}

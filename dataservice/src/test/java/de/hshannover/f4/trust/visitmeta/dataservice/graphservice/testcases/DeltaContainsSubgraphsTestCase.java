@@ -153,7 +153,7 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 	public void getDelta() throws JSONException {
 		getDeltaFrom0To1();
 		getDeltaFrom1To2();
-		//		getDeltaFrom0To2();	// FIXME this test currently fails, because delta calculation is wrong
+		getDeltaFrom0To2();
 	}
 
 	private void getDeltaFrom0To1() throws JSONException {

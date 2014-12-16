@@ -481,12 +481,12 @@ public class SimpleGraphServiceTest {
 
 		String id1 = delta.getUpdates().get(0).getIdentifiers().get(0).getTypeName();
 		String id2 = delta.getUpdates().get(0).getIdentifiers().get(1).getTypeName();
-		assertTrue(id1.equals("ip-address") || id2.equals("mac-address"));
+		assertTrue(id1.equals("ip-address") || id1.equals("mac-address"));
 		assertTrue(id2.equals("ip-address") || id2.equals("mac-address"));
 
 		id1 = delta.getDeletes().get(0).getIdentifiers().get(0).getTypeName();
 		id2 = delta.getDeletes().get(0).getIdentifiers().get(1).getTypeName();
-		assertTrue(id1.equals("ip-address") || id2.equals("mac-address"));
+		assertTrue(id1.equals("ip-address") || id1.equals("mac-address"));
 		assertTrue(id2.equals("ip-address") || id2.equals("mac-address"));
 
 		assertEquals(1, delta.getDeletes().get(0).getIdentifiers().get(0).getLinks().size());

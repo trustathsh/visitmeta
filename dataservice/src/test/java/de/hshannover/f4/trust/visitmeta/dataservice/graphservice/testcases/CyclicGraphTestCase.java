@@ -138,7 +138,7 @@ public class CyclicGraphTestCase extends AbstractTestCase {
 		List<IdentifierGraph> updates = delta.getUpdates();
 		List<IdentifierGraph> deletes = delta.getDeletes();
 
-		assertEquals(3, updates.get(0).getIdentifiers().size());
+		assertEquals(2, updates.get(0).getIdentifiers().size());
 		assertEquals(0, deletes.size());
 
 		JSONArray actualDeletes = toJson(deletes);

@@ -211,10 +211,8 @@ public class DeltaContainsSubgraphsTestCase extends AbstractTestCase {
 
 		JSONArray actualUpdates = toJson(delta.getUpdates());
 		JSONArray expectedUpdates = new JSONArray();
-		List<JSONObject> jsonObjects = new ArrayList<JSONObject>();
-		jsonObjects.add(createJSONIdentifierMetadataConnection("mac-address1", "access-request1", "access-request-mac1"));
-		jsonObjects.add(createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1"));
-		expectedUpdates.put(createJSON(t2, jsonObjects));
+		expectedUpdates.put(createJSON(t2, createJSONIdentifierMetadataConnection("mac-address1", "access-request1", "access-request-mac1")));
+		expectedUpdates.put(createJSON(t2, createJSONIdentifierMetadataConnection("ip-address1", "device1", "device-ip1")));
 
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 

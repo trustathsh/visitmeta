@@ -18,7 +18,7 @@
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of visitmeta-dataservice, version 0.2.0,
+ * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2014 Trust@HsH

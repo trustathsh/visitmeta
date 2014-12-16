@@ -146,7 +146,7 @@ public class Piccolo2DPanel implements GraphPanel {
 		String vColorBackground = mConfig.getString("color.background",
 				"0xFFFFFF");
 		String vColorEdge = mConfig.getString("color.edge", "0x000000");
-		String vColorNewNode = mConfig.getString("color.node.new", "0xC5D931");
+		String vColorNewNode = mConfig.getString("color.node.new", "0x228B22");
 		String vColorDeleteNode = mConfig.getString("color.node.delete",
 				"0x82150F");
 		String vColorSelectedNode = mConfig.getString("color.node.selected",

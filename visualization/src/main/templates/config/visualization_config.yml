@@ -57,7 +57,7 @@ color:
     outside: '0xFF9966'
     border: '0x000000'
   node:
-    new: '0xC5D931'
+    new: '0x228B22'
     delete: '0x82150F'
     selected: '0xFFF02E'
   identifier:

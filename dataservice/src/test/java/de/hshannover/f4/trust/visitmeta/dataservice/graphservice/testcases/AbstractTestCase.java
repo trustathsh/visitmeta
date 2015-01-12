@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,6 +64,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
+import de.hshannover.f4.trust.ironcommon.yaml.YamlReader;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.Neo4JTestDatabaseFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
@@ -79,7 +80,6 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JExecutor;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JReader;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTimestampManager;
-import de.hshannover.f4.trust.visitmeta.util.yaml.YamlReader;
 
 public abstract class AbstractTestCase {
 
@@ -122,11 +122,13 @@ public abstract class AbstractTestCase {
 
 		loadTestcaseIntoGraphDB();
 
-		Neo4JRepository repo = new Neo4JRepository(mDbConnection, MessageDigest.getInstance("MD5"));
+		Neo4JRepository repo = new Neo4JRepository(mDbConnection,
+				MessageDigest.getInstance("MD5"));
 		mReader = new Neo4JReader(repo, mDbConnection);
 		mExecutor = new Neo4JExecutor(mDbConnection);
 
-		mService = new SimpleGraphService(mReader, mExecutor, new DummyGraphCache());
+		mService = new SimpleGraphService(mReader, mExecutor,
+				new DummyGraphCache());
 		mJsonMarshaller = new JsonMarshaller();
 	}
 
@@ -146,12 +148,14 @@ public abstract class AbstractTestCase {
 				mTestcase = YamlReader.loadMap(testcaseFilename);
 				assumeTrue(!mTestcase.isEmpty());
 				parseYamlMap();
-				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(mTestcase, mGraphDb, mTimestampManager);
+				Neo4JTestDatabaseFactory.loadTestCaseIntoGraphDB(mTestcase,
+						mGraphDb, mTimestampManager);
 			} else {
 				logger.info("Testcase filename was null, using empty graph database for tests.");
 			}
 		} catch (IOException e) {
-			logger.error("Could not load '" + getTestcaseFilename() + "'; skipping tests");
+			logger.error("Could not load '" + getTestcaseFilename()
+					+ "'; skipping tests");
 		}
 	}
 
@@ -161,21 +165,30 @@ public abstract class AbstractTestCase {
 		mMetadata = new HashMap<String, JSONObject>();
 
 		for (String linkKey : mTestcase.keySet()) {
-			Map<String, Object> link = (Map<String, Object>) mTestcase.get(linkKey);
-			Map<String, Object> first = (Map<String, Object>) link.get(KEY_YAML_FIRST_IDENTIFIER);
-			Map<String, Object> second = (Map<String, Object>) link.get(KEY_YAML_SECOND_IDENTIFIER);
-			Map<String, Object> metadata = (Map<String, Object>) link.get(KEY_YAML_METADATA);
+			Map<String, Object> link = (Map<String, Object>) mTestcase
+					.get(linkKey);
+			Map<String, Object> first = (Map<String, Object>) link
+					.get(KEY_YAML_FIRST_IDENTIFIER);
+			Map<String, Object> second = (Map<String, Object>) link
+					.get(KEY_YAML_SECOND_IDENTIFIER);
+			Map<String, Object> metadata = (Map<String, Object>) link
+					.get(KEY_YAML_METADATA);
 
 			if (!mIdentifier.containsKey(first.get(KEY_YAML_RAWDATA))) {
-				mIdentifier.put((String) first.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(first));
+				mIdentifier.put((String) first.get(KEY_YAML_RAWDATA),
+						buildJSONObjectFromMap(first));
 			}
-			if (second != null && !mIdentifier.containsKey(second.get(KEY_YAML_RAWDATA))) {
-				mIdentifier.put((String) second.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(second));
+			if (second != null
+					&& !mIdentifier.containsKey(second.get(KEY_YAML_RAWDATA))) {
+				mIdentifier.put((String) second.get(KEY_YAML_RAWDATA),
+						buildJSONObjectFromMap(second));
 			}
 
 			for (String metaKey : metadata.keySet()) {
-				Map<String, Object> meta = (Map<String, Object>) metadata.get(metaKey);
-				mMetadata.put((String) meta.get(KEY_YAML_RAWDATA), buildJSONObjectFromMap(meta));
+				Map<String, Object> meta = (Map<String, Object>) metadata
+						.get(metaKey);
+				mMetadata.put((String) meta.get(KEY_YAML_RAWDATA),
+						buildJSONObjectFromMap(meta));
 
 			}
 		}
@@ -191,7 +204,8 @@ public abstract class AbstractTestCase {
 	 * @return JSONObject containing the subgraph
 	 * @throws JSONException
 	 */
-	protected JSONObject createJSON(long timestamp, List<JSONObject> objects) throws JSONException {
+	protected JSONObject createJSON(long timestamp, List<JSONObject> objects)
+			throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("timestamp", timestamp);
 
@@ -205,7 +219,8 @@ public abstract class AbstractTestCase {
 		return json;
 	}
 
-	protected JSONObject createJSON(long timestamp, JSONObject object) throws JSONException {
+	protected JSONObject createJSON(long timestamp, JSONObject object)
+			throws JSONException {
 		ArrayList<JSONObject> objects = new ArrayList<JSONObject>();
 		objects.add(object);
 		return createJSON(timestamp, objects);
@@ -222,23 +237,23 @@ public abstract class AbstractTestCase {
 	 * @return JSONObject containing Identifier-Metadata connection.
 	 * @throws JSONException
 	 */
-	protected JSONObject createJSONIdentifierMetadataConnection(String first, String second, List<String> metadata)
-			throws JSONException {
+	protected JSONObject createJSONIdentifierMetadataConnection(String first,
+			String second, List<String> metadata) throws JSONException {
 		JSONObject l = new JSONObject();
 		Object identifiers;
-		if(second != null) {
+		if (second != null) {
 			identifiers = new JSONArray();
-			((JSONArray)identifiers).put(mIdentifier.get(first));
-			((JSONArray)identifiers).put(mIdentifier.get(second));
+			((JSONArray) identifiers).put(mIdentifier.get(first));
+			((JSONArray) identifiers).put(mIdentifier.get(second));
 		} else {
 			identifiers = mIdentifier.get(first);
 		}
 		l.put("identifiers", identifiers);
 		Object meta;
-		if(metadata.size() > 1) {
+		if (metadata.size() > 1) {
 			meta = new JSONArray();
 			for (String metaKey : metadata) {
-				((JSONArray)meta).put(mMetadata.get(metaKey));
+				((JSONArray) meta).put(mMetadata.get(metaKey));
 			}
 		} else {
 			meta = mMetadata.get(metadata.get(0));
@@ -248,19 +263,20 @@ public abstract class AbstractTestCase {
 		return l;
 	}
 
-	protected JSONObject createJSONIdentifierMetadataConnection(String first, List<String> metadata)
-			throws JSONException {
+	protected JSONObject createJSONIdentifierMetadataConnection(String first,
+			List<String> metadata) throws JSONException {
 		return createJSONIdentifierMetadataConnection(first, null, metadata);
 	}
 
-	protected JSONObject createJSONIdentifierMetadataConnection(String first, String second, String metadata)
-			throws JSONException {
+	protected JSONObject createJSONIdentifierMetadataConnection(String first,
+			String second, String metadata) throws JSONException {
 		ArrayList<String> meta = new ArrayList<String>();
 		meta.add(metadata);
 		return createJSONIdentifierMetadataConnection(first, second, meta);
 	}
 
-	protected JSONObject createJSONIdentifierMetadataConnection(String first, String metadata) throws JSONException {
+	protected JSONObject createJSONIdentifierMetadataConnection(String first,
+			String metadata) throws JSONException {
 		return createJSONIdentifierMetadataConnection(first, null, metadata);
 	}
 
@@ -336,7 +352,8 @@ public abstract class AbstractTestCase {
 			for (int i = 0; i < keyNames.length(); i++) {
 				if (!keyNames.get(i).getClass().equals(String.class)
 						|| !keyNames2.get(i).getClass().equals(String.class)) {
-					throw new JSONException("The key from the JSONObject must be a String");
+					throw new JSONException(
+							"The key from the JSONObject must be a String");
 				}
 			}
 
@@ -398,8 +415,10 @@ public abstract class AbstractTestCase {
 	 * @throws JSONException
 	 */
 	@SuppressWarnings("unchecked")
-	private JSONObject buildJSONObjectFromMap(Map<String, Object> valueMap) throws JSONException {
-		Map<String, Object> properties = (Map<String, Object>) valueMap.get(KEY_YAML_PROPERTIES);
+	private JSONObject buildJSONObjectFromMap(Map<String, Object> valueMap)
+			throws JSONException {
+		Map<String, Object> properties = (Map<String, Object>) valueMap
+				.get(KEY_YAML_PROPERTIES);
 
 		JSONObject propertiesJSONObject = new JSONObject();
 		if (properties != null) {
@@ -414,16 +433,19 @@ public abstract class AbstractTestCase {
 		return valueJSONObject;
 	}
 
-	protected void testGraphListSize(List<IdentifierGraph> list, int expectedGraphListSize) {
+	protected void testGraphListSize(List<IdentifierGraph> list,
+			int expectedGraphListSize) {
 		assertEquals(expectedGraphListSize, list.size());
 	}
 
-	protected void testIdentifierCount(IdentifierGraph graph, int expectedIdentifierCount) {
+	protected void testIdentifierCount(IdentifierGraph graph,
+			int expectedIdentifierCount) {
 		List<Identifier> identifiers = graph.getIdentifiers();
 		assertEquals(expectedIdentifierCount, identifiers.size());
 	}
 
-	protected void testDeltaSize(Delta delta, int expectedUpdateGraphSize, int expectedDeleteGraphSize) {
+	protected void testDeltaSize(Delta delta, int expectedUpdateGraphSize,
+			int expectedDeleteGraphSize) {
 		List<IdentifierGraph> updates = delta.getUpdates();
 		List<IdentifierGraph> deletes = delta.getDeletes();
 
@@ -431,7 +453,8 @@ public abstract class AbstractTestCase {
 		assertEquals(expectedDeleteGraphSize, deletes.size());
 	}
 
-	protected void testChangesMap(Map<Long, Long> expectedValues, Map<Long, Long> changesMap) {
+	protected void testChangesMap(Map<Long, Long> expectedValues,
+			Map<Long, Long> changesMap) {
 		assertEquals(expectedValues.size(), changesMap.size());
 
 		Iterator<Long> iterator = expectedValues.keySet().iterator();
@@ -441,8 +464,8 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	protected void testChangesMapJSON(SortedMap<Long, Long> expectedValues, SortedMap<Long, Long> changesMap)
-			throws JSONException {
+	protected void testChangesMapJSON(SortedMap<Long, Long> expectedValues,
+			SortedMap<Long, Long> changesMap) throws JSONException {
 		JSONObject actual = toJson(changesMap);
 		JSONObject expected = toJson(expectedValues);
 

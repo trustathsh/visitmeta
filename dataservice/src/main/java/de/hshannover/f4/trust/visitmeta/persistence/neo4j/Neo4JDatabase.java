@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,6 +40,8 @@ package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphCache;
@@ -49,8 +51,6 @@ import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.ThreadedWriter;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 public class Neo4JDatabase {
 
@@ -80,8 +80,7 @@ public class Neo4JDatabase {
 
 	private Executor mExecutor;
 
-
-	public Neo4JDatabase(String connectionName){
+	public Neo4JDatabase(String connectionName) {
 		log.trace("new Neo4JDatabase() ...");
 
 		try {
@@ -103,23 +102,25 @@ public class Neo4JDatabase {
 	}
 
 	private void initNeo4JConnection(String connectionName) {
-		neo4jDb = new Neo4JConnection(mNeo4JdbPath + "/connection/" + connectionName);
+		neo4jDb = new Neo4JConnection(mNeo4JdbPath + "/connection/"
+				+ connectionName);
 
-		if(mClearDatabase){
+		if (mClearDatabase) {
 
 			neo4jDb.ClearDatabase();
 		}
 
-		neo4jRepo = new Neo4JRepository(neo4jDb, Application.loadHashAlgorithm());
+		neo4jRepo = new Neo4JRepository(neo4jDb,
+				Application.loadHashAlgorithm());
 	}
 
 	private void initWriter(String connectionName) {
 		mWriter = new ThreadedWriter(new Neo4JWriter(neo4jRepo, neo4jDb));
 
-		writerThread = new Thread(mWriter, "WriterThread-"+connectionName);
+		writerThread = new Thread(mWriter, "WriterThread-" + connectionName);
 	}
 
-	private void startWriter(){
+	private void startWriter() {
 		writerThread.start();
 
 		log.info("Writer thread started");
@@ -132,12 +133,12 @@ public class Neo4JDatabase {
 		GraphCache cache = null;
 
 		if (mDbCaching) {
-			cache =	new SimpleGraphCache(mDbCachSize);
+			cache = new SimpleGraphCache(mDbCachSize);
 		} else {
 			cache = new DummyGraphCache();
 		}
 
-		mGraphService = new SimpleGraphService(mReader,mExecutor, cache);
+		mGraphService = new SimpleGraphService(mReader, mExecutor, cache);
 	}
 
 	public Writer getWriter() {

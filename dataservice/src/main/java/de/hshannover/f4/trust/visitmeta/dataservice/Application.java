@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,14 +48,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManagerImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 /**
@@ -149,15 +149,18 @@ public abstract class Application {
 		try {
 			keySet = mConnections.getKeySet();
 		} catch (PropertyException e) {
-			log.error("error while getKeySet from ConnectionsProperties -> " + e.toString(), e);
+			log.error("error while getKeySet from ConnectionsProperties -> "
+					+ e.toString(), e);
 		}
-		
-		for(String s: keySet){
+
+		for (String s : keySet) {
 			Connection tmp = null;
 			try {
 				tmp = mConnections.buildConnection(s);
 			} catch (ConnectionException | PropertyException e) {
-				log.error("error while build new connection from Properties -> " + e.toString(), e);
+				log.error(
+						"error while build new connection from Properties -> "
+								+ e.toString(), e);
 			}
 			try {
 				mManager.addConnection(tmp);
@@ -173,13 +176,12 @@ public abstract class Application {
 		log.info("Start RestService");
 
 		String url = "";
-		try{
-			url  = Application.getConfig().getString("restServiceUrl");
+		try {
+			url = Application.getConfig().getString("restServiceUrl");
 		} catch (PropertyException e) {
 			log.fatal(e.toString(), e);
 			throw new RuntimeException("could not load requested properties", e);
 		}
-
 
 		Set<Class<?>> classes = new HashSet<>();
 		for (DataserviceModule module : modules) {
@@ -194,8 +196,10 @@ public abstract class Application {
 
 	public static void initComponents() {
 		try {
-			String config = Application.class.getClassLoader().getResource("dataservice_config.yml").getPath();
-			String connections = Application.class.getClassLoader().getResource("dataservice_connections.yml").getPath();
+			String config = Application.class.getClassLoader()
+					.getResource("dataservice_config.yml").getPath();
+			String connections = Application.class.getClassLoader()
+					.getResource("dataservice_connections.yml").getPath();
 			mConfig = new Properties(config);
 			mConnections = new ConnectionsProperties(mManager, connections);
 
@@ -210,10 +214,11 @@ public abstract class Application {
 	public static MessageDigest loadHashAlgorithm() {
 		try {
 			String algoname = mConfig.getString("database.hashAlgorithm");
-			log.trace("try to load MessageDigest for '"+algoname+"'");
+			log.trace("try to load MessageDigest for '" + algoname + "'");
 			return MessageDigest.getInstance(algoname);
 		} catch (NoSuchAlgorithmException | PropertyException e) {
-			throw new RuntimeException("could not load requested hash algorithm", e);
+			throw new RuntimeException(
+					"could not load requested hash algorithm", e);
 		}
 	}
 

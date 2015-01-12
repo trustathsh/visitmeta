@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,13 +60,13 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
-import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 @Path("/")
 public class ConnectionResource {
@@ -159,8 +159,10 @@ public class ConnectionResource {
 		boolean authenticationBasic = jObj
 				.optBoolean(ConnectionKey.AUTHENTICATION_BASIC);
 		String truststorePath = jObj.optString(ConnectionKey.TRUSTSTORE_PATH);
-		String truststorePass = jObj.optString(ConnectionKey.TRUSTSTORE_PASSWORD);
-		boolean startupConnect = jObj.optBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP);
+		String truststorePass = jObj
+				.optString(ConnectionKey.TRUSTSTORE_PASSWORD);
+		boolean startupConnect = jObj
+				.optBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP);
 		int maxPollResultSize = jObj.optInt(ConnectionKey.MAX_POLL_RESULT_SIZE);
 
 		// build new Connection
@@ -186,31 +188,31 @@ public class ConnectionResource {
 			String jKey = i.next();
 
 			switch (jKey) {
-			case ConnectionKey.AUTHENTICATION_BASIC:
-				newConnection.setAuthenticationBasic(authenticationBasic);
-				break;
+				case ConnectionKey.AUTHENTICATION_BASIC:
+					newConnection.setAuthenticationBasic(authenticationBasic);
+					break;
 
-			case ConnectionKey.TRUSTSTORE_PATH:
-				newConnection.setTruststorePath(truststorePath);
-				break;
+				case ConnectionKey.TRUSTSTORE_PATH:
+					newConnection.setTruststorePath(truststorePath);
+					break;
 
-			case ConnectionKey.TRUSTSTORE_PASSWORD:
-				newConnection.setTruststorePassword(truststorePass);
-				break;
+				case ConnectionKey.TRUSTSTORE_PASSWORD:
+					newConnection.setTruststorePassword(truststorePass);
+					break;
 
-			case ConnectionKey.USE_CONNECTION_AS_STARTUP:
-				newConnection.setStartupConnect(startupConnect);
-				break;
+				case ConnectionKey.USE_CONNECTION_AS_STARTUP:
+					newConnection.setStartupConnect(startupConnect);
+					break;
 
-			case ConnectionKey.MAX_POLL_RESULT_SIZE:
-				newConnection.setMaxPollResultSize(maxPollResultSize);
-				break;
+				case ConnectionKey.MAX_POLL_RESULT_SIZE:
+					newConnection.setMaxPollResultSize(maxPollResultSize);
+					break;
 
-			case ConnectionKey.AUTHENTICATION_CERT:
-				return Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(ConnectionKey.AUTHENTICATION_CERT
-								+ " is not implemented yet").build();
+				case ConnectionKey.AUTHENTICATION_CERT:
+					return Response
+							.status(Response.Status.INTERNAL_SERVER_ERROR)
+							.entity(ConnectionKey.AUTHENTICATION_CERT
+									+ " is not implemented yet").build();
 			}
 		}
 
@@ -306,7 +308,8 @@ public class ConnectionResource {
 					.getSavedConnections().values()) {
 				Map<String, String> connectionMap = new HashMap<String, String>();
 
-				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL, c.getIfmapServerUrl());
+				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL,
+						c.getIfmapServerUrl());
 				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
 				connectionMap.put(ConnectionKey.USER_PASSWORD,
 						c.getUserPassword());

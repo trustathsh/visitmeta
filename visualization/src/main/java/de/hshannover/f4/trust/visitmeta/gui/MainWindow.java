@@ -77,13 +77,13 @@ import org.codehaus.jettison.json.JSONException;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.util.properties.PropertyException;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;

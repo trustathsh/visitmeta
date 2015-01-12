@@ -83,6 +83,10 @@
 		</dependency>
 		<dependency>
 			<groupId>de.hshannover.f4.trust</groupId>
+			<artifactId>ironcommon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.hshannover.f4.trust</groupId>
 			<artifactId>visitmeta-common</artifactId>
 		</dependency>
 		<dependency>

@@ -69,7 +69,8 @@ import javax.swing.event.ChangeListener;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 
-public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStrategy {
+public class TabBasedHistoryNavigation implements Observer,
+		HistoryNavigationStrategy {
 
 	private JPanel mPanel;
 	private TimeHolder mTimeHolder;
@@ -97,7 +98,7 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 
 	private long mNewestTime;
 	private long mOldestTime;
-	private SortedMap<Long,Long> mChangesMap;
+	private SortedMap<Long, Long> mChangesMap;
 
 	private JLabel mLiveViewTimestampLabel;
 	private JLabel mLiveViewRestUrlLabel;
@@ -126,11 +127,19 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 	private JButton mDeltaViewStartForwardButton;
 	private JButton mDeltaViewEndBackwardButton;
 	private JButton mDeltaViewEndForwardButton;
+	private JButton mDeltaViewIntervalForwardButton;
+	private JButton mDeltaViewIntervalBackwardButton;
 	private int mChangesMapSize;
+	private ActionListener mDeltaViewStartForwardButtonActionListener;
+	private ActionListener mDeltaViewStartBackwardButtonActionListener;
+	private ActionListener mDeltaViewEndForwardButtonActionListener;
+	private ActionListener mDeltaViewEndBackwardButtonActionListener;
+	private ActionListener mDeltaViewIntervalForwardButtonActionListener;
+	private ActionListener mDeltaViewIntervalBackwardButtonActionListener;
 
 	public TabBasedHistoryNavigation(TimeHolder timeHolder, String restUrl) {
-		//		this.setPreferredSize(new Dimension(400, 33));
-		//		this.setMinimumSize(new Dimension(400, 33));
+		// this.setPreferredSize(new Dimension(400, 33));
+		// this.setMinimumSize(new Dimension(400, 33));
 		mPanel = new JPanel();
 		mPanel.setSize(600, 400);
 
@@ -152,9 +161,12 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 		JPanel historyViewPanel = setUpHistoryViewPanel();
 		JPanel deltaViewPanel = setUpDeltaViewPanel();
 
-		mTabbedPane.insertTab("Live view", null, liveViewPanel, null, INDEX_LIVE_VIEW);
-		mTabbedPane.insertTab("History view", null, historyViewPanel, null, INDEX_HISTORY_VIEW);
-		mTabbedPane.insertTab("Delta view", null, deltaViewPanel, null, INDEX_DELTA_VIEW);
+		mTabbedPane.insertTab("Live view", null, liveViewPanel, null,
+				INDEX_LIVE_VIEW);
+		mTabbedPane.insertTab("History view", null, historyViewPanel, null,
+				INDEX_HISTORY_VIEW);
+		mTabbedPane.insertTab("Delta view", null, deltaViewPanel, null,
+				INDEX_DELTA_VIEW);
 		mCurrentMode = INDEX_LIVE_VIEW;
 
 		mPanel.add(mTabbedPane);
@@ -189,16 +201,22 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 
 	private JPanel setUpHistoryViewPanel() {
 		JPanel historyViewPanel = new JPanel();
-		historyViewPanel.setLayout(new BoxLayout(historyViewPanel, BoxLayout.Y_AXIS));
+		historyViewPanel.setLayout(new BoxLayout(historyViewPanel,
+				BoxLayout.Y_AXIS));
 
 		mHistoryViewSelectedTimestampLabel = new JLabel();
-		mHistoryViewSelectedTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mHistoryViewSelectedTimestampLabel.setText(createHistoryViewSelectedTimestampLabel());
+		mHistoryViewSelectedTimestampLabel
+				.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mHistoryViewSelectedTimestampLabel
+				.setText(createHistoryViewSelectedTimestampLabel());
 		historyViewPanel.add(mHistoryViewSelectedTimestampLabel);
 
-		mHistoryViewSelectedTimestampRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_HISTORY_VIEW));
-		mHistoryViewSelectedTimestampRestUrlLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mHistoryViewSelectedTimestampRestUrlLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		mHistoryViewSelectedTimestampRestUrlLabel = new JLabel(
+				createRestUrlLabel(INDEX_HISTORY_VIEW));
+		mHistoryViewSelectedTimestampRestUrlLabel
+				.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mHistoryViewSelectedTimestampRestUrlLabel.setCursor(new Cursor(
+				Cursor.HAND_CURSOR));
 		registerLinkHandler(mHistoryViewSelectedTimestampRestUrlLabel);
 		historyViewPanel.add(mHistoryViewSelectedTimestampRestUrlLabel);
 
@@ -224,19 +242,25 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 
 	private JPanel setUpDeltaViewPanel() {
 		JPanel deltaViewPanel = new JPanel();
-		deltaViewPanel.setLayout(new BoxLayout(deltaViewPanel, BoxLayout.Y_AXIS));
+		deltaViewPanel
+				.setLayout(new BoxLayout(deltaViewPanel, BoxLayout.Y_AXIS));
 
 		mDeltaViewSelectedStartTimestampLabel = new JLabel();
-		mDeltaViewSelectedStartTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mDeltaViewSelectedStartTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
+		mDeltaViewSelectedStartTimestampLabel
+				.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mDeltaViewSelectedStartTimestampLabel
+				.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
 		deltaViewPanel.add(mDeltaViewSelectedStartTimestampLabel);
 
 		mDeltaViewSelectedEndTimestampLabel = new JLabel();
-		mDeltaViewSelectedEndTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mDeltaViewSelectedEndTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+		mDeltaViewSelectedEndTimestampLabel
+				.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mDeltaViewSelectedEndTimestampLabel
+				.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
 		deltaViewPanel.add(mDeltaViewSelectedEndTimestampLabel);
 
-		mDeltaViewRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_DELTA_VIEW));
+		mDeltaViewRestUrlLabel = new JLabel(
+				createRestUrlLabel(INDEX_DELTA_VIEW));
 		mDeltaViewRestUrlLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mDeltaViewRestUrlLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		registerLinkHandler(mDeltaViewRestUrlLabel);
@@ -258,6 +282,16 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 		buttonPanel.add(mDeltaViewEndForwardButton);
 		deltaViewPanel.add(buttonPanel);
 
+		JPanel advancedButtonPanel = new JPanel();
+		advancedButtonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		mDeltaViewIntervalForwardButton = new JButton(">");
+		mDeltaViewIntervalBackwardButton = new JButton("<");
+		advancedButtonPanel.add(new JLabel("Move interval: "));
+		advancedButtonPanel.add(mDeltaViewIntervalBackwardButton);
+		advancedButtonPanel.add(mDeltaViewIntervalForwardButton);
+		deltaViewPanel.add(advancedButtonPanel);
+
 		return deltaViewPanel;
 	}
 
@@ -266,25 +300,25 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 		if (o instanceof TimeHolder) {
 			int selectedIndex = mTabbedPane.getSelectedIndex();
 
-			removeListeners();
+			// removeListeners();
 			updateValues();
 			switchTabEnableState();
 
 			switch (selectedIndex) {
-			case INDEX_LIVE_VIEW:
-				updateLiveView();
-				break;
-			case INDEX_HISTORY_VIEW:
-				updateHistoryView();
-				break;
-			case INDEX_DELTA_VIEW:
-				updateDeltaView();
-				break;
-			default:
-				break;
+				case INDEX_LIVE_VIEW:
+					updateLiveView();
+					break;
+				case INDEX_HISTORY_VIEW:
+					updateHistoryView();
+					break;
+				case INDEX_DELTA_VIEW:
+					updateDeltaView();
+					break;
+				default:
+					break;
 			}
 
-			addListeners();
+			// addListeners();
 		}
 	}
 
@@ -314,9 +348,12 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 					mDeltaViewSelectedEndTimestamp = mNewestTime;
 				}
 
-				mHistoryViewSelectedTimestampIndex = findIndexToTimestamp(mHistoryViewSelectedTimestamp, mChangesMap);
-				mDeltaViewSelectedStartTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedStartTimestamp, mChangesMap);
-				mDeltaViewSelectedEndTimestampIndex = findIndexToTimestamp(mDeltaViewSelectedEndTimestamp, mChangesMap);
+				mHistoryViewSelectedTimestampIndex = findIndexToTimestamp(
+						mHistoryViewSelectedTimestamp, mChangesMap);
+				mDeltaViewSelectedStartTimestampIndex = findIndexToTimestamp(
+						mDeltaViewSelectedStartTimestamp, mChangesMap);
+				mDeltaViewSelectedEndTimestampIndex = findIndexToTimestamp(
+						mDeltaViewSelectedEndTimestamp, mChangesMap);
 			}
 		} else {
 			mMaximumTimestampIndex = 0;
@@ -337,18 +374,21 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 
 		if (mHistoryViewSelectedTimestamp != TIMESTAMP_NOT_INITIALIZED
 				&& mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED) {
-			mHistoryViewSelectedTimestampRestUrlLabel.setText(createRestUrlLabel(INDEX_HISTORY_VIEW));
+			mHistoryViewSelectedTimestampRestUrlLabel
+					.setText(createRestUrlLabel(INDEX_HISTORY_VIEW));
 
 			mHistoryViewSlider.setMinimum(mMinimumTimestampIndex + 1);
 			mHistoryViewSlider.setMaximum(mMaximumTimestampIndex);
 			mHistoryViewSlider.setValue(mHistoryViewSelectedTimestampIndex + 1);
-			mHistoryViewSlider.setLabelTable(createHistoryViewSliderLabelTable());
+			mHistoryViewSlider
+					.setLabelTable(createHistoryViewSliderLabelTable());
 			mHistoryViewSlider.setEnabled(true);
 
 			mHistoryViewBackwardButton.setEnabled(true);
 			mHistoryViewForwardButton.setEnabled(true);
 
-			mHistoryViewSelectedTimestampLabel.setText(createHistoryViewSelectedTimestampLabel());
+			mHistoryViewSelectedTimestampLabel
+					.setText(createHistoryViewSelectedTimestampLabel());
 
 			mTimeHolder.setDeltaTimeStart(mHistoryViewSelectedTimestamp, false);
 			mTimeHolder.setDeltaTimeEnd(mHistoryViewSelectedTimestamp, false);
@@ -367,17 +407,52 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 				&& mDeltaViewSelectedEndTimestamp != TIMESTAMP_NOT_INITIALIZED
 				&& mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED) {
-			mDeltaViewRestUrlLabel.setText(createRestUrlLabel(INDEX_DELTA_VIEW));
+			mDeltaViewRestUrlLabel
+					.setText(createRestUrlLabel(INDEX_DELTA_VIEW));
 
-			mDeltaViewStartForwardButton.setEnabled(true);
-			mDeltaViewStartBackwardButton.setEnabled(true);
-			mDeltaViewEndForwardButton.setEnabled(true);
-			mDeltaViewEndBackwardButton.setEnabled(true);
+			if (mDeltaViewSelectedStartTimestampIndex < (mDeltaViewSelectedEndTimestampIndex - 1)) {
+				mDeltaViewStartForwardButton.setEnabled(true);
+			} else {
+				mDeltaViewStartForwardButton.setEnabled(false);
+			}
 
-			mDeltaViewSelectedStartTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
-			mDeltaViewSelectedEndTimestampLabel.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+			if (mDeltaViewSelectedStartTimestampIndex > mMinimumTimestampIndex) {
+				mDeltaViewStartBackwardButton.setEnabled(true);
+			} else {
+				mDeltaViewStartBackwardButton.setEnabled(false);
+			}
 
-			mTimeHolder.setDeltaTimeStart(mDeltaViewSelectedStartTimestamp, false);
+			if (mDeltaViewSelectedEndTimestampIndex < (mMaximumTimestampIndex - 1)) {
+				mDeltaViewEndForwardButton.setEnabled(true);
+			} else {
+				mDeltaViewEndForwardButton.setEnabled(false);
+			}
+
+			if (mDeltaViewSelectedEndTimestampIndex > (mDeltaViewSelectedStartTimestampIndex + 1)) {
+				mDeltaViewEndBackwardButton.setEnabled(true);
+			} else {
+				mDeltaViewEndBackwardButton.setEnabled(false);
+			}
+
+			if (mDeltaViewSelectedStartTimestampIndex == mMinimumTimestampIndex) {
+				mDeltaViewIntervalBackwardButton.setEnabled(false);
+			} else {
+				mDeltaViewIntervalBackwardButton.setEnabled(true);
+			}
+
+			if (mDeltaViewSelectedEndTimestampIndex == (mMaximumTimestampIndex - 1)) {
+				mDeltaViewIntervalForwardButton.setEnabled(false);
+			} else {
+				mDeltaViewIntervalForwardButton.setEnabled(true);
+			}
+
+			mDeltaViewSelectedStartTimestampLabel
+					.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
+			mDeltaViewSelectedEndTimestampLabel
+					.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+
+			mTimeHolder.setDeltaTimeStart(mDeltaViewSelectedStartTimestamp,
+					false);
 			mTimeHolder.setDeltaTimeEnd(mDeltaViewSelectedEndTimestamp, false);
 			mTimeHolder.notifyObservers();
 		} else {
@@ -385,6 +460,8 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 			mDeltaViewStartBackwardButton.setEnabled(false);
 			mDeltaViewEndForwardButton.setEnabled(false);
 			mDeltaViewEndBackwardButton.setEnabled(false);
+			mDeltaViewIntervalForwardButton.setEnabled(false);
+			mDeltaViewIntervalBackwardButton.setEnabled(false);
 		}
 	}
 
@@ -395,21 +472,26 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 				mCurrentMode = mTabbedPane.getSelectedIndex();
 
 				switch (mCurrentMode) {
-				case INDEX_LIVE_VIEW:
-					updateLiveView();
-					break;
-				case INDEX_HISTORY_VIEW:
-					updateHistoryView();
-					break;
-				case INDEX_DELTA_VIEW:
-					updateDeltaView();
-					break;
-				default:
-					break;
+					case INDEX_LIVE_VIEW:
+						updateLiveView();
+						break;
+					case INDEX_HISTORY_VIEW:
+						updateHistoryView();
+						break;
+					case INDEX_DELTA_VIEW:
+						updateDeltaView();
+						break;
+					default:
+						break;
 				}
 			}
 		};
 
+		createHistoryViewListeners();
+		createDeltaViewListeners();
+	}
+
+	private void createHistoryViewListeners() {
 		mHistoryViewForwardButtonActionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -430,26 +512,112 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (!mHistoryViewSlider.getValueIsAdjusting()) {
-					mHistoryViewSelectedTimestampIndex = mHistoryViewSlider.getValue() - 1;
-					mHistoryViewSelectedTimestamp = findTimestampToIndex(mHistoryViewSelectedTimestampIndex, mChangesMap);
+					mHistoryViewSelectedTimestampIndex = mHistoryViewSlider
+							.getValue() - 1;
+					mHistoryViewSelectedTimestamp = findTimestampToIndex(
+							mHistoryViewSelectedTimestampIndex, mChangesMap);
 					updateHistoryView();
 				}
 			}
 		};
 	}
 
+	private void createDeltaViewListeners() {
+		mDeltaViewStartForwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				incrementDeltaStartTimestamp();
+				updateDeltaView();
+			}
+		};
+
+		mDeltaViewStartBackwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				decrementDeltaStartTimestamp();
+				updateDeltaView();
+			}
+		};
+
+		mDeltaViewEndForwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				incrementDeltaEndTimestamp();
+				updateDeltaView();
+			}
+		};
+
+		mDeltaViewEndBackwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				decrementDeltaEndTimestamp();
+				updateDeltaView();
+			}
+		};
+
+		mDeltaViewIntervalForwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				moveDeltaIntervalForward();
+				updateDeltaView();
+			}
+		};
+
+		mDeltaViewIntervalBackwardButtonActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				moveDeltaIntervalBackward();
+				updateDeltaView();
+			}
+		};
+	}
+
 	private void addListeners() {
 		mTabbedPane.addChangeListener(mTabbedPaneChangeListener);
-		mHistoryViewForwardButton.addActionListener(mHistoryViewForwardButtonActionListener);
-		mHistoryViewBackwardButton.addActionListener(mHistoryViewBackwardButtonActionListener);
+		mHistoryViewForwardButton
+				.addActionListener(mHistoryViewForwardButtonActionListener);
+		mHistoryViewBackwardButton
+				.addActionListener(mHistoryViewBackwardButtonActionListener);
 		mHistoryViewSlider.addChangeListener(mHistoryViewSliderChangeListener);
+
+		mDeltaViewStartForwardButton
+				.addActionListener(mDeltaViewStartForwardButtonActionListener);
+		mDeltaViewStartBackwardButton
+				.addActionListener(mDeltaViewStartBackwardButtonActionListener);
+		mDeltaViewEndForwardButton
+				.addActionListener(mDeltaViewEndForwardButtonActionListener);
+		mDeltaViewEndBackwardButton
+				.addActionListener(mDeltaViewEndBackwardButtonActionListener);
+
+		mDeltaViewIntervalForwardButton
+				.addActionListener(mDeltaViewIntervalForwardButtonActionListener);
+		mDeltaViewIntervalBackwardButton
+				.addActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
 	private void removeListeners() {
 		mTabbedPane.removeChangeListener(mTabbedPaneChangeListener);
-		mHistoryViewForwardButton.removeActionListener(mHistoryViewForwardButtonActionListener);
-		mHistoryViewBackwardButton.removeActionListener(mHistoryViewBackwardButtonActionListener);
-		mHistoryViewSlider.removeChangeListener(mHistoryViewSliderChangeListener);
+
+		mHistoryViewForwardButton
+				.removeActionListener(mHistoryViewForwardButtonActionListener);
+		mHistoryViewBackwardButton
+				.removeActionListener(mHistoryViewBackwardButtonActionListener);
+		mHistoryViewSlider
+				.removeChangeListener(mHistoryViewSliderChangeListener);
+
+		mDeltaViewStartForwardButton
+				.removeActionListener(mDeltaViewStartForwardButtonActionListener);
+		mDeltaViewStartBackwardButton
+				.removeActionListener(mDeltaViewStartBackwardButtonActionListener);
+		mDeltaViewEndForwardButton
+				.removeActionListener(mDeltaViewEndForwardButtonActionListener);
+		mDeltaViewEndBackwardButton
+				.removeActionListener(mDeltaViewEndBackwardButtonActionListener);
+
+		mDeltaViewIntervalForwardButton
+				.removeActionListener(mDeltaViewIntervalForwardButtonActionListener);
+		mDeltaViewIntervalBackwardButton
+				.removeActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
 	private String createLiveViewTimestampLabel() {
@@ -471,7 +639,8 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 		sb.append("<b>Selected timestamp:</b> ");
 		sb.append(Long.toString(mHistoryViewSelectedTimestamp));
 		sb.append(" (<i>");
-		sb.append(mDateFormatter.format(new Date(mHistoryViewSelectedTimestamp)));
+		sb.append(mDateFormatter
+				.format(new Date(mHistoryViewSelectedTimestamp)));
 		sb.append("</i>), #");
 		sb.append(Integer.toString(mHistoryViewSelectedTimestampIndex + 1));
 		sb.append(" of ");
@@ -489,10 +658,12 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 			table = new Hashtable<Integer, JLabel>();
 		}
 
-		table.put(new Integer(mMinimumTimestampIndex + 1), new JLabel(Integer.toString(mMinimumTimestampIndex + 1)));
+		table.put(new Integer(mMinimumTimestampIndex + 1),
+				new JLabel(Integer.toString(mMinimumTimestampIndex + 1)));
 
 		if (mMaximumTimestampIndex % 5 != 0) {
-			table.put(new Integer(mMaximumTimestampIndex), new JLabel(Integer.toString(mMaximumTimestampIndex)));
+			table.put(new Integer(mMaximumTimestampIndex),
+					new JLabel(Integer.toString(mMaximumTimestampIndex)));
 		}
 		return table;
 	}
@@ -528,19 +699,21 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 	}
 
 	private String createRestUrlLabel(int mode) {
-		return "<html> REST url: <a href=\"\">" + createRestCall(mode) + "</a></html>";
+		return "<html> REST url: <a href=\"\">" + createRestCall(mode)
+				+ "</a></html>";
 	}
 
 	private String createRestCall(int mode) {
 		switch (mode) {
-		case INDEX_LIVE_VIEW:
-			return mRestUrl + "/current";
-		case INDEX_HISTORY_VIEW:
-			return mRestUrl + "/" + mHistoryViewSelectedTimestamp;
-		case INDEX_DELTA_VIEW:
-			return mRestUrl + "/" + mDeltaViewSelectedStartTimestamp + "/" + mDeltaViewSelectedEndTimestamp;
-		default:
-			return null;
+			case INDEX_LIVE_VIEW:
+				return mRestUrl + "/current";
+			case INDEX_HISTORY_VIEW:
+				return mRestUrl + "/" + mHistoryViewSelectedTimestamp;
+			case INDEX_DELTA_VIEW:
+				return mRestUrl + "/" + mDeltaViewSelectedStartTimestamp + "/"
+						+ mDeltaViewSelectedEndTimestamp;
+			default:
+				return null;
 		}
 	}
 
@@ -552,10 +725,10 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 					String restCall = createRestCall(mCurrentMode);
 					if (restCall != null) {
 						URI uri = new URI(restCall);
-						Desktop.getDesktop().browse(uri );
+						Desktop.getDesktop().browse(uri);
 					}
 				} catch (URISyntaxException | IOException ex) {
-					//It looks like there's a problem
+					// It looks like there's a problem
 				}
 			}
 		});
@@ -564,9 +737,11 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 	private void switchTabEnableState() {
 		if (mChangesMapSize == 0) {
 			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, false);
-			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW, "<html><font color=gray>History view</font></html>");
+			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW,
+					"<html><font color=gray>History view</font></html>");
 			mTabbedPane.setEnabledAt(INDEX_DELTA_VIEW, false);
-			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW, "<html><font color=gray>Delta view</font></html>");
+			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW,
+					"<html><font color=gray>Delta view</font></html>");
 		} else {
 			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, true);
 			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW, "History view");
@@ -576,24 +751,94 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 	}
 
 	private void incrementSelectedHistoryTimestamp() {
-		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED && mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
+		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
 			mHistoryViewSelectedTimestampIndex++;
-			mHistoryViewSelectedTimestamp = findTimestampToIndex(mHistoryViewSelectedTimestampIndex, mChangesMap);
+			mHistoryViewSelectedTimestamp = findTimestampToIndex(
+					mHistoryViewSelectedTimestampIndex, mChangesMap);
 		}
 	}
 
 	private void decrementSelectedHistoryTimestamp() {
-		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED && mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
+		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
 			mHistoryViewSelectedTimestampIndex--;
-			mHistoryViewSelectedTimestamp = findTimestampToIndex(mHistoryViewSelectedTimestampIndex, mChangesMap);
+			mHistoryViewSelectedTimestamp = findTimestampToIndex(
+					mHistoryViewSelectedTimestampIndex, mChangesMap);
 		}
 	}
 
-	private int findIndexToTimestamp(long timestamp, SortedMap<Long,Long> changesMap) {
+	private void incrementDeltaStartTimestamp() {
+		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedStartTimestampIndex < (mMaximumTimestampIndex - 1)
+				&& mDeltaViewSelectedStartTimestampIndex < (mDeltaViewSelectedEndTimestampIndex - 1)) {
+			mDeltaViewSelectedStartTimestampIndex++;
+			mDeltaViewSelectedStartTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedStartTimestampIndex, mChangesMap);
+		}
+	}
+
+	private void decrementDeltaStartTimestamp() {
+		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedStartTimestampIndex > mMinimumTimestampIndex) {
+			mDeltaViewSelectedStartTimestampIndex--;
+			mDeltaViewSelectedStartTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedStartTimestampIndex, mChangesMap);
+		}
+	}
+
+	private void incrementDeltaEndTimestamp() {
+		if (mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex < (mMaximumTimestampIndex - 1)) {
+			mDeltaViewSelectedEndTimestampIndex++;
+			mDeltaViewSelectedEndTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedEndTimestampIndex, mChangesMap);
+		}
+	}
+
+	private void decrementDeltaEndTimestamp() {
+		if (mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex > mMinimumTimestampIndex
+				&& mDeltaViewSelectedEndTimestampIndex > (mDeltaViewSelectedStartTimestampIndex + 1)) {
+			mDeltaViewSelectedEndTimestampIndex--;
+			mDeltaViewSelectedEndTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedEndTimestampIndex, mChangesMap);
+		}
+	}
+
+	private void moveDeltaIntervalForward() {
+		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex < (mMaximumTimestampIndex - 1)) {
+			mDeltaViewSelectedStartTimestampIndex++;
+			mDeltaViewSelectedEndTimestampIndex++;
+			mDeltaViewSelectedStartTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedStartTimestampIndex, mChangesMap);
+			mDeltaViewSelectedEndTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedEndTimestampIndex, mChangesMap);
+		}
+	}
+
+	private void moveDeltaIntervalBackward() {
+		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
+				&& mDeltaViewSelectedStartTimestampIndex > mMinimumTimestampIndex) {
+			mDeltaViewSelectedStartTimestampIndex--;
+			mDeltaViewSelectedEndTimestampIndex--;
+			mDeltaViewSelectedStartTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedStartTimestampIndex, mChangesMap);
+			mDeltaViewSelectedEndTimestamp = findTimestampToIndex(
+					mDeltaViewSelectedEndTimestampIndex, mChangesMap);
+		}
+	}
+
+	private int findIndexToTimestamp(long timestamp,
+			SortedMap<Long, Long> changesMap) {
 		int index = 0;
 
 		if (changesMap != null) {
-			for (Iterator<Long> iterator = changesMap.keySet().iterator(); iterator.hasNext();) {
+			for (Iterator<Long> iterator = changesMap.keySet().iterator(); iterator
+					.hasNext();) {
 				Long key = iterator.next();
 				if (key == timestamp) {
 					return index;
@@ -605,12 +850,14 @@ public class TabBasedHistoryNavigation implements Observer, HistoryNavigationStr
 		return 0;
 	}
 
-	private long findTimestampToIndex(int index, SortedMap<Long,Long> changesMap) {
+	private long findTimestampToIndex(int index,
+			SortedMap<Long, Long> changesMap) {
 		long timestamp = 0l;
 
 		int i = 0;
 		if (changesMap != null) {
-			for (Iterator<Long> iterator = changesMap.keySet().iterator(); iterator.hasNext();) {
+			for (Iterator<Long> iterator = changesMap.keySet().iterator(); iterator
+					.hasNext();) {
 				timestamp = iterator.next();
 				if (i == index) {
 					return timestamp;

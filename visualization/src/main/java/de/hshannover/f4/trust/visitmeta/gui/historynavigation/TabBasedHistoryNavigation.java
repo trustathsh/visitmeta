@@ -384,8 +384,17 @@ public class TabBasedHistoryNavigation implements Observer,
 					.setLabelTable(createHistoryViewSliderLabelTable());
 			mHistoryViewSlider.setEnabled(true);
 
-			mHistoryViewBackwardButton.setEnabled(true);
-			mHistoryViewForwardButton.setEnabled(true);
+			if (mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
+				mHistoryViewBackwardButton.setEnabled(true);
+			} else {
+				mHistoryViewBackwardButton.setEnabled(false);
+			}
+
+			if (mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
+				mHistoryViewForwardButton.setEnabled(true);
+			} else {
+				mHistoryViewForwardButton.setEnabled(false);
+			}
 
 			mHistoryViewSelectedTimestampLabel
 					.setText(createHistoryViewSelectedTimestampLabel());

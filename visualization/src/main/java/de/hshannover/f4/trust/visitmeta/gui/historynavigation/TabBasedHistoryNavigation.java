@@ -63,7 +63,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -101,10 +103,12 @@ public class TabBasedHistoryNavigation implements Observer,
 	private SortedMap<Long, Long> mChangesMap;
 
 	private JLabel mLiveViewTimestampLabel;
+	private JLabel mLiveViewFirstTimestampLabel;
 	private JLabel mLiveViewRestUrlLabel;
 
 	private long mHistoryViewSelectedTimestamp;
 	private int mHistoryViewSelectedTimestampIndex;
+	private JSpinner mHistoryViewSpinner;
 	private JButton mHistoryViewForwardButton;
 	private JButton mHistoryViewBackwardButton;
 	private JSlider mHistoryViewSlider;
@@ -136,6 +140,7 @@ public class TabBasedHistoryNavigation implements Observer,
 	private ActionListener mDeltaViewEndBackwardButtonActionListener;
 	private ActionListener mDeltaViewIntervalForwardButtonActionListener;
 	private ActionListener mDeltaViewIntervalBackwardButtonActionListener;
+	private ChangeListener mHistoryViewSpinnerChangeListener;
 
 	public TabBasedHistoryNavigation(TimeHolder timeHolder, String restUrl) {
 		// this.setPreferredSize(new Dimension(400, 33));
@@ -185,9 +190,16 @@ public class TabBasedHistoryNavigation implements Observer,
 		JPanel liveViewPanel = new JPanel();
 		liveViewPanel.setLayout(new BoxLayout(liveViewPanel, BoxLayout.Y_AXIS));
 
+		mLiveViewFirstTimestampLabel = new JLabel();
+		mLiveViewFirstTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mLiveViewFirstTimestampLabel.setText(createLiveViewTimestampLabel(
+				"Oldest timestamp", mOldestTime, mMinimumTimestampIndex));
+		liveViewPanel.add(mLiveViewFirstTimestampLabel);
+
 		mLiveViewTimestampLabel = new JLabel();
 		mLiveViewTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel());
+		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel(
+				"Newest timestamp", mNewestTime, mMaximumTimestampIndex));
 		liveViewPanel.add(mLiveViewTimestampLabel);
 
 		mLiveViewRestUrlLabel = new JLabel(createRestUrlLabel(INDEX_LIVE_VIEW));
@@ -219,6 +231,13 @@ public class TabBasedHistoryNavigation implements Observer,
 				Cursor.HAND_CURSOR));
 		registerLinkHandler(mHistoryViewSelectedTimestampRestUrlLabel);
 		historyViewPanel.add(mHistoryViewSelectedTimestampRestUrlLabel);
+
+		JPanel spinnerPanel = new JPanel();
+		spinnerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mHistoryViewSpinner = new JSpinner(new SpinnerNumberModel(0,
+				mMinimumTimestampIndex, mMaximumTimestampIndex, 1));
+		spinnerPanel.add(mHistoryViewSpinner);
+		historyViewPanel.add(spinnerPanel);
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -366,7 +385,10 @@ public class TabBasedHistoryNavigation implements Observer,
 	private void updateLiveView() {
 		mTimeHolder.setLiveView(true, false);
 
-		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel());
+		mLiveViewFirstTimestampLabel.setText(createLiveViewTimestampLabel(
+				"Oldest timestamp", mOldestTime, mMinimumTimestampIndex + 1));
+		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel(
+				"Newest timestamp", mNewestTime, mMaximumTimestampIndex));
 	}
 
 	private void updateHistoryView() {
@@ -376,6 +398,10 @@ public class TabBasedHistoryNavigation implements Observer,
 				&& mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED) {
 			mHistoryViewSelectedTimestampRestUrlLabel
 					.setText(createRestUrlLabel(INDEX_HISTORY_VIEW));
+
+			mHistoryViewSpinner.setModel(new SpinnerNumberModel(
+					mHistoryViewSelectedTimestampIndex + 1,
+					mMinimumTimestampIndex + 1, mMaximumTimestampIndex, 1));
 
 			mHistoryViewSlider.setMinimum(mMinimumTimestampIndex + 1);
 			mHistoryViewSlider.setMaximum(mMaximumTimestampIndex);
@@ -529,6 +555,17 @@ public class TabBasedHistoryNavigation implements Observer,
 				}
 			}
 		};
+
+		mHistoryViewSpinnerChangeListener = new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				mHistoryViewSelectedTimestampIndex = (int) mHistoryViewSpinner
+						.getValue() - 1;
+				mHistoryViewSelectedTimestamp = findTimestampToIndex(
+						mHistoryViewSelectedTimestampIndex, mChangesMap);
+				updateHistoryView();
+			}
+		};
 	}
 
 	private void createDeltaViewListeners() {
@@ -588,6 +625,8 @@ public class TabBasedHistoryNavigation implements Observer,
 		mHistoryViewBackwardButton
 				.addActionListener(mHistoryViewBackwardButtonActionListener);
 		mHistoryViewSlider.addChangeListener(mHistoryViewSliderChangeListener);
+		mHistoryViewSpinner
+				.addChangeListener(mHistoryViewSpinnerChangeListener);
 
 		mDeltaViewStartForwardButton
 				.addActionListener(mDeltaViewStartForwardButtonActionListener);
@@ -613,6 +652,8 @@ public class TabBasedHistoryNavigation implements Observer,
 				.removeActionListener(mHistoryViewBackwardButtonActionListener);
 		mHistoryViewSlider
 				.removeChangeListener(mHistoryViewSliderChangeListener);
+		mHistoryViewSpinner
+				.removeChangeListener(mHistoryViewSpinnerChangeListener);
 
 		mDeltaViewStartForwardButton
 				.removeActionListener(mDeltaViewStartForwardButtonActionListener);
@@ -629,15 +670,18 @@ public class TabBasedHistoryNavigation implements Observer,
 				.removeActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
-	private String createLiveViewTimestampLabel() {
+	private String createLiveViewTimestampLabel(String prefix, long timestamp,
+			int index) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
-		sb.append("<b>Newest timestamp:</b> ");
-		sb.append(Long.toString(mNewestTime));
+		sb.append("<b>");
+		sb.append(prefix);
+		sb.append(":</b> ");
+		sb.append(Long.toString(timestamp));
 		sb.append(" (<i>");
-		sb.append(mDateFormatter.format(new Date(mNewestTime)));
+		sb.append(mDateFormatter.format(new Date(timestamp)));
 		sb.append("</i>), #");
-		sb.append(Integer.toString(mMaximumTimestampIndex));
+		sb.append(Integer.toString(index));
 		sb.append("</html>");
 		return sb.toString();
 	}

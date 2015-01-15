@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,15 +71,15 @@ public class MenuBar extends JMenuBar {
 	private GuiController mContoller = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
-	private JMenu mMenuTheme   = null;
-	private JMenu mMenuLayout  = null;
+	private JMenu mMenuTheme = null;
+	private JMenu mMenuLayout = null;
 	private JMenuItem mItemStopMotion = null;
 	private JMenuItem mItemRedrawGraph = null;
 	private JMenuItem mItemSetColors = null;
 	private JMenuItem mItemTimings = null;
 
 	/**
-	 * 
+	 *
 	 * @param guiController
 	 */
 	public MenuBar(final GuiController guiController) {
@@ -131,14 +131,12 @@ public class MenuBar extends JMenuBar {
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				if (mContoller.isGraphMotion()) {
-					LOGGER.debug("Stop motion of the graph.");
-					mContoller.stopGraphMotion();
-					mItemStopMotion.setText("Start Motion");
-				} else {
-					LOGGER.debug("Start motion of the graph.");
-					mContoller.startGraphMotion();
-					mItemStopMotion.setText("Stop Motion");
+				String oldState = mContoller.switchGraphMotion();
+
+				if (oldState != null) {
+					LOGGER.debug("Changed motion of the graph, old state: "
+							+ oldState);
+					mItemStopMotion.setText(oldState + " motion");
 				}
 			}
 		});
@@ -199,15 +197,16 @@ public class MenuBar extends JMenuBar {
 		mMenuTheme = new JMenu("Theme");
 		mnSettings.add(mMenuTheme);
 
-		final List<SupportedLaF> supportedLaFs = guiController.getMainWindow().getSupportedLaFs();
+		final List<SupportedLaF> supportedLaFs = guiController.getMainWindow()
+				.getSupportedLaFs();
 		final MainWindow mainWindow = guiController.getMainWindow();
 
-		for (final SupportedLaF lAf: supportedLaFs){
+		for (final SupportedLaF lAf : supportedLaFs) {
 			mMenuTheme.add(lAf.menuItem);
 			if (lAf.laf.getID() == UIManager.getLookAndFeel().getID()) {
 				lAf.menuItem.setSelected(true);
 			}
-			lAf.menuItem.addActionListener(new ActionListener(){
+			lAf.menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
 					LookAndFeel laf = lAf.laf;
@@ -219,8 +218,8 @@ public class MenuBar extends JMenuBar {
 						System.out.println(e.getMessage());
 					}
 
-					for (SupportedLaF lAf2 : supportedLaFs){
-						if(lAf != lAf2){
+					for (SupportedLaF lAf2 : supportedLaFs) {
+						if (lAf != lAf2) {
 							lAf2.menuItem.setSelected(false);
 						}
 					}
@@ -251,26 +250,30 @@ public class MenuBar extends JMenuBar {
 		//
 		// JMenuItem mntmAbout = new JMenuItem("About");
 		// mnHelp.add(mntmAbout);
-		
+
 		mMenuLayout = new JMenu("Layout");
 		mnSettings.add(mMenuLayout);
-		
+
 		@SuppressWarnings("serial")
-		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(LayoutType.class) {
+		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(
+				LayoutType.class) {
 			{
-				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem("Force-directed (JUNG2)"));
+				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem(
+						"Force-directed (JUNG2)"));
 				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
-				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));				
+				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
 			}
 		};
 
-		for(final Entry<LayoutType, JCheckBoxMenuItem> layout : layoutMap.entrySet()){
+		for (final Entry<LayoutType, JCheckBoxMenuItem> layout : layoutMap
+				.entrySet()) {
 			mMenuLayout.add(layout.getValue());
-			layout.getValue().addActionListener(new ActionListener(){
+			layout.getValue().addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					mContoller.setLayoutType(layout.getKey());				
-					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap.entrySet()) {
+					mContoller.setLayoutType(layout.getKey());
+					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap
+							.entrySet()) {
 						if (otherLayout.getKey() != layout.getKey()) {
 							otherLayout.getValue().setSelected(false);
 						}
@@ -278,9 +281,10 @@ public class MenuBar extends JMenuBar {
 				}
 			});
 		}
-		
-		// TODO: Initialize layout type from user settings/preferences, remove dependency on JungCalculator. <VA> 2014-08-05
+
+		// TODO: Initialize layout type from user settings/preferences, remove
+		// dependency on JungCalculator. <VA> 2014-08-05
 		layoutMap.get(JungCalculator.DEFAULT_LAYOUT_TYPE).setSelected(true);
 	}
-	
+
 }

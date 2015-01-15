@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -49,7 +50,8 @@ import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
 public class GuiController {
-	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
+	private static final Logger LOGGER = Logger
+			.getLogger(GraphConnection.class);
 	private MainWindow mMainWindow = null;
 	private ConnectionTab mSelectedConnection = null;
 
@@ -59,22 +61,26 @@ public class GuiController {
 
 	/**
 	 * Initializes the VisITMeta window
+	 *
 	 * @param motionController
 	 */
 	private void initMainWindow(MotionControllerHandler motionController) {
 		mMainWindow = new MainWindow(motionController);
 		mMainWindow.setJMenuBar(new MenuBar(this));
 
-		mMainWindow.getConnectionTree().addTreeSelectionListener(new TreeSelectionListener() {
+		mMainWindow.getConnectionTree().addTreeSelectionListener(
+				new TreeSelectionListener() {
 
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-				if (node.getUserObject() instanceof ConnectionTab) {
-					setSelectedConnectionTab((ConnectionTab)node.getUserObject());
-				}
-			}
-		});
+					@Override
+					public void valueChanged(TreeSelectionEvent e) {
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
+								.getPath().getLastPathComponent();
+						if (node.getUserObject() instanceof ConnectionTab) {
+							setSelectedConnectionTab((ConnectionTab) node
+									.getUserObject());
+						}
+					}
+				});
 	}
 
 	public void updateRestConnections() {
@@ -95,7 +101,7 @@ public class GuiController {
 
 	/**
 	 * Adds a connection to the GuiController
-	 * 
+	 *
 	 * @param name
 	 *            of the connection
 	 * @param connection
@@ -119,7 +125,11 @@ public class GuiController {
 	 */
 	public void showColorSettings() {
 		LOGGER.trace("Method showColorSettings() called.");
-		mSelectedConnection.showColorSettings(mMainWindow);
+		if (checkForSelectedConnection(
+				"A connection must be selected to edit the color settings.",
+				"Color settings")) {
+			mSelectedConnection.showColorSettings(mMainWindow);
+		}
 	}
 
 	/**
@@ -127,35 +137,61 @@ public class GuiController {
 	 */
 	public void showSettings() {
 		LOGGER.trace("Method showSettings() called.");
-		mSelectedConnection.showSettings(mMainWindow);
+		if (checkForSelectedConnection(
+				"A connection must be selected to edit the window settings.",
+				"Window settings")) {
+			mSelectedConnection.showSettings(mMainWindow);
+		}
 	}
 
 	/**
 	 * Set layout type (e.g., force-directed)
+	 *
 	 * @param layoutType
 	 */
 	public void setLayoutType(LayoutType layoutType) {
-		mSelectedConnection.getConnection().setLayoutType(layoutType);
+		if (checkForSelectedConnection(
+				"A connection must be selected to change the layout algorithm.",
+				"Layout settings")) {
+			mSelectedConnection.getConnection().setLayoutType(layoutType);
+		}
 	}
 
 	public void redrawGraph() {
-		mSelectedConnection.getConnection().redrawGraph();
+		if (checkForSelectedConnection(
+				"A connection must be selected to redraw the graph.",
+				"Redraw graph")) {
+			mSelectedConnection.getConnection().redrawGraph();
+		}
 	}
 
-	public void startGraphMotion() {
-		mSelectedConnection.getConnection().startGraphMotion();
-	}
-
-	public void stopGraphMotion() {
-		mSelectedConnection.getConnection().stopGraphMotion();
-	}
-
-	public boolean isGraphMotion() {
-		return mSelectedConnection.getConnection().isGraphMotion();
+	public String switchGraphMotion() {
+		if (checkForSelectedConnection(
+				"A connection must be selected to change the animation of the graph.",
+				"Change graph animation")) {
+			if (mSelectedConnection.getConnection().isGraphMotion()) {
+				mSelectedConnection.getConnection().startGraphMotion();
+				return "Stop";
+			} else {
+				mSelectedConnection.getConnection().stopGraphMotion();
+				return "Start";
+			}
+		} else {
+			return null;
+		}
 	}
 
 	public MainWindow getMainWindow() {
 		return mMainWindow;
 	}
-		
+
+	private boolean checkForSelectedConnection(String message, String title) {
+		if (mSelectedConnection != null) {
+			return true;
+		} else {
+			JOptionPane.showMessageDialog(mMainWindow, message, title,
+					JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
+	}
 }

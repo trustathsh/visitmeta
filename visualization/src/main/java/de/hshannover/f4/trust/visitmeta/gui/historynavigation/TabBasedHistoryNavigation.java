@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -80,7 +81,7 @@ public class TabBasedHistoryNavigation implements Observer,
 
 	private int mCurrentMode;
 
-	private static final String TIMEFORMAT = "yyyy-MM-FF HH:mm:ss";
+	private static final String TIMEFORMAT = "HH:mm:ss @ dd.MM.yyyy";
 	private DateFormat mDateFormatter;
 
 	private static final int INDEX_LIVE_VIEW = 0;
@@ -89,9 +90,6 @@ public class TabBasedHistoryNavigation implements Observer,
 
 	private static final long TIMESTAMP_NOT_INITIALIZED = -1;
 	private static final int INDEX_NOT_INITIALIZED = -1;
-
-	private static final int DELTA_TIMESTAMP_START = 0;
-	private static final int DELTA_TIMESTAMP_END = 1;
 
 	private JTabbedPane mTabbedPane;
 
@@ -192,13 +190,13 @@ public class TabBasedHistoryNavigation implements Observer,
 
 		mLiveViewFirstTimestampLabel = new JLabel();
 		mLiveViewFirstTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mLiveViewFirstTimestampLabel.setText(createLiveViewTimestampLabel(
+		mLiveViewFirstTimestampLabel.setText(createTimestampLabel(
 				"Oldest timestamp", mOldestTime, mMinimumTimestampIndex));
 		liveViewPanel.add(mLiveViewFirstTimestampLabel);
 
 		mLiveViewTimestampLabel = new JLabel();
 		mLiveViewTimestampLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel(
+		mLiveViewTimestampLabel.setText(createTimestampLabel(
 				"Newest timestamp", mNewestTime, mMaximumTimestampIndex));
 		liveViewPanel.add(mLiveViewTimestampLabel);
 
@@ -220,7 +218,10 @@ public class TabBasedHistoryNavigation implements Observer,
 		mHistoryViewSelectedTimestampLabel
 				.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mHistoryViewSelectedTimestampLabel
-				.setText(createHistoryViewSelectedTimestampLabel());
+				.setText(createTimestampLabel("Selected timestamp",
+						mHistoryViewSelectedTimestamp,
+						mHistoryViewSelectedTimestampIndex + 1,
+						mMaximumTimestampIndex));
 		historyViewPanel.add(mHistoryViewSelectedTimestampLabel);
 
 		mHistoryViewSelectedTimestampRestUrlLabel = new JLabel(
@@ -267,15 +268,17 @@ public class TabBasedHistoryNavigation implements Observer,
 		mDeltaViewSelectedStartTimestampLabel = new JLabel();
 		mDeltaViewSelectedStartTimestampLabel
 				.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mDeltaViewSelectedStartTimestampLabel
-				.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
+		mDeltaViewSelectedStartTimestampLabel.setText(createTimestampLabel(
+				"Start timestamp", mDeltaViewSelectedStartTimestamp,
+				mDeltaViewSelectedStartTimestampIndex + 1));
 		deltaViewPanel.add(mDeltaViewSelectedStartTimestampLabel);
 
 		mDeltaViewSelectedEndTimestampLabel = new JLabel();
 		mDeltaViewSelectedEndTimestampLabel
 				.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mDeltaViewSelectedEndTimestampLabel
-				.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+		mDeltaViewSelectedEndTimestampLabel.setText(createTimestampLabel(
+				"End timestamp", mDeltaViewSelectedEndTimestamp,
+				mDeltaViewSelectedEndTimestampIndex + 1));
 		deltaViewPanel.add(mDeltaViewSelectedEndTimestampLabel);
 
 		mDeltaViewRestUrlLabel = new JLabel(
@@ -319,7 +322,7 @@ public class TabBasedHistoryNavigation implements Observer,
 		if (o instanceof TimeHolder) {
 			int selectedIndex = mTabbedPane.getSelectedIndex();
 
-			// removeListeners();
+			removeListeners();
 			updateValues();
 			switchTabEnableState();
 
@@ -337,7 +340,7 @@ public class TabBasedHistoryNavigation implements Observer,
 					break;
 			}
 
-			// addListeners();
+			addListeners();
 		}
 	}
 
@@ -383,12 +386,20 @@ public class TabBasedHistoryNavigation implements Observer,
 	}
 
 	private void updateLiveView() {
-		mTimeHolder.setLiveView(true, false);
+		mTimeHolder.setLiveView(true, true);
 
-		mLiveViewFirstTimestampLabel.setText(createLiveViewTimestampLabel(
-				"Oldest timestamp", mOldestTime, mMinimumTimestampIndex + 1));
-		mLiveViewTimestampLabel.setText(createLiveViewTimestampLabel(
-				"Newest timestamp", mNewestTime, mMaximumTimestampIndex));
+		if (mChangesMapSize > 0) {
+			mLiveViewFirstTimestampLabel.setText(createTimestampLabel(
+					"Oldest timestamp", mOldestTime,
+					mMaximumTimestampIndex > 0 ? 1 : 0));
+			mLiveViewTimestampLabel.setText(createTimestampLabel(
+					"Newest timestamp", mNewestTime, mMaximumTimestampIndex));
+		} else {
+			mLiveViewFirstTimestampLabel
+					.setText("<html><b>Oldest timestamp</b>: empty graph/no data</html>");
+			mLiveViewTimestampLabel
+					.setText("<html><b>Newest timestamp</b>: empty graph/no data</html>");
+		}
 	}
 
 	private void updateHistoryView() {
@@ -422,8 +433,10 @@ public class TabBasedHistoryNavigation implements Observer,
 				mHistoryViewForwardButton.setEnabled(false);
 			}
 
-			mHistoryViewSelectedTimestampLabel
-					.setText(createHistoryViewSelectedTimestampLabel());
+			mHistoryViewSelectedTimestampLabel.setText(createTimestampLabel(
+					"Selected timestamp", mHistoryViewSelectedTimestamp,
+					mHistoryViewSelectedTimestampIndex + 1,
+					mMaximumTimestampIndex));
 
 			mTimeHolder.setDeltaTimeStart(mHistoryViewSelectedTimestamp, false);
 			mTimeHolder.setDeltaTimeEnd(mHistoryViewSelectedTimestamp, false);
@@ -481,10 +494,12 @@ public class TabBasedHistoryNavigation implements Observer,
 				mDeltaViewIntervalForwardButton.setEnabled(true);
 			}
 
-			mDeltaViewSelectedStartTimestampLabel
-					.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_START));
-			mDeltaViewSelectedEndTimestampLabel
-					.setText(createDeltaViewSelectedTimestampLabel(DELTA_TIMESTAMP_END));
+			mDeltaViewSelectedStartTimestampLabel.setText(createTimestampLabel(
+					"Start timestamp", mDeltaViewSelectedStartTimestamp,
+					mDeltaViewSelectedStartTimestampIndex + 1));
+			mDeltaViewSelectedEndTimestampLabel.setText(createTimestampLabel(
+					"End timestamp", mDeltaViewSelectedEndTimestamp,
+					mDeltaViewSelectedEndTimestampIndex + 1));
 
 			mTimeHolder.setDeltaTimeStart(mDeltaViewSelectedStartTimestamp,
 					false);
@@ -670,34 +685,37 @@ public class TabBasedHistoryNavigation implements Observer,
 				.removeActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
-	private String createLiveViewTimestampLabel(String prefix, long timestamp,
-			int index) {
+	private String createTimestampLabel(String prefix, long timestamp, int index) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
 		sb.append("<b>");
 		sb.append(prefix);
-		sb.append(":</b> ");
-		sb.append(Long.toString(timestamp));
-		sb.append(" (<i>");
-		sb.append(mDateFormatter.format(new Date(timestamp)));
-		sb.append("</i>), #");
+		sb.append(":</b> #");
 		sb.append(Integer.toString(index));
+		sb.append(", ");
+		sb.append(mDateFormatter.format(new Date(timestamp)));
+		sb.append(" (<i>");
+		sb.append(Long.toString(timestamp));
+		sb.append("</i>)");
 		sb.append("</html>");
 		return sb.toString();
 	}
 
-	private String createHistoryViewSelectedTimestampLabel() {
+	private String createTimestampLabel(String prefix, long timestamp,
+			int index, int maxIndex) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
-		sb.append("<b>Selected timestamp:</b> ");
-		sb.append(Long.toString(mHistoryViewSelectedTimestamp));
-		sb.append(" (<i>");
-		sb.append(mDateFormatter
-				.format(new Date(mHistoryViewSelectedTimestamp)));
-		sb.append("</i>), #");
-		sb.append(Integer.toString(mHistoryViewSelectedTimestampIndex + 1));
+		sb.append("<b>");
+		sb.append(prefix);
+		sb.append(":</b> #");
+		sb.append(Integer.toString(index));
 		sb.append(" of ");
-		sb.append(Integer.toString(mMaximumTimestampIndex));
+		sb.append(Integer.toString(maxIndex));
+		sb.append(", ");
+		sb.append(mDateFormatter.format(new Date(timestamp)));
+		sb.append(" (<i>");
+		sb.append(Long.toString(timestamp));
+		sb.append("</i>)");
 		sb.append("</html>");
 		return sb.toString();
 	}
@@ -719,36 +737,6 @@ public class TabBasedHistoryNavigation implements Observer,
 					new JLabel(Integer.toString(mMaximumTimestampIndex)));
 		}
 		return table;
-	}
-
-	private String createDeltaViewSelectedTimestampLabel(int mode) {
-		String modeText;
-		long timestamp;
-		int index;
-
-		if (mode == DELTA_TIMESTAMP_START) {
-			modeText = "<b>Start";
-			timestamp = mDeltaViewSelectedStartTimestamp;
-			index = mDeltaViewSelectedStartTimestampIndex;
-		} else {
-			modeText = "<b>End";
-			timestamp = mDeltaViewSelectedEndTimestamp;
-			index = mDeltaViewSelectedEndTimestampIndex;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append("<html>");
-		sb.append(modeText);
-		sb.append(" timestamp:</b> ");
-		sb.append(Long.toString(timestamp));
-		sb.append(" (<i>");
-		sb.append(mDateFormatter.format(new Date(timestamp)));
-		sb.append("</i>), #");
-		sb.append(Integer.toString(index + 1));
-		sb.append(" of ");
-		sb.append(Integer.toString(mMaximumTimestampIndex));
-		sb.append("</html>");
-		return sb.toString();
 	}
 
 	private String createRestUrlLabel(int mode) {
@@ -790,16 +778,14 @@ public class TabBasedHistoryNavigation implements Observer,
 	private void switchTabEnableState() {
 		if (mChangesMapSize == 0) {
 			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, false);
-			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW,
-					"<html><font color=gray>History view</font></html>");
+			mTabbedPane.setForegroundAt(INDEX_HISTORY_VIEW, Color.gray);
 			mTabbedPane.setEnabledAt(INDEX_DELTA_VIEW, false);
-			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW,
-					"<html><font color=gray>Delta view</font></html>");
-		} else {
+			mTabbedPane.setForegroundAt(INDEX_DELTA_VIEW, Color.gray);
+		} else if (mChangesMapSize >= 2) {
 			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, true);
-			mTabbedPane.setTitleAt(INDEX_HISTORY_VIEW, "History view");
+			mTabbedPane.setForegroundAt(INDEX_HISTORY_VIEW, Color.black);
 			mTabbedPane.setEnabledAt(INDEX_DELTA_VIEW, true);
-			mTabbedPane.setTitleAt(INDEX_DELTA_VIEW, "Delta view");
+			mTabbedPane.setForegroundAt(INDEX_DELTA_VIEW, Color.black);
 		}
 	}
 

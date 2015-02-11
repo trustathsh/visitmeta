@@ -36,15 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,118 +48,34 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONArray;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult.Type;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.Neo4JTestDatabaseFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache;
-import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
-import de.hshannover.f4.trust.visitmeta.dataservice.rest.JsonMarshaller;
-import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
-import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
-import de.hshannover.f4.trust.visitmeta.persistence.Executor;
-import de.hshannover.f4.trust.visitmeta.persistence.Writer;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JConnection;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JExecutor;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JReader;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTimestampManager;
-import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JWriter;
 
-public class MultiSubscriptionTest {
+public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 
-	private static final Logger mLog = Logger.getLogger(MultiSubscriptionTest.class);
-
-	public static final String TIMESTAMP = "ifmap-timestamp";
-
-	public static final String TIMESTAMP_FRACTION = "ifmap-timestamp-fraction";
-
-	public static final String PUBLISHERID = "ifmap-publisher-id";
+	private static final Logger mLog = Logger.getLogger(SingleMultivalueTest.class);
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
 	private static final Date SECOND_TIMESTAMP = new Date(5555);
 
-	private Writer mWriter;
-
-	private Connection mConnection;
-
-	private Executor mExecutor;
-
-	private JsonMarshaller mJsonMarshaller;
-
-	private Neo4JConnection mDbConnection;
-
-	private Neo4JReader mNeo4jDb;
-
-	private GraphDatabaseService mGraphDb;
-
-	private Neo4JTimestampManager mTimestampManager;
-
-	private GraphService mService;
-
-	private Neo4JRepository mNeo4jRepo;
-
-	private IfmapJHelper mIfmapJHelper;
-
-	private InternalIdentifierFactory mIdentifierFactory;
-
-	private InternalMetadataFactory mMetadataFactory;
-
 	private SortedMap<Long, Long> mFirstChangesMap;
 
 	private SortedMap<Long, Long> mSecondChangesMap;
 
-	@Before
-	public void setUp() throws Exception {
-		mGraphDb = Neo4JTestDatabaseFactory.createGraphDB();
-		assumeNotNull(mGraphDb);
-
-		mDbConnection = mock(Neo4JConnection.class);
-		when(mDbConnection.getConnection()).thenReturn(mGraphDb);
-
-		mTimestampManager = new Neo4JTimestampManager(mDbConnection);
-		when(mDbConnection.getTimestampManager()).thenReturn(mTimestampManager);
-
-		mNeo4jRepo = new Neo4JRepository(mDbConnection, MessageDigest.getInstance("MD5"));
-		mNeo4jDb = new Neo4JReader(mNeo4jRepo, mDbConnection);
-		mExecutor = new Neo4JExecutor(mDbConnection);
-		mWriter = new Neo4JWriter(mNeo4jRepo, mDbConnection);
-
-		mService = new SimpleGraphService(mNeo4jDb, mExecutor, new DummyGraphCache());
-		mJsonMarshaller = new JsonMarshaller();
-
-		mIdentifierFactory = new InMemoryIdentifierFactory();
-		mMetadataFactory = new InMemoryMetadataFactory();
-		mIfmapJHelper = new IfmapJHelper(mIdentifierFactory);
-
-		mConnection = mock(Connection.class);
-
-		executeMultiSubscriptionTestCase();
-	}
-
 	/**
 	 * Makes two polls with two different PollResult. The PollResult are the same as if when we makes two subscriptions.
 	 */
-	private void executeMultiSubscriptionTestCase() {
+	private void executePolls() {
 		// mock first and second poll results
 		PollResult firstPollResult = buildFirstPollResult();
 		PollResult secondPollResult = buildSecondPollResult();
@@ -172,28 +84,21 @@ public class MultiSubscriptionTest {
 		startPollTask(firstPollResult);
 
 		// save current ChangesMap after the first poll
-		mFirstChangesMap = mService.getChangesMap();
+		mFirstChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
+		printCurrentGraph();
+		printNeo4jDB();
 
 		// run second poll
 		startPollTask(secondPollResult);
 
-		// printCurrentGraph();
-		// printNeo4jDB();
+		printCurrentGraph();
+		printNeo4jDB();
 
 		// save current ChangesMap after the second poll
-		mSecondChangesMap = mService.getChangesMap();
+		mSecondChangesMap = super.mService.getChangesMap();
 
-		// printChangesMaps();
-	}
-
-	@After
-	public void tearDown() {
-		if (mGraphDb != null) {
-			mGraphDb.shutdown();
-		}
+		printChangesMaps();
 	}
 
 	/**
@@ -203,9 +108,11 @@ public class MultiSubscriptionTest {
 	 */
 	@Test
 	public void shouldReturnTheRightChangeMapSize() {
+		executePolls();
+
 		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Becase the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: " + mFirstChangesMap.size() + " || SecondMap-Size: "
-					+ mSecondChangesMap.size());
+			fail("Becase the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
+					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
 		}
 	}
 
@@ -215,10 +122,13 @@ public class MultiSubscriptionTest {
 	 */
 	@Test
 	public void shouldReturnTheRightChangeMapValues() {
+		executePolls();
+
 		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
 			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
 				// all keys from the first must contains in the second and the values must the same, if not -> FAIL
-				fail("Becase the changes from change-map timestamp " + entry.getKey() + " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
+				fail("Becase the changes from change-map timestamp " + entry.getKey()
+						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
 						+ mSecondChangesMap.get(entry.getKey()));
 			}
 		}
@@ -230,36 +140,16 @@ public class MultiSubscriptionTest {
 	 */
 	@Test
 	public void shouldReturnTheRightSecondChangeMap() {
+		executePolls();
+
 		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
 			if (!mFirstChangesMap.containsKey(entry.getKey())) {
 				// only the one new key in the secondChangesMap
-				assertEquals("Becase the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.", 1L, entry.getValue().longValue());
+				assertEquals("Becase the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.", 1L,
+						entry.getValue().longValue());
 				break;
 			}
 		}
-	}
-
-	private void startPollTask(PollResult ifmapPollResult) {
-		mLog.debug("PollTask started....");
-
-		try {
-			when(mConnection.poll()).thenReturn(ifmapPollResult);
-		} catch (ConnectionException e) {
-			mLog.error(e.getMessage(), e);
-		}
-
-		PollTask task = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
-
-		try {
-
-			de.hshannover.f4.trust.visitmeta.ifmap.PollResult pollResult = task.call();
-			mWriter.submitPollResult(pollResult);
-
-		} catch (ConnectionException e) {
-			mLog.error(e.toString(), e);
-		}
-
-		mLog.debug("... PollTask finished");
 	}
 
 	private List<ResultItem> buildFirstResultItems() {
@@ -322,17 +212,6 @@ public class MultiSubscriptionTest {
 		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
 
 		return secondPollResult_mock.getMock();
-	}
-
-	private void printNeo4jDB() {
-		Neo4JTestDatabaseFactory.printDB(mGraphDb);
-	}
-
-	private void printCurrentGraph() {
-		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
-		JSONArray currentGraphJSON = mJsonMarshaller.toJson(currentGraph);
-
-		System.out.println(currentGraphJSON);
 	}
 
 	private void printChangesMaps() {

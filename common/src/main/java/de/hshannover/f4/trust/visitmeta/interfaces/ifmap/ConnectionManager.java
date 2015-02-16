@@ -53,8 +53,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 
 /**
- * An interface for {@link ConnectionManager} classes, that handle all
- * {@link Connection} instances.
+ * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.
  *
  * @author Bastian Hellmann
  * @author Marcel Reichenbach
@@ -133,8 +132,7 @@ public interface ConnectionManager {
 	 * Checks if the given {@link Connection} exists in the list of saved
 	 * connections.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @return
 	 */
 	public boolean doesConnectionExist(String connectionName);
@@ -142,13 +140,20 @@ public interface ConnectionManager {
 	/**
 	 * Returns all active subscriptions for a given {@link Connection}.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @return a Set<String> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public Set<String> getActiveSubscriptions(String connectionName)
-			throws ConnectionException;
+	public Set<String> getActiveSubscriptions(String connectionName) throws ConnectionException;
+
+	/**
+	 * Returns all subscriptions for a given {@link Connection}.
+	 *
+	 * @param connectionName name of the {@link Connection}
+	 * @return a Set<String> with the active subscriptions.
+	 * @throws ConnectionException
+	 */
+	public Set<String> getSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
 	 * Returns all saved connections as a String {@link Set}.

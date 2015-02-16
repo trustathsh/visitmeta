@@ -84,27 +84,39 @@ public class SubscribeResource {
 	@DefaultValue("false")
 	private boolean mDeleteAll = false;
 
+	@QueryParam("onlyActive")
+	@DefaultValue("false")
+	private boolean mOnlyActive = false;
+
 	/**
-	 * Returns a JSONArray with the active subscriptions for the dataservice
-	 * about the default connection.
+	 * Returns a JSONArray with the subscriptions for the dataservice about the default connection.
 	 *
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe</tt>
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getActiveSubscriptions(
-			@PathParam("connectionName") String name) {
-		JSONArray activeSubscriptions;
-		try {
-			activeSubscriptions = new JSONArray(Application
-					.getConnectionManager().getActiveSubscriptions(name));
-		} catch (ConnectionException e) {
-			log.error("error at getActiveSubscriptions from " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
+	public Object getSubscriptions(@PathParam("connectionName") String name) {
+		JSONArray jaSubscriptions;
+		if (!mOnlyActive) {
+			try {
+				jaSubscriptions = new JSONArray(Application.getConnectionManager().getSubscriptions(name));
+			} catch (ConnectionException e) {
+				log.error("error at getSubscriptions from " + name, e);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			}
+
+		} else {
+
+			try {
+				jaSubscriptions = new JSONArray(Application.getConnectionManager().getActiveSubscriptions(name));
+			} catch (ConnectionException e) {
+				log.error("error at getActiveSubscriptions from " + name, e);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			}
+
 		}
 
-		return activeSubscriptions;
+		return jaSubscriptions;
 	}
 
 	/**
@@ -129,8 +141,7 @@ public class SubscribeResource {
 	@PUT
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("connectionName") String name,
-			JSONObject jObj) {
+	public Response update(@PathParam("connectionName") String name, JSONObject jObj) {
 		ConnectionManager manager = Application.getConnectionManager();
 		try {
 
@@ -164,8 +175,7 @@ public class SubscribeResource {
 
 			} catch (ConnectionException | IOException | PropertyException ee) {
 				log.error("error while single subscribeUpdate from " + name, ee);
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(ee.toString()).build();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}
 		}
 		return Response.ok().entity("INFO: subscribe successfully").build();
@@ -175,8 +185,7 @@ public class SubscribeResource {
 	 * Send a subscribeDelete for all active subscriptions to the MAP-Server.
 	 * You must set the deleteAll value of true.
 	 *
-	 * Example-URL:
-	 * <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
 	 */
 	@DELETE
 	@Path("delete")
@@ -185,47 +194,32 @@ public class SubscribeResource {
 			try {
 				Application.getConnectionManager().deleteAllSubscriptions(name);
 			} catch (ConnectionException e) {
-				log.error("error while delete all subscriptions from " + name,
-						e);
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(e.toString()).build();
+				log.error("error while delete all subscriptions from " + name, e);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 			}
-
-			return Response
-					.ok()
-					.entity("INFO: delete all active subscriptions successfully")
-					.build();
+			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
 		} else {
-			return Response
-					.status(Response.Status.NOT_MODIFIED)
-					.entity("INFO: deleteAll value is not true, nothing were deleted")
-					.build();
+			return Response.status(Response.Status.NOT_MODIFIED)
+					.entity("INFO: deleteAll value is not true, nothing were deleted").build();
 		}
 	}
 
 	/**
 	 * Send a subscribeDelete for the active subscription to the MAP-Server.
 	 *
-	 * Example-URL:
-	 * <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
 	 */
 	@DELETE
 	@Path("delete/{subscriptionName}")
 	public Response delete(@PathParam("connectionName") String name,
 			@PathParam("subscriptionName") String subscriptionName) {
 		try {
-			Application.getConnectionManager().deleteSubscription(name,
-					subscriptionName);
+			Application.getConnectionManager().deleteSubscription(name, subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while delete " + subscriptionName + " from "
-					+ name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
+			log.error("error while delete " + subscriptionName + " from " + name, e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
-		return Response
-				.ok()
-				.entity("INFO: delete subscription(" + subscriptionName
-						+ ") successfully").build();
+		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();
 	}
 }

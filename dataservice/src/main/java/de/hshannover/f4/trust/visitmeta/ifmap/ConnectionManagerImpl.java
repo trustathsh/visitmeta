@@ -40,6 +40,8 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -138,9 +140,18 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public Set<String> getActiveSubscriptions(String connectionName)
-			throws ConnectionException {
+	public Set<String> getActiveSubscriptions(String connectionName) throws ConnectionException {
 		return getConnection(connectionName).getActiveSubscriptions();
+	}
+
+	@Override
+	public Set<String> getSubscriptions(String connectionName) throws ConnectionException {
+		Set<String> subscriptionNames = new HashSet<String>();
+		List<Subscription> subscriptions = getConnection(connectionName).getSubscriptions();
+		for (Subscription s : subscriptions) {
+			subscriptionNames.add(s.getName());
+		}
+		return subscriptionNames;
 	}
 
 	@Override

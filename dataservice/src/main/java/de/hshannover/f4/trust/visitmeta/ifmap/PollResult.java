@@ -63,7 +63,7 @@ public class PollResult {
 		List<ResultItem> tmp = new ArrayList<ResultItem>();
 		
 		for(ResultItem item : mResults) {
-			if (item.isUpdate()) {
+			if (item.getType() == ResultItemTypeEnum.UPDATE) {
 				tmp.add(item);
 			}
 		}
@@ -75,7 +75,7 @@ public class PollResult {
 		List<ResultItem> tmp = new ArrayList<ResultItem>();
 		
 		for(ResultItem item : mResults) {
-			if (!item.isUpdate()) {
+			if (item.getType() == ResultItemTypeEnum.DELETE) {
 				tmp.add(item);
 			}
 		}

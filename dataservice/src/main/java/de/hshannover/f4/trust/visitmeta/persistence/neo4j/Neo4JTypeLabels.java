@@ -45,5 +45,6 @@ public enum Neo4JTypeLabels implements Label {
 		HISTORY,
         IDENTIFIER,
         CHANGE,
-        METADATA
+        METADATA,
+        NOTIFY
 }

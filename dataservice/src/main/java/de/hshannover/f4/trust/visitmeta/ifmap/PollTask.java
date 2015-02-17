@@ -38,9 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -110,19 +107,22 @@ class PollTask implements Callable<PollResult> {
 		for (SearchResult searchResult : pollResult.getResults()) {
 			switch (searchResult.getType()) {
 			case updateResult:
-				log.debug("processing search list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), true));
+				log.debug("processing update list ...");
+				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.UPDATE));
 				break;
 			case searchResult:
-				log.debug("processing update list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), true));
+				log.debug("processing search list ...");
+				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.SEARCH));
 				break;
 			case deleteResult:
 				log.debug("processing delete list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), false));
+				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.DELETE));
+				break;
+			case notifyResult:
+				log.debug("processing notify list ...");
+				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.NOTIFY));
 				break;
 			default:
-				// TODO ignore notify updates?
 				log.info(searchResult.getType() + " result skipped");
 				break;
 			}
@@ -138,12 +138,12 @@ class PollTask implements Callable<PollResult> {
 	 * list of internal {@link ResultItem}s.
 	 */
 	List<ResultItem> transformResultItems(List<de.hshannover.f4.trust.ifmapj.messages.ResultItem> ifmapjResultItems,
-			boolean isUpdate) {
+			ResultItemTypeEnum type) {
 		List<ResultItem> items = new ArrayList<>();
 		for (de.hshannover.f4.trust.ifmapj.messages.ResultItem item : ifmapjResultItems) {
 			log.debug("processing result item '" + item + "'");
 
-			ResultItem resultItem = transformResultItem(item, isUpdate);
+			ResultItem resultItem = transformResultItem(item, type);
 			if (resultItem.getMetadata().size() > 0) {
 				items.add(resultItem);
 			}
@@ -156,12 +156,14 @@ class PollTask implements Callable<PollResult> {
 	 * {@link de.hshannover.f4.trust.ifmapj.messages.ResultItem} into a internal
 	 * {@link ResultItem}.
 	 */
-	ResultItem transformResultItem(de.hshannover.f4.trust.ifmapj.messages.ResultItem ifmapjResultItem, boolean isUpdate) {
+	ResultItem transformResultItem(de.hshannover.f4.trust.ifmapj.messages.ResultItem ifmapjResultItem,
+			ResultItemTypeEnum type) {
 		List<Document> metadataDocuments = ifmapjResultItem.getMetadata();
 
 		List<InternalMetadata> metadata = new ArrayList<>(metadataDocuments.size());
 		for (Document d : metadataDocuments) {
 			InternalMetadata m = mMetadataFactory.createMetadata(d);
+			m.setIsNotify(type == ResultItemTypeEnum.NOTIFY);
 			metadata.add(m);
 		}
 
@@ -170,10 +172,10 @@ class PollTask implements Callable<PollResult> {
 					.getIdentifier1());
 			InternalIdentifier id2 = mIfmapJHelper.ifmapjIdentifierToInternalIdentifier(ifmapjResultItem
 					.getIdentifier2());
-			return new ResultItem(id1, id2, metadata, isUpdate);
+			return new ResultItem(id1, id2, metadata, type);
 		} else {
 			InternalIdentifier id = mIfmapJHelper.extractSingleIdentifier(ifmapjResultItem);
-			return new ResultItem(id, null, metadata, isUpdate);
+			return new ResultItem(id, null, metadata, type);
 		}
 	}
 }

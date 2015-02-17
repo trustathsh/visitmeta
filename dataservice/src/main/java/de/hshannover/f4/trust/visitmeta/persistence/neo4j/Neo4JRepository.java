@@ -236,6 +236,10 @@ public class Neo4JRepository implements Repository {
 			metaNode.setProperty(KEY_TIMESTAMP_PUBLISH, meta.getPublishTimestamp());
 			metaNode.setProperty(KEY_TIMESTAMP_DELETE, InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP);
 			metaNode.setProperty(KEY_RAW_DATA, meta.getRawData());
+			if(meta.isNotify()) {
+				metaNode.addLabel(Neo4JTypeLabels.NOTIFY);
+				metaNode.setProperty(KEY_TIMESTAMP_DELETE, meta.getPublishTimestamp());
+			}
 			m = new Neo4JMetadata(metaNode, this);
 
 			for (String key : meta.getProperties()) {

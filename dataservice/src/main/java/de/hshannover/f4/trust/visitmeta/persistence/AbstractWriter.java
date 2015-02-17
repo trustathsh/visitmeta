@@ -66,7 +66,10 @@ public abstract class AbstractWriter implements Writer {
 	public void submitPollResult(PollResult pr) {
 		beginTransaction();
 		for (ResultItem resultItem : pr.getResults()) {
-			if (resultItem.isUpdate()) {
+			switch(resultItem.getType()) {
+			case UPDATE:
+			case SEARCH:
+			case NOTIFY:
 				if (resultItem.getId1() == null) {
 					submitUpdate(resultItem.getId2(), resultItem.getMetadata());
 				} else if (resultItem.getId2() == null) {
@@ -74,7 +77,8 @@ public abstract class AbstractWriter implements Writer {
 				} else {
 					submitUpdate(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
 				}
-			} else {
+				break;
+			case DELETE:
 				if (resultItem.getId1() == null) {
 					submitDelete(resultItem.getId2(), resultItem.getMetadata());
 				} else if (resultItem.getId2() == null) {
@@ -82,6 +86,9 @@ public abstract class AbstractWriter implements Writer {
 				} else {
 					submitDelete(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
 				}
+				break;
+			default:
+				break;
 			}
 		}
 

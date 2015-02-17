@@ -221,6 +221,7 @@ public class Neo4JTestDatabaseFactory {
 	 * 			  pubStamp
 	 *			  delStamp
 	 * 			  rawData
+	 * 			  (notify)
 	 * 			  properties
 	 * 			  	(properties map)
 	 * @param db
@@ -240,6 +241,10 @@ public class Neo4JTestDatabaseFactory {
 			meta.setProperty(KEY_TIMESTAMP_DELETE, map.get("delStamp"));
 			meta.setProperty(KEY_RAW_DATA, map.get("rawData"));
 			meta.setProperty(KEY_HASH, map.get("rawData"));
+			if(map.containsKey("notify") && 
+					((String)map.get("notify")).equalsIgnoreCase("true")) {
+				meta.addLabel(Neo4JTypeLabels.NOTIFY);
+			}
 			HashMap<String, Object> properties = (HashMap<String, Object>) map.get("properties");
 			if(properties != null){
 				for (String key : properties.keySet()) {

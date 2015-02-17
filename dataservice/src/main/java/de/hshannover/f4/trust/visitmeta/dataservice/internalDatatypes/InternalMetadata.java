@@ -51,6 +51,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
  */
 public abstract class InternalMetadata implements Propable{
 	public static final long METADATA_NOT_DELETED_TIMESTAMP = -1;
+	private boolean mIsNotify;
 
 	/**
 	 * Returns the raw, unparsed XML data used to describe this Metadata. <b>Note: The xml version
@@ -183,5 +184,13 @@ public abstract class InternalMetadata implements Propable{
 			return false;
 		}
 		return ((getDeleteTimestamp() == -1) || (timestamp < getDeleteTimestamp()));
+	}
+
+	public boolean isNotify() {
+		return mIsNotify;
+	}
+
+	public void setIsNotify(boolean isNotify) {
+		mIsNotify = isNotify;
 	}
 }

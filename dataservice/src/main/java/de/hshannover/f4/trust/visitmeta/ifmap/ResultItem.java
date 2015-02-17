@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-
-
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
@@ -56,14 +54,15 @@ public class ResultItem {
 	private final List<InternalMetadata> mMetadata;
 
 	private final boolean mIsLinkUpdate;
-	private final boolean mIsUpdate;
+	private final ResultItemTypeEnum mType;
 
-	public ResultItem(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> metadata, boolean isUpdate) {
+	public ResultItem(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> metadata,
+			ResultItemTypeEnum type) {
 		super();
 		mId1 = id1;
 		mId2 = id2;
 		mMetadata = metadata;
-		mIsUpdate = isUpdate;
+		mType = type;
 
 		if (id1 == null) {
 			throw new IllegalArgumentException("id1 cannot be null");
@@ -87,9 +86,9 @@ public class ResultItem {
 	public List<InternalMetadata> getMetadata() {
 		return mMetadata;
 	}
-	
-	public boolean isUpdate() {
-		return mIsUpdate;
+
+	public ResultItemTypeEnum getType() {
+		return mType;
 	}
 
 	@Override
@@ -109,7 +108,5 @@ public class ResultItem {
 
 		return s.toString();
 	}
-
-
 
 }

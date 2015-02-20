@@ -44,7 +44,7 @@ import java.util.Map;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
-import de.hshannover.f4.trust.ironcommon.util.Same;
+import de.hshannover.f4.trust.ironcommon.util.ObjectChecks;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionImpl;
@@ -201,19 +201,24 @@ public class ConnectionsProperties extends Properties {
 
 		// set Optional default values to connection, if value == default
 		// nothing to set
-		if (!Same.check(truststorePath, DEFAULT_TRUSTSTORE_PATH)) {
+		if (!ObjectChecks.equalsWithNullReferenceAllowed(truststorePath,
+				DEFAULT_TRUSTSTORE_PATH)) {
 			setPropertyTruststorePath(name, truststorePath);
 		}
-		if (!Same.check(truststorePassword, DEFAULT_TRUSTSTORE_PASSWORD)) {
+		if (!ObjectChecks.equalsWithNullReferenceAllowed(truststorePassword,
+				DEFAULT_TRUSTSTORE_PASSWORD)) {
 			setPropertyTruststorePassword(name, truststorePassword);
 		}
-		if (!Same.check(authenticationBasic, DEFAULT_AUTHENTICATION_BASIC)) {
+		if (!ObjectChecks.equalsWithNullReferenceAllowed(authenticationBasic,
+				DEFAULT_AUTHENTICATION_BASIC)) {
 			setPropertyAuthenticationBasic(name, authenticationBasic);
 		}
-		if (!Same.check(startupConnect, DEFAULT_STARTUP_CONNECT)) {
+		if (!ObjectChecks.equalsWithNullReferenceAllowed(startupConnect,
+				DEFAULT_STARTUP_CONNECT)) {
 			setPropertyStartupConnect(name, startupConnect);
 		}
-		if (!Same.check(maxPollResultSize, DEFAULT_MAX_POLL_RESULT_SIZE)) {
+		if (!ObjectChecks.equalsWithNullReferenceAllowed(maxPollResultSize,
+				DEFAULT_MAX_POLL_RESULT_SIZE)) {
 			setPropertyMaxPollResultSize(name, maxPollResultSize);
 		}
 
@@ -258,15 +263,18 @@ public class ConnectionsProperties extends Properties {
 				setPropertySubscriptionTerminalIdentifierTypes(connectionName,
 						subscriptionName, terminalIdentifierTypes);
 			}
-			if (!Same.check(startupSubscribe, DEFAULT_STARTUP_SUBSCRIPTION)) {
+			if (!ObjectChecks.equalsWithNullReferenceAllowed(startupSubscribe,
+					DEFAULT_STARTUP_SUBSCRIPTION)) {
 				setPropertySubscriptionStartup(connectionName,
 						subscriptionName, startupSubscribe);
 			}
-			if (!Same.check(maxDepth, DEFAULT_SUBSCRIPTION_MAX_DEPTH)) {
+			if (!ObjectChecks.equalsWithNullReferenceAllowed(maxDepth,
+					DEFAULT_SUBSCRIPTION_MAX_DEPTH)) {
 				setPropertySubscriptionMaxDepth(connectionName,
 						subscriptionName, maxDepth);
 			}
-			if (!Same.check(maxSize, DEFAULT_MAX_POLL_RESULT_SIZE)) {
+			if (!ObjectChecks.equalsWithNullReferenceAllowed(maxSize,
+					DEFAULT_MAX_POLL_RESULT_SIZE)) {
 				setPropertySubscriptionMaxSize(connectionName,
 						subscriptionName, maxSize);
 			}
@@ -275,7 +283,7 @@ public class ConnectionsProperties extends Properties {
 
 	/**
 	 * Get the sub-Properties(subscriptions) for connectionName.
-	 * 
+	 *
 	 * @param connectionName
 	 *            property key
 	 * @return Properties

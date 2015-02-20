@@ -45,12 +45,16 @@ public class HistoryNavigationStrategyFactory {
 	public static HistoryNavigationStrategy create(
 			HistoryNavigationStrategyType type, GraphContainer graphContainer) {
 		switch (type) {
-		case TAB_BASED_NAVIGATION:
-			return new TabBasedHistoryNavigation(graphContainer.getTimeHolder(), graphContainer.getRestUrl());
-		case RANGE_SLIDER_BASED_NAVIGATION:
-			return new RangeSliderBasedHistoryNavigation(graphContainer.getTimeHolder());
-		default:
-			throw new IllegalArgumentException("No strategy for given type '" + type + "'");
+			case TAB_BASED_NAVIGATION:
+				return new TabBasedHistoryNavigation(
+						graphContainer.getTimeHolder(),
+						graphContainer.getRestUrl());
+			case RANGE_SLIDER_BASED_NAVIGATION:
+				return new RangeSliderBasedHistoryNavigation(
+						graphContainer.getTimeHolder());
+			default:
+				throw new IllegalArgumentException(
+						"No strategy for given type '" + type + "'");
 		}
 	}
 

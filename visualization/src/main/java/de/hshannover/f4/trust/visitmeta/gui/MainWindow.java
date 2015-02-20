@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,7 +109,7 @@ public class MainWindow extends JFrame {
 	private MotionControllerHandler mMotionControllerHandler = null;
 
 	/**
-	 * 
+	 *
 	 * @param guiController
 	 */
 	public MainWindow(MotionControllerHandler motionControllerHandler) {
@@ -121,11 +121,11 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param connection
 	 */
 	public void addDataserviceConnection(DataserviceConnection dataservice) {
-		if(!existsDataservice(dataservice)){
+		if (!existsDataservice(dataservice)) {
 			addDataserviceTreeNode(dataservice);
 			updateRestConnections();
 			mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
@@ -134,19 +134,26 @@ public class MainWindow extends JFrame {
 
 	public void updateRestConnections() {
 		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot.getChildAt(i);
-			DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode.getUserObject();
+			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
+					.getChildAt(i);
+			DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode
+					.getUserObject();
 			List<String> restConnections;
 			try {
 				restConnections = treeNodedataservice.loadRestConnectionNames();
 
 				tmpNode.removeAllChildren();
-				for(String restConnectionName: restConnections){
-					GraphContainer graphContainer = new GraphContainer(restConnectionName, treeNodedataservice);
-					tmpNode.add(new DefaultMutableTreeNode(new ConnectionTab(graphContainer, this)));
+				for (String restConnectionName : restConnections) {
+					GraphContainer graphContainer = new GraphContainer(
+							restConnectionName, treeNodedataservice);
+					tmpNode.add(new DefaultMutableTreeNode(new ConnectionTab(
+							graphContainer, this)));
 				}
-			} catch (ClientHandlerException | UniformInterfaceException | JSONException e) {
-				LOGGER.warn("Exception while load rest connection names, from " + treeNodedataservice.getName() + " -> " + e.getMessage());
+			} catch (ClientHandlerException | UniformInterfaceException
+					| JSONException e) {
+				LOGGER.warn("Exception while load rest connection names, from "
+						+ treeNodedataservice.getName() + " -> "
+						+ e.getMessage());
 			}
 		}
 		mConnectionTree.updateUI();
@@ -155,8 +162,10 @@ public class MainWindow extends JFrame {
 	private boolean existsDataservice(DataserviceConnection dataservice) {
 		String dataserviceName = dataservice.getName();
 		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot.getChildAt(i);
-			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode.getUserObject();
+			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
+					.getChildAt(i);
+			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode
+					.getUserObject();
 			if (tmpDataserviceConnection.getName().equals(dataserviceName)) {
 				return true;
 			}
@@ -172,7 +181,7 @@ public class MainWindow extends JFrame {
 
 	/**
 	 * Removes a connection
-	 * 
+	 *
 	 * @param connection
 	 *            the should be removed
 	 */
@@ -187,12 +196,21 @@ public class MainWindow extends JFrame {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath()).getImage();
-		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath()).getImage();
-		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath()).getImage();
-		Image visitMetaIcon128px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath()).getImage();
+		Image visitMetaIcon16px = new ImageIcon(MainWindow.class
+				.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath())
+				.getImage();
+		Image visitMetaIcon32px = new ImageIcon(MainWindow.class
+				.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath())
+				.getImage();
+		Image visitMetaIcon64px = new ImageIcon(MainWindow.class
+				.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath())
+				.getImage();
+		Image visitMetaIcon128px = new ImageIcon(MainWindow.class
+				.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath())
+				.getImage();
 
-		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px, visitMetaIcon32px, visitMetaIcon64px, visitMetaIcon128px);
+		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px,
+				visitMetaIcon32px, visitMetaIcon64px, visitMetaIcon128px);
 		this.setIconImages(visitMetaIcons);
 
 		initLeftHandSide();
@@ -222,19 +240,25 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				mConnectionTree.setSelectionRow(mConnectionTree.getClosestRowForLocation(e.getX(), e.getY()));
+				mConnectionTree.setSelectionRow(mConnectionTree
+						.getClosestRowForLocation(e.getX(), e.getY()));
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getClosestPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
+							.getClosestPathForLocation(e.getX(), e.getY())
+							.getLastPathComponent()).getUserObject();
 					if (tmp instanceof ConnectionTab) {
-						new ConnectionTabListMenu((ConnectionTab) tmp).show(mConnectionTree, e.getX(), e.getY());
+						new ConnectionTabListMenu((ConnectionTab) tmp).show(
+								mConnectionTree, e.getX(), e.getY());
 					}
-				} else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent()).getUserObject();
+				} else if (e.getButton() == MouseEvent.BUTTON1
+						&& e.getClickCount() > 1) {
+					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
+							.getLastSelectedPathComponent()).getUserObject();
 					if (tmp instanceof ConnectionTab) {
 						ConnectionTab tmpTab = (ConnectionTab) tmp;
 						boolean alreadyOpen = false;
-						for (Component t : mTabbedConnectionPane.getComponents()) {
+						for (Component t : mTabbedConnectionPane
+								.getComponents()) {
 							if (t.equals(tmpTab)) {
 								alreadyOpen = true;
 							}
@@ -276,15 +300,17 @@ public class MainWindow extends JFrame {
 	/**
 	 * Adds a component to a JTabbedPane with a little "close tab" button on the
 	 * right side of the tab.
-	 * 
+	 *
 	 * @param cTab
 	 *            the ConnectionTab that should be added
 	 */
 	private void addClosableTab(final ConnectionTab cTab) {
 		if (mCancelIcon == null) {
 			mCancelIcon = new ImageIcon[2];
-			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader().getResource("close.png").getPath());
-			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader().getResource("closeHover.png").getPath());
+			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader()
+					.getResource("close.png").getPath());
+			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader()
+					.getResource("closeHover.png").getPath());
 		}
 		mTabbedConnectionPane.addTab(cTab.getConnName(), cTab);
 		int pos = mTabbedConnectionPane.indexOfComponent(cTab);
@@ -332,16 +358,19 @@ public class MainWindow extends JFrame {
 		mTabbedConnectionPane = new JTabbedPane();
 
 		/**
-		 * Whenever the current tab inside the GUI changes,
-		 * the MotionControllerHandler instance is informed.
+		 * Whenever the current tab inside the GUI changes, the
+		 * MotionControllerHandler instance is informed.
 		 */
 		mTabbedConnectionPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
+				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane
+						.getSelectedComponent();
 				if (currentTab != null) {
-					mMotionControllerHandler.setCurrentConnectionTab(currentTab);;
+					mMotionControllerHandler
+							.setCurrentConnectionTab(currentTab);
+					;
 					LOGGER.debug("Tab changed to " + currentTab.getConnName());
 				}
 			}
@@ -356,8 +385,12 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setLocation(mConfig.getInt("window.position.x", 0), mConfig.getInt("window.position.y", 0));
-		setPreferredSize(new Dimension(mConfig.getInt("window.width", 700), mConfig.getInt("window.height", 700)));
+		setLocation(mConfig.getInt("window.position.x", 0),
+				mConfig.getInt("window.position.y", 0));
+		setPreferredSize(new Dimension(mConfig.getInt("window.width", 1280),
+				mConfig.getInt("window.height", 720)));
+		mMainSplitPane.setDividerLocation(mConfig.getInt("window.resizeweight",
+				-1));
 	}
 
 	/**
@@ -370,10 +403,14 @@ public class MainWindow extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent we) {
 				try {
-					mConfig.set("window.position.x", (int) getLocationOnScreen().getX());
-					mConfig.set("window.position.y", (int) getLocationOnScreen().getY());
+					mConfig.set("window.position.x",
+							(int) getLocationOnScreen().getX());
+					mConfig.set("window.position.y",
+							(int) getLocationOnScreen().getY());
 					mConfig.set("window.width", getWidth());
 					mConfig.set("window.height", getHeight());
+					mConfig.set("window.divider",
+							mMainSplitPane.getDividerLocation());
 				} catch (PropertyException e) {
 					LOGGER.fatal(e.toString(), e);
 					throw new RuntimeException("could not save properties");
@@ -406,7 +443,8 @@ public class MainWindow extends JFrame {
 	private void setLookAndFeel() {
 		LOGGER.trace("Method setLookAndFeel() called.");
 
-		UIManager.LookAndFeelInfo[] installedLafs = UIManager.getInstalledLookAndFeels();
+		UIManager.LookAndFeelInfo[] installedLafs = UIManager
+				.getInstalledLookAndFeels();
 		for (UIManager.LookAndFeelInfo lafInfo : installedLafs) {
 			try {
 				@SuppressWarnings("rawtypes")

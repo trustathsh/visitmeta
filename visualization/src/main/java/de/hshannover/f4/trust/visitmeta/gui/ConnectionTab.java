@@ -38,11 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -105,7 +106,8 @@ public class ConnectionTab extends JPanel {
 		mGraphConnection.setParentTab(this);
 
 		String historyNavigationType = mConfig.getString(
-				"visualization.history.navigation", "TAB_BASED_NAVIGATION");
+				"visualization.history.navigation.style",
+				HistoryNavigationStrategyType.TAB_BASED_NAVIGATION.name());
 		mHistoryNavigationStrategy = HistoryNavigationStrategyFactory.create(
 				HistoryNavigationStrategyType.valueOf(historyNavigationType),
 				mConnection);
@@ -125,18 +127,24 @@ public class ConnectionTab extends JPanel {
 		mLowerPanel = new JPanel();
 
 		mUpperPanel.setLayout(new GridLayout());
-		mLowerPanel.setLayout(new BorderLayout());
+		mLowerPanel.setLayout(new BoxLayout(mLowerPanel, BoxLayout.Y_AXIS));
 
 		mGraphPanel = mGraphConnection.getGraphPanel();
 		mMotionInformationPane = new MotionInformationPane(
 				mGraphPanel.getPanel());
+
 		mPanelXmlTree = new PanelXmlTree();
+		mPanelXmlTree.setPreferredSize(new Dimension(800, 200));
+		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy
+				.getJPanel();
+		historyNavigationStrategyPanel
+				.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mUpperPanel.add(mMotionInformationPane);
-		mLowerPanel.add(mHistoryNavigationStrategy.getJPanel(),
-				BorderLayout.NORTH);
-		mLowerPanel.add(mPanelXmlTree, BorderLayout.CENTER);
-		mLowerPanel.setPreferredSize(new Dimension(this.getWidth(), 200));
+		mLowerPanel.add(historyNavigationStrategyPanel);
+		mLowerPanel.add(mPanelXmlTree);
 
 		mSplitPane = new JSplitPane();
 		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);

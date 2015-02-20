@@ -50,6 +50,7 @@ import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
@@ -59,7 +60,6 @@ import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationS
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionInformationPane;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
-import de.hshannover.f4.trust.visitmeta.util.properties.Properties;
 
 public class ConnectionTab extends JPanel {
 	private static final Properties mConfig = Main.getConfig();

@@ -39,6 +39,6 @@ default:
       # IPv4,10.0.0.1
       # or
       # IPv6,...
-      startIdentifier: ar:1
+      startIdentifier: freeradius-pdp
       #  send this subscription when the data service is started
       useSubscriptionAsStartup: true

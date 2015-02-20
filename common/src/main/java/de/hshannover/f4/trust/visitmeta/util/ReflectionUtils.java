@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-common, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -50,9 +51,9 @@ import org.apache.log4j.Logger;
 
 /**
  * Utility class for Reflection operations.
- * 
+ *
  * @author Bastian Hellmann
- * 
+ *
  */
 public class ReflectionUtils {
 
@@ -61,7 +62,7 @@ public class ReflectionUtils {
 	/**
 	 * Checks a list of given class names if they implement a given interface
 	 * and loads it via reflection.
-	 * 
+	 *
 	 * @param classLoader
 	 *            a given {@link ClassLoader} instance (configured with specific
 	 *            URLs for JARs etc.)
@@ -107,11 +108,11 @@ public class ReflectionUtils {
 
 	/**
 	 * Creates a {@link List} of all classes within a given JAR file.
-	 * 
+	 *
 	 * From:
 	 * http://stackoverflow.com/questions/15720822/how-to-get-names-of-classes
 	 * -inside-a-jar-file
-	 * 
+	 *
 	 * @param jarFile
 	 *            the JAR file to search for Classes
 	 * @return a {@link List} with all found classes
@@ -146,4 +147,24 @@ public class ReflectionUtils {
 		return classNames;
 	}
 
+	/**
+	 * Checks if a given class implements a given interface.
+	 *
+	 * @param givenClass
+	 *            a class
+	 * @param interfaceClass
+	 *            a class specifying an interface
+	 * @return true, if the givenClass implements the interface
+	 */
+	public static boolean implementsInterface(Class<?> givenClass,
+			Class<?> interfaceClass) {
+		List<Class<?>> interfacesList = Arrays.asList(givenClass
+				.getInterfaces());
+
+		if (interfacesList != null && interfacesList.contains(interfaceClass)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

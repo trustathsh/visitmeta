@@ -40,7 +40,13 @@ visualization:
       # RANGE_SLIDER_BASED_NAVIGATION: uses a slider with two knobs that
       #                                includes all possible modes
       style: TAB_BASED_NAVIGATION
-
+  searchandfilter:
+    # Sets the search and filtering mechanism; possible values are:
+    # SIMPLE_SEARCH_AND_NO_FILTER: a simple search functionality, using a single textfield
+    #                              and matches every node containing the given 
+    #                              input string
+    style: SIMPLE_SEARCH_AND_NO_FILTER
+      
 dataservice:
   connectiontype: rest
   

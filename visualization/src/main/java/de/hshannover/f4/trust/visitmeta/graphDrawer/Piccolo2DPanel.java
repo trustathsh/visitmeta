@@ -72,6 +72,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -90,7 +91,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
 import edu.umd.cs.piccolox.nodes.PComposite;
 
-public class Piccolo2DPanel implements GraphPanel {
+public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private static final Logger LOGGER = Logger.getLogger(Piccolo2DPanel.class);
 	private static final Properties mConfig = Main.getConfig();
 	private PLayer mLayerNode = null;
@@ -1030,6 +1031,14 @@ public class Piccolo2DPanel implements GraphPanel {
 		}
 
 		return publisherId;
+	}
+
+	@Override
+	public void search(String searchTerm) {
+		System.out.println("Search for '" + searchTerm + "'");
+		// TODO queue incoming search terms?
+		// TODO check all nodes if needed to be highlighted
+		// TODO display all OTHER nodes slighty transparent (?)
 	}
 
 }

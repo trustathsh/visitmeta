@@ -57,9 +57,14 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
+import de.hshannover.f4.trust.visitmeta.gui.search.SeachAndFilterStrategy;
+import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyFactory;
+import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyType;
+import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionInformationPane;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.util.ReflectionUtils;
 
 public class ConnectionTab extends JPanel {
 	private static final Properties mConfig = Main.getConfig();
@@ -72,7 +77,9 @@ public class ConnectionTab extends JPanel {
 	private GraphContainer mConnection = null;
 	private GraphConnection mGraphConnection = null;
 
+	private SeachAndFilterStrategy mSearchAndFilterStrategy = null;
 	private HistoryNavigationStrategy mHistoryNavigationStrategy = null;
+
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
@@ -104,6 +111,7 @@ public class ConnectionTab extends JPanel {
 		mDataserviceConnection = mConnection.getDataserviceConnection();
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
+		mGraphPanel = mGraphConnection.getGraphPanel();
 
 		String historyNavigationType = mConfig.getString(
 				"visualization.history.navigation.style",
@@ -111,6 +119,19 @@ public class ConnectionTab extends JPanel {
 		mHistoryNavigationStrategy = HistoryNavigationStrategyFactory.create(
 				HistoryNavigationStrategyType.valueOf(historyNavigationType),
 				mConnection);
+
+		if (ReflectionUtils.implementsInterface(mGraphPanel.getClass(),
+				Searchable.class)) {
+			String searchAndFilterStrategyType = mConfig.getString(
+					"visualization.searchandfilter.style",
+					SearchAndFilterStrategyType.SIMPLE_SEARCH_AND_NO_FILTER
+							.name());
+			mSearchAndFilterStrategy = SearchAndFilterStrategyFactory.create(
+					SearchAndFilterStrategyType
+							.valueOf(searchAndFilterStrategyType),
+					(Searchable) mGraphPanel);
+		}
+
 		this.setLayout(new GridLayout());
 
 		initPanels();
@@ -129,20 +150,23 @@ public class ConnectionTab extends JPanel {
 		mUpperPanel.setLayout(new GridLayout());
 		mLowerPanel.setLayout(new BoxLayout(mLowerPanel, BoxLayout.Y_AXIS));
 
-		mGraphPanel = mGraphConnection.getGraphPanel();
 		mMotionInformationPane = new MotionInformationPane(
 				mGraphPanel.getPanel());
 
-		mPanelXmlTree = new PanelXmlTree();
-		mPanelXmlTree.setPreferredSize(new Dimension(800, 200));
-		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JPanel searchAndFilterPanel = mSearchAndFilterStrategy.getJPanel();
+		searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy
 				.getJPanel();
 		historyNavigationStrategyPanel
 				.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+		mPanelXmlTree = new PanelXmlTree();
+		mPanelXmlTree.setPreferredSize(new Dimension(800, 200));
+		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
+
 		mUpperPanel.add(mMotionInformationPane);
+		mLowerPanel.add(searchAndFilterPanel);
 		mLowerPanel.add(historyNavigationStrategyPanel);
 		mLowerPanel.add(mPanelXmlTree);
 
@@ -245,10 +269,6 @@ public class ConnectionTab extends JPanel {
 	public void showPropertiesOfNode(final Propable propable) {
 		mPanelXmlTree.fill(propable);
 		mPanelXmlTree.repaint();
-	}
-
-	public DataserviceConnection getDataserviceConnection() {
-		return mDataserviceConnection;
 	}
 
 	/**

@@ -32,6 +32,14 @@ visualization:
       # SINGLE_LINE:    just the typename of the metadata is used
       # WITH_TIMESTAMP: adds a line with the publisher timestamp to the typename
       style: SINGLE_LINE
+  history:
+    navigation:
+      # Sets the control mechanism for history navigation; possible values are:
+      # TAB_BASED_NAVIGATION:          uses multiple tabs to switch between
+      #                                live view, history view and delta view
+      # RANGE_SLIDER_BASED_NAVIGATION: uses a slider with two knobs that
+      #                                includes all possible modes
+      style: TAB_BASED_NAVIGATION
 
 dataservice:
   connectiontype: rest
@@ -41,9 +49,9 @@ guicontroller:
   xyfactor: 20.0
 
 window:
-  width: 700
-  height: 700
-  splitpercent: 0.8
+  width: 1280
+  height: 720
+  divider: 170
   position:
     x: 0
     y: 0

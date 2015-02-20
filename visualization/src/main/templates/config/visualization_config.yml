@@ -74,6 +74,7 @@ color:
     new: '0x228B22'
     delete: '0x82150F'
     selected: '0xFFF02E'
+    search: '0x228B22'
   identifier:
     access-request:
       text: '0x000000'

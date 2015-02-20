@@ -78,6 +78,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
+import de.hshannover.f4.trust.visitmeta.util.SearchUtilities;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -115,6 +116,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private Color mColorNewNode = null;
 	private Color mColorDeleteNode = null;
 	private Paint mColorSelectedNode = null;
+	private Paint mColorContainsSearchTermNode = null;
 
 	private List<String> mPublisher = new ArrayList<>();
 
@@ -122,6 +124,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private MetadataInformationStrategy mMetadataInformationStrategy;
 
 	private Propable mSelectedNode = null;
+	private String mSearchTerm;
 
 	public Piccolo2DPanel(GraphConnection connection) {
 		mNodeTranslationDuration = connection.getSettingManager()
@@ -152,11 +155,15 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				"0x82150F");
 		String vColorSelectedNode = mConfig.getString("color.node.selected",
 				"0xFFF687");
+		String vColormContainsSearchTermNode = mConfig.getString(
+				"color.node.search", "0x228B22");
 		mColorNewNode = Color.decode(vColorNewNode);
 		mColorBackground = Color.decode(vColorBackground);
 		mColorEdge = Color.decode(vColorEdge);
 		mColorDeleteNode = Color.decode(vColorDeleteNode);
 		mColorSelectedNode = Color.decode(vColorSelectedNode);
+		mColorContainsSearchTermNode = Color
+				.decode(vColormContainsSearchTermNode);
 		mPanel.setBackground(mColorBackground);
 
 		String nodeInformationStyle = mConfig.getString(
@@ -863,13 +870,19 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 					.equals(mColorNewNode)
 					|| vNode.getStrokePaint().equals(mColorDeleteNode);
 			boolean isSelected;
+			boolean containsSearchTerm;
 			if (pType == NodeType.IDENTIFIER) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeIdentifier i = (NodeIdentifier) key;
-					isSelected = (mSelectedNode == i.getIdentifier());
+					Identifier identifier = i.getIdentifier();
+					isSelected = (mSelectedNode == identifier);
+					containsSearchTerm = SearchUtilities.containsSearchTerm(
+							identifier, mSearchTerm);
 					/* Repaint identifier nodes */
 					if (isSelected) {
 						vNode.setPaint(mColorSelectedNode);
+					} else if (containsSearchTerm) {
+						vNode.setPaint(mColorContainsSearchTermNode);
 					} else {
 						vNode.setPaint(getColor(vNode, i));
 					}
@@ -881,13 +894,17 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			} else if (pType == NodeType.METADATA) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeMetadata m = (NodeMetadata) key;
-					isSelected = (mSelectedNode == m.getMetadata());
+					Metadata metadata = m.getMetadata();
+					isSelected = (mSelectedNode == metadata);
+					containsSearchTerm = SearchUtilities.containsSearchTerm(
+							metadata, mSearchTerm);
 					/* Repaint metadata nodes */
 					if (vCom.getAttribute("publisher").equals(pPublisher)) {
 						/* Repaint the nodes of this publisher */
 						if (isSelected) {
-							System.out.println("repaintNodes: " + m);
 							vNode.setPaint(mColorSelectedNode);
+						} else if (containsSearchTerm) {
+							vNode.setPaint(mColorContainsSearchTermNode);
 						} else {
 							vNode.setPaint(getColor(pPublisher, vNode));
 						}
@@ -904,6 +921,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 								.getAttribute("publisher");
 						if (isSelected) {
 							vNode.setPaint(mColorSelectedNode);
+						} else if (containsSearchTerm) {
+							vNode.setPaint(mColorContainsSearchTermNode);
 						} else {
 							vNode.setPaint(getColor(vPublisher, vNode));
 						}
@@ -1036,6 +1055,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	@Override
 	public void search(String searchTerm) {
 		System.out.println("Search for '" + searchTerm + "'");
+		mSearchTerm = searchTerm;
+
+		repaintNodes(NodeType.IDENTIFIER, "");
+		repaintNodes(NodeType.METADATA, "");
 		// TODO queue incoming search terms?
 		// TODO check all nodes if needed to be highlighted
 		// TODO display all OTHER nodes slighty transparent (?)

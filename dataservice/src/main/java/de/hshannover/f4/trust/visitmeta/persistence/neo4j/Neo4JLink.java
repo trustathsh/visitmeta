@@ -238,6 +238,22 @@ public class Neo4JLink extends InternalLink {
 		return result;
 	}
 
+	@Override
+	public boolean equalsSingleValueMetadata(InternalMetadata meta) {
+		boolean result = false;
+		try (Transaction tx = mRepo.beginTx()) {
+			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
+				Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo
+						.getMetadata(r.getEndNode().getId());
+				if (meta.equalsSingleValueMetadata(neo4jMetadata)) {
+					result = true;
+				}
+			}
+			tx.success();
+		}
+		return result;
+	}
+
 	/**
 	 * Removes every Metadata from the Link
 	 */

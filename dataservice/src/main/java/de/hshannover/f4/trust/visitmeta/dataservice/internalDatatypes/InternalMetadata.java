@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes;
 
-
-
 import java.util.Collections;
 import java.util.List;
 
@@ -49,7 +47,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 /**
  * Internal representation of one IF-MAP metadata.
  */
-public abstract class InternalMetadata implements Propable{
+public abstract class InternalMetadata implements Propable {
 	public static final long METADATA_NOT_DELETED_TIMESTAMP = -1;
 	private boolean mIsNotify;
 
@@ -68,12 +66,11 @@ public abstract class InternalMetadata implements Propable{
 	 */
 	@Deprecated
 	public abstract void setPublishTimestamp(long timestamp);
+
 	/**
 	 * Returns the timestamp when this metadata was received with a delete operation.
 	 *
-	 * @return the delete timestamp or
-	 *          {@link Metadata.METADATA_NOT_DELETED_TIMESTAMP}
-	 *          if this metadata is still valid
+	 * @return the delete timestamp or {@link Metadata.METADATA_NOT_DELETED_TIMESTAMP} if this metadata is still valid
 	 */
 	public abstract long getDeleteTimestamp();
 
@@ -88,6 +85,26 @@ public abstract class InternalMetadata implements Propable{
 		return tmp.toString();
 	}
 
+	public boolean equalsSingleValueMetadata(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof InternalMetadata)) {
+			return false;
+		}
+		InternalMetadata other = (InternalMetadata) o;
+
+		if (other.getDeleteTimestamp() != this.getDeleteTimestamp()) {
+			return false;
+		}
+
+		if (other.getPublishTimestamp() != this.getPublishTimestamp()) {
+			return false;
+		}
+
+		return this.equals(other);
+	}
+
 	/**
 	 * Equals method for metadata contained in a link, where the singleValue field is decision making
 	 * 
@@ -96,20 +113,20 @@ public abstract class InternalMetadata implements Propable{
 	 * 
 	 */
 	public boolean equalsForLinks(Object o) {
-		if(o == null) {
+		if (o == null) {
 			return false;
 		}
-		if(! (o instanceof InternalMetadata)) {
+		if (!(o instanceof InternalMetadata)) {
 			return false;
 		}
 		InternalMetadata other = (InternalMetadata) o;
 
-		if(other.getDeleteTimestamp() != this.getDeleteTimestamp()){
+		if (other.getDeleteTimestamp() != this.getDeleteTimestamp()) {
 			return false;
 		}
 
-		if(this.isSingleValue() && other.isSingleValue()) {
-			if(this.getTypeName().equals(other.getTypeName())) {
+		if (this.isSingleValue() && other.isSingleValue()) {
+			if (this.getTypeName().equals(other.getTypeName())) {
 				return true;
 			}
 		}
@@ -121,14 +138,14 @@ public abstract class InternalMetadata implements Propable{
 		if (o == null) {
 			return false;
 		}
-		if (! (o instanceof InternalMetadata) ) {
+		if (!(o instanceof InternalMetadata)) {
 			return false;
 		}
 		InternalMetadata other = (InternalMetadata) o;
 		if (!this.getTypeName().equals(other.getTypeName())) {
 			return false;
 		}
-		if(this.isSingleValue() != other.isSingleValue()) {
+		if (this.isSingleValue() != other.isSingleValue()) {
 			return false;
 		}
 		if (getProperties().size() != other.getProperties().size()) {
@@ -164,23 +181,25 @@ public abstract class InternalMetadata implements Propable{
 
 	/**
 	 * @return
-	 * True if corresponding IF-MAP metadata is single value, false otherwise.
+	 *         True if corresponding IF-MAP metadata is single value, false otherwise.
 	 */
 	public abstract boolean isSingleValue();
+
 	/**
 	 * @return
-	 * The (IF-MAP) publish timestamp
+	 *         The (IF-MAP) publish timestamp
 	 */
 	public abstract long getPublishTimestamp();
 
 	/**
 	 * Checks if this metadata is valid at the given timestamp.
 	 * Test is performed on the PublishTimestamp and DeleteTimestamp
+	 * 
 	 * @param timestamp the timestamp to check
 	 * @return the result wether it is valid or not
 	 */
 	public boolean isValidAt(long timestamp) {
-		if(getPublishTimestamp() > timestamp) {
+		if (getPublishTimestamp() > timestamp) {
 			return false;
 		}
 		return ((getDeleteTimestamp() == -1) || (timestamp < getDeleteTimestamp()));

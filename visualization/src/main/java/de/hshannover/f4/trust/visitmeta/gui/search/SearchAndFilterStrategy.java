@@ -38,20 +38,34 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.search;
 
+import javax.swing.JPanel;
+
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+
 /**
  * @author Bastian Hellmann
  *
  */
-public interface Searchable {
+public interface SearchAndFilterStrategy {
 
 	/**
+	 * @return
+	 */
+	public JPanel getJPanel();
+
+	/**
+	 * @param identifier
 	 * @param searchTerm
+	 * @return
 	 */
-	public void search(String searchTerm);
+	public boolean containsSearchTerm(Identifier identifier, String searchTerm);
 
 	/**
-	 * @param strategy
+	 * @param metadata
+	 * @param searchTerm
+	 * @return
 	 */
-	void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy);
+	public boolean containsSearchTerm(Metadata metadata, String searchTerm);
 
 }

@@ -72,13 +72,13 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
-import de.hshannover.f4.trust.visitmeta.util.SearchUtilities;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -125,6 +125,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 
 	private Propable mSelectedNode = null;
 	private String mSearchTerm;
+	private SearchAndFilterStrategy mSearchAndFilterStrategy;
 
 	public Piccolo2DPanel(GraphConnection connection) {
 		mNodeTranslationDuration = connection.getSettingManager()
@@ -865,75 +866,81 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			PComposite vCom = mMapNode.get(key);
 			PPath vNode = (PPath) vCom.getChild(0);
 			PText vText = (PText) vCom.getChild(1);
-			/* Check if node is highlighted */
-			boolean isHighlighted = vNode.getStrokePaint()
-					.equals(mColorNewNode)
-					|| vNode.getStrokePaint().equals(mColorDeleteNode);
-			boolean isSelected;
-			boolean containsSearchTerm;
+
 			if (pType == NodeType.IDENTIFIER) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeIdentifier i = (NodeIdentifier) key;
 					Identifier identifier = i.getIdentifier();
-					isSelected = (mSelectedNode == identifier);
-					containsSearchTerm = SearchUtilities.containsSearchTerm(
-							identifier, mSearchTerm);
-					/* Repaint identifier nodes */
-					if (isSelected) {
-						vNode.setPaint(mColorSelectedNode);
-					} else if (containsSearchTerm) {
-						vNode.setPaint(mColorContainsSearchTermNode);
-					} else {
-						vNode.setPaint(getColor(vNode, i));
-					}
-					if (!isHighlighted) {
-						vNode.setStrokePaint(getColorIdentifierStroke(i));
-					}
-					vText.setTextPaint(getColorIdentifierText(i));
+					repaintIdentifierNodes(identifier, i, vNode, vText);
 				}
 			} else if (pType == NodeType.METADATA) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeMetadata m = (NodeMetadata) key;
 					Metadata metadata = m.getMetadata();
-					isSelected = (mSelectedNode == metadata);
-					containsSearchTerm = SearchUtilities.containsSearchTerm(
-							metadata, mSearchTerm);
-					/* Repaint metadata nodes */
-					if (vCom.getAttribute("publisher").equals(pPublisher)) {
-						/* Repaint the nodes of this publisher */
-						if (isSelected) {
-							vNode.setPaint(mColorSelectedNode);
-						} else if (containsSearchTerm) {
-							vNode.setPaint(mColorContainsSearchTermNode);
-						} else {
-							vNode.setPaint(getColor(pPublisher, vNode));
-						}
-						if (!isHighlighted) {
-							vNode.setStrokePaint(getColorMetadataStroke(pPublisher));
-						}
-						vText.setTextPaint(getColorText(pPublisher));
-					} else if (pPublisher.equals("")) {
-						/*
-						 * Default color was changed, repaint each node with its
-						 * own color
-						 */
-						String vPublisher = (String) vCom
-								.getAttribute("publisher");
-						if (isSelected) {
-							vNode.setPaint(mColorSelectedNode);
-						} else if (containsSearchTerm) {
-							vNode.setPaint(mColorContainsSearchTermNode);
-						} else {
-							vNode.setPaint(getColor(vPublisher, vNode));
-						}
-						if (!isHighlighted) {
-							vNode.setStrokePaint(getColorMetadataStroke(vPublisher));
-						}
-						vText.setTextPaint(getColorText(vPublisher));
-					}
+					repaintMetadataNodes(metadata, m, vNode, vText, pPublisher,
+							vCom);
 				}
 			}
 		}
+	}
+
+	private void repaintMetadataNodes(Metadata metadata, NodeMetadata m,
+			PPath vNode, PText vText, String pPublisher, PComposite vCom) {
+		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
+				|| vNode.getStrokePaint().equals(mColorDeleteNode);
+		boolean isSelected = (mSelectedNode == metadata);
+		boolean containsSearchTerm = mSearchAndFilterStrategy
+				.containsSearchTerm(metadata, mSearchTerm);
+		if (vCom.getAttribute("publisher").equals(pPublisher)) {
+			/* Repaint the nodes of this publisher */
+			if (isSelected) {
+				vNode.setPaint(mColorSelectedNode);
+			} else if (containsSearchTerm) {
+				vNode.setPaint(mColorContainsSearchTermNode);
+			} else {
+				vNode.setPaint(getColor(pPublisher, vNode));
+			}
+			if (!isHighlighted) {
+				vNode.setStrokePaint(getColorMetadataStroke(pPublisher));
+			}
+			vText.setTextPaint(getColorText(pPublisher));
+		} else if (pPublisher.equals("")) {
+			/*
+			 * Default color was changed, repaint each node with its own color
+			 */
+			String vPublisher = (String) vCom.getAttribute("publisher");
+			if (isSelected) {
+				vNode.setPaint(mColorSelectedNode);
+			} else if (containsSearchTerm) {
+				vNode.setPaint(mColorContainsSearchTermNode);
+			} else {
+				vNode.setPaint(getColor(vPublisher, vNode));
+			}
+			if (!isHighlighted) {
+				vNode.setStrokePaint(getColorMetadataStroke(vPublisher));
+			}
+			vText.setTextPaint(getColorText(vPublisher));
+		}
+	}
+
+	private void repaintIdentifierNodes(Identifier identifier,
+			NodeIdentifier i, PPath vNode, PText vText) {
+		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
+				|| vNode.getStrokePaint().equals(mColorDeleteNode);
+		boolean isSelected = (mSelectedNode == identifier);
+		boolean containsSearchTerm = mSearchAndFilterStrategy
+				.containsSearchTerm(identifier, mSearchTerm);
+		if (isSelected) {
+			vNode.setPaint(mColorSelectedNode);
+		} else if (containsSearchTerm) {
+			vNode.setPaint(mColorContainsSearchTermNode);
+		} else {
+			vNode.setPaint(getColor(vNode, i));
+		}
+		if (!isHighlighted) {
+			vNode.setStrokePaint(getColorIdentifierStroke(i));
+		}
+		vText.setTextPaint(getColorIdentifierText(i));
 	}
 
 	@Override
@@ -1062,6 +1069,11 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		// TODO queue incoming search terms?
 		// TODO check all nodes if needed to be highlighted
 		// TODO display all OTHER nodes slighty transparent (?)
+	}
+
+	@Override
+	public void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy) {
+		this.mSearchAndFilterStrategy = strategy;
 	}
 
 }

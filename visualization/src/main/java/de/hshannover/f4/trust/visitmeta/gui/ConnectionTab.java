@@ -57,7 +57,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
-import de.hshannover.f4.trust.visitmeta.gui.search.SeachAndFilterStrategy;
+import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyType;
 import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
@@ -77,7 +77,7 @@ public class ConnectionTab extends JPanel {
 	private GraphContainer mConnection = null;
 	private GraphConnection mGraphConnection = null;
 
-	private SeachAndFilterStrategy mSearchAndFilterStrategy = null;
+	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
 	private HistoryNavigationStrategy mHistoryNavigationStrategy = null;
 
 	private JSplitPane mSplitPane = null;
@@ -122,14 +122,15 @@ public class ConnectionTab extends JPanel {
 
 		if (ReflectionUtils.implementsInterface(mGraphPanel.getClass(),
 				Searchable.class)) {
+			Searchable searchable = (Searchable) mGraphPanel;
 			String searchAndFilterStrategyType = mConfig.getString(
 					"visualization.searchandfilter.style",
 					SearchAndFilterStrategyType.SIMPLE_SEARCH_AND_NO_FILTER
 							.name());
 			mSearchAndFilterStrategy = SearchAndFilterStrategyFactory.create(
 					SearchAndFilterStrategyType
-							.valueOf(searchAndFilterStrategyType),
-					(Searchable) mGraphPanel);
+							.valueOf(searchAndFilterStrategyType), searchable);
+			searchable.setSearchAndFilterStrategy(mSearchAndFilterStrategy);
 		}
 
 		this.setLayout(new GridLayout());

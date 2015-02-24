@@ -163,11 +163,28 @@ public class SimpleGraphService implements GraphService {
 	@Override
 	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
 		log.trace("Method getNotifiesAt(" + timestamp + ") called.");
-		List<IdentifierGraph> graph = new ArrayList<>();
-		for(InternalIdentifierGraph internalGraph : mReader.getNotifiesAt(timestamp)) {
-			graph.add(GraphHelper.internalToExternalGraph(internalGraph));
+		SortedMap<Long, Long> changes = getChangesMap();
+		long closestTimestamp = 0l;
+		if (!changes.isEmpty()) {
+			if (changes.containsKey(timestamp)) {
+				closestTimestamp = timestamp;
+			} else {
+				SortedMap<Long, Long> head = changes.headMap(timestamp);
+				if (!head.isEmpty()) {
+					closestTimestamp = head.lastKey();
+				} else {
+					List<IdentifierGraph> tmp = new ArrayList<IdentifierGraph>();
+					return tmp;
+				}
+			}
+			List<IdentifierGraph> graph = new ArrayList<>();
+			for(InternalIdentifierGraph internalGraph : mReader.getNotifiesAt(closestTimestamp)) {
+				graph.add(GraphHelper.internalToExternalGraph(internalGraph));
+			}
+			return graph;
 		}
-		return graph;
+		List<IdentifierGraph> tmp = new ArrayList<IdentifierGraph>();
+		return tmp;
 	}
 
 	@Override

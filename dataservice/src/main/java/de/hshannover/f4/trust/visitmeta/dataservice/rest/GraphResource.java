@@ -84,6 +84,10 @@ public class GraphResource {
 	@QueryParam("rawData")
 	@DefaultValue("false")
 	private boolean mIncludeRawXML;
+	
+	@QueryParam("onlyNotifies")
+	@DefaultValue("false")
+	private boolean mGetNotify;
 
 
 	@GET
@@ -141,8 +145,9 @@ public class GraphResource {
 	/**
 	 * Returns the graph at the given timestamp. If the given timestamp
 	 * is not a exact change-timestamp the next smaller timestamp to the
-	 * given timestamp will be chosen.
-	 * Example-URL: <tt>http://example.com:8000/graph/314159265</tt>
+	 * given timestamp will be chosen. If query parameter onlyNotifes is 
+	 * given only notify metadata matching the given timestamp is returned.
+	 * Example-URL: <tt>http://example.com:8000/graph/314159265[?onlyNotifes=true]</tt>
 	 */
 	@GET
 	@Path("{at}")
@@ -150,9 +155,11 @@ public class GraphResource {
 	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp) {
 		List<IdentifierGraph> graphs;
 		try{
-
-			graphs = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp);
-
+			if(!mGetNotify) {
+				graphs = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp);
+			} else {
+				graphs = Application.getConnectionManager().getGraphService(name).getNotifiesAt(timestamp);
+			}
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}

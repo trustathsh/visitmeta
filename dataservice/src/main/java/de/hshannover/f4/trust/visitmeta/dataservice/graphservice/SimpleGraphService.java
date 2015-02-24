@@ -89,13 +89,11 @@ public class SimpleGraphService implements GraphService {
 	@Override
 	public List<IdentifierGraph> getInitialGraph() {
 		log.trace("Method getInitialGraph() called.");
-		List<IdentifierGraph> graph = new ArrayList<>();
-		if (!getChangesMap().isEmpty()) {
-			for (InternalIdentifierGraph binky : getInternalGraphAt(getChangesMap().firstKey())) {
-				graph.add(GraphHelper.internalToExternalGraph(binky));
-			}
+		if (getChangesMap().isEmpty()) {
+			return new ArrayList<>();
+		} else {
+			return getGraphAt(getChangesMap().firstKey());
 		}
-		return graph;
 	}
 
 	@Override

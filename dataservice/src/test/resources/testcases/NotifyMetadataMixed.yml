@@ -5,33 +5,33 @@ link1:
       name: device1
     rawData: device1
   second:
-    type: device
+    type: ip-adress
     properties:
-      name: device2
-    rawData: device2
+      address: 10.0.0.1
+    rawData: ip1
   metadata:
     meta1:
-      type: event
+      type: dev-ip
       singleValue: true
-      notify: true
+      notify: false
       pubStamp: 0
-      delStamp: 0
-      rawData: event1
+      delStamp: -1
+      rawData: dev-ip1
       properties:
 link2:
   first:
     type: device
     properties:
-      name: device3
-    rawData: device3
+      name: device1
+    rawData: device1
   metadata:
     meta1:
       type: event
       singleValue: true
       notify: true
-      pubStamp: 0
-      delStamp: 0
-      rawData: event2
+      pubStamp: 1
+      delStamp: 1
+      rawData: event1
       properties:
 link3:  
   first:
@@ -40,16 +40,31 @@ link3:
       name: device1
     rawData: device1
   second:
+    type: ar
+    properties:
+      name: ar1
+    rawData: ar1
+  metadata:
+    meta1:
+      type: acess-request
+      singleValue: true
+      notify: false
+      pubStamp: 2
+      delStamp: -1
+      rawData: ar-dev1
+      properties:
+link4:
+  first:
     type: device
     properties:
-      name: device3
-    rawData: device3
+      name: device1
+    rawData: device1
   metadata:
     meta1:
       type: event
       singleValue: true
       notify: true
-      pubStamp: 1
-      delStamp: 1
-      rawData: event3
+      pubStamp: 2
+      delStamp: 2
+      rawData: event2
       properties:

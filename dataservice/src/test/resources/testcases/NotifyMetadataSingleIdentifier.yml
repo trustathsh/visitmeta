@@ -1,0 +1,31 @@
+link1:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  metadata:
+    meta1:
+      type: event
+      singleValue: true
+      notify: true
+      pubStamp: 0
+      delStamp: 0
+      rawData: event1
+      properties:
+link2:
+  first:
+    type: device
+    properties:
+      name: device1
+    rawData: device1
+  metadata:
+    meta1:
+      type: event
+      singleValue: true
+      notify: true
+      pubStamp: 1
+      delStamp: 1
+      rawData: event2
+      properties:
+

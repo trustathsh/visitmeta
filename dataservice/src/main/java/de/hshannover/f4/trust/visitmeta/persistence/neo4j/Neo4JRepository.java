@@ -157,6 +157,9 @@ public class Neo4JRepository implements Repository {
 		log.trace("Looking for Metadata with the id " +id+ " in the database ...");
 		Node node = getNodeById(id);
 		Neo4JMetadata meta = new Neo4JMetadata(node, this);
+		if(node.hasLabel(Neo4JTypeLabels.NOTIFY)) {
+			meta.setIsNotify(true);
+		}
 		return meta;
 	}
 

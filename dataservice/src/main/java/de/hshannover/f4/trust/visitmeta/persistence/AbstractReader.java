@@ -205,8 +205,55 @@ public abstract class AbstractReader implements Reader {
 		}
 		return graph;
 	}
-
-
+	
+	@Override
+	public List<InternalIdentifierGraph> getNotifiesAt(long timestamp) {
+		log.debug("Get the notifies at "+timestamp);
+		ArrayList<InternalIdentifierGraph> notifies = new ArrayList<>();
+		for(InternalIdentifier current : mRepo.getAllIdentifier()) {
+			for(InternalMetadata meta : current.getMetadata()) {
+				if(meta.isNotify() && meta.getPublishTimestamp() == timestamp) {
+					InMemoryIdentifierGraph temp = new InMemoryIdentifierGraph(timestamp);
+					InternalIdentifier first = temp.insert(current);
+					InternalMetadata newMeta = temp.insert(meta);
+					temp.connectMeta(first, newMeta);
+					notifies.add(temp);
+				}
+			}
+			
+			for(InternalLink link : current.getLinks()) {
+				if(checkIfListContainsLink(notifies, link)) {
+					continue;
+				}
+				for(InternalMetadata meta : link.getMetadata()) {
+					if(meta.isNotify() && meta.getPublishTimestamp() == timestamp) {
+						InMemoryIdentifierGraph temp = new InMemoryIdentifierGraph(timestamp);
+						InternalIdentifierPair ids = link.getIdentifiers();
+						InternalIdentifier first = temp.insert(ids.getFirst());
+						InternalIdentifier second = temp.insert(ids.getSecond());
+						InternalMetadata newMeta = temp.insert(meta);
+						InternalLink newLink = temp.connect(first, second);
+						temp.connectMeta(newLink, newMeta);
+						notifies.add(temp);
+					}
+				}
+			}
+		}
+		
+		return notifies;
+	}
+	
+	private boolean checkIfListContainsLink(List<InternalIdentifierGraph> list, InternalLink link) {
+		for(InternalIdentifierGraph graph : list) {
+			for(InternalIdentifier current : graph.getIdentifiers()) {
+				for(InternalLink tmpLink : current.getLinks())
+					if(link.equals(tmpLink)) {
+						return true;
+					}
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public abstract long getTimeOfLastUpdate();

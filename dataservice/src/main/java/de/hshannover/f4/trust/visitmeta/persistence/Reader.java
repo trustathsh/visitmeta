@@ -49,6 +49,7 @@ public interface Reader {
 	public List<InternalIdentifierGraph> getCurrentState();
 	public long getTimeOfLastUpdate();
 	public List<InternalIdentifierGraph> getGraphAt(long timestamp);
+	public List<InternalIdentifierGraph> getNotifiesAt(long timestamp);
 	public SortedMap<Long, Long> getChangesMap();
 }
 

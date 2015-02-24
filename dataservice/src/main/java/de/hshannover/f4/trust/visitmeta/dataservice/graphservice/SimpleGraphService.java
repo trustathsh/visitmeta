@@ -159,6 +159,16 @@ public class SimpleGraphService implements GraphService {
 		return new ArrayList<InternalIdentifierGraph>();
 
 	}
+	
+	@Override
+	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
+		log.trace("Method getNotifiesAt(" + timestamp + ") called.");
+		List<IdentifierGraph> graph = new ArrayList<>();
+		for(InternalIdentifierGraph internalGraph : mReader.getNotifiesAt(timestamp)) {
+			graph.add(GraphHelper.internalToExternalGraph(internalGraph));
+		}
+		return graph;
+	}
 
 	@Override
 	public List<IdentifierGraph> getGraphAt(long timestamp) {

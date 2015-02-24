@@ -167,6 +167,13 @@ public class ProxyGraphService implements GraphService {
 	}
 
 	@Override
+	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
+		//TODO not yet implemented
+		log.info("not yet implemented!");
+		return null;
+	}
+
+	@Override
 	public List<IdentifierGraph> getCurrentGraph() {
 		log.trace("Method getCurrentGraph() called.");
 		String json = mService
@@ -549,5 +556,4 @@ public class ProxyGraphService implements GraphService {
 		log.error("Not implemented!");
 		throw new RuntimeException("Not implemented!");
 	}
-
 }

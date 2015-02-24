@@ -75,6 +75,12 @@ public interface GraphService {
 	 *         latest changes in the IF-MAP graph structure.
 	 */
 	public List<IdentifierGraph> getCurrentGraph();
+	
+	/**
+	 * @return Multiple graphs each containing either one Identifier-(notify)Metadata 
+	 * 		   pair or a Link with two Identifiers and one (notify)Metadata. 
+	 */
+	public List<IdentifierGraph> getNotifiesAt(long timestamp);
 
 	/**
 	 * @param filter

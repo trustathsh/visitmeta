@@ -42,6 +42,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -61,6 +62,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
  */
 public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 
+	private static final String ENCLOSING_CHAR = "\"";
 	private JPanel mSearchInputPanel;
 	private Searchable mSearchableGraphPanel;
 	private JTextField mInputTextfield;
@@ -72,6 +74,9 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 		initGUI();
 	}
 
+	/**
+	 *
+	 */
 	private void initGUI() {
 		mSearchInputPanel = new JPanel();
 		mSearchInputPanel.setLayout(new BoxLayout(mSearchInputPanel,
@@ -116,8 +121,6 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	 */
 	private boolean containsSearchTerm(Propable propable, String searchTerm) {
 		if (!searchTerm.equals("")) {
-			String rawData = propable.getRawData();
-
 			boolean foundSomething = false;
 			String[] terms = searchTerm.split(";");
 
@@ -130,9 +133,24 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 				for (int i = 0; i < subTerms.length; i++) {
 					subTerm = subTerms[i];
 					if (subTerms.length == 1) {
-						allSubTermsFound = rawData.contains(subTerm);
-					} else if (!rawData.contains(subTerm)) {
-						allSubTermsFound = false;
+						if (isEnclosedSearchString(subTerm)) {
+							allSubTermsFound = searchForEqualString(propable,
+									subTerm.replaceAll(ENCLOSING_CHAR, ""));
+						} else {
+							allSubTermsFound = searchForContainingString(
+									propable, subTerm);
+						}
+					} else {
+						if (isEnclosedSearchString(subTerm)) {
+							if (!searchForEqualString(propable,
+									subTerm.replaceAll(ENCLOSING_CHAR, ""))) {
+								allSubTermsFound = false;
+							}
+						} else {
+							if (!searchForContainingString(propable, subTerm)) {
+								allSubTermsFound = false;
+							}
+						}
 					}
 				}
 
@@ -144,6 +162,60 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * @param searchTerm
+	 * @return
+	 */
+	private boolean isEnclosedSearchString(String searchTerm) {
+		return (searchTerm.startsWith(ENCLOSING_CHAR) && searchTerm
+				.endsWith(ENCLOSING_CHAR));
+	}
+
+	/**
+	 * @param propable
+	 * @param searchTerm
+	 * @return
+	 */
+	private boolean searchForContainingString(Propable propable,
+			String searchTerm) {
+		String typeName = propable.getTypeName();
+		List<String> properties = propable.getProperties();
+
+		if (typeName.contains(searchTerm)) {
+			return true;
+		}
+
+		for (String property : properties) {
+			if (propable.valueFor(property).contains(searchTerm)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param propable
+	 * @param searchTerm
+	 * @return
+	 */
+	private boolean searchForEqualString(Propable propable, String searchTerm) {
+		String typeName = propable.getTypeName();
+		List<String> properties = propable.getProperties();
+
+		if (typeName.equals(searchTerm)) {
+			return true;
+		}
+
+		for (String property : properties) {
+			if (propable.valueFor(property).equals(searchTerm)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

@@ -124,8 +124,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private MetadataInformationStrategy mMetadataInformationStrategy;
 
 	private Propable mSelectedNode = null;
-	private String mSearchTerm;
-	private SearchAndFilterStrategy mSearchAndFilterStrategy;
+	private String mSearchTerm = "";
+	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
+	private boolean mHideSearchMismatches = false;
+	private float mHideSearchMismatchesTransparency;
 
 	public Piccolo2DPanel(GraphConnection connection) {
 		mNodeTranslationDuration = connection.getSettingManager()
@@ -166,6 +168,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		mColorContainsSearchTermNode = Color
 				.decode(vColormContainsSearchTermNode);
 		mPanel.setBackground(mColorBackground);
+
+		mHideSearchMismatchesTransparency = (float) mConfig.getDouble(
+				"visualization.searchandfilter.transparency", 0.2);
 
 		String nodeInformationStyle = mConfig.getString(
 				"visualization.identifier.text.style", "SINGLE_LINE");
@@ -664,6 +669,13 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			pEdge.setStrokePaint(mColorEdge);
 			pEdge.moveTo((float) vStart.getX(), (float) vStart.getY());
 			pEdge.lineTo((float) vEnd.getX(), (float) vEnd.getY());
+
+			if (mHideSearchMismatches) {
+				pEdge.setTransparency(mHideSearchMismatchesTransparency);
+			} else {
+				pEdge.setTransparency(1.0f);
+			}
+
 			pEdge.repaint();
 		}
 	}
@@ -893,32 +905,50 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				.containsSearchTerm(metadata, mSearchTerm);
 		if (vCom.getAttribute("publisher").equals(pPublisher)) {
 			/* Repaint the nodes of this publisher */
+
+			vNode.setTransparency(1.0f);
 			if (isSelected) {
 				vNode.setPaint(mColorSelectedNode);
-			} else if (containsSearchTerm) {
+			}
+
+			if (containsSearchTerm) {
 				vNode.setPaint(mColorContainsSearchTermNode);
 			} else {
 				vNode.setPaint(getColor(pPublisher, vNode));
+				if (mHideSearchMismatches) {
+					vNode.setTransparency(mHideSearchMismatchesTransparency);
+				}
 			}
+
 			if (!isHighlighted) {
 				vNode.setStrokePaint(getColorMetadataStroke(pPublisher));
 			}
+
 			vText.setTextPaint(getColorText(pPublisher));
 		} else if (pPublisher.equals("")) {
 			/*
 			 * Default color was changed, repaint each node with its own color
 			 */
+			vNode.setTransparency(1.0f);
+
 			String vPublisher = (String) vCom.getAttribute("publisher");
 			if (isSelected) {
 				vNode.setPaint(mColorSelectedNode);
-			} else if (containsSearchTerm) {
+			}
+
+			if (containsSearchTerm) {
 				vNode.setPaint(mColorContainsSearchTermNode);
 			} else {
 				vNode.setPaint(getColor(vPublisher, vNode));
+				if (mHideSearchMismatches) {
+					vNode.setTransparency(mHideSearchMismatchesTransparency);
+				}
 			}
+
 			if (!isHighlighted) {
 				vNode.setStrokePaint(getColorMetadataStroke(vPublisher));
 			}
+
 			vText.setTextPaint(getColorText(vPublisher));
 		}
 	}
@@ -930,16 +960,25 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		boolean isSelected = (mSelectedNode == identifier);
 		boolean containsSearchTerm = mSearchAndFilterStrategy
 				.containsSearchTerm(identifier, mSearchTerm);
+		vNode.setTransparency(1.0f);
+
 		if (isSelected) {
 			vNode.setPaint(mColorSelectedNode);
-		} else if (containsSearchTerm) {
+		}
+
+		if (containsSearchTerm) {
 			vNode.setPaint(mColorContainsSearchTermNode);
 		} else {
 			vNode.setPaint(getColor(vNode, i));
+			if (mHideSearchMismatches) {
+				vNode.setTransparency(mHideSearchMismatchesTransparency);
+			}
 		}
+
 		if (!isHighlighted) {
 			vNode.setStrokePaint(getColorIdentifierStroke(i));
 		}
+
 		vText.setTextPaint(getColorIdentifierText(i));
 	}
 
@@ -1061,7 +1100,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 
 	@Override
 	public void search(String searchTerm) {
-		System.out.println("Search for '" + searchTerm + "'");
+		LOGGER.trace("Search for '" + searchTerm + "'");
 		mSearchTerm = searchTerm;
 
 		repaintNodes(NodeType.IDENTIFIER, "");
@@ -1074,6 +1113,14 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	@Override
 	public void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy) {
 		this.mSearchAndFilterStrategy = strategy;
+	}
+
+	@Override
+	public void setHideSearchMismatches(boolean b) {
+		this.mHideSearchMismatches = b;
+
+		repaintNodes(NodeType.IDENTIFIER, "");
+		repaintNodes(NodeType.METADATA, "");
 	}
 
 }

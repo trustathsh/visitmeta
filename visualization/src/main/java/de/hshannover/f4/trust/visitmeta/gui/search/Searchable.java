@@ -54,4 +54,9 @@ public interface Searchable {
 	 */
 	void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy);
 
+	/**
+	 * @param b
+	 */
+	public void setHideSearchMismatches(boolean b);
+
 }

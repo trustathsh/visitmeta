@@ -38,10 +38,13 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.search;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,6 +64,7 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	private JPanel mSearchInputPanel;
 	private Searchable mSearchableGraphPanel;
 	private JTextField mInputTextfield;
+	private JCheckBox mHideSearchMismatchCheckbox;
 
 	public SimpleSearchAndNoFilter(Searchable searchableGraphPanel) {
 		mSearchableGraphPanel = searchableGraphPanel;
@@ -84,8 +88,20 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 			}
 		});
 
+		mHideSearchMismatchCheckbox = new JCheckBox();
+		mHideSearchMismatchCheckbox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				mSearchableGraphPanel
+						.setHideSearchMismatches(mHideSearchMismatchCheckbox
+								.isSelected());
+			}
+		});
+
 		mSearchInputPanel.add(new JLabel("Search: "));
 		mSearchInputPanel.add(mInputTextfield);
+		mSearchInputPanel.add(new JLabel("Hide search mismatches: "));
+		mSearchInputPanel.add(mHideSearchMismatchCheckbox);
 	}
 
 	@Override

@@ -85,7 +85,15 @@ public abstract class InternalMetadata implements Propable {
 		return tmp.toString();
 	}
 
-	public boolean equalsSingleValueMetadata(Object o) {
+	/**
+	 * Equals method for single value metadata. It is true when the delete timestamp, publish timestamp and all other
+	 * properties are the same.
+	 * 
+	 * @param o other metadata object
+	 * @return boolean value whether both metadata objects are equal
+	 * 
+	 */
+	public boolean equalsSingleValue(Object o) {
 		if (o == null) {
 			return false;
 		}

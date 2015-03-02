@@ -132,9 +132,9 @@ public class InMemoryLink extends InternalLink {
 	}
 
 	@Override
-	public boolean equalsSingleValueMetadata(InternalMetadata meta) {
+	public boolean equalsSingleValue(InternalMetadata meta) {
 		for (InternalMetadata m : mMeta) {
-			if (m.equalsSingleValueMetadata(meta)) {
+			if (m.equalsSingleValue(meta)) {
 				return true;
 			}
 		}

@@ -143,7 +143,7 @@ public abstract class AbstractWriter implements Writer {
 					unique.add(m);
 				} else {
 					if (m.isSingleValue()) {
-						if (!l.equalsSingleValueMetadata(m)) {
+						if (!l.equalsSingleValue(m)) {
 							l.updateMetadata(m);
 							unique.add(m);
 						}

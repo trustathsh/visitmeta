@@ -61,7 +61,7 @@ public abstract class InternalLink {
 
 	public abstract List<InternalMetadata> getMetadata();
 
-	public abstract boolean equalsSingleValueMetadata(InternalMetadata meta);
+	public abstract boolean equalsSingleValue(InternalMetadata meta);
 
 	@Override
 	public String toString() {

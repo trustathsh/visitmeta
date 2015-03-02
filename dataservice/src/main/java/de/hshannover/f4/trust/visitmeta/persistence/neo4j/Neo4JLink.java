@@ -238,14 +238,19 @@ public class Neo4JLink extends InternalLink {
 		return result;
 	}
 
+	/**
+	 * Check if this link has the given single value metadata connected to it.
+	 *
+	 * @param meta a single value metadata to check for
+	 */
 	@Override
-	public boolean equalsSingleValueMetadata(InternalMetadata meta) {
+	public boolean equalsSingleValue(InternalMetadata meta) {
 		boolean result = false;
 		try (Transaction tx = mRepo.beginTx()) {
 			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
 				Neo4JMetadata neo4jMetadata = (Neo4JMetadata) mRepo
 						.getMetadata(r.getEndNode().getId());
-				if (meta.equalsSingleValueMetadata(neo4jMetadata)) {
+				if (meta.equalsSingleValue(neo4jMetadata)) {
 					result = true;
 				}
 			}

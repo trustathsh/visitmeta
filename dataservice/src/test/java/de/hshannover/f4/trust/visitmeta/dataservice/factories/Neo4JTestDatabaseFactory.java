@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,11 +38,11 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.factories;
 
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_META_CARDINALITY;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_DELETE;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TIMESTAMP_PUBLISH;
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_MULTI;
 import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.VALUE_META_CARDINALITY_SINGLE;
@@ -66,17 +66,20 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTypeLabels;
 public class Neo4JTestDatabaseFactory {
 
 	@SuppressWarnings("unchecked")
-	public static void loadTestCaseIntoGraphDB(Map<String, Object> map, GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
+	public static void loadTestCaseIntoGraphDB(Map<String, Object> map,
+			GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
 		for (String key : map.keySet()) {
-			createLink((HashMap<String, Object>) map.get(key), db, timestampManager);
+			createLink((HashMap<String, Object>) map.get(key), db,
+					timestampManager);
 		}
 	}
 
 	public static GraphDatabaseService createGraphDB() {
-		GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().
-				setConfig(GraphDatabaseSettings.node_keys_indexable, KEY_HASH).
-				setConfig(GraphDatabaseSettings.node_auto_indexing, "true").
-				newGraphDatabase();
+		GraphDatabaseService db = new TestGraphDatabaseFactory()
+				.newImpermanentDatabaseBuilder()
+				.setConfig(GraphDatabaseSettings.node_keys_indexable, KEY_HASH)
+				.setConfig(GraphDatabaseSettings.node_auto_indexing, "true")
+				.newGraphDatabase();
 
 		return db;
 	}
@@ -88,35 +91,34 @@ public class Neo4JTestDatabaseFactory {
 
 			while (i.hasNext()) {
 				Node tmp = i.next();
-				if(tmp.hasLabel(Neo4JTypeLabels.LINK)) {
+				if (tmp.hasLabel(Neo4JTypeLabels.LINK)) {
 					System.out.println("LINK-------------------------");
 					System.out.println("ID: " + tmp.getId());
-					for(String key : tmp.getPropertyKeys()) {
+					for (String key : tmp.getPropertyKeys()) {
 						System.out.println(key + ": " + tmp.getProperty(key));
 					}
 					System.out.println("/LINK------------------------");
-				}
-				else if(tmp.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
+				} else if (tmp.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
 					System.out.println("IDENTIFIER-------------------");
 					System.out.println("ID: " + tmp.getId());
-					for(String key : tmp.getPropertyKeys()) {
+					for (String key : tmp.getPropertyKeys()) {
 						System.out.println(key + ": " + tmp.getProperty(key));
 					}
 					System.out.println("/IDENTIFIER------------------");
-				} else if(tmp.hasLabel(Neo4JTypeLabels.METADATA)) {
+				} else if (tmp.hasLabel(Neo4JTypeLabels.METADATA)) {
 					System.out.println("METADATA---------------------");
 					System.out.println("ID: " + tmp.getId());
-					for(String key : tmp.getPropertyKeys()) {
+					for (String key : tmp.getPropertyKeys()) {
 						System.out.println(key + ": " + tmp.getProperty(key));
 					}
-					if(tmp.hasLabel(Neo4JTypeLabels.NOTIFY)) {
+					if (tmp.hasLabel(Neo4JTypeLabels.NOTIFY)) {
 						System.out.println("NOTIFY METADATA");
 					}
 					System.out.println("/METADATA--------------------");
-				} else if(tmp.hasLabel(Neo4JTypeLabels.CHANGE)) {
+				} else if (tmp.hasLabel(Neo4JTypeLabels.CHANGE)) {
 					System.out.println("CHANGESMAP-------------------");
 					System.out.println("ID: " + tmp.getId());
-					for(String key : tmp.getPropertyKeys()) {
+					for (String key : tmp.getPropertyKeys()) {
 						System.out.println(key + ": " + tmp.getProperty(key));
 					}
 					System.out.println("/CHANGESMAP------------------");
@@ -130,47 +132,42 @@ public class Neo4JTestDatabaseFactory {
 	/**
 	 *
 	 * @param map
-	 *            Containing test data. Looks like:
-	 *            (link1)
-	 *            	first
-	 *            		(identifier data)
-	 *            	second
-	 *            		(identifier data)
-	 *            	metadata
-	 *            		(meta1)
-	 *            			(metadata data)
-	 *            		(meta2)
-	 *            			(metadata data)
-	 *            (link2)
-	 *            	first
-	 *            		(identifier data)
-	 *            	metadata
-	 *            		meta1
-	 *            			(metadata data)
+	 *            Containing test data. Looks like: (link1) first (identifier
+	 *            data) second (identifier data) metadata (meta1) (metadata
+	 *            data) (meta2) (metadata data) (link2) first (identifier data)
+	 *            metadata meta1 (metadata data)
 	 * @param db
 	 *            The Graphdatabase which should be filled with test data.
 	 * @param timestampManager
 	 * @return Node of the link (or identifier).
 	 */
 	@SuppressWarnings("unchecked")
-	private static Node createLink(HashMap<String, Object> map, GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
+	private static Node createLink(HashMap<String, Object> map,
+			GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
 		Node link = null;
 		try (Transaction tx = db.beginTx()) {
 			if (map.containsKey("second")) {
 				link = db.createNode();
 				link.addLabel(Neo4JTypeLabels.LINK);
-				Node id1 = searchOrCreateIdentifier((HashMap<String, Object>) map.get("first"), db);
-				Node id2 = searchOrCreateIdentifier((HashMap<String, Object>) map.get("second"), db);
+				Node id1 = searchOrCreateIdentifier(
+						(HashMap<String, Object>) map.get("first"), db);
+				Node id2 = searchOrCreateIdentifier(
+						(HashMap<String, Object>) map.get("second"), db);
 
 				id1.createRelationshipTo(link, LinkTypes.Link);
 				id2.createRelationshipTo(link, LinkTypes.Link);
 
 			} else {
-				link = searchOrCreateIdentifier((HashMap<String, Object>) map.get("first"), db);
+				link = searchOrCreateIdentifier(
+						(HashMap<String, Object>) map.get("first"), db);
 			}
-			HashMap<String, Object> metadata = (HashMap<String, Object>) map.get("metadata");
+			HashMap<String, Object> metadata = (HashMap<String, Object>) map
+					.get("metadata");
 			for (String key : metadata.keySet()) {
-				link.createRelationshipTo(createMetadata((HashMap<String, Object>) metadata.get(key), db, timestampManager), LinkTypes.Meta);
+				link.createRelationshipTo(
+						createMetadata(
+								(HashMap<String, Object>) metadata.get(key),
+								db, timestampManager), LinkTypes.Meta);
 			}
 			tx.success();
 		}
@@ -181,17 +178,15 @@ public class Neo4JTestDatabaseFactory {
 	/**
 	 *
 	 * @param map
-	 * 			  Containing test data. Looks like:
-	 * 			  type
-	 * 			  rawData
-	 * 			  properties
-	 * 			  	(properties map)
+	 *            Containing test data. Looks like: type rawData properties
+	 *            (properties map)
 	 * @param db
 	 *            The Graphdatabase which should be filled with test data.
 	 * @return Node of the identifier.
 	 */
 	@SuppressWarnings("unchecked")
-	private static Node searchOrCreateIdentifier(HashMap<String, Object> map, GraphDatabaseService db) {
+	private static Node searchOrCreateIdentifier(HashMap<String, Object> map,
+			GraphDatabaseService db) {
 		Node id = null;
 
 		ReadableIndex<Node> ri = db.index().getNodeAutoIndexer().getAutoIndex();
@@ -203,7 +198,8 @@ public class Neo4JTestDatabaseFactory {
 				id.addLabel(Neo4JTypeLabels.IDENTIFIER);
 				id.setProperty(KEY_TYPE_NAME, map.get("type"));
 				id.setProperty(KEY_RAW_DATA, map.get("rawData"));
-				HashMap<String, Object> properties = (HashMap<String, Object>) map.get("properties");
+				HashMap<String, Object> properties = (HashMap<String, Object>) map
+						.get("properties");
 				for (String key : properties.keySet()) {
 					id.setProperty(key, properties.get(key));
 				}
@@ -218,37 +214,33 @@ public class Neo4JTestDatabaseFactory {
 	/**
 	 *
 	 * @param map
-	 * 			  Containing test data. Looks like:
-	 * 			  type
-	 * 			  singleValue
-	 * 			  pubStamp
-	 *			  delStamp
-	 * 			  rawData
-	 * 			  (notify)
-	 * 			  properties
-	 * 			  	(properties map)
+	 *            Containing test data. Looks like: type singleValue pubStamp
+	 *            delStamp rawData (notify) properties (properties map)
 	 * @param db
 	 *            The Graphdatabase which should be filled with test data.
 	 * @return Node of the metadata.
 	 */
 	@SuppressWarnings("unchecked")
-	private static Node createMetadata(HashMap<String, Object> map, GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
+	private static Node createMetadata(HashMap<String, Object> map,
+			GraphDatabaseService db, Neo4JTimestampManager timestampManager) {
 		Node meta = null;
 		try (Transaction tx = db.beginTx()) {
 			meta = db.createNode();
 			meta.addLabel(Neo4JTypeLabels.METADATA);
 			meta.setProperty(KEY_TYPE_NAME, map.get("type"));
-			meta.setProperty(KEY_META_CARDINALITY, ((boolean) map.get("singleValue")) ? VALUE_META_CARDINALITY_SINGLE
+			meta.setProperty(KEY_META_CARDINALITY, ((boolean) map
+					.get("singleValue")) ? VALUE_META_CARDINALITY_SINGLE
 					: VALUE_META_CARDINALITY_MULTI);
 			meta.setProperty(KEY_TIMESTAMP_PUBLISH, map.get("pubStamp"));
 			meta.setProperty(KEY_TIMESTAMP_DELETE, map.get("delStamp"));
 			meta.setProperty(KEY_RAW_DATA, map.get("rawData"));
 			meta.setProperty(KEY_HASH, map.get("rawData"));
-			if(map.containsKey("notify") && ((Boolean)map.get("notify"))) {
+			if (map.containsKey("notify") && ((Boolean) map.get("notify"))) {
 				meta.addLabel(Neo4JTypeLabels.NOTIFY);
 			}
-			HashMap<String, Object> properties = (HashMap<String, Object>) map.get("properties");
-			if(properties != null){
+			HashMap<String, Object> properties = (HashMap<String, Object>) map
+					.get("properties");
+			if (properties != null) {
 				for (String key : properties.keySet()) {
 					meta.setProperty(key, properties.get(key));
 				}
@@ -256,7 +248,8 @@ public class Neo4JTestDatabaseFactory {
 			tx.success();
 
 			timestampManager.incrementCounter((int) map.get("pubStamp"));
-			if ((int) map.get("delStamp") != -1) {
+			if (((int) map.get("delStamp") != -1)
+					&& (!meta.hasLabel(Neo4JTypeLabels.NOTIFY))) {
 				timestampManager.incrementCounter((int) map.get("delStamp"));
 			}
 		}

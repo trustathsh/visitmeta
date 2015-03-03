@@ -128,17 +128,12 @@ public class ConnectionsProperties extends Properties {
 	private List<Subscription> buildSubscribtion(String connectionName)
 			throws PropertyException {
 		// try to read SubscribeList from Connection, if not exists return null
-		Properties propertySubscribeList;
-		try {
-			propertySubscribeList = getPropertySubscribeList(connectionName);
-		} catch (PropertyException e) {
-			return null;
-		}
+        Map<String,String> propertySubscribeList = (Map<String, String>) super.get(connectionName).getValue(ConnectionKey.SUBSCRIPTIONS);
 
 		List<Subscription> subscribtionList = new ArrayList<Subscription>();
 
 		// for all Subscriptions
-		for (String subscribeName : propertySubscribeList.getKeySet()) {
+		for (String subscribeName : propertySubscribeList.keySet()) {
 			// build new Subscription
 			Subscription subscribtion = new SubscriptionImpl();
 			// set required values

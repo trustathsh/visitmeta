@@ -905,53 +905,34 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		boolean isSelected = (mSelectedNode == metadata);
 		boolean containsSearchTerm = mSearchAndFilterStrategy
 				.containsSearchTerm(metadata, mSearchTerm);
+
+		String publisher = "";
 		if (vCom.getAttribute("publisher").equals(pPublisher)) {
-			/* Repaint the nodes of this publisher */
-			vNode.setTransparency(1.0f);
-			if (containsSearchTerm) {
-				vNode.setPaint(mColorContainsSearchTermNode);
-			} else {
-				vNode.setPaint(getColor(pPublisher, vNode));
-				if (mHideSearchMismatches) {
-					vNode.setTransparency(mHideSearchMismatchesTransparency);
-				}
-			}
-
-			if (!isHighlighted) {
-				vNode.setStrokePaint(getColorMetadataStroke(pPublisher));
-			}
-
-			if (isSelected) {
-				vNode.setPaint(mColorSelectedNode);
-			}
-
-			vText.setTextPaint(getColorText(pPublisher));
+			publisher = pPublisher;
 		} else if (pPublisher.equals("")) {
-			/*
-			 * Default color was changed, repaint each node with its own color
-			 */
-			vNode.setTransparency(1.0f);
-			String vPublisher = (String) vCom.getAttribute("publisher");
-
-			if (containsSearchTerm) {
-				vNode.setPaint(mColorContainsSearchTermNode);
-			} else {
-				vNode.setPaint(getColor(vPublisher, vNode));
-				if (mHideSearchMismatches) {
-					vNode.setTransparency(mHideSearchMismatchesTransparency);
-				}
-			}
-
-			if (!isHighlighted) {
-				vNode.setStrokePaint(getColorMetadataStroke(vPublisher));
-			}
-
-			if (isSelected) {
-				vNode.setPaint(mColorSelectedNode);
-			}
-
-			vText.setTextPaint(getColorText(vPublisher));
+			publisher = (String) vCom.getAttribute("publisher");
 		}
+
+		/* Repaint the nodes of this publisher */
+		vNode.setTransparency(1.0f);
+		if (containsSearchTerm) {
+			vNode.setPaint(mColorContainsSearchTermNode);
+		} else {
+			vNode.setPaint(getColor(publisher, vNode));
+			if (mHideSearchMismatches) {
+				vNode.setTransparency(mHideSearchMismatchesTransparency);
+			}
+		}
+
+		if (!isHighlighted) {
+			vNode.setStrokePaint(getColorMetadataStroke(publisher));
+		}
+
+		if (isSelected) {
+			vNode.setPaint(mColorSelectedNode);
+		}
+
+		vText.setTextPaint(getColorText(publisher));
 	}
 
 	private void paintIdentifierNode(Identifier identifier, NodeIdentifier i,

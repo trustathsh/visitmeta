@@ -41,4 +41,30 @@ default:
       # IPv6,...
       startIdentifier: freeradius-pdp
       #  send this subscription when the data service is started
+      useSubscriptionAsStartup: false
+    sub1:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: mac-address
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: 00:11:22:33:44:55
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: true
+    sub2:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: mac-address
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: 11:22:33:44:55:66
+      #  send this subscription when the data service is started
       useSubscriptionAsStartup: true

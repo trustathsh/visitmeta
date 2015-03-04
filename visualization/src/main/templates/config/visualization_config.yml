@@ -19,6 +19,14 @@ visualization:
     translation:
       # The animation time for the translation of a node to the new position.
       duration: 3000
+    information:
+      # Sets the style for detailed node information when a node is selected
+      # Possible values are:
+      # XML_BREAKDOWN: breaks down the XML structure of nodes; the encapsulated XML
+      #                of Extended Identifiers will be shown as a sub XML tree
+      # PLAIN_XML:     a simple output of a nodes information, encapsulated XML
+      #                will remain a single String
+      style: XML_BREAKDOWN
   identifier:
     text:
       # Sets the text style for identifier nodes; possible values are:

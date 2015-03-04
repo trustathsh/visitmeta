@@ -44,7 +44,7 @@ package de.hshannover.f4.trust.visitmeta.gui.nodeinformation;
  * @author Bastian Hellmann
  *
  */
-public class NodeInformationStrategyFactor {
+public class NodeInformationStrategyFactory {
 
 	/**
 	 * Returns a {@link NodeInformationStrategy} instance

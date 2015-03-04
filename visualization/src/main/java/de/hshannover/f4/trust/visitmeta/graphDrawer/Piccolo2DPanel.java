@@ -153,13 +153,13 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		String vColorBackground = mConfig.getString("color.background",
 				"0xFFFFFF");
 		String vColorEdge = mConfig.getString("color.edge", "0x000000");
-		String vColorNewNode = mConfig.getString("color.node.new", "0x228B22");
+		String vColorNewNode = mConfig.getString("color.node.new", "0x266E62");
 		String vColorDeleteNode = mConfig.getString("color.node.delete",
-				"0x82150F");
+				"0xA73946");
 		String vColorSelectedNode = mConfig.getString("color.node.selected",
-				"0xFFF687");
+				"0xCEB100");
 		String vColormContainsSearchTermNode = mConfig.getString(
-				"color.node.search", "0x228B22");
+				"color.node.search", "0x88A538");
 		mColorNewNode = Color.decode(vColorNewNode);
 		mColorBackground = Color.decode(vColorBackground);
 		mColorEdge = Color.decode(vColorEdge);

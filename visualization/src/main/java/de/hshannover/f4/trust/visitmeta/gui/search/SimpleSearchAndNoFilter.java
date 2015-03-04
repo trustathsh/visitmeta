@@ -62,7 +62,10 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
  */
 public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 
+	private static final String SEARCH_TERM_DELIMITER = ";";
+	private static final String SUB_SEARCH_TERM_DELIMITER = ",";
 	private static final String ENCLOSING_CHAR = "\"";
+
 	private JPanel mSearchInputPanel;
 	private Searchable mSearchableGraphPanel;
 	private JTextField mInputTextfield;
@@ -85,6 +88,18 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 		DefaultFormatter formatter = new DefaultFormatter();
 		formatter.setCommitsOnValidEdit(true);
 		mInputTextfield = new JFormattedTextField(formatter);
+		mInputTextfield
+				.setToolTipText("<html>Search terms separator: <b>"
+						+ SEARCH_TERM_DELIMITER
+						+ "</b><br>"
+						+ "Inner search term separator: <b>"
+						+ SUB_SEARCH_TERM_DELIMITER
+						+ "</b><br>"
+						+ "Exact match enclosing character: <b>"
+						+ ENCLOSING_CHAR
+						+ "</b><br>"
+						+ "Example: ip,10.0.0;mac,\"aa:bb:cc:dd:ee:ff\" detects and highlights all nodes that <b>contain</b> the strings <i>ip</i> and <i>10.0.0</i>, as well as all nodes that <b>contain</b> the string mac and <b>exactly contain</b> the value <i>aa:bb:cc:dd:ee:ff</i>"
+						+ "</html>");
 
 		mInputTextfield.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -122,16 +137,13 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	private boolean containsSearchTerm(Propable propable, String searchTerm) {
 		if (!searchTerm.equals("")) {
 			boolean foundSomething = false;
-			String[] terms = searchTerm.split(";");
+			String[] terms = searchTerm.split(SEARCH_TERM_DELIMITER);
 
 			for (String term : terms) {
-				String[] subTerms = term.split(",");
+				String[] subTerms = term.split(SUB_SEARCH_TERM_DELIMITER);
+
 				boolean allSubTermsFound = true;
-
-				String subTerm = "";
-
-				for (int i = 0; i < subTerms.length; i++) {
-					subTerm = subTerms[i];
+				for (String subTerm : subTerms) {
 					if (subTerms.length == 1) {
 						if (isEnclosedSearchString(subTerm)) {
 							allSubTermsFound = searchForEqualString(propable,

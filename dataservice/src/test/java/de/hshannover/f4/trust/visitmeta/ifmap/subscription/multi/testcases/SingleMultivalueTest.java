@@ -133,7 +133,7 @@ public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 
 	/**
 	 * Check the changeMap size is right.
-	 * The second ChangesMap size may be increased only by 1 from the first ChangesMap.
+	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
 	 * The second ChangesMap must have only one new timestamp.
 	 */
 	@Test

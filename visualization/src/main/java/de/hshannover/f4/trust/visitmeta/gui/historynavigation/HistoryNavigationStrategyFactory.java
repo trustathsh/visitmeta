@@ -40,8 +40,25 @@ package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 
+/**
+ * Factory class for {@link HistoryNavigationStrategy}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class HistoryNavigationStrategyFactory {
 
+	/**
+	 * Returns a {@link HistoryNavigationStrategy} instance based on the given
+	 * {@link HistoryNavigationStrategyType}.
+	 *
+	 * @param type
+	 *            {@link HistoryNavigationStrategyType}
+	 * @param graphContainer
+	 *            a {@link GraphContainer} instance
+	 * @return {@link HistoryNavigationStrategy} instance for the given
+	 *         {@link HistoryNavigationStrategyType}
+	 */
 	public static HistoryNavigationStrategy create(
 			HistoryNavigationStrategyType type, GraphContainer graphContainer) {
 		switch (type) {

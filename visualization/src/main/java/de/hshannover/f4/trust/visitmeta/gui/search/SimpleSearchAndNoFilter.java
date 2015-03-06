@@ -57,6 +57,23 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
+ * Implementation of the {@link SearchAndFilterStrategy}, that allows simple
+ * search functionality and no filtering.
+ *
+ * Search terms support the following techniques:
+ * <ul>
+ * <li>multiple search terms, separated by a specified character; allows that a
+ * search term matches different nodes. Example: <i>dev;ip<i>, matches on all
+ * Identifiers and Metadata nodes that contain either <dev> or <ip>
+ * <li>multiple arguments per search term, separated by a specified character;
+ * allows that a single node has to match multiple strings to apply to a search
+ * term. Example: <i>dev,switch</i>, matches on all Identifier and Metadata
+ * nodes that contain both <i>dev</i> and <i>switch</i>
+ * <li>check for exact matches by enclosing a string with a special character.
+ * Example: <i>ip,"10.0.0.1"</i> matches only Identifier and Metadata nodes that
+ * contain <dev> but also exactly contain the string <i>10.0.0.1</i>
+ * </ul>
+ *
  * @author Bastian Hellmann
  *
  */
@@ -71,6 +88,12 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	private JTextField mInputTextfield;
 	private JCheckBox mHideSearchMismatchCheckbox;
 
+	/**
+	 * Creates a new {@link SimpleSearchAndNoFilter} instance.
+	 *
+	 * @param searchableGraphPanel
+	 *            a {@link Searchable} instance, used to visualize search terms.
+	 */
 	public SimpleSearchAndNoFilter(Searchable searchableGraphPanel) {
 		mSearchableGraphPanel = searchableGraphPanel;
 
@@ -78,7 +101,9 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	}
 
 	/**
-	 *
+	 * Initializes the graphical user interface for this search implementation.
+	 * Consists of a textfield for the search term and a checkbox, that is used
+	 * to hide all nodes that don't match a search string.
 	 */
 	private void initGUI() {
 		mSearchInputPanel = new JPanel();
@@ -86,20 +111,20 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 				BoxLayout.X_AXIS));
 
 		DefaultFormatter formatter = new DefaultFormatter();
+		formatter.setOverwriteMode(false);
 		formatter.setCommitsOnValidEdit(true);
 		mInputTextfield = new JFormattedTextField(formatter);
-		mInputTextfield
-				.setToolTipText("<html>Search terms separator: <b>"
-						+ SEARCH_TERM_DELIMITER
-						+ "</b><br>"
-						+ "Inner search term separator: <b>"
-						+ SUB_SEARCH_TERM_DELIMITER
-						+ "</b><br>"
-						+ "Exact match enclosing character: <b>"
-						+ ENCLOSING_CHAR
-						+ "</b><br>"
-						+ "Example: ip,10.0.0;mac,\"aa:bb:cc:dd:ee:ff\" detects and highlights all nodes that <b>contain</b> the strings <i>ip</i> and <i>10.0.0</i>, as well as all nodes that <b>contain</b> the string mac and <b>exactly contain</b> the value <i>aa:bb:cc:dd:ee:ff</i>"
-						+ "</html>");
+		mInputTextfield.setToolTipText("<html>Search terms separator: <b>"
+				+ SEARCH_TERM_DELIMITER + "</b><br>"
+				+ "Inner search term separator: <b>"
+				+ SUB_SEARCH_TERM_DELIMITER + "</b><br>"
+				+ "Exact match enclosing character: <b>" + ENCLOSING_CHAR
+				+ "</b><br>"
+				+ "Example: ip,10.0.0;mac,\"aa:bb:cc:dd:ee:ff\" detects and "
+				+ "highlights all nodes that <b>contain</b> the strings "
+				+ "<i>ip</i> and <i>10.0.0</i>, as well as all nodes that "
+				+ "<b>contain</b> the string mac and <b>exactly contain</b> "
+				+ " the value <i>aa:bb:cc:dd:ee:ff</i>" + "</html>");
 
 		mInputTextfield.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -130,9 +155,19 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	}
 
 	/**
+	 * Checks if a {@link Propable} object matches a given search term. This
+	 * method separates the search term in sub-search terms when applicable, by
+	 * splitting the search term with the specified character. Furthermore
+	 * splits each sub-search term into single search terms and checks if all
+	 * single search terms are applicable to the {@link Propable} object.
+	 * Delegates to methods that search for equality or containedness of a
+	 * search term.
+	 *
 	 * @param propable
+	 *            either a {@link Identifier} or a {@link Metadata} object
 	 * @param searchTerm
-	 * @return
+	 *            a search term
+	 * @return true, if the {@link Propable} object matches the search term
 	 */
 	private boolean containsSearchTerm(Propable propable, String searchTerm) {
 		if (!searchTerm.equals("")) {
@@ -177,8 +212,12 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	}
 
 	/**
+	 * Checks if a search term is begins and ends ("is enclosed") with the
+	 * specified character.
+	 *
 	 * @param searchTerm
-	 * @return
+	 *            a search term
+	 * @return true, if the search term is enclosed by the specified character
 	 */
 	private boolean isEnclosedSearchString(String searchTerm) {
 		return (searchTerm.startsWith(ENCLOSING_CHAR) && searchTerm
@@ -186,9 +225,16 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	}
 
 	/**
+	 * Checks if the content of a {@link Propable} object matches a search
+	 * string by means of containing it. All values (typename and properties)
+	 * are checked with the contains-method of {@link String}.
+	 *
 	 * @param propable
+	 *            either a {@link Identifier} or a {@link Metadata} object
 	 * @param searchTerm
-	 * @return
+	 *            a search term
+	 * @return true, if the any of the values of the {@link Propable} contains
+	 *         the search string
 	 */
 	private boolean searchForContainingString(Propable propable,
 			String searchTerm) {
@@ -209,9 +255,16 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	}
 
 	/**
+	 * Checks if the content of a {@link Propable} object exactly matches a
+	 * search string by means of complete equality. All values (typename and
+	 * properties) are checked with the equals-method of {@link String} class.
+	 *
 	 * @param propable
+	 *            either a {@link Identifier} or a {@link Metadata} object
 	 * @param searchTerm
-	 * @return
+	 *            a search term
+	 * @return true, if the any of the values of the {@link Propable} equals the
+	 *         search string
 	 */
 	private boolean searchForEqualString(Propable propable, String searchTerm) {
 		String typeName = propable.getTypeName();

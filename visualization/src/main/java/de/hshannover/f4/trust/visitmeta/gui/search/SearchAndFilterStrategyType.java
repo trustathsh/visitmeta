@@ -39,6 +39,8 @@
 package de.hshannover.f4.trust.visitmeta.gui.search;
 
 /**
+ * Enumeration class for different {@link SearchAndFilterStrategyType}.
+ *
  * @author Bastian Hellmann
  *
  */

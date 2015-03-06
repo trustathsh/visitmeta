@@ -39,15 +39,23 @@
 package de.hshannover.f4.trust.visitmeta.gui.search;
 
 /**
- * @author @author Bastian Hellmann
+ * Factory class for {@link SearchAndFilterStrategy}.
+ *
+ * @author Bastian Hellmann
  *
  */
 public class SearchAndFilterStrategyFactory {
 
 	/**
+	 * Returns a {@link SearchAndFilterStrategy} instance based on the given
+	 * {@link SearchAndFilterStrategyType}.
+	 *
 	 * @param type
+	 *            {@link SearchAndFilterStrategyType}
 	 * @param searchableGraphPanel
-	 * @return
+	 *            a {@link Searchable} instance
+	 * @return {@link SearchAndFilterStrategy} instance for the given
+	 *         {@link SearchAndFilterStrategyType}
 	 */
 	public static SearchAndFilterStrategy create(
 			SearchAndFilterStrategyType type, Searchable searchableGraphPanel) {

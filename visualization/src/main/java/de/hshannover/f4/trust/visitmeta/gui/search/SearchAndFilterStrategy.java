@@ -44,27 +44,50 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 /**
+ * Interface for implementations of search and filtering functionality. Defines
+ * both the GUI components (text input fields, ...) and the mechanisms to check
+ * if a search term applies to {@link Metadata} or {@link Identifier} nodes.
+ *
  * @author Bastian Hellmann
  *
  */
 public interface SearchAndFilterStrategy {
 
 	/**
-	 * @return
+	 * Returns a {@link JPanel} component that contains all needed GUI
+	 * components for the specific search and filter methods.
+	 *
+	 * @return the associated {@link JPanel} of a
+	 *         {@link SearchAndFilterStrategy}.
 	 */
 	public JPanel getJPanel();
 
 	/**
+	 * Checks if the values of a {@link Identifier} matches a given search term.
+	 * The meaning of <i>matching</i> is dependent on the implementation of this
+	 * interface.
+	 *
 	 * @param identifier
+	 *            a {@link Identifier} node
 	 * @param searchTerm
-	 * @return
+	 *            a {@link String} that defines a search term; the syntax of the
+	 *            search term depends on the implementation of this interface
+	 * @return true, if the search term matches the given {@link Identifier}
+	 *         node
 	 */
 	public boolean containsSearchTerm(Identifier identifier, String searchTerm);
 
 	/**
+	 * Checks if the values of a {@link Metadata} matches a given search term.
+	 * The meaning of <i>matching</i> is dependent on the implementation of this
+	 * interface.
+	 *
 	 * @param metadata
+	 *            a {@link Metadata} node
 	 * @param searchTerm
-	 * @return
+	 *            a {@link String} that defines a search term; the syntax of the
+	 *            search term depends on the implementation of this interface
+	 * @return true, if the search term matches the given {@link Metadata} node
 	 */
 	public boolean containsSearchTerm(Metadata metadata, String searchTerm);
 

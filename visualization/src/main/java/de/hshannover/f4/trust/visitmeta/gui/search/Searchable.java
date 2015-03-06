@@ -39,23 +39,45 @@
 package de.hshannover.f4.trust.visitmeta.gui.search;
 
 /**
+ * Interface for GUI classes that display IF-MAP graphs and provide
+ * functionality to highlight nodes based on a search term. Handling of the
+ * search-mechanism itself is done be a {@link SearchAndFilterStrategy}.
+ *
  * @author Bastian Hellmann
  *
  */
 public interface Searchable {
 
 	/**
+	 * This method is called by a {@link SearchAndFilterStrategy} instance to
+	 * signal the {@link Searchable} instance that a new search term was entered
+	 * by the user and nodes may have to be rendered again with a
+	 * {@link Searchable} specific highlighting.
+	 *
 	 * @param searchTerm
+	 *            a {@link String} that defines a search term
 	 */
 	public void search(String searchTerm);
 
 	/**
+	 * Setter for a {@link SearchAndFilterStrategy}. Can then be used to
+	 * delegate the decision, if a given node matches the given search term back
+	 * to the {@link SearchAndFilterStrategy}
+	 *
 	 * @param strategy
+	 *            implementation of the {@link SearchAndFilterStrategy}
+	 *            interface
 	 */
 	void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy);
 
 	/**
+	 * Sets a flag if mismatches of a given search term shall be "hidden" or
+	 * otherwise visually rendered differently in comparison to nodes that do
+	 * match the search term.
+	 *
 	 * @param b
+	 *            boolean flag if mismatches shall be rendered as "hidden" to
+	 *            emphasize the matches of a search
 	 */
 	public void setHideSearchMismatches(boolean b);
 

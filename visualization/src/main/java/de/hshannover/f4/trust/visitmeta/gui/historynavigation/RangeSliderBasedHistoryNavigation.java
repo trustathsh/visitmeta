@@ -64,6 +64,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
  * This class represents the part of the GUI which is responsible for viewing
  * and handling historic instances of a given map-server.
  *
+ * @author Bastian Hellmann
  */
 public class RangeSliderBasedHistoryNavigation implements Observer,
 		HistoryNavigationStrategy {

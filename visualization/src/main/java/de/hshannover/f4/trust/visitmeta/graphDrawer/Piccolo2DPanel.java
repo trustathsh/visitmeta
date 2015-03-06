@@ -92,6 +92,14 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
 import edu.umd.cs.piccolox.nodes.PComposite;
 
+/**
+ * Implementation of the {@link GraphPanel} and {@link Searchable} interfaces.
+ * Creates a Piccolo2D-based panel for drawing a graph. Can also mark nodes
+ * based on search terms provided by a {@link SearchAndFilterStrategy}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private static final Logger LOGGER = Logger.getLogger(Piccolo2DPanel.class);
 	private static final Properties mConfig = Main.getConfig();

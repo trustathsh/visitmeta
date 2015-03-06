@@ -40,8 +40,22 @@ package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
 
 import javax.swing.JPanel;
 
+/**
+ * (Marker) interface for different implementations of GUI components that allow
+ * to navigate the history of IF-MAP graphs.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public interface HistoryNavigationStrategy {
 
+	/**
+	 * Returns a {@link JPanel} component that contains all needed GUI
+	 * components for the specific history navigation method.
+	 * 
+	 * @return the associated {@link JPanel} of a
+	 *         {@link HistoryNavigationStrategy}
+	 */
 	JPanel getJPanel();
 
 }

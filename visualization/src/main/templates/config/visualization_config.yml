@@ -19,6 +19,14 @@ visualization:
     translation:
       # The animation time for the translation of a node to the new position.
       duration: 3000
+    information:
+      # Sets the style for detailed node information when a node is selected
+      # Possible values are:
+      # XML_BREAKDOWN: breaks down the XML structure of nodes; the encapsulated XML
+      #                of Extended Identifiers will be shown as a sub XML tree
+      # PLAIN_XML:     a simple output of a nodes information, encapsulated XML
+      #                will remain a single String
+      style: XML_BREAKDOWN
   identifier:
     text:
       # Sets the text style for identifier nodes; possible values are:
@@ -40,7 +48,15 @@ visualization:
       # RANGE_SLIDER_BASED_NAVIGATION: uses a slider with two knobs that
       #                                includes all possible modes
       style: TAB_BASED_NAVIGATION
-
+  searchandfilter:
+    # Sets the search and filtering mechanism; possible values are:
+    # SIMPLE_SEARCH_AND_NO_FILTER: a simple search functionality, using a single textfield
+    #                              and matches every node containing the given 
+    #                              input string
+    style: SIMPLE_SEARCH_AND_NO_FILTER
+    # value in 0.0 to 1.0 for transparency of elements that do not match a search value
+    transparency : 0.2
+      
 dataservice:
   connectiontype: rest
   
@@ -65,9 +81,10 @@ color:
     outside: '0xFF9966'
     border: '0x000000'
   node:
-    new: '0x228B22'
-    delete: '0x82150F'
-    selected: '0xFFF02E'
+    new: '0x266E62'
+    delete: '0xA73946'
+    selected: '0xCEB100'
+    search: '0x88A538'
   identifier:
     access-request:
       text: '0x000000'

@@ -18,7 +18,7 @@
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  *
- * This file is part of visitmeta-visualization, version 0.2.0,
+ * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2013 Trust@HsH
@@ -36,26 +36,36 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
-
-import javax.swing.JPanel;
+package de.hshannover.f4.trust.visitmeta.gui.search;
 
 /**
- * (Marker) interface for different implementations of GUI components that allow
- * to navigate the history of IF-MAP graphs.
+ * Factory class for {@link SearchAndFilterStrategy}.
  *
  * @author Bastian Hellmann
  *
  */
-public interface HistoryNavigationStrategy {
+public class SearchAndFilterStrategyFactory {
 
 	/**
-	 * Returns a {@link JPanel} component that contains all needed GUI
-	 * components for the specific history navigation method.
-	 * 
-	 * @return the associated {@link JPanel} of a
-	 *         {@link HistoryNavigationStrategy}
+	 * Returns a {@link SearchAndFilterStrategy} instance based on the given
+	 * {@link SearchAndFilterStrategyType}.
+	 *
+	 * @param type
+	 *            {@link SearchAndFilterStrategyType}
+	 * @param searchableGraphPanel
+	 *            a {@link Searchable} instance
+	 * @return {@link SearchAndFilterStrategy} instance for the given
+	 *         {@link SearchAndFilterStrategyType}
 	 */
-	JPanel getJPanel();
+	public static SearchAndFilterStrategy create(
+			SearchAndFilterStrategyType type, Searchable searchableGraphPanel) {
+		switch (type) {
+			case SIMPLE_SEARCH_AND_NO_FILTER:
+				return new SimpleSearchAndNoFilter(searchableGraphPanel);
+			default:
+				throw new IllegalArgumentException(
+						"No strategy for given type '" + type + "'");
+		}
+	}
 
 }

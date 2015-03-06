@@ -38,6 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.historynavigation;
 
+/**
+ * Enumeration class for different {@link HistoryNavigationStrategyType}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public enum HistoryNavigationStrategyType {
 	TAB_BASED_NAVIGATION, RANGE_SLIDER_BASED_NAVIGATION
 }

@@ -47,6 +47,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -71,6 +72,25 @@ import javax.swing.event.ChangeListener;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 
+/**
+ * A {@link HistoryNavigationStrategy} that uses tabs to organize navigation
+ * through the history of IF-MAP graphs. Consists of three tabs:
+ * <ol>
+ * <li>Live view: displays the current graph as provided by a VisITMeta
+ * dataservice instance. Shows the timestamp of the current and the oldest
+ * graphs stored in the dataservice, as well as a REST URL to the current graph</li>
+ * <li>History view: displays the graph at a given timestamp. Uses a sliding
+ * mechanism and buttons to let the user navigate through all available
+ * timestamps.</li>
+ * <li>Delta view: displays the delta between two timestmaps. Lets the user
+ * select the start and end timestamp by buttons that increase or decrease the
+ * index of the timestamp. Also allows the user to move the timestamp interval
+ * between the selected start and end timestamps in both directions.</li>
+ * </ol>
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class TabBasedHistoryNavigation implements Observer,
 		HistoryNavigationStrategy {
 	private JPanel mPanel;
@@ -136,6 +156,18 @@ public class TabBasedHistoryNavigation implements Observer,
 	private ActionListener mDeltaViewIntervalForwardButtonActionListener;
 	private ActionListener mDeltaViewIntervalBackwardButtonActionListener;
 
+	/**
+	 * Creates a new {@link TabBasedHistoryNavigation}.
+	 *
+	 * @param timeHolder
+	 *            a {@link TimeHolder} object, that is used to communicate user
+	 *            input that requires new/other data than currently displayed to
+	 *            be fetched and rendered.
+	 * @param restUrl
+	 *            the REST URL for the underlying connection; contains the URL
+	 *            of the VisITMeta dataservice application and the connection
+	 *            name. Example: <i>http://localhost:8000/default/</i>
+	 */
 	public TabBasedHistoryNavigation(TimeHolder timeHolder, String restUrl) {
 		mPanel = new JPanel();
 		mPanel.setLayout(new BorderLayout());
@@ -178,6 +210,13 @@ public class TabBasedHistoryNavigation implements Observer,
 		mTimeHolder.addObserver(this);
 	}
 
+	/**
+	 * Creates and sets up the panel for the live view. Consists only of labels,
+	 * displaying the timestamps of the newest and oldest timestamps available,
+	 * as well as a user-callable REST URL
+	 *
+	 * @return a {@link JPanel} for the live view.
+	 */
 	private JPanel setUpLiveViewPanel() {
 		JPanel liveViewPanel = new JPanel();
 		liveViewPanel.setLayout(new BoxLayout(liveViewPanel, BoxLayout.Y_AXIS));
@@ -203,6 +242,15 @@ public class TabBasedHistoryNavigation implements Observer,
 		return liveViewPanel;
 	}
 
+	/**
+	 * Creates and sets up the panel for the history view. Consists of labels
+	 * displaying the currently selected timestamp, as well as buttons to
+	 * increase or decrease the selected timestamp. An additional slider also
+	 * allows the user to select a timestamp. The REST URL to the currently
+	 * selected timestmap is also displayed and callable by the user.
+	 *
+	 * @return a {@link JPanel} for the history view.
+	 */
 	private JPanel setUpHistoryViewPanel() {
 		JPanel historyViewPanel = new JPanel();
 		historyViewPanel.setLayout(new BoxLayout(historyViewPanel,
@@ -247,6 +295,16 @@ public class TabBasedHistoryNavigation implements Observer,
 		return historyViewPanel;
 	}
 
+	/**
+	 * Creates and sets up the panel for the delta view. Displays the start and
+	 * end timestamp for the delta to be displayed. The user can increase and
+	 * decrease both timestmaps individually via two buttons in each case. Two
+	 * additional buttons allow to move the interval between the start and end
+	 * timestamp in both directions. The REST URL to the defined delta is also
+	 * displayed and callable by the user.
+	 *
+	 * @return a {@link JPanel} for the delta view.
+	 */
 	private JPanel setUpDeltaViewPanel() {
 		JPanel deltaViewPanel = new JPanel();
 		deltaViewPanel
@@ -331,6 +389,12 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Updates the values for all three views, starting with the changes map. If
+	 * the changes map differs from the previously stored map in size, the
+	 * newest and oldest timestamps are extracted. Afterwards, the start and end
+	 * timestamps for history and delta view are initialised if not already set.
+	 */
 	private void updateValues() {
 		mChangesMap = mTimeHolder.getChangesMap();
 
@@ -375,6 +439,10 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Tells the {@link TimeHolder} to use the live mode and updates the GUI
+	 * elements of the live view.
+	 */
 	private void updateLiveView() {
 		mTimeHolder.setLiveView(true, true);
 
@@ -392,6 +460,13 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Tells the {@link TimeHolder} to not use the live mode and updates the GUI
+	 * elements of the history view. Finally calls the {@link TimeHolder} to
+	 * fetch a delta with same start and end timestamp, thus resulting in the
+	 * graph at this timestamp. Enables and disables buttons that cannot be used
+	 * due to the selected timestamp values.
+	 */
 	private void updateHistoryView() {
 		mTimeHolder.setLiveView(false, false);
 
@@ -434,6 +509,12 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Tells the {@link TimeHolder} to not use the live mode and updates the GUI
+	 * elements of the delta view. Finally calls the {@link TimeHolder} to fetch
+	 * a delta with the selected start and end timestamps. Enables and disables
+	 * buttons that cannot be used due to the selected timestamp values.
+	 */
 	private void updateDeltaView() {
 		mTimeHolder.setLiveView(false, false);
 
@@ -505,6 +586,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Creates all listeners, delegates to methods for history and delta view.
+	 */
 	private void createListeners() {
 		mTabbedPaneChangeListener = new ChangeListener() {
 			@Override
@@ -531,6 +615,10 @@ public class TabBasedHistoryNavigation implements Observer,
 		createDeltaViewListeners();
 	}
 
+	/**
+	 * Creates all listeners for the history view, being listeners for the two
+	 * buttons and the slider.
+	 */
 	private void createHistoryViewListeners() {
 		mHistoryViewForwardButtonActionListener = new ActionListener() {
 			@Override
@@ -562,6 +650,11 @@ public class TabBasedHistoryNavigation implements Observer,
 		};
 	}
 
+	/**
+	 * Create all listeners for the delta view, being listeners for the forward
+	 * and backward buttons for the start and end timestamp and the two buttons
+	 * that move the interval forward and backward.
+	 */
 	private void createDeltaViewListeners() {
 		mDeltaViewStartForwardButtonActionListener = new ActionListener() {
 			@Override
@@ -612,6 +705,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		};
 	}
 
+	/**
+	 * Adds all listeners to the appropriate GUI elements.
+	 */
 	private void addListeners() {
 		mTabbedPane.addChangeListener(mTabbedPaneChangeListener);
 		mHistoryViewForwardButton
@@ -635,6 +731,9 @@ public class TabBasedHistoryNavigation implements Observer,
 				.addActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
+	/**
+	 * Removes all listeners from the appropriate GUI elements.
+	 */
 	private void removeListeners() {
 		mTabbedPane.removeChangeListener(mTabbedPaneChangeListener);
 
@@ -660,6 +759,19 @@ public class TabBasedHistoryNavigation implements Observer,
 				.removeActionListener(mDeltaViewIntervalBackwardButtonActionListener);
 	}
 
+	/**
+	 * Creates a {@link String} for a timestamp, displaying its index (first
+	 * timestamp being index 1), its value as a human readable string and as the
+	 * Unix epoch value.
+	 *
+	 * @param prefix
+	 *            a {@link String} prefixing the timestmap itself.
+	 * @param timestamp
+	 *            the timestamp as Unix epoch value
+	 * @param index
+	 *            the index of the timestamp
+	 * @return a {@link String} displaying the timestamp.
+	 */
 	private String createTimestampLabel(String prefix, long timestamp, int index) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
@@ -676,6 +788,22 @@ public class TabBasedHistoryNavigation implements Observer,
 		return sb.toString();
 	}
 
+	/**
+	 * Creates a {@link String} for a timestamp, displaying its index (first
+	 * timestamp being index 1) and a given maximum index (used to display
+	 * <i>index of max-index</i>), its value as a human readable string and as
+	 * the Unix epoch value.
+	 *
+	 * @param prefix
+	 *            a {@link String} prefixing the timestmap itself.
+	 * @param timestamp
+	 *            the timestamp as Unix epoch value
+	 * @param index
+	 *            the index of the timestamp
+	 * @param maxIndex
+	 *            a second index, defining the maximum timestamp possible
+	 * @return a {@link String} displaying the timestamp.
+	 */
 	private String createTimestampLabel(String prefix, long timestamp,
 			int index, int maxIndex) {
 		StringBuilder sb = new StringBuilder();
@@ -695,6 +823,14 @@ public class TabBasedHistoryNavigation implements Observer,
 		return sb.toString();
 	}
 
+	/**
+	 * Creates a new {@link Dictionary} to be used by the history view
+	 * {@link JSlider} to display labels at the first value, the last value and
+	 * every 5 values in between.
+	 *
+	 * @return a {@link Dictionary} containing {@link JLabel} for the first,
+	 *         last and every fifth element in between
+	 */
 	@SuppressWarnings("unchecked")
 	private Dictionary<Integer, JLabel> createHistoryViewSliderLabelTable() {
 		Dictionary<Integer, JLabel> table;
@@ -714,11 +850,30 @@ public class TabBasedHistoryNavigation implements Observer,
 		return table;
 	}
 
+	/**
+	 * Creates a {@link String} usable for a {@link JLabel} to display the REST
+	 * URL for the current mode (live, history, view) as a underlined and
+	 * blue-ish link.
+	 *
+	 * @param mode
+	 *            the current mode of the view (live, history, delta)
+	 * @return a {@link String} containing a HTML link-like REST URL
+	 */
 	private String createRestUrlLabel(int mode) {
-		return "<html> REST url: <a href=\"\">" + createRestCall(mode)
+		return "<html>REST url: <a href=\"\">" + createRestCall(mode)
 				+ "</a></html>";
 	}
 
+	/**
+	 * Creates a {@link String} representing the complete URL to call the
+	 * VisITMeta dataservice REST API for the current connection and view mode
+	 * (live, history, delta).
+	 *
+	 * @param mode
+	 *            the current mode of the view (live, history, delta)
+	 * @return the URI for the REST call to the VisITMeta dataservice
+	 *         application
+	 */
 	private String createRestCall(int mode) {
 		switch (mode) {
 			case INDEX_LIVE_VIEW:
@@ -733,6 +888,15 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Adds a {@link MouseListener} to a given {@link JLabel} that opens the
+	 * default systems browser with the proper REST URL according to the current
+	 * mode (live, history, delta).
+	 *
+	 * @param label
+	 *            a {@link JLabel} object that gets callable by the user and
+	 *            opens a browser
+	 */
 	private void registerLinkHandler(JLabel label) {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
@@ -750,6 +914,12 @@ public class TabBasedHistoryNavigation implements Observer,
 		});
 	}
 
+	/**
+	 * Switches the enabled state of the history and delta view tabs, according
+	 * to the size of the changes map. If the changes map contains less than 2
+	 * elements, both history view and delta view are disabled and displayed in
+	 * gray color.
+	 */
 	private void switchTabEnableState() {
 		if (mChangesMapSize == 0) {
 			mTabbedPane.setEnabledAt(INDEX_HISTORY_VIEW, false);
@@ -764,6 +934,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Increments the history view end timestamp if possible.
+	 */
 	private void incrementSelectedHistoryTimestamp() {
 		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mHistoryViewSelectedTimestampIndex < (mMaximumTimestampIndex - 1)) {
@@ -773,6 +946,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Decrements the history view end timestamp if possible.
+	 */
 	private void decrementSelectedHistoryTimestamp() {
 		if (mHistoryViewSelectedTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mHistoryViewSelectedTimestampIndex > mMinimumTimestampIndex) {
@@ -782,6 +958,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Increments the delta start timestamp if possible.
+	 */
 	private void incrementDeltaStartTimestamp() {
 		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedStartTimestampIndex < (mMaximumTimestampIndex - 1)
@@ -792,6 +971,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Decrements the delta start timestamp if possible.
+	 */
 	private void decrementDeltaStartTimestamp() {
 		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedStartTimestampIndex > mMinimumTimestampIndex) {
@@ -801,6 +983,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Increments the delta end timestamp if possible.
+	 */
 	private void incrementDeltaEndTimestamp() {
 		if (mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedEndTimestampIndex < (mMaximumTimestampIndex - 1)) {
@@ -810,6 +995,9 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Decrements the delta end timestamp if possible.
+	 */
 	private void decrementDeltaEndTimestamp() {
 		if (mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedEndTimestampIndex > mMinimumTimestampIndex
@@ -820,6 +1008,10 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Moves the delta interval one index forward, by increasing both the delta
+	 * start and end timestamp if possible.
+	 */
 	private void moveDeltaIntervalForward() {
 		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
@@ -833,6 +1025,10 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Moves the delta interval one index backward, by decreasing both the delta
+	 * start and end timestamp if possible.
+	 */
 	private void moveDeltaIntervalBackward() {
 		if (mDeltaViewSelectedStartTimestampIndex != INDEX_NOT_INITIALIZED
 				&& mDeltaViewSelectedEndTimestampIndex != INDEX_NOT_INITIALIZED
@@ -846,6 +1042,16 @@ public class TabBasedHistoryNavigation implements Observer,
 		}
 	}
 
+	/**
+	 * Finds the index to a given timestamp as Unix epoch value by using a
+	 * {@link SortedMap}.
+	 *
+	 * @param timestamp
+	 *            a Unix epoch timestmap
+	 * @param changesMap
+	 *            a {@link SortedMap} containing a changes map
+	 * @return the index corresponding to the given timestamp
+	 */
 	private int findIndexToTimestamp(long timestamp,
 			SortedMap<Long, Long> changesMap) {
 		int index = 0;
@@ -867,6 +1073,17 @@ public class TabBasedHistoryNavigation implements Observer,
 		return 0;
 	}
 
+	/**
+	 * Finds the corresponding timestamp to a given index in a {@link SortedMap}
+	 * .
+	 *
+	 * @param index
+	 *            the index of the timestamp to be found
+	 * @param changesMap
+	 *            a {@link SortedMap} containing a changes map
+	 * @return the timestamp as Unix epoch value corresponding the the index
+	 *         value
+	 */
 	private long findTimestampToIndex(int index,
 			SortedMap<Long, Long> changesMap) {
 		long timestamp = 0l;

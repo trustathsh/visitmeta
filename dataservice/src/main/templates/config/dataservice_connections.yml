@@ -67,7 +67,7 @@ default:
       # IPv6,...
       startIdentifier: 11:22:33:44:55:66
       #  send this subscription when the data service is started
-      useSubscriptionAsStartup: false
+      useSubscriptionAsStartup: true
     sub3:
       # identifierType is one of the following:
       # access-request, device, ip-address, mac-address
@@ -93,4 +93,4 @@ default:
       # IPv6,...
       startIdentifier: ARMultiSubscriptionTest
       #  send this subscription when the data service is started
-      useSubscriptionAsStartup: true
+      useSubscriptionAsStartup: false

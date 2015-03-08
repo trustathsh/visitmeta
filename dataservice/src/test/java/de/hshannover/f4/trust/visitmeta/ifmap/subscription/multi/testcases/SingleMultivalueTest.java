@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
@@ -61,8 +60,6 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
 public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
-
-	private static final Logger mLog = Logger.getLogger(SingleMultivalueTest.class);
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
@@ -90,19 +87,12 @@ public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the first poll
 		mFirstChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
-
 		// run second poll
 		startPollTask(secondPollResult);
-
-		// printCurrentGraph();
-		// printNeo4jDB();
 
 		// save current ChangesMap after the second poll
 		mSecondChangesMap = super.mService.getChangesMap();
 
-		// printChangesMaps();
 	}
 
 	private void executeThirdPollWithSingleValue() {
@@ -113,9 +103,6 @@ public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the third poll
 		mThirdChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
-		// printChangesMaps();
 	}
 
 	private void executeThirdPollWithMultiValue() {
@@ -126,9 +113,6 @@ public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the third poll
 		mThirdChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
-		// printChangesMaps();
 	}
 
 	/**
@@ -408,12 +392,6 @@ public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
 
 		return secondPollResult_mock.getMock();
-	}
-
-	private void printChangesMaps() {
-		System.out.println("First-Changes-Map: " + mFirstChangesMap);
-		System.out.println("Second-Changes-Map: " + mSecondChangesMap);
-		System.out.println("Third-Changes-Map: " + mThirdChangesMap);
 	}
 
 }

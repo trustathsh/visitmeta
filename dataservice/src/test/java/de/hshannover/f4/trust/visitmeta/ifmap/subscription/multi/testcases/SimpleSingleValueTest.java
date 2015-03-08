@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
@@ -61,8 +60,6 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
 public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
-
-	private static final Logger mLog = Logger.getLogger(SimpleSingleValueTest.class);
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
@@ -85,8 +82,6 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the first poll
 		mFirstChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
 	}
 
 	private void executePollWithSingleValue() {
@@ -96,11 +91,9 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 		// run poll
 		startPollTask(pollResult);
 
-		// save current ChangesMap after the first poll
+		// save current ChangesMap after the second poll
 		mSecondChangesMap = super.mService.getChangesMap();
 
-		printCurrentGraph();
-		printNeo4jDB();
 	}
 
 	/**

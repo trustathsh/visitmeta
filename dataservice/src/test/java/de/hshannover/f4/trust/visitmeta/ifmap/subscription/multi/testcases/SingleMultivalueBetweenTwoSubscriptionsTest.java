@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
@@ -60,8 +59,6 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
 public class SingleMultivalueBetweenTwoSubscriptionsTest extends AbstractMultiSubscriptionTestCase {
-
-	private static final Logger mLog = Logger.getLogger(SingleMultivalueBetweenTwoSubscriptionsTest.class);
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
@@ -77,9 +74,6 @@ public class SingleMultivalueBetweenTwoSubscriptionsTest extends AbstractMultiSu
 		// save current ChangesMap after the first poll
 		mChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
-		// printChangesMap();
 	}
 
 	private void executePollWithMultiValue() {
@@ -92,9 +86,6 @@ public class SingleMultivalueBetweenTwoSubscriptionsTest extends AbstractMultiSu
 		// save current ChangesMap after the first poll
 		mChangesMap = super.mService.getChangesMap();
 
-		// printCurrentGraph();
-		// printNeo4jDB();
-		// printChangesMap();
 	}
 
 	/**
@@ -197,10 +188,6 @@ public class SingleMultivalueBetweenTwoSubscriptionsTest extends AbstractMultiSu
 		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
 
 		return secondPollResult_mock.getMock();
-	}
-
-	private void printChangesMap() {
-		System.out.println("First-Changes-Map: " + mChangesMap);
 	}
 
 }

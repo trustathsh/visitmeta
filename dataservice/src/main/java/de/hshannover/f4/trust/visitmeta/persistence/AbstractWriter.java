@@ -99,28 +99,34 @@ public abstract class AbstractWriter implements Writer {
 		log.debug("Got update for a single identifier");
 		InternalIdentifier in = mRepo.findIdentifier(id);
 		List<InternalMetadata> unique = new ArrayList<InternalMetadata>();
+		SubmitStatus status = new SubmitStatus(meta.size());
+
 		if (in == null) {
 			in = mRepo.insert(id);
 			for (InternalMetadata m : meta) {
 				in.addMetadata(m);
 				unique.add(m);
+				status.added();
 			}
 		} else {
 			for (InternalMetadata m : meta) {
 				if (!in.hasMetadata(m)) {
 					in.addMetadata(m);
 					unique.add(m);
+					status.added();
 				} else {
 					if (m.isSingleValue()) {
 						if (!in.equalsSingleValue(m)) {
 							in.updateMetadata(m);
 							unique.add(m);
+							status.updated();
 						}
 					}
 				}
 			}
 		}
 		this.submitUpdate(unique);
+		log.debug(status);
 		log.trace("Added update for a single identifier");
 	}
 
@@ -130,11 +136,12 @@ public abstract class AbstractWriter implements Writer {
 		InternalIdentifier idGraph2 = mRepo.findIdentifier(id2);
 		InternalLink l;
 		List<InternalMetadata> unique = new ArrayList<InternalMetadata>();
+		SubmitStatus status = new SubmitStatus(meta.size());
 
 		if (idGraph1 != null && idGraph2 != null) {
-			// both identifiers are in the graph, this means we either have to
-			// update the metadata
+			// both identifiers are in the graph, this means we either have to update the metadata
 			// on the link between them or establish a new link between them
+			log.trace("Found both identifier in the graph");
 			l = mRepo.findCommonLink(idGraph1, idGraph2);
 			if (l == null) {
 				l = mRepo.connect(idGraph1, idGraph2);
@@ -143,11 +150,13 @@ public abstract class AbstractWriter implements Writer {
 				if (!l.hasMetadata(m)) {
 					l.addMetadata(m);
 					unique.add(m);
+					status.added();
 				} else {
 					if (m.isSingleValue()) {
 						if (!l.equalsSingleValue(m)) {
 							l.updateMetadata(m);
 							unique.add(m);
+							status.updated();
 						}
 					}
 				}
@@ -160,6 +169,7 @@ public abstract class AbstractWriter implements Writer {
 			for (InternalMetadata m : meta) {
 				l.addMetadata(m);
 				unique.add(m);
+				status.added();
 			}
 		} else if (idGraph1 == null && idGraph2 != null) {
 			// add link to idGraph2 with metadata
@@ -169,6 +179,7 @@ public abstract class AbstractWriter implements Writer {
 			for (InternalMetadata m : meta) {
 				l.addMetadata(m);
 				unique.add(m);
+				status.added();
 			}
 		} else {
 			// both links are not in the graph
@@ -178,10 +189,12 @@ public abstract class AbstractWriter implements Writer {
 			for (InternalMetadata m : meta) {
 				l.addMetadata(m);
 				unique.add(m);
+				status.added();
 			}
 
 		}
 		this.submitUpdate(unique);
+		log.debug(status);
 		log.trace("Added update for two identifiers");
 	}
 
@@ -190,6 +203,7 @@ public abstract class AbstractWriter implements Writer {
 		InternalIdentifier idGraph1 = mRepo.findIdentifier(id1);
 		InternalIdentifier idGraph2 = null;
 		InternalLink linkToEdit = null;
+		SubmitStatus status = new SubmitStatus(meta.size());
 		int n = 0;
 		if (idGraph1 == null) {
 			throw new RuntimeException("Someone is trying to delete from an non initiated identifier.");
@@ -206,6 +220,7 @@ public abstract class AbstractWriter implements Writer {
 				if (linkToEdit.hasMetadata(m)) {
 					linkToEdit.removeMetadata(m);
 					n++;
+					status.removed();
 				}
 			}
 			if (linkToEdit.getMetadata().size() == 0) {
@@ -219,18 +234,21 @@ public abstract class AbstractWriter implements Writer {
 					"Someone is trying to delete from a link that is not in the graph or not connected to the given identifiers. Bad Boy!");
 		}
 		this.submitDelete(n);
+		log.debug(status);
 		log.trace("Performed delete for two identifiers");
 	}
 
 	protected void submitDelete(InternalIdentifier id, List<InternalMetadata> meta) {
 		log.debug("Got delete for single identifier");
 		InternalIdentifier idGraph = mRepo.findIdentifier(id);
+		SubmitStatus status = new SubmitStatus(meta.size());
 		int n = 0;
 		if (idGraph != null) {
 			for (InternalMetadata m : meta) {
 				if (idGraph.hasMetadata(m)) {
 					idGraph.removeMetadata(m);
 					n++;
+					status.removed();
 				}
 			}
 		} else {
@@ -238,6 +256,7 @@ public abstract class AbstractWriter implements Writer {
 					"Someone is trying to delete from an identifier that is not in the graph. Bad Boy!");
 		}
 		this.submitDelete(n);
+		log.debug(status);
 		log.trace("Performed delete for a single identifier");
 	}
 }

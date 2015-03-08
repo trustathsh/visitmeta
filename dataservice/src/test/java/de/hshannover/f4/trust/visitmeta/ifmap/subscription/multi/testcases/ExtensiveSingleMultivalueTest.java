@@ -59,7 +59,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
-public class SingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
+public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 

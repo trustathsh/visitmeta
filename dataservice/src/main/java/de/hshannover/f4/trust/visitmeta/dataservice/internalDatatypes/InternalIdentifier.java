@@ -70,6 +70,8 @@ public abstract class InternalIdentifier implements Propable {
 
 	public abstract boolean hasMetadata(InternalMetadata meta);
 
+	public abstract boolean equalsSingleValue(InternalMetadata meta);
+
 	/**
 	 * Removes all Links connected to the Identifier. <b>Note: The List
 	 * containing the Links is just cleared. The connected identifier is left

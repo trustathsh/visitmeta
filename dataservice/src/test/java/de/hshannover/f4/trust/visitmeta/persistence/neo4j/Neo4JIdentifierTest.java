@@ -252,6 +252,11 @@ public class Neo4JIdentifierTest {
 		}
 
 		@Override
+		public boolean equalsSingleValue(InternalMetadata meta) {
+			throw new UnsupportedOperationException("not implemented in test stub");
+		}
+
+		@Override
 		public void clearLinks() {
 			throw new UnsupportedOperationException("not implemented in test stub");
 		}

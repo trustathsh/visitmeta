@@ -38,7 +38,10 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
 
-import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.*;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.HIDDEN_PROPERTIES_KEY_PREFIX;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_HASH;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_RAW_DATA;
+import static de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JPropertyConstants.KEY_TYPE_NAME;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -260,6 +263,26 @@ public class Neo4JIdentifier extends InternalIdentifier {
 				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r
 						.getEndNode().getId());
 				if (meta.equalsForLinks(n4jm)) {
+					result = true;
+				}
+			}
+			tx.success();
+		}
+		return result;
+	}
+
+	/**
+	 * Check if this link has the given single value metadata connected to it.
+	 *
+	 * @param meta a single value metadata to check for
+	 */
+	@Override
+	public boolean equalsSingleValue(InternalMetadata meta) {
+		boolean result = false;
+		try (Transaction tx = mRepo.beginTx()) {
+			for (Relationship r : mMe.getRelationships(LinkTypes.Meta)) {
+				Neo4JMetadata n4jm = (Neo4JMetadata) mRepo.getMetadata(r.getEndNode().getId());
+				if (meta.equalsSingleValue(n4jm)) {
 					result = true;
 				}
 			}

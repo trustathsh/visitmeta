@@ -157,6 +157,16 @@ public class InMemoryIdentifier extends InternalIdentifier {
 	}
 
 	@Override
+	public boolean equalsSingleValue(InternalMetadata meta) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsSingleValue(meta)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public List<InternalMetadata> getMetadata() {
 		List<InternalMetadata> result = new ArrayList<>();
 		result.addAll(mMeta);

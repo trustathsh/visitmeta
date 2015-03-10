@@ -115,19 +115,11 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 
 	}
 
-	/**
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void twoPolls_ShouldReturnTheRightChangeMapSize() {
 		executeFirstTwoPolls();
 
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
+		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
 	/**
@@ -167,20 +159,12 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 		}
 	}
 
-	/**
-	 * Check the changeMap size is right.
-	 * The third ChangesMap size may be increased only by 1 from the second ChangesMap.
-	 * The third ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapSize() {
 		executeFirstTwoPolls();
 		executeThirdPollWithSingleValue();
 
-		if (mThirdChangesMap.size() - 1 != mSecondChangesMap.size()) {
-			fail("Because the third ChangesMap size is wrong. May be increased by one. (SecondMap-Size: "
-					+ mSecondChangesMap.size() + " || ThirdMap-Size: " + mThirdChangesMap.size());
-		}
+		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
 	/**
@@ -223,20 +207,12 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 		}
 	}
 
-	/**
-	 * Check the changeMap size is right.
-	 * The third ChangesMap size may be increased only by 1 from the second ChangesMap.
-	 * The third ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapSize() {
 		executeFirstTwoPolls();
 		executeThirdPollWithMultiValue();
 
-		if (mThirdChangesMap.size() - 1 != mSecondChangesMap.size()) {
-			fail("Because the third ChangesMap size is wrong. May be increased by one. (SecondMap-Size: "
-					+ mSecondChangesMap.size() + " || ThirdMap-Size: " + mThirdChangesMap.size());
-		}
+		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
 	/**

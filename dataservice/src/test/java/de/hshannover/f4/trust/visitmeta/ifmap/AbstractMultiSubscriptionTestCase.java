@@ -38,12 +38,14 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -167,6 +169,16 @@ public abstract class AbstractMultiSubscriptionTestCase {
 		}
 
 		mLog.debug("... PollTask finished");
+	}
+
+	/**
+	 * Check the change-map-size.
+	 * 
+	 * @param changesMap
+	 * @param expected
+	 */
+	protected void checkChangesMapSize(SortedMap<Long, Long> changesMap, int expected) {
+		assertEquals("Because the changes map size is wrong.", expected, changesMap.size());
 	}
 
 	protected void printNeo4jDB() {

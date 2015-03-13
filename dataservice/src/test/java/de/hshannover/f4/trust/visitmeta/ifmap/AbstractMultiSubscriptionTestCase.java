@@ -39,12 +39,14 @@
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -78,12 +80,6 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JWriter;
 public abstract class AbstractMultiSubscriptionTestCase {
 
 	private static final Logger mLog = Logger.getLogger(AbstractMultiSubscriptionTestCase.class);
-
-	protected static final String TIMESTAMP = "ifmap-timestamp";
-
-	protected static final String TIMESTAMP_FRACTION = "ifmap-timestamp-fraction";
-
-	protected static final String PUBLISHERID = "ifmap-publisher-id";
 
 	protected Writer mWriter;
 
@@ -177,8 +173,59 @@ public abstract class AbstractMultiSubscriptionTestCase {
 	 * @param changesMap
 	 * @param expected
 	 */
-	protected void checkChangesMapSize(SortedMap<Long, Long> changesMap, int expected) {
+	protected void assertEqualsMapSize(SortedMap<Long, Long> changesMap, int expected) {
+		if (changesMap == null) {
+			throw new IllegalArgumentException();
+		}
 		assertEquals("Because the changes map size is wrong.", expected, changesMap.size());
+	}
+
+	/**
+	 * Equals the map keys and values.
+	 * All keys and values from changesMap1 may be contains in changesMap2.
+	 * 
+	 * @param changesMap1
+	 * @param changesMap2
+	 */
+	public void assertEqualsMapValues(SortedMap<Long, Long> changesMap1, SortedMap<Long, Long> changesMap2) {
+		if (changesMap1 == null || changesMap2 == null) {
+			throw new IllegalArgumentException();
+		}
+
+		for (Entry<Long, Long> entry : changesMap1.entrySet()) {
+
+			Long changeMap1Value = entry.getValue();
+			Long chnageMap2Value = changesMap2.get(entry.getKey());
+
+			if (chnageMap2Value == null) {
+				fail("The second changes map does not contain the key(" + entry.getKey()
+						+ ") from the first changes map.");
+			}
+
+			assertEquals("Because the changes map values are not same.", chnageMap2Value, changeMap1Value);
+		}
+	}
+
+	/**
+	 * Equals new values from the second changes map with the expected value.
+	 * New values from the second changes map does not contains in the first changes map.
+	 * 
+	 * @param changesMap1
+	 * @param changesMap2
+	 */
+	public void assertEqualsNewValues(SortedMap<Long, Long> changesMap1, SortedMap<Long, Long> changesMap2, long expectedValue) {
+		if (changesMap1 == null || changesMap2 == null) {
+			throw new IllegalArgumentException();
+		}
+
+		for (Entry<Long, Long> entry : changesMap2.entrySet()) {
+			if (!changesMap1.containsKey(entry.getKey())) {
+				// only for new keys in the second changes map
+				assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", expectedValue,
+						entry.getValue().longValue());
+				break;
+			}
+		}
 	}
 
 	protected void printNeo4jDB() {

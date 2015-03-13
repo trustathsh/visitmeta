@@ -38,13 +38,9 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.junit.Test;
@@ -69,10 +65,31 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 
 	private SortedMap<Long, Long> mSecondChangesMap;
 
-	/**
-	 * Makes two polls with different PollResult. The PollResult are the same as if when we makes two subscriptions.
-	 */
-	private void executeFirstPolls() {
+	@Test
+	public void shouldReturnTheRightChangeMapSize() {
+		executeFirstPoll();
+		executePollWithSingleValue();
+
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
+	}
+
+	@Test
+	public void shouldReturnTheRightChangeMapChangeValues() {
+		executeFirstPoll();
+		executePollWithSingleValue();
+
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
+	}
+
+	@Test
+	public void shouldReturnTheRightSecondChangeMapChangeValue() {
+		executeFirstPoll();
+		executePollWithSingleValue();
+
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
+	}
+
+	private void executeFirstPoll() {
 		// mock first and second poll results
 		PollResult firstPollResult = buildFirstPollResult();
 
@@ -94,61 +111,6 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the second poll
 		mSecondChangesMap = super.mService.getChangesMap();
 
-	}
-
-	/**
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
-	@Test
-	public void shouldReturnTheRightChangeMapSize() {
-		executeFirstPolls();
-		executePollWithSingleValue();
-
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
-	}
-
-	/**
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
-	@Test
-	public void shouldReturnTheRightChangeMapChangeValues() {
-		executeFirstPolls();
-		executePollWithSingleValue();
-
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
-	}
-
-	/**
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
-	@Test
-	public void shouldReturnTheRightSecondChangeMapChangeValue() {
-		executeFirstPolls();
-		executePollWithSingleValue();
-
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
 	}
 
 	private List<ResultItem> buildSingleValueResultItems() {

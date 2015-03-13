@@ -38,13 +38,9 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.junit.Test;
@@ -69,242 +65,94 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 
 	// ########### MULTI VALUE ONE IDENTIFIER TESTS ##############
 
-	/**
-	 * multi value with one identifier test
-	 * 
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void multiValueOneIdentifierTest_ShouldReturnTheRightChangeMapSize() {
 		executePollMultiValueDeleteTestOneIdentifier();
 
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
-	/**
-	 * multi value with one identifier test
-	 * 
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
 	@Test
 	public void multiValueOneIdentifierTest_ShouldReturnTheRightChangeMapChangeValues() {
 		executePollMultiValueDeleteTestOneIdentifier();
 
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
-	/**
-	 * multi value with one identifier test
-	 * 
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
 	@Test
 	public void multiValueOneIdentifierTest_ShouldReturnTheRightSecondChangeMapChangeValue() {
 		executePollMultiValueDeleteTestOneIdentifier();
 
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
 	// ########### MULTI VALUE TWO IDENTIFIER TESTS ##############
 
-	/**
-	 * multi value with two identifier test
-	 * 
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void multiValueTwoIdentifierTest_ShouldReturnTheRightChangeMapSize() {
 		executePollMultiValueDeleteTestTwoIdentifier();
 
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
-	/**
-	 * multi value with two identifier test
-	 * 
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
 	@Test
 	public void multiValueTwoIdentifierTest_ShouldReturnTheRightChangeMapChangeValues() {
 		executePollMultiValueDeleteTestTwoIdentifier();
 
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
-	/**
-	 * multi value with two identifier test
-	 * 
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
 	@Test
 	public void multiValueTwoIdentifierTest_ShouldReturnTheRightSecondChangeMapChangeValue() {
 		executePollMultiValueDeleteTestTwoIdentifier();
 
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
-	// ########### MULTI SINGLE ONE IDENTIFIER TESTS ##############
+	// ########### SINGLE VALUE ONE IDENTIFIER TESTS ##############
 
-	/**
-	 * single value with one identifier test
-	 * 
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void singleValueOneIdentifierTest_ShouldReturnTheRightChangeMapSize() {
 		executePollSingleValueDeleteTestOneIdentifier();
 
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
-	/**
-	 * single value with one identifier test
-	 * 
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
 	@Test
 	public void singleValueOneIdentifierTest_ShouldReturnTheRightChangeMapChangeValues() {
 		executePollSingleValueDeleteTestOneIdentifier();
 
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
-	/**
-	 * single value with one identifier test
-	 * 
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
 	@Test
 	public void singleValueOneIdentifierTest_ShouldReturnTheRightSecondChangeMapChangeValue() {
 		executePollSingleValueDeleteTestOneIdentifier();
 
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
-	// ########### MULTI SINGLE TWO IDENTIFIER TESTS ##############
+	// ########### SINGLE VALUE TWO IDENTIFIER TESTS ##############
 
-	/**
-	 * single value with two identifier test
-	 * 
-	 * Check the changeMap size is right.
-	 * The first ChangesMap size may be increased only by 1 from the first ChangesMap.
-	 * The second ChangesMap must have only one new timestamp.
-	 */
 	@Test
 	public void singleValueTwoIdentifierTest_ShouldReturnTheRightChangeMapSize() {
 		executePollSingleValueDeleteTestTwoIdentifier();
 
-		if (mSecondChangesMap.size() - 1 != mFirstChangesMap.size()) {
-			fail("Because the second ChangesMap size is wrong. May be increased by one. (FirstMap-Size: "
-					+ mFirstChangesMap.size() + " || SecondMap-Size: " + mSecondChangesMap.size());
-		}
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
-	/**
-	 * single value with two identifier test
-	 * 
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
 	@Test
 	public void singleValueTwoIdentifierTest_ShouldReturnTheRightChangeMapChangeValues() {
 		executePollSingleValueDeleteTestTwoIdentifier();
 
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
-	/**
-	 * single value with two identifier test
-	 * 
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
 	@Test
 	public void singleValueTwoIdentifierTest_ShouldReturnTheRightSecondChangeMapChangeValue() {
 		executePollSingleValueDeleteTestTwoIdentifier();
 
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
 	private void executePollMultiValueDeleteTestOneIdentifier() {

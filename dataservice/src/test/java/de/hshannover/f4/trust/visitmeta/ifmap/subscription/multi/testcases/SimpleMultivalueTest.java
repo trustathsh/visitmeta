@@ -64,6 +64,42 @@ public class SimpleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 
 	private SortedMap<Long, Long> mChangesMap;
 
+	@Test
+	public void singleValue_ShouldReturnTheRightChangeMapSize() {
+		executePollWithSingleValue();
+
+		super.assertEqualsMapSize(mChangesMap, 1);
+	}
+
+	@Test
+	public void singleValue_ShouldReturnTheRightChangeMapChangeValue() {
+		executePollWithSingleValue();
+
+		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
+			assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", 1L, entry.getValue()
+					.longValue());
+			break;
+		}
+	}
+
+	@Test
+	public void multiValue_ShouldReturnTheRightChangeMapSize() {
+		executePollWithMultiValue();
+
+		super.assertEqualsMapSize(mChangesMap, 1);
+	}
+
+	@Test
+	public void multiValue_ShouldReturnTheRightChangeMapChangeValue() {
+		executePollWithMultiValue();
+
+		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
+			assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", 1L, entry.getValue()
+					.longValue());
+			break;
+		}
+	}
+
 	private void executePollWithSingleValue() {
 		// mock poll results
 		PollResult pollResult = buildPollResultWithSingleValue();
@@ -86,54 +122,6 @@ public class SimpleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		// save current ChangesMap after the first poll
 		mChangesMap = super.mService.getChangesMap();
 
-	}
-
-	/**
-	 * Check the changeMap size is 1.
-	 */
-	@Test
-	public void singleValue_ShouldReturnTheRightChangeMapSize() {
-		executePollWithSingleValue();
-
-		assertEquals("Because the ChangesMap size is wrong.", 1, mChangesMap.size());
-	}
-
-	/**
-	 * The ChangesMap must have only one timestamp and this one have only one changes.
-	 */
-	@Test
-	public void singleValue_ShouldReturnTheRightChangeMapChangeValue() {
-		executePollWithSingleValue();
-
-		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
-			assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.", 1L,
-					entry.getValue().longValue());
-			break;
-		}
-	}
-
-	/**
-	 * Check the changeMap size is 1.
-	 */
-	@Test
-	public void multiValue_ShouldReturnTheRightChangeMapSize() {
-		executePollWithMultiValue();
-
-		assertEquals("Because the ChangesMap size is wrong.", 1, mChangesMap.size());
-	}
-
-	/**
-	 * The ChangesMap must have only one timestamp and this one have only one changes.
-	 */
-	@Test
-	public void multiValue_ShouldReturnTheRightChangeMapChangeValue() {
-		executePollWithMultiValue();
-
-		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
-			assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.", 1L,
-					entry.getValue().longValue());
-			break;
-		}
 	}
 
 	private List<ResultItem> buildMultiValueResultItems() {

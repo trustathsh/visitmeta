@@ -38,13 +38,9 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.junit.Test;
@@ -73,6 +69,75 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 
 	private SortedMap<Long, Long> mThirdChangesMap;
 
+	@Test
+	public void twoPolls_ShouldReturnTheRightChangeMapSize() {
+		executeFirstTwoPolls();
+
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
+	}
+
+	@Test
+	public void twoPolls_ShouldReturnTheRightChangeMapChangeValues() {
+		executeFirstTwoPolls();
+
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
+	}
+
+	@Test
+	public void twoPolls_ShouldReturnTheRightSecondChangeMapChangeValue() {
+		executeFirstTwoPolls();
+
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
+	}
+
+	@Test
+	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapSize() {
+		executeFirstTwoPolls();
+		executeThirdPollWithSingleValue();
+
+		super.assertEqualsMapSize(mThirdChangesMap, mSecondChangesMap.size() + 1);
+	}
+
+	@Test
+	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapChangeValues() {
+		executeFirstTwoPolls();
+		executeThirdPollWithSingleValue();
+
+		super.assertEqualsMapValues(mSecondChangesMap, mThirdChangesMap);
+	}
+
+	@Test
+	public void thirdPollSingleValue_ShouldReturnTheRightThirdChangeMapChangeValue() {
+		executeFirstTwoPolls();
+		executeThirdPollWithSingleValue();
+
+		super.assertEqualsNewValues(mSecondChangesMap, mThirdChangesMap, 1);
+	}
+
+	@Test
+	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapSize() {
+		executeFirstTwoPolls();
+		executeThirdPollWithMultiValue();
+
+		super.assertEqualsMapSize(mThirdChangesMap, mSecondChangesMap.size() + 1);
+	}
+
+	@Test
+	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapChangeValues() {
+		executeFirstTwoPolls();
+		executeThirdPollWithMultiValue();
+
+		super.assertEqualsMapValues(mSecondChangesMap, mThirdChangesMap);
+	}
+
+	@Test
+	public void thirdPollMultiValue_ShouldReturnTheRightThirdChangeMapChangeValue() {
+		executeFirstTwoPolls();
+		executeThirdPollWithMultiValue();
+
+		super.assertEqualsNewValues(mSecondChangesMap, mThirdChangesMap, 1);
+	}
+
 	/**
 	 * Makes two polls with different PollResult. The PollResult are the same as if when we makes two subscriptions.
 	 */
@@ -82,13 +147,13 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 		PollResult secondPollResult = buildSecondPollResult();
 
 		// run first poll
-		startPollTask(firstPollResult);
+		super.startPollTask(firstPollResult);
 
 		// save current ChangesMap after the first poll
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		// run second poll
-		startPollTask(secondPollResult);
+		super.startPollTask(secondPollResult);
 
 		// save current ChangesMap after the second poll
 		mSecondChangesMap = super.mService.getChangesMap();
@@ -98,7 +163,7 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 	private void executeThirdPollWithSingleValue() {
 		PollResult thirdPollResult = buildThirdSingleValuePollResult();
 
-		startPollTask(thirdPollResult);
+		super.startPollTask(thirdPollResult);
 
 		// save current ChangesMap after the third poll
 		mThirdChangesMap = super.mService.getChangesMap();
@@ -108,151 +173,11 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 	private void executeThirdPollWithMultiValue() {
 		PollResult thirdPollResult = buildThirdMultiValuePollResult();
 
-		startPollTask(thirdPollResult);
+		super.startPollTask(thirdPollResult);
 
 		// save current ChangesMap after the third poll
 		mThirdChangesMap = super.mService.getChangesMap();
 
-	}
-
-	@Test
-	public void twoPolls_ShouldReturnTheRightChangeMapSize() {
-		executeFirstTwoPolls();
-
-		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
-	}
-
-	/**
-	 * Check the changeMap keys and values.
-	 * All keys and values from the first ChangesMap may be contains in the second ChangesMap.
-	 */
-	@Test
-	public void twoPolls_ShouldReturnTheRightChangeMapChangeValues() {
-		executeFirstTwoPolls();
-
-		for (Entry<Long, Long> entry : mFirstChangesMap.entrySet()) {
-			if (mSecondChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the first ChangesMap must contains in the second and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (FirstMap-Value: " + entry.getValue() + " || SecondMap-Value: "
-						+ mSecondChangesMap.get(entry.getKey()));
-			}
-		}
-	}
-
-	/**
-	 * Check the new timestamp for the second changeMap.
-	 * The second ChangesMap must have only one new timestamp and this one have only one changes.
-	 */
-	@Test
-	public void twoPolls_ShouldReturnTheRightSecondChangeMapChangeValue() {
-		executeFirstTwoPolls();
-
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (!mFirstChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the second ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
-	}
-
-	@Test
-	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapSize() {
-		executeFirstTwoPolls();
-		executeThirdPollWithSingleValue();
-
-		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
-	}
-
-	/**
-	 * Check the changeMap keys and values.
-	 * All keys and values from the second ChangesMap may be contains in the third ChangesMap.
-	 */
-	@Test
-	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapChangeValues() {
-		executeFirstTwoPolls();
-		executeThirdPollWithSingleValue();
-
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (mThirdChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the second ChangesMap must contains in the third and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (SecondMap-Value: " + entry.getValue() + " || ThirdMap-Value: "
-						+ mThirdChangesMap.get(entry.getKey()));
-			}
-		}
-	}
-
-	/**
-	 * Check the new timestamp for the third changeMap.
-	 * The third ChangesMap must have only one new timestamp and this one have only one changes.
-	 * This third poll added a new single value Metadata
-	 */
-	@Test
-	public void thirdPollSingleValue_ShouldReturnTheRightThirdChangeMapChangeValue() {
-		executeFirstTwoPolls();
-		executeThirdPollWithSingleValue();
-
-		for (Entry<Long, Long> entry : mThirdChangesMap.entrySet()) {
-			if (!mSecondChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the third ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
-	}
-
-	@Test
-	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapSize() {
-		executeFirstTwoPolls();
-		executeThirdPollWithMultiValue();
-
-		checkChangesMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
-	}
-
-	/**
-	 * Check the changeMap keys and values.
-	 * All keys and values from the second ChangesMap may be contains in the third ChangesMap.
-	 */
-	@Test
-	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapChangeValues() {
-		executeFirstTwoPolls();
-		executeThirdPollWithMultiValue();
-
-		for (Entry<Long, Long> entry : mSecondChangesMap.entrySet()) {
-			if (mThirdChangesMap.get(entry.getKey()) != entry.getValue()) {
-				// all keys from the second ChangesMap must contains in the third and the values must the same, if
-				// not -> FAIL
-				fail("Because the changes from change-map timestamp " + entry.getKey()
-						+ " are not the same. (SecondMap-Value: " + entry.getValue() + " || ThirdMap-Value: "
-						+ mThirdChangesMap.get(entry.getKey()));
-			}
-		}
-	}
-
-	/**
-	 * Check the new timestamp for the third changeMap.
-	 * The third ChangesMap must have only one new timestamp and this one have only one changes.
-	 * This third poll added a new multi value Metadata
-	 */
-	@Test
-	public void thirdPollMultiValue_ShouldReturnTheRightThirdChangeMapChangeValue() {
-		executeFirstTwoPolls();
-		executeThirdPollWithMultiValue();
-
-		for (Entry<Long, Long> entry : mThirdChangesMap.entrySet()) {
-			if (!mSecondChangesMap.containsKey(entry.getKey())) {
-				// only the one new key in the third ChangesMap
-				assertEquals("Because the changes from the change-map timestamp(" + entry.getKey() + ") must be 1.",
-						1L, entry.getValue().longValue());
-				break;
-			}
-		}
 	}
 
 	private List<ResultItem> buildFirstResultItems() {

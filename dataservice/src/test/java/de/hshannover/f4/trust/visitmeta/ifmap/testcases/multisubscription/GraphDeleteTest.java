@@ -54,6 +54,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class GraphDeleteTest extends AbstractMultiSubscriptionTestCase {
 
@@ -82,6 +83,15 @@ public class GraphDeleteTest extends AbstractMultiSubscriptionTestCase {
 		executeExtensiveSingleMultiValueDeleteTest();
 
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
+	}
+
+	@Test
+	public void shouldReturnTheRightGraph() {
+		executeExtensiveSingleMultiValueDeleteTest();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 4, 5);
 	}
 
 	private void executeExtensiveSingleMultiValueDeleteTest() {

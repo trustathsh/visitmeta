@@ -57,6 +57,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class SimpleSingleMultiValueTest extends AbstractMultiSubscriptionTestCase {
 
@@ -83,6 +84,15 @@ public class SimpleSingleMultiValueTest extends AbstractMultiSubscriptionTestCas
 	}
 
 	@Test
+	public void singleValue_ShouldReturnTheRightGraph() {
+		executePollWithSingleValue();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 2, 1);
+	}
+
+	@Test
 	public void multiValue_ShouldReturnTheRightChangeMapSize() {
 		executePollWithMultiValue();
 
@@ -98,6 +108,15 @@ public class SimpleSingleMultiValueTest extends AbstractMultiSubscriptionTestCas
 					.longValue());
 			break;
 		}
+	}
+
+	@Test
+	public void multiValue_ShouldReturnTheRightGraph() {
+		executePollWithMultiValue();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 2, 1);
 	}
 
 	private void executePollWithSingleValue() {

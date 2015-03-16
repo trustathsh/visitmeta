@@ -54,6 +54,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 
@@ -91,6 +92,15 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 	}
 
 	@Test
+	public void twoPolls_ShouldReturnTheRightGraph() {
+		executeFirstTwoPolls();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 5);
+	}
+
+	@Test
 	public void thirdPollSingleValue_ShouldReturnTheRightChangeMapSize() {
 		executeFirstTwoPolls();
 		executeThirdPollWithSingleValue();
@@ -115,6 +125,16 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 	}
 
 	@Test
+	public void thirdPollSingleValue_ShouldReturnTheRightGraph() {
+		executeFirstTwoPolls();
+		executeThirdPollWithSingleValue();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 4, 6);
+	}
+
+	@Test
 	public void thirdPollMultiValue_ShouldReturnTheRightChangeMapSize() {
 		executeFirstTwoPolls();
 		executeThirdPollWithMultiValue();
@@ -136,6 +156,16 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 		executeThirdPollWithMultiValue();
 
 		super.assertEqualsNewValues(mSecondChangesMap, mThirdChangesMap, 1);
+	}
+
+	@Test
+	public void thirdPollMultiValue_ShouldReturnTheRightGraph() {
+		executeFirstTwoPolls();
+		executeThirdPollWithMultiValue();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 6);
 	}
 
 	/**

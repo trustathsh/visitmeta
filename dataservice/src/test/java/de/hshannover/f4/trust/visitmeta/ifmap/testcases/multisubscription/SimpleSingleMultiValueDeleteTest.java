@@ -54,6 +54,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
+import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionTestCase {
 
@@ -86,6 +87,15 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
+	@Test
+	public void multiValueOneIdentifierTest_ShouldReturnTheRightGraph() {
+		executePollMultiValueDeleteTestOneIdentifier();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 2);
+	}
+
 	// ########### MULTI VALUE TWO IDENTIFIER TESTS ##############
 
 	@Test
@@ -107,6 +117,15 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 		executePollMultiValueDeleteTestTwoIdentifier();
 
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
+	}
+
+	@Test
+	public void multiValueTwoIdentifierTest_ShouldReturnTheRightGraph() {
+		executePollMultiValueDeleteTestTwoIdentifier();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 2);
 	}
 
 	// ########### SINGLE VALUE ONE IDENTIFIER TESTS ##############
@@ -132,6 +151,15 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
+	@Test
+	public void singleValueOneIdentifierTest_ShouldReturnTheRightGraph() {
+		executePollSingleValueDeleteTestOneIdentifier();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 2);
+	}
+
 	// ########### SINGLE VALUE TWO IDENTIFIER TESTS ##############
 
 	@Test
@@ -153,6 +181,15 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 		executePollSingleValueDeleteTestTwoIdentifier();
 
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
+	}
+
+	@Test
+	public void singleValueTwoIdentifierTest_ShouldReturnTheRightGraph() {
+		executePollSingleValueDeleteTestTwoIdentifier();
+
+		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
+
+		super.assertRightGraph(currentGraph, 1, 3, 2);
 	}
 
 	private void executePollMultiValueDeleteTestOneIdentifier() {

@@ -66,7 +66,10 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphServ
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.JsonMarshaller;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.interfaces.Link;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
@@ -226,6 +229,76 @@ public abstract class AbstractMultiSubscriptionTestCase {
 				break;
 			}
 		}
+	}
+
+	private int countGraph(List<IdentifierGraph> graphList) {
+		return graphList.size();
+	}
+
+	private int countIdentifier(List<IdentifierGraph> graphList) {
+		int count = 0;
+		for (IdentifierGraph graph : graphList) {
+			List<Identifier> identifiers = graph.getIdentifiers();
+			count = count + identifiers.size();
+		}
+		return count;
+	}
+
+	private int countMetadata(List<IdentifierGraph> graphList) {
+		int metadatacount = 0;
+		int linkMetadatacount = 0;
+		for (IdentifierGraph graph : graphList) {
+			List<Identifier> identifiers = graph.getIdentifiers();
+			for (Identifier identifier : identifiers) {
+				List<Metadata> metadataList = identifier.getMetadata();
+				metadatacount = metadatacount + metadataList.size();
+
+				List<Link> linksList = identifier.getLinks();
+				for (Link link : linksList) {
+					List<Metadata> linkMetadataList = link.getMetadata();
+					linkMetadatacount = linkMetadatacount + linkMetadataList.size();
+				}
+			}
+		}
+		return metadatacount + (linkMetadatacount / 2);
+	}
+
+	/**
+	 * Equals the expected Graph|Identifier|Metadata list size with the current from the graphList.
+	 * 
+	 * @param graphList e.g. the current graph
+	 * @param expectedGraphCount The current graph list size
+	 * @param expectedIdentifierCount All identifier in the current graph
+	 * @param expectedMetadataCount In the current graph all metadata on identifier and links
+	 */
+	protected void assertRightGraph(List<IdentifierGraph> graphList, int expectedGraphCount,
+			int expectedIdentifierCount, int expectedMetadataCount) {
+
+		int currendGraphCount = countGraph(graphList);
+		int currendIdentifierCount = countIdentifier(graphList);
+		int currendMetadataCount = countMetadata(graphList);
+
+		if (currendGraphCount != expectedGraphCount || currendIdentifierCount != expectedIdentifierCount
+				|| currendMetadataCount != expectedMetadataCount) {
+			fail("GraphCount: " + currendGraphCount + "(" + expectedGraphCount + ") IdentifierCount: "
+					+ currendIdentifierCount + "(" + expectedIdentifierCount + ")MetadataCount: "
+					+ currendMetadataCount + "("
+					+ expectedMetadataCount + ") [example: 'currend'('expected')]");
+		}
+	}
+
+	protected void testGraphListSize(List<IdentifierGraph> list, int expectedGraphListSize) {
+		assertEquals(expectedGraphListSize, list.size());
+	}
+
+	protected void testIdentifierCount(IdentifierGraph graph, int expectedIdentifierCount) {
+		List<Identifier> identifiers = graph.getIdentifiers();
+		assertEquals(expectedIdentifierCount, identifiers.size());
+	}
+
+	protected void testMetadataCount(Identifier identifier, int expectedIdentifierCount) {
+		List<Metadata> metadataList = identifier.getMetadata();
+		assertEquals(expectedIdentifierCount, metadataList.size());
 	}
 
 	protected void printNeo4jDB() {

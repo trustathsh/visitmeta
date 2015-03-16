@@ -158,13 +158,13 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 	private void executePollMultiValueDeleteTestOneIdentifier() {
 		PollResult pollResult = buildMultiValueOneIdentifierPollResult();
 
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		PollResult deletePollResult = buildMultiValueOneIdentifierDeletePollResult();
 
-		startPollTask(deletePollResult);
+		super.startPollTask(deletePollResult);
 
 		mSecondChangesMap = super.mService.getChangesMap();
 	}
@@ -172,13 +172,13 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 	private void executePollMultiValueDeleteTestTwoIdentifier() {
 		PollResult pollResult = buildMultiValueTwoIdentifierPollResult();
 
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		PollResult deletePollResult = buildMultiValueTwoIdentifierDeletePollResult();
 
-		startPollTask(deletePollResult);
+		super.startPollTask(deletePollResult);
 
 		mSecondChangesMap = super.mService.getChangesMap();
 	}
@@ -186,13 +186,13 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 	private void executePollSingleValueDeleteTestOneIdentifier() {
 		PollResult pollResult = buildSingleValueOneIdentifierPollResult();
 
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		PollResult deletePollResult = buildSingleValueOneIdentifierDeletePollResult();
 
-		startPollTask(deletePollResult);
+		super.startPollTask(deletePollResult);
 
 		mSecondChangesMap = super.mService.getChangesMap();
 	}
@@ -200,13 +200,13 @@ public class SimpleSingleMultiValueDeleteTest extends AbstractMultiSubscriptionT
 	private void executePollSingleValueDeleteTestTwoIdentifier() {
 		PollResult pollResult = buildSingleValueTwoIdentifierPollResult();
 
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		PollResult deletePollResult = buildSingleValueTwoIdentifierDeletePollResult();
 
-		startPollTask(deletePollResult);
+		super.startPollTask(deletePollResult);
 
 		mSecondChangesMap = super.mService.getChangesMap();
 	}

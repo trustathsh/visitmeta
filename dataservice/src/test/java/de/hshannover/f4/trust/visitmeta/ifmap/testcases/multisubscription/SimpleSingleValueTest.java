@@ -94,7 +94,7 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 		PollResult firstPollResult = buildFirstPollResult();
 
 		// run first poll
-		startPollTask(firstPollResult);
+		super.startPollTask(firstPollResult);
 
 		// save current ChangesMap after the first poll
 		mFirstChangesMap = super.mService.getChangesMap();
@@ -106,7 +106,7 @@ public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 		PollResult pollResult = buildPollResultWithSingleValue();
 
 		// run poll
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		// save current ChangesMap after the second poll
 		mSecondChangesMap = super.mService.getChangesMap();

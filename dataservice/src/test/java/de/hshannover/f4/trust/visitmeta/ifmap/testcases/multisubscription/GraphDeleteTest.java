@@ -55,7 +55,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
-public class ExtensiveSingleMultiValueDeleteTest extends AbstractMultiSubscriptionTestCase {
+public class GraphDeleteTest extends AbstractMultiSubscriptionTestCase {
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
@@ -87,13 +87,13 @@ public class ExtensiveSingleMultiValueDeleteTest extends AbstractMultiSubscripti
 	private void executeExtensiveSingleMultiValueDeleteTest() {
 		PollResult pollResult = buildStartingGraphPollResult();
 
-		startPollTask(pollResult);
+		super.startPollTask(pollResult);
 
 		mFirstChangesMap = super.mService.getChangesMap();
 
 		PollResult deletePollResult = buildDeletePollResult();
 
-		startPollTask(deletePollResult);
+		super.startPollTask(deletePollResult);
 
 		mSecondChangesMap = super.mService.getChangesMap();
 	}

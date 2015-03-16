@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
+package de.hshannover.f4.trust.visitmeta.ifmap.testcases.multisubscription;
 
 import java.util.ArrayList;
 import java.util.Date;

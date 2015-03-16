@@ -36,14 +36,11 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap.subscription.multi.testcases;
-
-import static org.junit.Assert.assertEquals;
+package de.hshannover.f4.trust.visitmeta.ifmap.testcases.multisubscription;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.junit.Test;
@@ -58,46 +55,50 @@ import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
 import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 
-public class SimpleMultivalueTest extends AbstractMultiSubscriptionTestCase {
+public class SimpleSingleValueTest extends AbstractMultiSubscriptionTestCase {
 
 	private static final Date FIRST_TIMESTAMP = new Date(3333);
 
-	private SortedMap<Long, Long> mChangesMap;
+	private static final Date SECOND_TIMESTAMP = new Date(5555);
+
+	private SortedMap<Long, Long> mFirstChangesMap;
+
+	private SortedMap<Long, Long> mSecondChangesMap;
 
 	@Test
-	public void singleValue_ShouldReturnTheRightChangeMapSize() {
+	public void shouldReturnTheRightChangeMapSize() {
+		executeFirstPoll();
 		executePollWithSingleValue();
 
-		super.assertEqualsMapSize(mChangesMap, 1);
+		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
 	@Test
-	public void singleValue_ShouldReturnTheRightChangeMapChangeValue() {
+	public void shouldReturnTheRightChangeMapChangeValues() {
+		executeFirstPoll();
 		executePollWithSingleValue();
 
-		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
-			assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", 1L, entry.getValue()
-					.longValue());
-			break;
-		}
+		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
 	@Test
-	public void multiValue_ShouldReturnTheRightChangeMapSize() {
-		executePollWithMultiValue();
+	public void shouldReturnTheRightSecondChangeMapChangeValue() {
+		executeFirstPoll();
+		executePollWithSingleValue();
 
-		super.assertEqualsMapSize(mChangesMap, 1);
+		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
-	@Test
-	public void multiValue_ShouldReturnTheRightChangeMapChangeValue() {
-		executePollWithMultiValue();
+	private void executeFirstPoll() {
+		// mock first and second poll results
+		PollResult firstPollResult = buildFirstPollResult();
 
-		for (Entry<Long, Long> entry : mChangesMap.entrySet()) {
-			assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", 1L, entry.getValue()
-					.longValue());
-			break;
-		}
+		// run first poll
+		startPollTask(firstPollResult);
+
+		// save current ChangesMap after the first poll
+		mFirstChangesMap = super.mService.getChangesMap();
+
 	}
 
 	private void executePollWithSingleValue() {
@@ -107,60 +108,20 @@ public class SimpleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		// run poll
 		startPollTask(pollResult);
 
-		// save current ChangesMap after the first poll
-		mChangesMap = super.mService.getChangesMap();
+		// save current ChangesMap after the second poll
+		mSecondChangesMap = super.mService.getChangesMap();
 
-	}
-
-	private void executePollWithMultiValue() {
-		// mock poll results
-		PollResult pollResult = buildMultiValuePollResult();
-
-		// run poll
-		startPollTask(pollResult);
-
-		// save current ChangesMap after the first poll
-		mChangesMap = super.mService.getChangesMap();
-
-	}
-
-	private List<ResultItem> buildMultiValueResultItems() {
-		Identifier identifierIP = Identifiers.createIp4("192.168.0.1");
-		Identifier identifierMAC = Identifiers.createMac("00:11:22:33:44:55");
-
-		ResultItemMock resultItem_mock = new ResultItemMock(identifierIP, identifierMAC);
-
-		resultItem_mock.addIpMac(FIRST_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem_mock.getMock());
-
-		return resultItems;
-	}
-
-	private PollResult buildMultiValuePollResult() {
-		List<ResultItem> resultItems = buildMultiValueResultItems();
-
-		SearchResultMock searchResult1_mock = new SearchResultMock(resultItems, Type.updateResult);
-		SearchResultMock searchResult2_mock = new SearchResultMock(resultItems, Type.updateResult);
-
-		PollResultMock secondPollResult_mock = new PollResultMock();
-		secondPollResult_mock.addSearchResult(searchResult1_mock.getMock());
-		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
-
-		return secondPollResult_mock.getMock();
 	}
 
 	private List<ResultItem> buildSingleValueResultItems() {
 		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
-		Identifier identifierMAC = Identifiers.createMac("00:11:22:33:44:55");
 
-		ResultItemMock resultItem_mock = new ResultItemMock(identifierAR, identifierMAC);
+		ResultItemMock resultItem1_mock = new ResultItemMock(identifierAR);
 
-		resultItem_mock.addArMac(FIRST_TIMESTAMP);
+		resultItem1_mock.addArDev(SECOND_TIMESTAMP);
 
 		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem_mock.getMock());
+		resultItems.add(resultItem1_mock.getMock());
 
 		return resultItems;
 	}
@@ -176,6 +137,35 @@ public class SimpleMultivalueTest extends AbstractMultiSubscriptionTestCase {
 		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
 
 		return secondPollResult_mock.getMock();
+	}
+
+	private List<ResultItem> buildFirstResultItems() {
+		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
+		Identifier identifierMAC1 = Identifiers.createMac("00:11:22:33:44:55");
+		Identifier identifierMAC2 = Identifiers.createMac("11:22:33:44:55:66");
+
+		ResultItemMock resultItem1_mock = new ResultItemMock(identifierAR, identifierMAC1);
+		ResultItemMock resultItem2_mock = new ResultItemMock(identifierAR, identifierMAC2);
+
+		resultItem1_mock.addArMac(FIRST_TIMESTAMP);
+		resultItem2_mock.addArMac(FIRST_TIMESTAMP);
+
+		List<ResultItem> resultItems = new ArrayList<ResultItem>();
+		resultItems.add(resultItem1_mock.getMock());
+		resultItems.add(resultItem2_mock.getMock());
+
+		return resultItems;
+	}
+
+	private PollResult buildFirstPollResult() {
+		List<ResultItem> resultItems = buildFirstResultItems();
+
+		SearchResultMock searchResult_mock = new SearchResultMock(resultItems, Type.updateResult);
+
+		PollResultMock pollResult_mock = new PollResultMock();
+		pollResult_mock.addSearchResult(searchResult_mock.getMock());
+
+		return pollResult_mock.getMock();
 	}
 
 }

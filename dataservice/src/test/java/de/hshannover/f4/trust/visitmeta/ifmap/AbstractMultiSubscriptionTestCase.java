@@ -287,20 +287,6 @@ public abstract class AbstractMultiSubscriptionTestCase {
 		}
 	}
 
-	protected void testGraphListSize(List<IdentifierGraph> list, int expectedGraphListSize) {
-		assertEquals(expectedGraphListSize, list.size());
-	}
-
-	protected void testIdentifierCount(IdentifierGraph graph, int expectedIdentifierCount) {
-		List<Identifier> identifiers = graph.getIdentifiers();
-		assertEquals(expectedIdentifierCount, identifiers.size());
-	}
-
-	protected void testMetadataCount(Identifier identifier, int expectedIdentifierCount) {
-		List<Metadata> metadataList = identifier.getMetadata();
-		assertEquals(expectedIdentifierCount, metadataList.size());
-	}
-
 	protected void printNeo4jDB() {
 		Neo4JTestDatabaseFactory.printDB(mGraphDb);
 	}

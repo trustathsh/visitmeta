@@ -260,15 +260,15 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 	public void updateWindow() {
 		LOGGER.trace("Method updateWindow() called.");
 		mSelectPublisher.removeAllItems();
-		mSelectPublisher.addItem("identifier: access-request");
-		mSelectPublisher.addItem("identifier: device");
-		mSelectPublisher.addItem("identifier: identity");
-		mSelectPublisher.addItem("identifier: ip-address");
-		mSelectPublisher.addItem("identifier: mac-address");
-		mSelectPublisher.addItem("identifier: extended");
-		mSelectPublisher.addItem("default metadata");
+		mSelectPublisher.addItem("Identifier: access-request");
+		mSelectPublisher.addItem("Identifier: device");
+		mSelectPublisher.addItem("Identifier: identity");
+		mSelectPublisher.addItem("Identifier: ip-address");
+		mSelectPublisher.addItem("Identifier: mac-address");
+		mSelectPublisher.addItem("Identifier: extended");
+		mSelectPublisher.addItem("Default Metadata");
 		for (String s : mPublisher) {
-			mSelectPublisher.addItem(s);
+			mSelectPublisher.addItem("Publisher-ID: " + s);
 		}
 	}
 
@@ -278,10 +278,25 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 	private void setColorChooserColor() {
 		LOGGER.trace("Method setColorChooserColor() called.");
 		ButtonModel vButton = mGroup.getSelection();
-		String vKey = "color." + mSelectPublisher.getSelectedItem() + "."
-				+ vButton.getActionCommand();
-		String vDefault = mConfig.getString(
-				"color.metadata." + vButton.getActionCommand(), "0xFFFFFF");
+
+		String selectedItem = (String) mSelectPublisher.getSelectedItem();
+		String actionCommand = vButton.getActionCommand();
+
+		if (selectedItem != null) {
+			if (selectedItem.contains("Identifier:")) {
+				selectedItem = selectedItem.replace("Identifier: ",
+						"identifier.");
+			} else if (selectedItem.contains("Default Metadata")) {
+				selectedItem = selectedItem.replace("Default Metadata",
+						"metadata");
+			} else if (selectedItem.contains("Publisher-ID:")) {
+				selectedItem = selectedItem.replace("Publisher-ID: ", "");
+			}
+		}
+
+		String vKey = "color." + selectedItem + "." + actionCommand;
+		String vDefault = mConfig.getString("color.metadata." + actionCommand,
+				"0xFFFFFF");
 		Color vColor = Color.decode(mConfig.getString(vKey, vDefault));
 		mColorChooser.setColor(vColor);
 		mDelay.stop();

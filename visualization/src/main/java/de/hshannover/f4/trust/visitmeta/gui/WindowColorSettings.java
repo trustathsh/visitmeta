@@ -165,8 +165,8 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 								+ "." + vParam;
 					} else {
 						vType = NodeType.METADATA;
-						vPublisher = (String) mSelectPublisher
-								.getSelectedItem();
+						vPublisher = cleanUpPublisherString((String) mSelectPublisher
+								.getSelectedItem());
 						vProperty = "color." + vPublisher + "." + vParam;
 					}
 					String vColor = "0x"
@@ -183,6 +183,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 				}
 				mDelay.stop();
 			}
+
 		});
 
 		/* Color Chooser */
@@ -254,6 +255,22 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		pack();
 	}
 
+	private String cleanUpPublisherString(String selectedItem) {
+		if (selectedItem != null) {
+			if (selectedItem.contains("Identifier:")) {
+				return selectedItem.replace("Identifier: ", "identifier.");
+			} else if (selectedItem.contains("Default Metadata")) {
+				return selectedItem.replace("Default Metadata", "metadata");
+			} else if (selectedItem.contains("Publisher-ID:")) {
+				return selectedItem.replace("Publisher-ID: ", "");
+			} else {
+				return selectedItem;
+			}
+		} else {
+			return "";
+		}
+	}
+
 	/**
 	 * Updates the list of known publishers.
 	 */
@@ -279,20 +296,9 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		LOGGER.trace("Method setColorChooserColor() called.");
 		ButtonModel vButton = mGroup.getSelection();
 
-		String selectedItem = (String) mSelectPublisher.getSelectedItem();
+		String selectedItem = cleanUpPublisherString((String) mSelectPublisher
+				.getSelectedItem());
 		String actionCommand = vButton.getActionCommand();
-
-		if (selectedItem != null) {
-			if (selectedItem.contains("Identifier:")) {
-				selectedItem = selectedItem.replace("Identifier: ",
-						"identifier.");
-			} else if (selectedItem.contains("Default Metadata")) {
-				selectedItem = selectedItem.replace("Default Metadata",
-						"metadata");
-			} else if (selectedItem.contains("Publisher-ID:")) {
-				selectedItem = selectedItem.replace("Publisher-ID: ", "");
-			}
-		}
 
 		String vKey = "color." + selectedItem + "." + actionCommand;
 		String vDefault = mConfig.getString("color.metadata." + actionCommand,

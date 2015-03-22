@@ -1,0 +1,150 @@
+\section{Graph Management}
+The last sections shows how to view graphs or deltas at different timestamps.
+\subsection{Changes Map}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/graph/changes
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/graph/changes
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+{
+    "1425915295000": 1,
+    "1425915342000": 1
+}
+\end{lstlisting}
+\end{minipage}
+The Response is a JSON-Object mapping timestamps on the amount of changes occurred at that time.
+
+
+\subsection{Initial Graph}\label{initial}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/graph/initial
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/graph/initial
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+[{
+    "timestamp": 1425915295000,
+    "links": [{
+        "identifiers": [{
+            "typename": "device",
+            "properties": {
+                "name": "freeradius-pdp"
+            }
+        }, {
+            "typename": "access-request",
+            "properties": {
+                "name": "ar1"
+            }
+        }],
+        "metadata": {
+            "typename": "access-request-device",
+            "properties": { 
+                "ifmap-cardinality": "singleValue",
+            }
+        }
+    }]
+}]
+\end{lstlisting}
+Note: The response was reduced for an easier view.
+\end{minipage}
+
+\subsection{Current Graph}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/graph/current
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/graph/current
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+See \ref{initial}
+\end{minipage}
+
+\subsection{Graph At}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/
+	graph/{Timestamp}
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/graph/1425915342000
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+See \ref{initial}
+\end{minipage}
+
+\subsection{Notifies At}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/graph/
+	{Timestamp}?onlyNotifies=true
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/
+	graph/314159265?onlyNotifies=true
+\end{lstlisting}
+\end{minipage}
+
+\textbf{Response:}
+See \ref{initial}. Only difference to initial, current or graph at response: each notify metadata has its own subgraph.
+
+
+\subsection{Delta}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/graph/
+	{Timestamp From}/{Timestamp To}
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/
+	graph/314159265/358979323
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+See \ref{initial}
+\end{minipage}

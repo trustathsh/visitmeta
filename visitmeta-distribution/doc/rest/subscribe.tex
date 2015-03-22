@@ -1,0 +1,108 @@
+\section{Subscribe Management}
+The following section shows the handling of subscriptions. \{Subscription Name\} like \{Connection Name\} is a unique identifier which can be chosen freely.
+\subsection{Get Subscriptions}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/{Connection Name}/subscribe
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/subscribe
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+["default", "exampleSub"]
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Subscribe}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/{Connection Name}/subscribe/update
+Content-Type: application/json
+{
+  subscribeName:{Subscription Name},
+  identifierType:{Identifier Type},
+  identifier:{Identifier}
+}
+\end{lstlisting}
+Identifier Types are:
+\begin{itemize}
+\item access-request
+\item device
+\item ip-address
+\item mac-address
+\end{itemize}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/subscribe/update
+Content-Type: application/json
+{
+  subscribeName:exampleSub,
+  identifierType:device,
+  identifier:exampleDevice
+}
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+INFO: subscribe successfully
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Delete Subscription}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/{Connection Name}/
+	subscribe/delete/{Subscription Name}
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/default/
+	subscribe/delete/exampleSub
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+INFO: delete subscription(exampleSub) successfully
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Delete All Subscriptions}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/{Connection Name}/
+	subscribe/delete?deleteAll=true
+\end{lstlisting}
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/default/
+	subscribe/delete?deleteAll=true
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+\begin{lstlisting}
+INFO: delete all active subscriptions successfully
+\end{lstlisting}
+\end{minipage}

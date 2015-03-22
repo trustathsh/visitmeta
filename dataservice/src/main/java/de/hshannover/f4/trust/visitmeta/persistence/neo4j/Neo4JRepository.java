@@ -158,7 +158,7 @@ public class Neo4JRepository implements Repository {
 		Node node = getNodeById(id);
 		Neo4JMetadata meta = new Neo4JMetadata(node, this);
 		if(node.hasLabel(Neo4JTypeLabels.NOTIFY)) {
-			meta.setIsNotify(true);
+			meta.switchToNotify();
 		}
 		return meta;
 	}

@@ -163,7 +163,9 @@ class PollTask implements Callable<PollResult> {
 		List<InternalMetadata> metadata = new ArrayList<>(metadataDocuments.size());
 		for (Document d : metadataDocuments) {
 			InternalMetadata m = mMetadataFactory.createMetadata(d);
-			m.setIsNotify(type == ResultItemTypeEnum.NOTIFY);
+			if(type == ResultItemTypeEnum.NOTIFY) {
+				m.switchToNotify();
+			}
 			metadata.add(m);
 		}
 

@@ -190,7 +190,11 @@ public abstract class InternalMetadata implements Propable{
 		return mIsNotify;
 	}
 
-	public void setIsNotify(boolean isNotify) {
-		mIsNotify = isNotify;
+	/**
+	 * Changes the status of the metadata to nofiy. It can not be
+	 * reversed!
+	 */
+	public void switchToNotify() {
+		mIsNotify = true;
 	}
 }

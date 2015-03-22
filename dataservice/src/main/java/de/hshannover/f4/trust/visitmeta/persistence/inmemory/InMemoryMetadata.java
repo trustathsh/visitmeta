@@ -134,6 +134,9 @@ public class InMemoryMetadata extends InternalMetadata {
 	}
 	@Override
 	public long getDeleteTimestamp() {
+		if(this.isNotify()) {
+			return getPublishTimestamp();
+		}
 		return mDeleteTimestamp;
 	}
 

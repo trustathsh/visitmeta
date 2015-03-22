@@ -178,6 +178,9 @@ public class Neo4JMetadata extends InternalMetadata {
 	@Override
 	public long getDeleteTimestamp() {
 		// TODO handle false Metadata
+		if(this.isNotify()) {
+			return getPublishTimestamp();
+		}
 		String value = "";
 		try (Transaction tx = mRepo.beginTx()) {
 			value = mMe.getProperty(KEY_TIMESTAMP_DELETE,

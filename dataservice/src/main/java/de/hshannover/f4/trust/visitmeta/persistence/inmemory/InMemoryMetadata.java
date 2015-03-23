@@ -21,7 +21,7 @@
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2015 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,9 @@ public class InMemoryMetadata extends InternalMetadata {
 	}
 	@Override
 	public long getDeleteTimestamp() {
+		if(this.isNotify()) {
+			return getPublishTimestamp();
+		}
 		return mDeleteTimestamp;
 	}
 

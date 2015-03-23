@@ -21,7 +21,7 @@
  * This file is part of visitmeta-dataservice, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2015 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ public class Neo4JRepository implements Repository {
 		Node node = getNodeById(id);
 		Neo4JMetadata meta = new Neo4JMetadata(node, this);
 		if(node.hasLabel(Neo4JTypeLabels.NOTIFY)) {
-			meta.setIsNotify(true);
+			meta.switchToNotify();
 		}
 		return meta;
 	}

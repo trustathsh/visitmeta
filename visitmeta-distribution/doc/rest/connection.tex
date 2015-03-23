@@ -1,0 +1,120 @@
+\section{Connection Management}
+This section shows examples using the REST-Interface to manage connections from the dataservice to any given number of map-server. The \{Connection Name\} is a unique name for each connection which can be chosen freely.
+
+\subsection{Get Connections}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000
+\end{lstlisting}
+
+If the suffix \textit{?onlyActive=true} is given, only active connections will be returned.
+
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000?onlyActive=true
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+["default", "exampleConn"]
+\end{lstlisting}
+The Response returns a JSON-Array which contains every \{Connection Name\} saved in the dataservice. 
+
+\subsection{Save Connection}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/
+Content-Type: application/json
+{
+	connectionName:{Connection Name}
+	ifmapServerUrl:{map-Server},
+	userName:{Username},
+	userPassword:{Password}
+}
+\end{lstlisting}
+List of required parameters:
+\begin{itemize}
+\item connectionName
+\item ifmapServerUrl
+\item userName
+\item userPassword
+\end{itemize}
+List of optional parameters:
+\begin{itemize}
+\item authenticationBasic
+\item truststorePath
+\item truststorePassword
+\item useConnectionAsStartup
+\item maxPollResultSize
+\end{itemize}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/
+Content-Type: application/json
+{
+	connectionName: exampleConn
+	ifmapServerUrl:"https://localhost:8443",
+	userName:visitmeta,
+	userPassword:visitmeta
+}
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+exampleConn was saved
+\end{lstlisting}
+
+\subsection{Delete Connection}
+\textbf{Not implemented as of \today}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/{Connection Name}
+\end{lstlisting}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:DELETE
+http://example.com:8000/default
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+Not implemented
+\end{lstlisting}
+
+\subsection{Connect}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/{Connection Name}/connect
+\end{lstlisting}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/connect
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+INFO: connecting successfully
+\end{lstlisting}
+
+\subsection{Disconnect}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/{Connection Name}/disconnect
+\end{lstlisting}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/disconnect
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+INFO: disconnection successfully
+\end{lstlisting}

@@ -21,7 +21,7 @@
  * This file is part of visitmeta-visualization, version 0.3.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
- * Copyright (C) 2012 - 2013 Trust@HsH
+ * Copyright (C) 2012 - 2015 Trust@HsH
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,8 +165,8 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 								+ "." + vParam;
 					} else {
 						vType = NodeType.METADATA;
-						vPublisher = (String) mSelectPublisher
-								.getSelectedItem();
+						vPublisher = cleanUpPublisherString((String) mSelectPublisher
+								.getSelectedItem());
 						vProperty = "color." + vPublisher + "." + vParam;
 					}
 					String vColor = "0x"
@@ -183,6 +183,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 				}
 				mDelay.stop();
 			}
+
 		});
 
 		/* Color Chooser */
@@ -254,21 +255,37 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		pack();
 	}
 
+	private String cleanUpPublisherString(String selectedItem) {
+		if (selectedItem != null) {
+			if (selectedItem.contains("Identifier:")) {
+				return selectedItem.replace("Identifier: ", "identifier.");
+			} else if (selectedItem.contains("Default Metadata")) {
+				return selectedItem.replace("Default Metadata", "metadata");
+			} else if (selectedItem.contains("Publisher-ID:")) {
+				return selectedItem.replace("Publisher-ID: ", "");
+			} else {
+				return selectedItem;
+			}
+		} else {
+			return "";
+		}
+	}
+
 	/**
 	 * Updates the list of known publishers.
 	 */
 	public void updateWindow() {
 		LOGGER.trace("Method updateWindow() called.");
 		mSelectPublisher.removeAllItems();
-		mSelectPublisher.addItem("identifier: access-request");
-		mSelectPublisher.addItem("identifier: device");
-		mSelectPublisher.addItem("identifier: identity");
-		mSelectPublisher.addItem("identifier: ip-address");
-		mSelectPublisher.addItem("identifier: mac-address");
-		mSelectPublisher.addItem("identifier: extended");
-		mSelectPublisher.addItem("default metadata");
+		mSelectPublisher.addItem("Identifier: access-request");
+		mSelectPublisher.addItem("Identifier: device");
+		mSelectPublisher.addItem("Identifier: identity");
+		mSelectPublisher.addItem("Identifier: ip-address");
+		mSelectPublisher.addItem("Identifier: mac-address");
+		mSelectPublisher.addItem("Identifier: extended");
+		mSelectPublisher.addItem("Default Metadata");
 		for (String s : mPublisher) {
-			mSelectPublisher.addItem(s);
+			mSelectPublisher.addItem("Publisher-ID: " + s);
 		}
 	}
 
@@ -278,10 +295,14 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 	private void setColorChooserColor() {
 		LOGGER.trace("Method setColorChooserColor() called.");
 		ButtonModel vButton = mGroup.getSelection();
-		String vKey = "color." + mSelectPublisher.getSelectedItem() + "."
-				+ vButton.getActionCommand();
-		String vDefault = mConfig.getString(
-				"color.metadata." + vButton.getActionCommand(), "0xFFFFFF");
+
+		String selectedItem = cleanUpPublisherString((String) mSelectPublisher
+				.getSelectedItem());
+		String actionCommand = vButton.getActionCommand();
+
+		String vKey = "color." + selectedItem + "." + actionCommand;
+		String vDefault = mConfig.getString("color.metadata." + actionCommand,
+				"0xFFFFFF");
 		Color vColor = Color.decode(mConfig.getString(vKey, vDefault));
 		mColorChooser.setColor(vColor);
 		mDelay.stop();

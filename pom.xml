@@ -37,10 +37,10 @@
 			<name>Trust@HsH</name>
 			<email>trust@f4-i.fh-hannover.de</email>
 		</developer>
-        </developers>
+	</developers>
 	
 	<contributors>
-    	<contributor>
+		<contributor>
 			<name>Bastian Hellmann</name>
 		</contributor>
 		<contributor>
@@ -93,12 +93,23 @@
 				<configuration>
 					<licenseName>apache_v2</licenseName>
 					<canUpdateDescription>true</canUpdateDescription>
+					<canUpdateCopyright>true</canUpdateCopyright>
 					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
 					<descriptionTemplate>${basedir}/src/license/description_template.ftl</descriptionTemplate>
 					<roots>
 						<root>src/main/java</root>
 						<root>src/test/java</root>
+						<root>src/license/dummy</root>
 					</roots>
+				</configuration>
+			</plugin>		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<propertyExpansion>headerfile=${project.basedir}/src/license/dummy/Dummy.java</propertyExpansion>
+					<configLocation>https://raw.githubusercontent.com/trustathsh/ironcommon/master/src/main/documents/trustAtHsHCheckstylePolicy.xml</configLocation>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -111,7 +122,7 @@
 				<artifactId>ironcommon</artifactId>
 				<version>0.1.0</version>
 			</dependency>
-    		<dependency>
+			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>visitmeta-common</artifactId>
 				<version>0.3.0</version>

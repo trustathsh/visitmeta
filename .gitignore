@@ -2,12 +2,6 @@
 .project
 .classpath
 .DS_Store
-.checkstyle
-common/.checkstyle
-dataservice/.checkstyle
-src/license/dummy/Dummy.java
-visitmeta-distribution/.checkstyle
-visualization/.checkstyle
 target/
 test.properties
 bin/

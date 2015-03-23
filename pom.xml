@@ -9,7 +9,7 @@
 	<!-- general project information -->
 	<groupId>de.hshannover.f4.trust</groupId>
 	<artifactId>visitmeta</artifactId>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
 	<packaging>pom</packaging>
 	<name>visitmeta</name>
 	<url>http://trust.f4.hs-hannover.de/</url>
@@ -125,7 +125,7 @@
 			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>visitmeta-common</artifactId>
-				<version>0.3.0</version>
+				<version>0.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>

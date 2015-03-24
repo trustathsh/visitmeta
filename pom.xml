@@ -9,7 +9,7 @@
 	<!-- general project information -->
 	<groupId>de.hshannover.f4.trust</groupId>
 	<artifactId>visitmeta</artifactId>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
 	<packaging>pom</packaging>
 	<name>visitmeta</name>
 	<url>http://trust.f4.hs-hannover.de/</url>
@@ -120,12 +120,12 @@
 			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>ironcommon</artifactId>
-				<version>0.1.0</version>
+				<version>0.1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>visitmeta-common</artifactId>
-				<version>0.3.0</version>
+				<version>0.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -136,7 +136,7 @@
 			<dependency>
 				<groupId>de.hshannover.f4.trust</groupId>
 				<artifactId>ifmapj</artifactId>
-				<version>2.2.0</version>
+				<version>2.2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>

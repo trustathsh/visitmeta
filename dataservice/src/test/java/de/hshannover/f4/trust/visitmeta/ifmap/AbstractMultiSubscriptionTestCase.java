@@ -282,8 +282,7 @@ public abstract class AbstractMultiSubscriptionTestCase {
 				|| currendMetadataCount != expectedMetadataCount) {
 			fail("GraphCount: " + currendGraphCount + "(" + expectedGraphCount + ") IdentifierCount: "
 					+ currendIdentifierCount + "(" + expectedIdentifierCount + ")MetadataCount: "
-					+ currendMetadataCount + "("
-					+ expectedMetadataCount + ") [example: 'currend'('expected')]");
+					+ currendMetadataCount + "(" + expectedMetadataCount + ") [example: 'currend'('expected')]");
 		}
 	}
 

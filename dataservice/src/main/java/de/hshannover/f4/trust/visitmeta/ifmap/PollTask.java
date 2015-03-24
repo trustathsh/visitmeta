@@ -39,7 +39,10 @@
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -69,6 +72,8 @@ class PollTask implements Callable<PollResult> {
 
 	private IfmapJHelper mIfmapJHelper;
 
+	Map<String, List<ResultItem>> mSearchResults;
+
 	/**
 	 * Create a new <tt>PollTask</tt> which uses the given {@link ARC} for
 	 * polling. The received data gets returned as a {@link PollResult}.
@@ -85,6 +90,7 @@ class PollTask implements Callable<PollResult> {
 		if (metadataFactory == null) {
 			throw new IllegalArgumentException("metadataFactory cannot be null");
 		}
+		mSearchResults = new HashMap<String, List<ResultItem>>();
 		mConnection = connection;
 		mMetadataFactory = metadataFactory;
 		mIfmapJHelper = helper;
@@ -103,33 +109,94 @@ class PollTask implements Callable<PollResult> {
 
 		de.hshannover.f4.trust.ifmapj.messages.PollResult pollResult = mConnection.poll();
 
-		List<ResultItem> results = new ArrayList<>();
 		for (SearchResult searchResult : pollResult.getResults()) {
 			switch (searchResult.getType()) {
-			case updateResult:
-				log.debug("processing update list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.UPDATE));
-				break;
-			case searchResult:
-				log.debug("processing search list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.SEARCH));
-				break;
-			case deleteResult:
-				log.debug("processing delete list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.DELETE));
-				break;
-			case notifyResult:
-				log.debug("processing notify list ...");
-				results.addAll(transformResultItems(searchResult.getResultItems(), ResultItemTypeEnum.NOTIFY));
-				break;
-			default:
-				log.info(searchResult.getType() + " result skipped");
-				break;
+				case updateResult:
+					log.debug("processing update list ...");
+					transformSearchResult(searchResult, ResultItemTypeEnum.UPDATE);
+					break;
+				case searchResult:
+					log.debug("processing search list ...");
+					transformSearchResult(searchResult, ResultItemTypeEnum.SEARCH);
+					break;
+				case deleteResult:
+					log.debug("processing delete list ...");
+					transformSearchResult(searchResult, ResultItemTypeEnum.DELETE);
+					break;
+				case notifyResult:
+					log.debug("processing notify list ...");
+					transformSearchResult(searchResult, ResultItemTypeEnum.NOTIFY);
+					break;
+				default:
+					log.info(searchResult.getType() + " result skipped");
+					break;
 			}
 		}
+
+		List<ResultItem> results = buildResultItemList();
+
 		log.debug("finish poll request.");
 		return new PollResult(results);
 
+	}
+
+	private List<ResultItem> buildResultItemList() {
+		int resultItemRemovedCount = 0;
+		List<ResultItem> results = new ArrayList<>();
+		for (Entry<String, List<ResultItem>> entry : mSearchResults.entrySet()) {
+			for (ResultItem item : entry.getValue()) {
+				if (item.getType() == ResultItemTypeEnum.DELETE) {
+					// check DELETE-ResultItems that are included in all other subscriptions
+					if (containsOtherSubscrptions(item, entry.getKey())) {
+						results.add(item);
+					} else {
+						resultItemRemovedCount++;
+					}
+				} else {
+					results.add(item);
+				}
+			}
+		}
+
+		if(resultItemRemovedCount > 0){
+			log.debug("removed " + resultItemRemovedCount
+					+ " DELETE-ResultItem(s) because not included in the other SearchResults");
+		}
+
+		return results;
+	}
+
+	private boolean containsOtherSubscrptions(ResultItem item, String subscriptionName) {
+		for (String key : mSearchResults.keySet()) {
+			if (!key.equals(subscriptionName)) {
+				// only for other subscriptions
+				if (!containsSubscription(item, key)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean containsSubscription(ResultItem item, String subscriptionName) {
+		List<ResultItem> results = mSearchResults.get(subscriptionName);
+		return results.contains(item);
+	}
+
+	private void transformSearchResult(SearchResult searchResult, ResultItemTypeEnum type) {
+		String subscriptionName = searchResult.getName();
+		if (subscriptionName == null) {
+			log.warn("SearchResult name is null! Nothing stored!");
+			return;
+		}
+
+		List<ResultItem> results = transformResultItems(searchResult.getResultItems(), type);
+
+		if (mSearchResults.containsKey(subscriptionName)) {
+			mSearchResults.get(subscriptionName).addAll(results);
+		} else {
+			mSearchResults.put(subscriptionName, results);
+		}
 	}
 
 	/**

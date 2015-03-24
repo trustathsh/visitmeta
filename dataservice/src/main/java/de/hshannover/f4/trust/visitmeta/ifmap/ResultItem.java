@@ -92,6 +92,51 @@ public class ResultItem {
 	}
 
 	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other == this) {
+			return true;
+		}
+		if (!(other instanceof ResultItem)) {
+			return false;
+		}
+
+		ResultItem otherItem = (ResultItem) other;
+
+		if (mIsLinkUpdate != otherItem.mIsLinkUpdate) {
+			return false;
+		}
+
+		if (mType != otherItem.mType) {
+			return false;
+		}
+
+		if (getId1() == null) {
+			if (otherItem.getId1() != null) {
+				return false;
+			}
+		} else if (!getId1().equals(otherItem.getId1())) {
+			return false;
+		}
+
+		if (getId2() == null) {
+			if (otherItem.getId2() != null) {
+				return false;
+			}
+		} else if (!getId2().equals(otherItem.getId2())) {
+			return false;
+		}
+
+		if (!getMetadata().equals(otherItem.getMetadata())) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder("ResultItem(");
 		s.append(mId1);

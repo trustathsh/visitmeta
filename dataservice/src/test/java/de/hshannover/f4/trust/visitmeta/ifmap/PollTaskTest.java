@@ -220,6 +220,7 @@ public class PollTaskTest {
 		SearchResult searchResult = mock(SearchResult.class);
 		when(searchResult.getResultItems()).thenReturn(item);
 		when(searchResult.getType()).thenReturn(type);
+		when(searchResult.getName()).thenReturn("SearchResultMock_Test");
 		return searchResult;
 	}
 

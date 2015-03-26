@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -451,9 +451,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private void addMetadata(NodeMetadata pNode) {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			String vType = pNode.getMetadata().getTypeName();
-			final String vPublisher = pNode.getMetadata().valueFor(
-					"/meta:" + vType + "[@ifmap-publisher-id]");
+			final String vPublisher = findPublisherId(pNode.getMetadata());
 			if (!mPublisher.contains(vPublisher)) {
 				mPublisher.add(vPublisher);
 			}
@@ -497,6 +495,15 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				}
 			});
 		}
+	}
+
+	private String findPublisherId(Metadata metadata) {
+		for (String property : metadata.getProperties()) {
+			if (property.contains("[@ifmap-publisher-id]")) {
+				return metadata.valueFor(property);
+			}
+		}
+		return "";
 	}
 
 	@Override
@@ -915,7 +922,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				.containsSearchTerm(metadata, mSearchTerm);
 
 		String publisher = "";
-		if (vCom.getAttribute("publisher").equals(pPublisher)) {
+		if (vCom.getAttribute("publisher", "").equals(pPublisher)) {
 			publisher = pPublisher;
 		} else if (pPublisher.equals("")) {
 			publisher = (String) vCom.getAttribute("publisher");

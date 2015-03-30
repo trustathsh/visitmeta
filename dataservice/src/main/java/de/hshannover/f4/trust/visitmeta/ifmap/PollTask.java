@@ -39,16 +39,20 @@
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import de.hshannover.f4.trust.ifmapj.channel.ARC;
+import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
@@ -106,6 +110,8 @@ class PollTask implements Callable<PollResult> {
 
 		de.hshannover.f4.trust.ifmapj.messages.PollResult pollResult = mConnection.poll();
 
+		printErrors(pollResult.getErrorResults());
+
 		Map<String, List<ResultItem>> searchResults = new HashMap<String, List<ResultItem>>();
 		for (SearchResult searchResult : pollResult.getResults()) {
 			switch (searchResult.getType()) {
@@ -146,37 +152,100 @@ class PollTask implements Callable<PollResult> {
 
 	}
 
+	private void printErrors(Collection<IfmapErrorResult> errorResults) {
+		if (errorResults.size() > 0) {
+			for (IfmapErrorResult error : errorResults) {
+				log.error(error.toString());
+			}
+		}
+	}
+
 	private List<ResultItem> filterDeleteResultItems(Map<String, List<ResultItem>> searchResults) {
-		int resultItemRemovedCount = 0;
+		// find linked subscriptions
+		List<Set<String>> linkedSubscriptionList = findLinkedSubscriptions(searchResults);
+
+		// filter DELETE-ResultItems
+		int filteredCount = 0;
 		List<ResultItem> results = new ArrayList<>();
 		for (Entry<String, List<ResultItem>> entry : searchResults.entrySet()) {
 			for (ResultItem item : entry.getValue()) {
 				if (item.getType() == ResultItemTypeEnum.DELETE) {
-					// check DELETE-ResultItems that are included in all other subscriptions
-					if (containsOtherSubscrptions(searchResults, item, entry.getKey())) {
+					// only for DELETE-ResultItems
+					Set<String> linkedSubSet = findLinkedSubscriptionSet(entry.getKey(), linkedSubscriptionList);
+
+					if (linkedSubSet == null || containsOtherSubscrptions(searchResults, item, linkedSubSet)) {
+						// check DELETE-ResultItems that are included in all linked subscriptions or is null
 						results.add(item);
 					} else {
-						resultItemRemovedCount++;
+						filteredCount++;
 					}
+
 				} else {
 					results.add(item);
 				}
 			}
 		}
 
-		if(resultItemRemovedCount > 0){
-			log.debug("removed " + resultItemRemovedCount
+		if (filteredCount > 0) {
+			log.debug("removed " + filteredCount
 					+ " DELETE-ResultItem(s) because not included in the other SearchResults");
 		}
 
 		return results;
 	}
 
+	private Set<String> findLinkedSubscriptionSet(String subscription, List<Set<String>> linkedSubscriptions) {
+		for (Set<String> set : linkedSubscriptions) {
+			if (set.contains(subscription)) {
+				return set;
+			}
+		}
+		return null;
+	}
+
+	private List<Set<String>> findLinkedSubscriptions(Map<String, List<ResultItem>> searchResults) {
+		List<Set<String>> linkedSubscriptions = new ArrayList<Set<String>>();
+
+		for (Entry<String, List<ResultItem>> entry : searchResults.entrySet()) {
+			for (ResultItem item : entry.getValue()) {
+				Set<String> subscriptions = findLinkedSubscriptions(searchResults, item);
+				if (subscriptions.size() > 1) {
+					addSubscriptionSet(linkedSubscriptions, subscriptions);
+				}
+			}
+		}
+		return linkedSubscriptions;
+	}
+
+	private void addSubscriptionSet(List<Set<String>> linkedSubscriptions, Set<String> subscriptions) {
+		for (Set<String> set : linkedSubscriptions) {
+			for (String s : subscriptions) {
+				if (set.contains(s)) {
+					set.addAll(subscriptions);
+					return;
+				}
+			}
+		}
+		linkedSubscriptions.add(subscriptions);
+	}
+
+	private Set<String> findLinkedSubscriptions(Map<String, List<ResultItem>> searchResults, ResultItem resultItem) {
+		Set<String> subscriptions = new HashSet<String>();
+
+		for (Entry<String, List<ResultItem>> entry : searchResults.entrySet()) {
+			if (entry.getValue().contains(resultItem)) {
+				subscriptions.add(entry.getKey());
+			}
+		}
+
+		return subscriptions;
+	}
+
 	private boolean containsOtherSubscrptions(Map<String, List<ResultItem>> searchResults, ResultItem item,
-			String subscriptionName) {
+			Set<String> subscriptions) {
 		for (String key : searchResults.keySet()) {
-			if (!key.equals(subscriptionName)) {
-				// only for other subscriptions
+			if (subscriptions.contains(key)) {
+				// only for linked subscriptions
 				if (!containsSubscription(searchResults, item, key)) {
 					return false;
 				}

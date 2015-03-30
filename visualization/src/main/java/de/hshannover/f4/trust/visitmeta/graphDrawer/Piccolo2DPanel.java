@@ -18,7 +18,7 @@
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of visitmeta-visualization, version 0.4.0,
+ * This file is part of visitmeta-visualization, version 0.4.1,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2015 Trust@HsH
@@ -451,9 +451,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private void addMetadata(NodeMetadata pNode) {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			String vType = pNode.getMetadata().getTypeName();
-			final String vPublisher = pNode.getMetadata().valueFor(
-					"/meta:" + vType + "[@ifmap-publisher-id]");
+			final String vPublisher = findPublisherId(pNode.getMetadata());
 			if (!mPublisher.contains(vPublisher)) {
 				mPublisher.add(vPublisher);
 			}
@@ -497,6 +495,15 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				}
 			});
 		}
+	}
+
+	private String findPublisherId(Metadata metadata) {
+		for (String property : metadata.getProperties()) {
+			if (property.contains("[@ifmap-publisher-id]")) {
+				return metadata.valueFor(property);
+			}
+		}
+		return "";
 	}
 
 	@Override
@@ -915,7 +922,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				.containsSearchTerm(metadata, mSearchTerm);
 
 		String publisher = "";
-		if (vCom.getAttribute("publisher").equals(pPublisher)) {
+		if (vCom.getAttribute("publisher", "").equals(pPublisher)) {
 			publisher = pPublisher;
 		} else if (pPublisher.equals("")) {
 			publisher = (String) vCom.getAttribute("publisher");

@@ -66,35 +66,35 @@ public class GraphDeleteTest extends AbstractMultiSubscriptionTestCase {
 
 	@Test
 	public void shouldReturnTheRightChangeMapSize() {
-		executeExtensiveSingleMultiValueDeleteTest();
+		executePollTask();
 
 		super.assertEqualsMapSize(mSecondChangesMap, mFirstChangesMap.size() + 1);
 	}
 
 	@Test
 	public void shouldReturnTheRightChangeMapChangeValues() {
-		executeExtensiveSingleMultiValueDeleteTest();
+		executePollTask();
 
 		super.assertEqualsMapValues(mFirstChangesMap, mSecondChangesMap);
 	}
 
 	@Test
-	public void shouldReturnTheRightSecondChangeMapChangeValue() {
-		executeExtensiveSingleMultiValueDeleteTest();
+	public void shouldReturnTheRightChangeMapChangeValue() {
+		executePollTask();
 
 		super.assertEqualsNewValues(mFirstChangesMap, mSecondChangesMap, 1);
 	}
 
 	@Test
 	public void shouldReturnTheRightGraph() {
-		executeExtensiveSingleMultiValueDeleteTest();
+		executePollTask();
 
 		List<IdentifierGraph> currentGraph = super.mService.getCurrentGraph();
 
 		super.assertRightGraph(currentGraph, 1, 4, 5);
 	}
 
-	private void executeExtensiveSingleMultiValueDeleteTest() {
+	private void executePollTask() {
 		PollResult pollResult = buildStartingGraphPollResult();
 
 		super.startPollTask(pollResult);

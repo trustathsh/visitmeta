@@ -72,8 +72,6 @@ class PollTask implements Callable<PollResult> {
 
 	private IfmapJHelper mIfmapJHelper;
 
-	Map<String, List<ResultItem>> mSearchResults;
-
 	/**
 	 * Create a new <tt>PollTask</tt> which uses the given {@link ARC} for
 	 * polling. The received data gets returned as a {@link PollResult}.
@@ -90,7 +88,6 @@ class PollTask implements Callable<PollResult> {
 		if (metadataFactory == null) {
 			throw new IllegalArgumentException("metadataFactory cannot be null");
 		}
-		mSearchResults = new HashMap<String, List<ResultItem>>();
 		mConnection = connection;
 		mMetadataFactory = metadataFactory;
 		mIfmapJHelper = helper;
@@ -109,23 +106,32 @@ class PollTask implements Callable<PollResult> {
 
 		de.hshannover.f4.trust.ifmapj.messages.PollResult pollResult = mConnection.poll();
 
+		Map<String, List<ResultItem>> searchResults = new HashMap<String, List<ResultItem>>();
 		for (SearchResult searchResult : pollResult.getResults()) {
 			switch (searchResult.getType()) {
 				case updateResult:
 					log.debug("processing update list ...");
-					transformSearchResult(searchResult, ResultItemTypeEnum.UPDATE);
+					List<ResultItem> updateResultItems = transformResultItems(searchResult.getResultItems(),
+							ResultItemTypeEnum.UPDATE);
+					addResultItems(searchResults, searchResult.getName(), updateResultItems);
 					break;
 				case searchResult:
 					log.debug("processing search list ...");
-					transformSearchResult(searchResult, ResultItemTypeEnum.SEARCH);
+					List<ResultItem> searchResultItems = transformResultItems(searchResult.getResultItems(),
+							ResultItemTypeEnum.SEARCH);
+					addResultItems(searchResults, searchResult.getName(), searchResultItems);
 					break;
 				case deleteResult:
 					log.debug("processing delete list ...");
-					transformSearchResult(searchResult, ResultItemTypeEnum.DELETE);
+					List<ResultItem> deleteResultItems = transformResultItems(searchResult.getResultItems(),
+							ResultItemTypeEnum.DELETE);
+					addResultItems(searchResults, searchResult.getName(), deleteResultItems);
 					break;
 				case notifyResult:
 					log.debug("processing notify list ...");
-					transformSearchResult(searchResult, ResultItemTypeEnum.NOTIFY);
+					List<ResultItem> notifyResultItems = transformResultItems(searchResult.getResultItems(),
+							ResultItemTypeEnum.NOTIFY);
+					addResultItems(searchResults, searchResult.getName(), notifyResultItems);
 					break;
 				default:
 					log.info(searchResult.getType() + " result skipped");
@@ -133,21 +139,21 @@ class PollTask implements Callable<PollResult> {
 			}
 		}
 
-		List<ResultItem> results = buildResultItemList();
+		List<ResultItem> results = filterDeleteResultItems(searchResults);
 
 		log.debug("finish poll request.");
 		return new PollResult(results);
 
 	}
 
-	private List<ResultItem> buildResultItemList() {
+	private List<ResultItem> filterDeleteResultItems(Map<String, List<ResultItem>> searchResults) {
 		int resultItemRemovedCount = 0;
 		List<ResultItem> results = new ArrayList<>();
-		for (Entry<String, List<ResultItem>> entry : mSearchResults.entrySet()) {
+		for (Entry<String, List<ResultItem>> entry : searchResults.entrySet()) {
 			for (ResultItem item : entry.getValue()) {
 				if (item.getType() == ResultItemTypeEnum.DELETE) {
 					// check DELETE-ResultItems that are included in all other subscriptions
-					if (containsOtherSubscrptions(item, entry.getKey())) {
+					if (containsOtherSubscrptions(searchResults, item, entry.getKey())) {
 						results.add(item);
 					} else {
 						resultItemRemovedCount++;
@@ -166,11 +172,12 @@ class PollTask implements Callable<PollResult> {
 		return results;
 	}
 
-	private boolean containsOtherSubscrptions(ResultItem item, String subscriptionName) {
-		for (String key : mSearchResults.keySet()) {
+	private boolean containsOtherSubscrptions(Map<String, List<ResultItem>> searchResults, ResultItem item,
+			String subscriptionName) {
+		for (String key : searchResults.keySet()) {
 			if (!key.equals(subscriptionName)) {
 				// only for other subscriptions
-				if (!containsSubscription(item, key)) {
+				if (!containsSubscription(searchResults, item, key)) {
 					return false;
 				}
 			}
@@ -178,24 +185,23 @@ class PollTask implements Callable<PollResult> {
 		return true;
 	}
 
-	private boolean containsSubscription(ResultItem item, String subscriptionName) {
-		List<ResultItem> results = mSearchResults.get(subscriptionName);
+	private boolean containsSubscription(Map<String, List<ResultItem>> searchResults, ResultItem item,
+			String subscriptionName) {
+		List<ResultItem> results = searchResults.get(subscriptionName);
 		return results.contains(item);
 	}
 
-	private void transformSearchResult(SearchResult searchResult, ResultItemTypeEnum type) {
-		String subscriptionName = searchResult.getName();
+	private void addResultItems(Map<String, List<ResultItem>> searchResults, String subscriptionName,
+			List<ResultItem> results) {
 		if (subscriptionName == null) {
 			log.warn("SearchResult name is null! Nothing stored!");
 			return;
 		}
 
-		List<ResultItem> results = transformResultItems(searchResult.getResultItems(), type);
-
-		if (mSearchResults.containsKey(subscriptionName)) {
-			mSearchResults.get(subscriptionName).addAll(results);
+		if (searchResults.containsKey(subscriptionName)) {
+			searchResults.get(subscriptionName).addAll(results);
 		} else {
-			mSearchResults.put(subscriptionName, results);
+			searchResults.put(subscriptionName, results);
 		}
 	}
 

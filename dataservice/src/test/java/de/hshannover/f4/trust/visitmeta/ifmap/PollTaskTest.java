@@ -39,27 +39,25 @@
 
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+import static de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock.CreateArDev;
+import static de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock.CreateIpMac;
+import static de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock.PollResultMock;
+import static de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock.ResultItemMock;
+import static de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock.SearchResultMock;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import de.hshannover.f4.trust.ifmapj.IfmapJ;
-import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
-import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
-import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult.Type;
-import de.hshannover.f4.trust.ifmapj.metadata.StandardIfmapMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
@@ -68,7 +66,9 @@ import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
 
 public class PollTaskTest {
 
-	private StandardIfmapMetadataFactory mIfmapMetadataFactory;
+	private static final Date FIRST_TIMESTAMP = new Date(3333);
+
+	private String mSearchResultName = "PollTaskTest";
 
 	private Connection mConnection;
 	private InternalMetadataFactory mMetadataFactory;
@@ -84,31 +84,26 @@ public class PollTaskTest {
 		InternalMetadata metadataMock = mock(InternalMetadata.class);
 		when(mMetadataFactory.createMetadata(any(Document.class))).thenReturn(metadataMock);
 
-		mIfmapMetadataFactory = IfmapJ.createStandardMetadataFactory();
-
 		mPollTask = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
 	}
 
 	@Test
 	public void thePollResultShouldContainAllReceivedUpdates() throws Exception {
-		PollResult pollResult = PollResultMock(Arrays.asList(
-				SearchResultMock(Arrays.asList(
+		PollResult pollResult = PollResultMock(
+				SearchResultMock(mSearchResultName, Type.updateResult,
 						ResultItemMock(
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-								ResultItemMock(
-										Identifiers.createIp4("10.1.1.9"),
-										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-						), Type.updateResult),
-						SearchResultMock(Arrays.asList(
-								ResultItemMock(
-										Identifiers.createAr("111:33"),
-										Identifiers.createDev("device42"),
-										Arrays.asList(mIfmapMetadataFactory.createArDev()))
-								), Type.updateResult)
-				));
+								CreateIpMac(FIRST_TIMESTAMP)),
+						ResultItemMock(
+								Identifiers.createIp4("10.1.1.9"),
+								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+								CreateIpMac(FIRST_TIMESTAMP))),
+				SearchResultMock(mSearchResultName, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createAr("111:33"),
+								Identifiers.createDev("device42"),
+								CreateArDev(FIRST_TIMESTAMP))));
 
 		when(mConnection.poll()).thenReturn(pollResult);
 
@@ -118,13 +113,10 @@ public class PollTaskTest {
 
 	@Test
 	public void thePollResultShouldNotContainUpdatesWithNoMetadataOnIdentifers() throws Exception {
-		PollResult pollResult = PollResultMock(Arrays.asList(
-				SearchResultMock(Arrays.asList(
+		PollResult pollResult = PollResultMock(
+				SearchResultMock(mSearchResultName, Type.updateResult,
 						ResultItemMock(
-								Identifiers.createAr("111:33"),
-								Collections.EMPTY_LIST)
-						), Type.updateResult)
-				));
+						Identifiers.createAr("111:33"))));
 
 		when(mConnection.poll()).thenReturn(pollResult);
 
@@ -134,14 +126,11 @@ public class PollTaskTest {
 
 	@Test
 	public void thePollResultShouldNotContainUpdatesWithNoMetadataOnLinks() throws Exception {
-		PollResult pollResult = PollResultMock(Arrays.asList(
-				SearchResultMock(Arrays.asList(
+		PollResult pollResult = PollResultMock(
+				SearchResultMock(mSearchResultName, Type.updateResult,
 						ResultItemMock(
 								Identifiers.createAr("111:33"),
-								Identifiers.createDev("device42"),
-								Collections.EMPTY_LIST)
-						), Type.updateResult)
-				));
+								Identifiers.createDev("device42"))));
 
 		when(mConnection.poll()).thenReturn(pollResult);
 
@@ -151,24 +140,21 @@ public class PollTaskTest {
 
 	@Test
 	public void thePollResultShouldContainAllReceivedDeletes() throws Exception {
-		PollResult pollResult = PollResultMock(Arrays.asList(
-				SearchResultMock(Arrays.asList(
+		PollResult pollResult = PollResultMock(
+				SearchResultMock(mSearchResultName, Type.deleteResult,
 						ResultItemMock(
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-								ResultItemMock(
-										Identifiers.createIp4("10.1.1.9"),
-										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-						), Type.deleteResult),
-						SearchResultMock(Arrays.asList(
-								ResultItemMock(
-										Identifiers.createAr("111:33"),
-										Identifiers.createDev("device42"),
-										Arrays.asList(mIfmapMetadataFactory.createArDev()))
-								), Type.deleteResult)
-				));
+								CreateIpMac(FIRST_TIMESTAMP)),
+						ResultItemMock(
+								Identifiers.createIp4("10.1.1.9"),
+								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+								CreateIpMac(FIRST_TIMESTAMP))),
+				SearchResultMock(mSearchResultName, Type.deleteResult,
+						ResultItemMock(
+								Identifiers.createAr("111:33"),
+								Identifiers.createDev("device42"),
+								CreateArDev(FIRST_TIMESTAMP))));
 
 		when(mConnection.poll()).thenReturn(pollResult);
 
@@ -178,68 +164,32 @@ public class PollTaskTest {
 
 	@Test
 	public void thePollResultShouldContainAllReceivedUpdatesAndDeletes() throws Exception {
-		PollResult pollResult = PollResultMock(Arrays.asList(
-				SearchResultMock(Arrays.asList(
+		PollResult pollResult = PollResultMock(
+				SearchResultMock(mSearchResultName, Type.updateResult,
 						ResultItemMock(
 								Identifiers.createIp4("10.1.1.1"),
 								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-								Arrays.asList(mIfmapMetadataFactory.createIpMac())),
-								ResultItemMock(
-										Identifiers.createIp4("10.1.1.9"),
-										Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
-										Arrays.asList(mIfmapMetadataFactory.createIpMac()))
-						), Type.updateResult),
-						SearchResultMock(Arrays.asList(
-								ResultItemMock(
-										Identifiers.createAr("111:33"),
-										Identifiers.createDev("device42"),
-										Arrays.asList(mIfmapMetadataFactory.createArDev()))
-								), Type.updateResult),
-								SearchResultMock(Arrays.asList(
-										ResultItemMock(
-												Identifiers.createAr("111:44"),
-												Identifiers.createDev("device77"),
-												Arrays.asList(mIfmapMetadataFactory.createArDev()))
-										), Type.deleteResult)
-				));
+								CreateIpMac(FIRST_TIMESTAMP)),
+						ResultItemMock(
+								Identifiers.createIp4("10.1.1.9"),
+								Identifiers.createMac("ee:ee:ee:ee:ee:ee"),
+								CreateIpMac(FIRST_TIMESTAMP))),
+				SearchResultMock(mSearchResultName, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createAr("111:33"),
+								Identifiers.createDev("device42"),
+								CreateArDev(FIRST_TIMESTAMP))),
+				SearchResultMock(mSearchResultName, Type.deleteResult,
+						ResultItemMock(
+								Identifiers.createAr("111:44"),
+								Identifiers.createDev("device77"),
+								CreateArDev(FIRST_TIMESTAMP))));
 
 		when(mConnection.poll()).thenReturn(pollResult);
 
 		de.hshannover.f4.trust.visitmeta.ifmap.PollResult p = mPollTask.call();
 		assertEquals(3, p.getUpdates().size());
 		assertEquals(1, p.getDeletes().size());
-	}
-
-	private static PollResult PollResultMock(List<SearchResult> searchResults) {
-		PollResult pollResult = mock(PollResult.class);
-		when(pollResult.getResults()).thenReturn(searchResults);
-		return pollResult;
-	}
-
-	private static SearchResult SearchResultMock(List<ResultItem> item, SearchResult.Type type) {
-		SearchResult searchResult = mock(SearchResult.class);
-		when(searchResult.getResultItems()).thenReturn(item);
-		when(searchResult.getType()).thenReturn(type);
-		when(searchResult.getName()).thenReturn("SearchResultMock_Test");
-		return searchResult;
-	}
-
-	private static ResultItem ResultItemMock(
-			Identifier id1, Identifier id2, List<Document> metadata) {
-		ResultItem resultItem = mock(ResultItem.class);
-		when(resultItem.getMetadata()).thenReturn(metadata);
-		when(resultItem.getIdentifier1()).thenReturn(id1);
-		when(resultItem.getIdentifier2()).thenReturn(id2);
-		when(resultItem.holdsLink()).thenReturn(true);
-		return resultItem;
-	}
-
-	private static ResultItem ResultItemMock(Identifier id, List<Document> metadata) {
-		ResultItem resultItem = mock(ResultItem.class);
-		when(resultItem.getMetadata()).thenReturn(metadata);
-		when(resultItem.getIdentifier1()).thenReturn(id);
-		when(resultItem.holdsLink()).thenReturn(false);
-		return resultItem;
 	}
 
 

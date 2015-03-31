@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
@@ -22,15 +23,33 @@ public class PollResultMock implements IfmapMock<PollResult> {
 		when(mPollResult_mock.getResults()).thenReturn(mSearchResults);
 	}
 
-	public PollResultMock(List<SearchResult> searchResults) {
+	public PollResultMock(SearchResult... searchResults) {
 		this();
 
-		mSearchResults = searchResults;
+		mSearchResults = Arrays.asList(searchResults);
 		when(mPollResult_mock.getResults()).thenReturn(mSearchResults);
+	}
+
+	public PollResultMock(List<SearchResultMock> searchResults) {
+		this();
+
+		addSearchResultMock(searchResults);
+	}
+
+	public PollResultMock(SearchResultMock... searchResults) {
+		this(Arrays.asList(searchResults));
 	}
 
 	public void addSearchResult(SearchResult searchResult) {
 		mSearchResults.add(searchResult);
+		when(mPollResult_mock.getResults()).thenReturn(mSearchResults);
+	}
+
+	public void addSearchResultMock(List<SearchResultMock> searchResultMock) {
+		for (SearchResultMock mock : searchResultMock) {
+			mSearchResults.add(mock.getMock());
+		}
+
 		when(mPollResult_mock.getResults()).thenReturn(mSearchResults);
 	}
 

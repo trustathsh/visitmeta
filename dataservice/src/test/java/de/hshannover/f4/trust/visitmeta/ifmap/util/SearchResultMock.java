@@ -11,16 +11,15 @@ import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 
 public class SearchResultMock implements IfmapMock<SearchResult> {
 
-	private static int mSerachResultNameCount = 1;
-
-	private String mSerachResultName = "SearchResultMock_" + getSerachResultNameCount();
+	private String mSerachResultName;
 
 	private SearchResult mSearchResult_mock;
 
 	private List<ResultItem> mResultItems;
 
-	public SearchResultMock(SearchResult.Type type) {
+	public SearchResultMock(String searchResultName, SearchResult.Type type) {
 		mSearchResult_mock = mock(SearchResult.class);
+		mSerachResultName = searchResultName;
 		mResultItems = new ArrayList<ResultItem>();
 
 		when(mSearchResult_mock.getResultItems()).thenReturn(mResultItems);
@@ -28,8 +27,8 @@ public class SearchResultMock implements IfmapMock<SearchResult> {
 		when(mSearchResult_mock.getName()).thenReturn(mSerachResultName);
 	}
 
-	public SearchResultMock(List<ResultItem> resultItems, SearchResult.Type type) {
-		this(type);
+	public SearchResultMock(String searchResultName, SearchResult.Type type, List<ResultItem> resultItems) {
+		this(searchResultName, type);
 
 		mResultItems = resultItems;
 		when(mSearchResult_mock.getResultItems()).thenReturn(mResultItems);
@@ -40,19 +39,9 @@ public class SearchResultMock implements IfmapMock<SearchResult> {
 		when(mSearchResult_mock.getResultItems()).thenReturn(mResultItems);
 	}
 
-	public void setName(String searchResultName) {
-		when(mSearchResult_mock.getName()).thenReturn(searchResultName);
-	}
-
 	@Override
 	public SearchResult getMock() {
 		return mSearchResult_mock;
-	}
-
-	private String getSerachResultNameCount() {
-		String count = mSerachResultNameCount + "";
-		mSerachResultNameCount++;
-		return count;
 	}
 
 }

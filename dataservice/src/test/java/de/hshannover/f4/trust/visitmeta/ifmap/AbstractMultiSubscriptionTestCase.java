@@ -65,6 +65,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.DummyGraphCache
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.dataservice.rest.JsonMarshaller;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.ifmap.util.IfmapjMock;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
@@ -80,9 +81,21 @@ import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JRepository;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JTimestampManager;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JWriter;
 
-public abstract class AbstractMultiSubscriptionTestCase {
+public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 
 	private static final Logger mLog = Logger.getLogger(AbstractMultiSubscriptionTestCase.class);
+
+	protected static final String SUB1 = "SubscriptionName1";
+	protected static final String SUB2 = "SubscriptionName2";
+
+	protected static final String ACCESS_REQUEST = "AccessRequest";
+	protected static final String MAC1 = "00:11:22:33:44:55";
+	protected static final String MAC2 = "11:22:33:44:55:66";
+	protected static final String MAC3 = "aa:bb:cc:dd:ee:ff";
+	protected static final String CAP1 = "Capability1";
+	protected static final String CAP2 = "Capability2";
+	protected static final String CAP3 = "Capability3";
+	protected static final String CAP4 = "Capability4";
 
 	protected Writer mWriter;
 

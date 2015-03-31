@@ -120,11 +120,11 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 				+ SUB_SEARCH_TERM_DELIMITER + "</b><br>"
 				+ "Exact match enclosing character: <b>" + ENCLOSING_CHAR
 				+ "</b><br>"
-				+ "Example: ip,10.0.0;mac,\"aa:bb:cc:dd:ee:ff\" detects and "
-				+ "highlights all nodes that <b>contain</b> the strings "
-				+ "<i>ip</i> and <i>10.0.0</i>, as well as all nodes that "
-				+ "<b>contain</b> the string mac and <b>exactly contain</b> "
-				+ " the value <i>aa:bb:cc:dd:ee:ff</i>" + "</html>");
+				+ "Example: ip,10.0.0;mac,\"aa:bb:cc:dd:ee:ff\"<br>" 
+				+ " detects and highlights all nodes that <b>contain</b> the strings "
+				+ "<i>ip</i> and <i>10.0.0</i>,<br>"
+				+ "as well as all nodes that <b>contain</b> the string mac and <b>exactly contain</b> "
+				+ "the value <i>aa:bb:cc:dd:ee:ff</i>" + "</html>");
 
 		mInputTextfield.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override

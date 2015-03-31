@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.1,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -216,13 +216,13 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		AffineTransform vTransformation = AffineTransform.getScaleInstance(1.0, // x
 				// scaling
 				pNode.getHeight() / pNode.getWidth() // y scaling
-		);
+				);
 		vTransformation.translate(center.getX(), // x center
 				center.getY() * (pNode.getWidth() / pNode.getHeight()) // y
-		// center
-		// *
-		// invert
-		// scaling
+				// center
+				// *
+				// invert
+				// scaling
 				);
 		return new RadialGradientPaint(zero, radius, zero, dist, colors,
 				RadialGradientPaint.CycleMethod.NO_CYCLE,
@@ -428,7 +428,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.setOffset( // Set position
 					mAreaOffsetX + pNode.getX() * mAreaWidth, // x
 					mAreaOffsetY + pNode.getY() * mAreaHeight // y
-			);
+					);
 			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
@@ -486,7 +486,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			// node
 
 			paintMetadataNode(pNode.getMetadata(), pNode, vNode, vText,
-					vPublisher, vCom);
+					vCom);
 			mMapNode.put(pNode, vCom); // Add node to HashMap.
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -627,7 +627,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 								public void getSourceMatrix(
 										final double[] aSource) {
 									vNode.getTransformReference(true)
-											.getMatrix(aSource);
+									.getMatrix(aSource);
 								}
 							};
 							PActivity vNodeTranslation = new PTransformActivity(
@@ -806,7 +806,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				);
 		vShadow.setOffset((float) (vPosition.getX()), // x
 				(float) (vPosition.getY()) // y
-		);
+				);
 		vShadow.setStroke(null);
 		Color opaqueHighlight = new Color(pHighlight.getRed(),
 				pHighlight.getGreen(), pHighlight.getBlue(), 255);
@@ -888,9 +888,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void repaintNodes(NodeType pType, String pPublisher) {
-		LOGGER.trace("Method repaintNodes(" + pType + ", " + pPublisher
-				+ ") called.");
+	public void repaintNodes(NodeType pType) {
+		LOGGER.trace("Method repaintNodes(" + pType + ") called.");
 		for (Object key : mMapNode.keySet()) {
 			PComposite vCom = mMapNode.get(key);
 			PPath vNode = (PPath) vCom.getChild(0);
@@ -906,7 +905,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeMetadata m = (NodeMetadata) key;
 					Metadata metadata = m.getMetadata();
-					paintMetadataNode(metadata, m, vNode, vText, pPublisher,
+					paintMetadataNode(metadata, m, vNode, vText,
 							vCom);
 				}
 			}
@@ -914,29 +913,32 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	private void paintMetadataNode(Metadata metadata, NodeMetadata m,
-			PPath vNode, PText vText, String pPublisher, PComposite vCom) {
+			PPath vNode, PText vText, PComposite vCom) {
 		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
 				|| vNode.getStrokePaint().equals(mColorDeleteNode);
-		boolean isSelected = (mSelectedNode == metadata);
+		boolean isSelected = isSelected(metadata);
 		boolean containsSearchTerm = mSearchAndFilterStrategy
 				.containsSearchTerm(metadata, mSearchTerm);
 
-		String publisher = "";
-		if (vCom.getAttribute("publisher", "").equals(pPublisher)) {
-			publisher = pPublisher;
-		} else if (pPublisher.equals("")) {
-			publisher = (String) vCom.getAttribute("publisher");
-		}
+		String publisher = extractPublisherId(metadata);
 
-		/* Repaint the nodes of this publisher */
+		/**
+		 * Paint the metadata node according to the publisher id
+		 */
+		vNode.setPaint(getColor(publisher, vNode));
+		vText.setTextPaint(getColorText(publisher));
+
+		/**
+		 * If the metadata node matches the search term,
+		 * paint it accordingly. Reduce the transparency
+		 * of all non-matching nodes if the user set the
+		 * checkbox.
+		 */
 		vNode.setTransparency(1.0f);
 		if (containsSearchTerm) {
 			vNode.setPaint(mColorContainsSearchTermNode);
-		} else {
-			vNode.setPaint(getColor(publisher, vNode));
-			if (mHideSearchMismatches) {
-				vNode.setTransparency(mHideSearchMismatchesTransparency);
-			}
+		} else if (mHideSearchMismatches) {
+			vNode.setTransparency(mHideSearchMismatchesTransparency);
 		}
 
 		if (!isHighlighted) {
@@ -946,26 +948,33 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		if (isSelected) {
 			vNode.setPaint(mColorSelectedNode);
 		}
-
-		vText.setTextPaint(getColorText(publisher));
 	}
 
 	private void paintIdentifierNode(Identifier identifier, NodeIdentifier i,
 			PPath vNode, PText vText) {
 		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
 				|| vNode.getStrokePaint().equals(mColorDeleteNode);
-		boolean isSelected = (mSelectedNode == identifier);
+		boolean isSelected = isSelected(identifier);
 		boolean containsSearchTerm = mSearchAndFilterStrategy
 				.containsSearchTerm(identifier, mSearchTerm);
-		vNode.setTransparency(1.0f);
 
+		/**
+		 * Paint the identifier node.
+		 */
+		vNode.setPaint(getColor(vNode, i));
+		vText.setTextPaint(getColorIdentifierText(i));
+
+		/**
+		 * If the identifier node matches the search term,
+		 * paint it accordingly. Reduce the transparency
+		 * of all non-matching nodes if the user set the
+		 * checkbox.
+		 */
+		vNode.setTransparency(1.0f);
 		if (containsSearchTerm) {
 			vNode.setPaint(mColorContainsSearchTermNode);
-		} else {
-			vNode.setPaint(getColor(vNode, i));
-			if (mHideSearchMismatches) {
-				vNode.setTransparency(mHideSearchMismatchesTransparency);
-			}
+		} else if (mHideSearchMismatches) {
+			vNode.setTransparency(mHideSearchMismatchesTransparency);
 		}
 
 		if (!isHighlighted) {
@@ -975,8 +984,18 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		if (isSelected) {
 			vNode.setPaint(mColorSelectedNode);
 		}
+	}
 
-		vText.setTextPaint(getColorIdentifierText(i));
+	private boolean isSelected(Propable propable) {
+		if (mSelectedNode == null) {
+			return false;
+		} else {
+			if (mSelectedNode == propable) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	@Override
@@ -1039,10 +1058,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	public void selectNode(Propable propable) {
 		LOGGER.trace("Method selectNode(" + propable + ") called.");
 		if ((propable != null) && (mSelectedNode != propable)) {
-			Propable unselectedNode = mSelectedNode;
 			mSelectedNode = propable;
 			triggerRepaint(propable);
-			triggerRepaint(unselectedNode);
 		}
 	}
 
@@ -1065,10 +1082,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		LOGGER.trace("Method triggerRepaint(" + propable + ") called.");
 
 		if (propable instanceof Identifier) {
-			repaintNodes(NodeType.IDENTIFIER, "");
+			repaintNodes(NodeType.IDENTIFIER);
 		} else if (propable instanceof Metadata) {
-			repaintNodes(NodeType.METADATA,
-					extractPublisherId((Metadata) propable));
+			repaintNodes(NodeType.METADATA);
 		}
 	}
 
@@ -1100,8 +1116,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		LOGGER.trace("Search for '" + searchTerm + "'");
 		mSearchTerm = searchTerm;
 
-		repaintNodes(NodeType.IDENTIFIER, "");
-		repaintNodes(NodeType.METADATA, "");
+		repaintNodes(NodeType.IDENTIFIER);
+		repaintNodes(NodeType.METADATA);
 	}
 
 	@Override
@@ -1113,8 +1129,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	public void setHideSearchMismatches(boolean b) {
 		this.mHideSearchMismatches = b;
 
-		repaintNodes(NodeType.IDENTIFIER, "");
-		repaintNodes(NodeType.METADATA, "");
+		repaintNodes(NodeType.IDENTIFIER);
+		repaintNodes(NodeType.METADATA);
 	}
 
 }

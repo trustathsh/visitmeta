@@ -38,22 +38,16 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap.testcases.multisubscription;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 
 import org.junit.Test;
 
-import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
-import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult.Type;
 import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class RareNotifyTest extends AbstractMultiSubscriptionTestCase {
@@ -174,89 +168,45 @@ public class RareNotifyTest extends AbstractMultiSubscriptionTestCase {
 
 	}
 
-	private List<ResultItem> buildMultiValueResultItems() {
-		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
-
-		ResultItemMock resultItem1_mock = new ResultItemMock(identifierAR);
-
-		resultItem1_mock.addIpMac(SECOND_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem1_mock.getMock());
-
-		return resultItems;
-	}
-
 	private PollResult buildNotifyPollResultWithMultiValue() {
-		List<ResultItem> resultItems = buildMultiValueResultItems();
-
-		SearchResultMock searchResult1_mock = new SearchResultMock(resultItems, Type.notifyResult);
-		SearchResultMock searchResult2_mock = new SearchResultMock(resultItems, Type.notifyResult);
-
-		PollResultMock secondPollResult_mock = new PollResultMock();
-		secondPollResult_mock.addSearchResult(searchResult1_mock.getMock());
-		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
-
-		return secondPollResult_mock.getMock();
-	}
-
-	private List<ResultItem> buildSingleValueResultItems() {
-		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
-
-		ResultItemMock resultItem1_mock = new ResultItemMock(identifierAR);
-
-		resultItem1_mock.addArDev(SECOND_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem1_mock.getMock());
-
-		return resultItems;
+		return PollResultMock(
+				SearchResultMock(SUB1, Type.notifyResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								CreateIpMac(SECOND_TIMESTAMP))),
+				SearchResultMock(SUB2, Type.notifyResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								CreateIpMac(SECOND_TIMESTAMP))));
 	}
 
 	private PollResult buildNotifyPollResultWithSingleValue() {
-		List<ResultItem> resultItems = buildSingleValueResultItems();
-
-		SearchResultMock searchResult1_mock = new SearchResultMock(resultItems, Type.notifyResult);
-		SearchResultMock searchResult2_mock = new SearchResultMock(resultItems, Type.notifyResult);
-
-		PollResultMock secondPollResult_mock = new PollResultMock();
-		secondPollResult_mock.addSearchResult(searchResult1_mock.getMock());
-		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
-
-		return secondPollResult_mock.getMock();
-	}
-
-	private List<ResultItem> buildFirstResultItems() {
-		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
-		Identifier identifierMAC1 = Identifiers.createMac("00:11:22:33:44:55");
-		Identifier identifierMAC2 = Identifiers.createMac("11:22:33:44:55:66");
-
-		ResultItemMock resultItem1_mock = new ResultItemMock(identifierAR, identifierMAC1);
-		ResultItemMock resultItem2_mock = new ResultItemMock(identifierAR, identifierMAC2);
-		ResultItemMock resultItem3_mock = new ResultItemMock(identifierAR);
-
-		resultItem1_mock.addArMac(FIRST_TIMESTAMP);
-		resultItem2_mock.addArMac(FIRST_TIMESTAMP);
-		resultItem3_mock.addArDev(FIRST_TIMESTAMP);
-		resultItem3_mock.addIpMac(FIRST_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem1_mock.getMock());
-		resultItems.add(resultItem2_mock.getMock());
-		resultItems.add(resultItem3_mock.getMock());
-
-		return resultItems;
+		return PollResultMock(
+				SearchResultMock(SUB1, Type.notifyResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								CreateArDev(SECOND_TIMESTAMP))),
+				SearchResultMock(SUB2, Type.notifyResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								CreateArDev(SECOND_TIMESTAMP))));
 	}
 
 	private PollResult buildFirstPollResult() {
-		List<ResultItem> resultItems = buildFirstResultItems();
-
-		SearchResultMock searchResult_mock = new SearchResultMock(resultItems, Type.updateResult);
-
-		PollResultMock pollResult_mock = new PollResultMock();
-		pollResult_mock.addSearchResult(searchResult_mock.getMock());
-
-		return pollResult_mock.getMock();
+		return PollResultMock(
+				SearchResultMock(Type.updateResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								Identifiers.createMac(MAC1),
+								CreateArMac(FIRST_TIMESTAMP)),
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								Identifiers.createMac(MAC2),
+								CreateArMac(FIRST_TIMESTAMP)),
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								CreateArDev(FIRST_TIMESTAMP),
+								CreateIpMac(FIRST_TIMESTAMP))));
 	}
 
 }

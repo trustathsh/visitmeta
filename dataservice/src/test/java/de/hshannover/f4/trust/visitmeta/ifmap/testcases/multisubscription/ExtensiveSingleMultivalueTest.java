@@ -262,12 +262,12 @@ public class ExtensiveSingleMultivalueTest extends AbstractMultiSubscriptionTest
 				SearchResultMock(SUB1, Type.updateResult,
 						ResultItemMock(
 								Identifiers.createAr(ACCESS_REQUEST),
-								Identifiers.createAr(MAC3),
+								Identifiers.createMac(MAC4),
 								CreateArMac(THIRD_TIMESTAMP))),
 				SearchResultMock(SUB2, Type.updateResult,
 						ResultItemMock(
 								Identifiers.createAr(ACCESS_REQUEST),
-								Identifiers.createAr(MAC3),
+								Identifiers.createMac(MAC4),
 								CreateArMac(THIRD_TIMESTAMP))));
 	}
 

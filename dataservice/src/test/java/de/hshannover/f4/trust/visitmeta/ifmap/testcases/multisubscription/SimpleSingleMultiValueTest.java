@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.ifmap.testcases.multisubscription;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -48,15 +47,10 @@ import java.util.SortedMap;
 
 import org.junit.Test;
 
-import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
-import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult.Type;
 import de.hshannover.f4.trust.visitmeta.ifmap.AbstractMultiSubscriptionTestCase;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.PollResultMock;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.ResultItemMock;
-import de.hshannover.f4.trust.visitmeta.ifmap.util.SearchResultMock;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class SimpleSingleMultiValueTest extends AbstractMultiSubscriptionTestCase {
@@ -143,58 +137,32 @@ public class SimpleSingleMultiValueTest extends AbstractMultiSubscriptionTestCas
 
 	}
 
-	private List<ResultItem> buildMultiValueResultItems() {
-		Identifier identifierIP = Identifiers.createIp4("192.168.0.1");
-		Identifier identifierMAC = Identifiers.createMac("00:11:22:33:44:55");
-
-		ResultItemMock resultItem_mock = new ResultItemMock(identifierIP, identifierMAC);
-
-		resultItem_mock.addIpMac(FIRST_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem_mock.getMock());
-
-		return resultItems;
-	}
-
 	private PollResult buildMultiValuePollResult() {
-		List<ResultItem> resultItems = buildMultiValueResultItems();
-
-		SearchResultMock searchResult1_mock = new SearchResultMock(resultItems, Type.updateResult);
-		SearchResultMock searchResult2_mock = new SearchResultMock(resultItems, Type.updateResult);
-
-		PollResultMock secondPollResult_mock = new PollResultMock();
-		secondPollResult_mock.addSearchResult(searchResult1_mock.getMock());
-		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
-
-		return secondPollResult_mock.getMock();
-	}
-
-	private List<ResultItem> buildSingleValueResultItems() {
-		Identifier identifierAR = Identifiers.createAr("ARMultiSubscriptionTest");
-		Identifier identifierMAC = Identifiers.createMac("00:11:22:33:44:55");
-
-		ResultItemMock resultItem_mock = new ResultItemMock(identifierAR, identifierMAC);
-
-		resultItem_mock.addArMac(FIRST_TIMESTAMP);
-
-		List<ResultItem> resultItems = new ArrayList<ResultItem>();
-		resultItems.add(resultItem_mock.getMock());
-
-		return resultItems;
+		return PollResultMock(
+				SearchResultMock(SUB1, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createIp4(IP4_ADDRESS),
+								Identifiers.createAr(MAC1),
+								CreateIpMac(FIRST_TIMESTAMP))),
+				SearchResultMock(SUB2, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createIp4(IP4_ADDRESS),
+								Identifiers.createAr(MAC1),
+								CreateIpMac(FIRST_TIMESTAMP))));
 	}
 
 	private PollResult buildPollResultWithSingleValue() {
-		List<ResultItem> resultItems = buildSingleValueResultItems();
-
-		SearchResultMock searchResult1_mock = new SearchResultMock(resultItems, Type.updateResult);
-		SearchResultMock searchResult2_mock = new SearchResultMock(resultItems, Type.updateResult);
-
-		PollResultMock secondPollResult_mock = new PollResultMock();
-		secondPollResult_mock.addSearchResult(searchResult1_mock.getMock());
-		secondPollResult_mock.addSearchResult(searchResult2_mock.getMock());
-
-		return secondPollResult_mock.getMock();
+		return PollResultMock(
+				SearchResultMock(SUB1, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								Identifiers.createMac(MAC1),
+								CreateArMac(FIRST_TIMESTAMP))),
+				SearchResultMock(SUB2, Type.updateResult,
+						ResultItemMock(
+								Identifiers.createAr(ACCESS_REQUEST),
+								Identifiers.createMac(MAC1),
+								CreateArMac(FIRST_TIMESTAMP))));
 	}
 
 }

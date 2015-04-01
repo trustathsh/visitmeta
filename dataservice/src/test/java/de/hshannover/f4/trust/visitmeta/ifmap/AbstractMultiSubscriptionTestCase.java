@@ -87,11 +87,15 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 
 	protected static final String SUB1 = "SubscriptionName1";
 	protected static final String SUB2 = "SubscriptionName2";
+	protected static final String SUB3 = "SubscriptionName3";
 
 	protected static final String ACCESS_REQUEST = "AccessRequest";
+	protected static final String IP4_ADDRESS = "192.168.0.1";
 	protected static final String MAC1 = "00:11:22:33:44:55";
 	protected static final String MAC2 = "11:22:33:44:55:66";
-	protected static final String MAC3 = "aa:bb:cc:dd:ee:ff";
+	protected static final String MAC3 = "22:33:44:55:66:77";
+	protected static final String MAC4 = "aa:bb:cc:dd:ee:ff";
+	protected static final String DEV45 = "DEV45";
 	protected static final String CAP1 = "Capability1";
 	protected static final String CAP2 = "Capability2";
 	protected static final String CAP3 = "Capability3";

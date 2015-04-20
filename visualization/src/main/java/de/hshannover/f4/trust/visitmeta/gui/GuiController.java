@@ -18,7 +18,7 @@
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
- * This file is part of visitmeta-visualization, version 0.4.1,
+ * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
  * Copyright (C) 2012 - 2015 Trust@HsH
@@ -170,11 +170,11 @@ public class GuiController {
 				"A connection must be selected to change the animation of the graph.",
 				"Change graph animation")) {
 			if (mSelectedConnection.getConnection().isGraphMotion()) {
-				mSelectedConnection.getConnection().startGraphMotion();
-				return "Stop";
-			} else {
 				mSelectedConnection.getConnection().stopGraphMotion();
 				return "Start";
+			} else {
+				mSelectedConnection.getConnection().startGraphMotion();
+				return "Stop";
 			}
 		} else {
 			return null;

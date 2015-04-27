@@ -1,4 +1,4 @@
-/*
+﻿/*
  * #%L
  * =====================================================
  *   _____                _     ____  _   _       _   _
@@ -38,15 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -83,7 +80,10 @@ import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscription;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -144,16 +144,20 @@ public class MainWindow extends JFrame {
 
 				tmpNode.removeAllChildren();
 				for (String restConnectionName : restConnections) {
-					GraphContainer graphContainer = new GraphContainer(
-							restConnectionName, treeNodedataservice);
-					tmpNode.add(new DefaultMutableTreeNode(new ConnectionTab(
-							graphContainer, this)));
+					GraphContainer graphContainer = new GraphContainer(restConnectionName, treeNodedataservice);
+					DefaultMutableTreeNode ifMapConnection = new DefaultMutableTreeNode(new ConnectionTab(
+							graphContainer, this));
+					tmpNode.add(ifMapConnection);
+
+					List<Data> restSubscription = treeNodedataservice
+							.loadRestSubscriptions(restConnectionName);
+					for (Data s : restSubscription) {
+						ifMapConnection.add(new DefaultMutableTreeNode(((RestSubscription) s).getName()));
+					}
 				}
-			} catch (ClientHandlerException | UniformInterfaceException
-					| JSONException e) {
-				LOGGER.warn("Exception while load rest connection names, from "
-						+ treeNodedataservice.getName() + " -> "
-						+ e.getMessage());
+			} catch (ClientHandlerException | UniformInterfaceException | JSONException e) {
+				LOGGER.warn("Exception while load rest connection names, from " + treeNodedataservice.getName()
+						+ " -> " + e.getMessage());
 			}
 		}
 		mConnectionTree.updateUI();
@@ -196,21 +200,17 @@ public class MainWindow extends JFrame {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		Image visitMetaIcon16px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath())
-				.getImage();
-		Image visitMetaIcon32px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath())
-				.getImage();
-		Image visitMetaIcon64px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath())
-				.getImage();
-		Image visitMetaIcon128px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath())
-				.getImage();
+		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX)
+				.getPath()).getImage();
+		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX)
+				.getPath()).getImage();
+		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX)
+				.getPath()).getImage();
+		Image visitMetaIcon128px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX)
+				.getPath()).getImage();
 
-		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px,
-				visitMetaIcon32px, visitMetaIcon64px, visitMetaIcon128px);
+		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px, visitMetaIcon32px, visitMetaIcon64px,
+				visitMetaIcon128px);
 		this.setIconImages(visitMetaIcons);
 
 		initLeftHandSide();
@@ -235,61 +235,65 @@ public class MainWindow extends JFrame {
 		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
 
-		mConnectionTree = new JTree(mTreeRoot);
-		mConnectionTree.addMouseListener(new MouseListener() {
+		// mConnectionTree = new JTree(mTreeRoot);
+		try {
+			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections());
+		} catch (PropertyException e1) {
+			e1.printStackTrace();
+		}
+		// mConnectionTree.addMouseListener(new MouseListener() {
+		//
+		// @Override
+		// public void mouseReleased(MouseEvent e) {
+		// mConnectionTree.setSelectionRow(mConnectionTree
+		// .getClosestRowForLocation(e.getX(), e.getY()));
+		// if (e.getButton() == MouseEvent.BUTTON3) {
+		// Object tmp = ((DefaultMutableTreeNode) mConnectionTree
+		// .getClosestPathForLocation(e.getX(), e.getY())
+		// .getLastPathComponent()).getUserObject();
+		// if (tmp instanceof ConnectionTab) {
+		// new ConnectionTabListMenu((ConnectionTab) tmp).show(
+		// mConnectionTree, e.getX(), e.getY());
+		// }
+		// } else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
+		// Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent())
+		// .getUserObject();
+		// if (tmp instanceof ConnectionTab) {
+		// ConnectionTab tmpTab = (ConnectionTab) tmp;
+		// boolean alreadyOpen = false;
+		// for (Component t : mTabbedConnectionPane
+		// .getComponents()) {
+		// if (t.equals(tmpTab)) {
+		// alreadyOpen = true;
+		// }
+		// }
+		// if (!alreadyOpen) {
+		// addClosableTab(tmpTab);
+		// } else {
+		// mTabbedConnectionPane.setSelectedComponent(tmpTab);
+		// }
+		// }
+		// }
+		// }
+		//
+		// @Override
+		// public void mousePressed(MouseEvent arg0) {
+		// }
+		//
+		// @Override
+		// public void mouseExited(MouseEvent arg0) {
+		// }
+		//
+		// @Override
+		// public void mouseEntered(MouseEvent arg0) {
+		// }
+		//
+		// @Override
+		// public void mouseClicked(MouseEvent arg0) {
+		// }
+		// });
 
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				mConnectionTree.setSelectionRow(mConnectionTree
-						.getClosestRowForLocation(e.getX(), e.getY()));
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getClosestPathForLocation(e.getX(), e.getY())
-							.getLastPathComponent()).getUserObject();
-					if (tmp instanceof ConnectionTab) {
-						new ConnectionTabListMenu((ConnectionTab) tmp).show(
-								mConnectionTree, e.getX(), e.getY());
-					}
-				} else if (e.getButton() == MouseEvent.BUTTON1
-						&& e.getClickCount() > 1) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getLastSelectedPathComponent()).getUserObject();
-					if (tmp instanceof ConnectionTab) {
-						ConnectionTab tmpTab = (ConnectionTab) tmp;
-						boolean alreadyOpen = false;
-						for (Component t : mTabbedConnectionPane
-								.getComponents()) {
-							if (t.equals(tmpTab)) {
-								alreadyOpen = true;
-							}
-						}
-						if (!alreadyOpen) {
-							addClosableTab(tmpTab);
-						} else {
-							mTabbedConnectionPane.setSelectedComponent(tmpTab);
-						}
-					}
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-
-		mConnectionTree.setCellRenderer(mTreeRenderer);
+		// mConnectionTree.setCellRenderer(mTreeRenderer);
 		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();

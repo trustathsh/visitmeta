@@ -79,20 +79,20 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 			boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		Object tmpValue = ((DefaultMutableTreeNode) value).getUserObject();
-		if (!leaf) {
-			if (tmpValue instanceof String) {
-				if (((String) tmpValue).equals("Dataservices")) {
-					setIcon(dataserviceIcon);
-				}
-			} else if (tmpValue instanceof DataserviceConnection) {
-				setIcon(connectionIcon);
+		// if (!leaf) {
+		if (tmpValue instanceof String) {
+			if (((String) tmpValue).equals("Dataservices")) {
+				setIcon(dataserviceIcon);
 			}
-		} else {
-			if (tmpValue instanceof ConnectionTab) {
-				ConnectionTab tmp = (ConnectionTab) tmpValue;
-				setIcon(getStatusIcon(tmp.isConnected()));
-			}
+		} else if (tmpValue instanceof DataserviceConnection) {
+			setIcon(connectionIcon);
 		}
+		// } else {
+		if (tmpValue instanceof ConnectionTab) {
+			ConnectionTab tmp = (ConnectionTab) tmpValue;
+			setIcon(getStatusIcon(tmp.isConnected()));
+		}
+		// }
 
 		return this;
 	}

@@ -90,6 +90,7 @@ import de.hshannover.f4.trust.visitmeta.gui.GuiController;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class ConnectionDialog extends JDialog {
@@ -443,7 +444,7 @@ public class ConnectionDialog extends JDialog {
 		public void updateDataserviceComboBox() {
 			mJcbDataServiceConnection.removeAllItems();
 
-			List<DataserviceConnection> dataserviceList = null;
+			List<Data> dataserviceList = null;
 			try {
 				dataserviceList = mDataservicePersister
 						.loadDataserviceConnections();
@@ -451,8 +452,8 @@ public class ConnectionDialog extends JDialog {
 				log.error("Error while update Dataservice-Combo-Box", e);
 			}
 
-			for (DataserviceConnection dc : dataserviceList) {
-				mJcbDataServiceConnection.addItem(dc);
+			for (Data dc : dataserviceList) {
+				mJcbDataServiceConnection.addItem((DataserviceConnection) dc);
 			}
 		}
 
@@ -680,10 +681,10 @@ public class ConnectionDialog extends JDialog {
 
 			try {
 
-				List<RestConnection> connectionList = dConnection
+				List<Data> connectionList = dConnection
 						.loadRestConnections();
-				for (RestConnection rConnection : connectionList) {
-					mListModelMapServer.addElement(rConnection);
+				for (Data rConnection : connectionList) {
+					mListModelMapServer.addElement((RestConnection) rConnection);
 				}
 
 			} catch (ClientHandlerException | UniformInterfaceException e) {
@@ -940,7 +941,7 @@ public class ConnectionDialog extends JDialog {
 		}
 
 		private void loadDataserviceConnections() {
-			List<DataserviceConnection> dataserviceSet = null;
+			List<Data> dataserviceSet = null;
 			try {
 				dataserviceSet = mDataservicePersister
 						.loadDataserviceConnections();
@@ -948,8 +949,8 @@ public class ConnectionDialog extends JDialog {
 				log.error("Error while load persisted Dataservice-Connections",
 						e);
 			}
-			for (DataserviceConnection dc : dataserviceSet) {
-				addDataserviceConnection(dc);
+			for (Data dc : dataserviceSet) {
+				addDataserviceConnection((DataserviceConnection) dc);
 			}
 		}
 

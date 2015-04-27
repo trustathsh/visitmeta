@@ -59,10 +59,11 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.data.DataImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
-
-public class DataserviceConnection {
+public class DataserviceConnection extends DataImpl {
 
 	private static final Logger log = Logger.getLogger(Main.class);
 
@@ -71,40 +72,43 @@ public class DataserviceConnection {
 
 	private boolean mRawXml;
 
-	public DataserviceConnection(){}
+	public DataserviceConnection() {
+	}
 
-	public DataserviceConnection(String name, String url, boolean rawXml){
+	public DataserviceConnection(String name, String url, boolean rawXml) {
 		setName(name);
 		setUrl(url);
 		setRawXml(rawXml);
 	}
 
-	public List<String> loadRestConnectionNames() throws JSONException, ClientHandlerException, UniformInterfaceException{
+	public List<String> loadRestConnectionNames() throws JSONException, ClientHandlerException,
+	UniformInterfaceException {
 		List<String> connections = new ArrayList<String>();
 
 		JSONArray jsonResponse = null;
 		jsonResponse = buildWebResource().path("/").accept(MediaType.APPLICATION_JSON).get(JSONArray.class);
-		for(int i=0; i < jsonResponse.length(); i++){
+		for (int i = 0; i < jsonResponse.length(); i++) {
 			connections.add(jsonResponse.getString(i));
 		}
 		return connections;
 	}
 
-	public List<String> loadActiveRestConnectionNames() throws JSONException, ClientHandlerException, UniformInterfaceException{
+	public List<String> loadActiveRestConnectionNames() throws JSONException, ClientHandlerException,
+	UniformInterfaceException {
 		List<String> connections = new ArrayList<String>();
 
 		JSONArray jsonResponse = null;
 		jsonResponse = buildWebResource().path("/").queryParam("onlyActive", String.valueOf(true))
 				.accept(MediaType.APPLICATION_JSON).get(JSONArray.class);
 
-		for(int i=0; i < jsonResponse.length(); i++){
+		for (int i = 0; i < jsonResponse.length(); i++) {
 			connections.add(jsonResponse.getString(i));
 		}
 		return connections;
 	}
 
-	public List<RestConnection> loadRestConnections() throws ClientHandlerException, UniformInterfaceException{
-		List<RestConnection> connections = new ArrayList<RestConnection>();
+	public List<Data> loadRestConnections() throws ClientHandlerException, UniformInterfaceException {
+		List<Data> connections = new ArrayList<Data>();
 
 		JSONObject jsonResponse = null;
 
@@ -113,7 +117,7 @@ public class DataserviceConnection {
 
 		@SuppressWarnings("unchecked")
 		Iterator<String> i = jsonResponse.keys();
-		while(i.hasNext()){
+		while (i.hasNext()) {
 			String connectionName = i.next();
 			JSONObject jsonConnection;
 
@@ -130,6 +134,7 @@ public class DataserviceConnection {
 				restConn.setTruststorePass(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASSWORD));
 				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP));
 				restConn.setMaxPollResultSize(jsonConnection.getString(ConnectionKey.MAX_POLL_RESULT_SIZE));
+				restConn.setRestSubscriptions(loadRestSubscriptions(connectionName));
 
 				connections.add(restConn);
 
@@ -138,6 +143,29 @@ public class DataserviceConnection {
 			}
 		}
 		return connections;
+	}
+
+	public List<Data> loadRestSubscriptions(String connectionName) throws ClientHandlerException,
+	UniformInterfaceException {
+		List<Data> subscriptions = new ArrayList<Data>();
+
+		JSONArray jsonResponse = null;
+
+		jsonResponse = buildWebResource().path(connectionName).path("subscribe").accept(MediaType.APPLICATION_JSON)
+				.get(JSONArray.class);
+
+		for (int i = 0; i < jsonResponse.length(); i++) {
+
+			try {
+
+				String subscriptionName = jsonResponse.getString(i);
+
+				subscriptions.add(new RestSubscription(subscriptionName, false));
+			} catch (JSONException e) {
+				log.error("error while loadRestSubscriptions()", e);
+			}
+		}
+		return subscriptions;
 	}
 
 	private WebResource buildWebResource() {
@@ -149,19 +177,19 @@ public class DataserviceConnection {
 		return resource;
 	}
 
-	public void connect(String restConnectionName){
+	public void connect(String restConnectionName) {
 		log.trace("send connect request...");
 		String response = buildWebResource().path(restConnectionName).path("connect").put(String.class);
 		log.info("connect response: " + response);
 	}
 
-	public void disconnect(String restConnectionName){
+	public void disconnect(String restConnectionName) {
 		log.trace("send disconnect request...");
 		String response = buildWebResource().path(restConnectionName).path("disconnect").put(String.class);
 		log.info("disconnect response: " + response);
 	}
 
-	public WebResource getGraphResource(String restConnectionName){
+	public WebResource getGraphResource(String restConnectionName) {
 		return buildWebResource().path(restConnectionName).path("graph");
 	}
 
@@ -173,6 +201,7 @@ public class DataserviceConnection {
 		return tmp;
 	}
 
+	@Override
 	public DataserviceConnection copy() {
 		return new DataserviceConnection(mName, mUrl, mRawXml);
 	}
@@ -183,10 +212,12 @@ public class DataserviceConnection {
 		mRawXml = dataservice.isRawXml();
 	}
 
+	@Override
 	public String getName() {
 		return mName;
 	}
 
+	@Override
 	public void setName(String name) {
 		mName = name;
 	}
@@ -208,19 +239,24 @@ public class DataserviceConnection {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return mName;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if(o == this){
+		if (o == this) {
 			return true;
-		}else if(o instanceof DataserviceConnection){
-			if(((DataserviceConnection)o).getName().equals(getName())){
+		} else if (o instanceof DataserviceConnection) {
+			if (((DataserviceConnection) o).getName().equals(getName())) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public List<Data> getSubData() {
+		return loadRestConnections();
 	}
 }

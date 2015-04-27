@@ -43,13 +43,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
-import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.DeviceToGuiConnector;
 import de.hshannover.f4.trust.visitmeta.input.device.Device;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 /**
@@ -82,50 +79,25 @@ public final class Main {
 	 */
 	public static void main(String[] args) {
 		LOGGER.trace("Method main(" + args + ") called.");
-		LOGGER.info("VisITMeta visualization application v"
-				+ VISUALIZATION_VERSION + " started.");
+		LOGGER.info("VisITMeta visualization application v" + VISUALIZATION_VERSION + " started.");
 
 		initComponents();
-
-		List<DataserviceConnection> dataserviceConnections = null;
-		try {
-			dataserviceConnections = getDataservicePersister()
-					.loadDataserviceConnections();
-		} catch (PropertyException e) {
-			LOGGER.error("error while load persistent dataservices", e);
-		}
-
-		String vConnectionTypeString = null;
-
-		vConnectionTypeString = getConfig().getString(
-				"dataservice.connectiontype", "local").toUpperCase();
-
-		ConnectionType vConnectionType = ConnectionType
-				.valueOf(vConnectionTypeString);
 
 		/**
 		 * Load and initialize external control devices, if available.
 		 */
 		MotionControllerHandler motionControllerHandler = new MotionControllerHandler();
 		GuiController gui = new GuiController(motionControllerHandler);
-		List<Device> devices = DeviceToGuiConnector
-				.initializeDevices(motionControllerHandler);
+		List<Device> devices = DeviceToGuiConnector.initializeDevices(motionControllerHandler);
+
 		LOGGER.info(devices.size() + " devices were loaded.");
 
-		if (vConnectionType == ConnectionType.REST
-				&& dataserviceConnections != null) {
-			for (DataserviceConnection dc : dataserviceConnections) {
-				gui.addDataserviceConnection(dc);
-			}
-			gui.show();
-		}
+		gui.show();
 	}
 
 	public static void initComponents() {
-		String config = Main.class.getClassLoader()
-				.getResource("visualization_config.yml").getPath();
-		String dataservicePath = Main.class.getClassLoader()
-				.getResource("dataservices.yml").getPath();
+		String config = Main.class.getClassLoader().getResource("visualization_config.yml").getPath();
+		String dataservicePath = Main.class.getClassLoader().getResource("dataservices.yml").getPath();
 
 		mConfig = new Properties(config);
 		mDataservicePersister = new DataservicePersister(dataservicePath);
@@ -139,8 +111,7 @@ public final class Main {
 	 */
 	public static Properties getConfig() {
 		if (mConfig == null) {
-			throw new RuntimeException(
-					"Application property has not been initialized. This is not good!");
+			throw new RuntimeException("Application property has not been initialized. This is not good!");
 		}
 		return mConfig;
 	}
@@ -150,8 +121,7 @@ public final class Main {
 	 */
 	public static DataservicePersister getDataservicePersister() {
 		if (mDataservicePersister == null) {
-			throw new RuntimeException(
-					"Dataservice's has not been initialized. This is not good!");
+			throw new RuntimeException("Dataservice's has not been initialized. This is not good!");
 		}
 		return mDataservicePersister;
 	}

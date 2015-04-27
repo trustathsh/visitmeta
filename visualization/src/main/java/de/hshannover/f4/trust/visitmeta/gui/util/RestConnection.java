@@ -39,6 +39,8 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -52,32 +54,34 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
+import de.hshannover.f4.trust.visitmeta.data.DataImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
-
-public class RestConnection {
+public class RestConnection extends DataImpl {
 
 	private static final String DEFAULT_URL = "https://localhost:8443";
 
 	private String mConnectionName;
 	private String mUrl;
-	private String mUserName ;
+	private String mUserName;
 	private String mUserPass;
 	private String mTruststorePath;
 	private String mTruststorePass;
 	private String mMaxPollResultSize;
 	private boolean mAuthenticationBasic;
 	private boolean mStartupConnect;
+	private List<Data> mSubscriptions;
 
 	private DataserviceConnection mDataserviceConnection;
 
-
-	public RestConnection(DataserviceConnection dataConnection, String name){
+	public RestConnection(DataserviceConnection dataConnection, String name) {
 		setConnectionName(name);
 		setDataserviceConnection(dataConnection);
+		mSubscriptions = new ArrayList<Data>();
 	}
 
-	public void saveInDataservice() throws UniformInterfaceException, JSONException{
+	public void saveInDataservice() throws UniformInterfaceException, JSONException {
 		// get required values
 		String connectionName = getConnectionName();
 		String url = getUrl();
@@ -100,19 +104,19 @@ public class RestConnection {
 		jObj.put(ConnectionKey.USER_PASSWORD, userPassword);
 
 		// save optional values in JSONObject
-		if(authenticationBasic){
+		if (authenticationBasic) {
 			jObj.put(ConnectionKey.AUTHENTICATION_BASIC, authenticationBasic);
 		}
-		if(truststorePath != null && truststorePath.isEmpty()){
+		if (truststorePath != null && truststorePath.isEmpty()) {
 			jObj.put(ConnectionKey.TRUSTSTORE_PATH, truststorePath);
 		}
-		if(truststorePass != null && !truststorePass.isEmpty()){
+		if (truststorePass != null && !truststorePass.isEmpty()) {
 			jObj.put(ConnectionKey.TRUSTSTORE_PASSWORD, truststorePass);
 		}
-		if(startupConnect){
+		if (startupConnect) {
 			jObj.put(ConnectionKey.USE_CONNECTION_AS_STARTUP, startupConnect);
 		}
-		if(maxPollResultSize != null && !maxPollResultSize.isEmpty()){
+		if (maxPollResultSize != null && !maxPollResultSize.isEmpty()) {
 			jObj.put(ConnectionKey.MAX_POLL_RESULT_SIZE, maxPollResultSize);
 		}
 
@@ -137,6 +141,7 @@ public class RestConnection {
 		return tmp;
 	}
 
+	@Override
 	public RestConnection copy() {
 		RestConnection tmp = new RestConnection(getDataserviceConnection(), getConnectionName());
 		tmp.setUrl(getUrl());
@@ -170,10 +175,11 @@ public class RestConnection {
 	public void setConnectionName(String connectionName) {
 		mConnectionName = connectionName;
 	}
+
 	public String getUrl() {
-		if(mUrl != null){
+		if (mUrl != null) {
 			return mUrl;
-		}else{
+		} else {
 			return DEFAULT_URL;
 		}
 	}
@@ -183,7 +189,7 @@ public class RestConnection {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return mConnectionName;
 	}
 
@@ -251,4 +257,16 @@ public class RestConnection {
 		mTruststorePass = truststorePass;
 	}
 
+	public void addRestSubscription(Data restSubscription) {
+		mSubscriptions.add(restSubscription);
+	}
+
+	public void setRestSubscriptions(List<Data> restSubscriptions) {
+		mSubscriptions = restSubscriptions;
+	}
+
+	@Override
+	public List<Data> getSubData() {
+		return mSubscriptions;
+	}
 }

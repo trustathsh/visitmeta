@@ -1,0 +1,31 @@
+package de.hshannover.f4.trust.visitmeta.interfaces.connections;
+
+import java.util.List;
+
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+
+public interface DataserviceConnectionData extends Data {
+
+	@Override
+	public String getName();
+
+	@Override
+	public void setName(String name);
+
+	public String getUrl();
+
+	public void setUrl(String url);
+
+	public boolean isRawXml();
+
+	public void setRawXml(boolean rawXml);
+
+	public void addMapServerData(MapServerConnectionData connection);
+
+	public void setMapServerData(List<Data> connection);
+
+	public void removeMapServerData(MapServerConnectionData connection);
+
+	public void removeMapServerData(int index);
+
+}

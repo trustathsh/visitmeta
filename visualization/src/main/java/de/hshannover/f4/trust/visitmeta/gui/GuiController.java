@@ -41,7 +41,6 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -73,12 +72,12 @@ public class GuiController {
 
 					@Override
 					public void valueChanged(TreeSelectionEvent e) {
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
-								.getPath().getLastPathComponent();
-						if (node.getUserObject() instanceof ConnectionTab) {
-							setSelectedConnectionTab((ConnectionTab) node
-									.getUserObject());
-						}
+						// DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
+						// .getPath().getLastPathComponent();
+						// if (node.getUserObject() instanceof ConnectionTab) {
+						// setSelectedConnectionTab((ConnectionTab) node
+						// .getUserObject());
+						// }
 					}
 				});
 	}

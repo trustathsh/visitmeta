@@ -38,12 +38,15 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -65,6 +68,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -81,6 +86,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscription;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -241,59 +247,72 @@ public class MainWindow extends JFrame {
 		} catch (PropertyException e1) {
 			e1.printStackTrace();
 		}
-		// mConnectionTree.addMouseListener(new MouseListener() {
-		//
-		// @Override
-		// public void mouseReleased(MouseEvent e) {
-		// mConnectionTree.setSelectionRow(mConnectionTree
-		// .getClosestRowForLocation(e.getX(), e.getY()));
-		// if (e.getButton() == MouseEvent.BUTTON3) {
-		// Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-		// .getClosestPathForLocation(e.getX(), e.getY())
-		// .getLastPathComponent()).getUserObject();
-		// if (tmp instanceof ConnectionTab) {
-		// new ConnectionTabListMenu((ConnectionTab) tmp).show(
-		// mConnectionTree, e.getX(), e.getY());
-		// }
-		// } else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
-		// Object tmp = ((DefaultMutableTreeNode) mConnectionTree.getLastSelectedPathComponent())
-		// .getUserObject();
-		// if (tmp instanceof ConnectionTab) {
-		// ConnectionTab tmpTab = (ConnectionTab) tmp;
-		// boolean alreadyOpen = false;
-		// for (Component t : mTabbedConnectionPane
-		// .getComponents()) {
-		// if (t.equals(tmpTab)) {
-		// alreadyOpen = true;
-		// }
-		// }
-		// if (!alreadyOpen) {
-		// addClosableTab(tmpTab);
-		// } else {
-		// mTabbedConnectionPane.setSelectedComponent(tmpTab);
-		// }
-		// }
-		// }
-		// }
-		//
-		// @Override
-		// public void mousePressed(MouseEvent arg0) {
-		// }
-		//
-		// @Override
-		// public void mouseExited(MouseEvent arg0) {
-		// }
-		//
-		// @Override
-		// public void mouseEntered(MouseEvent arg0) {
-		// }
-		//
-		// @Override
-		// public void mouseClicked(MouseEvent arg0) {
-		// }
-		// });
+		mConnectionTree.addTreeSelectionListener(new TreeSelectionListener() {
 
-		// mConnectionTree.setCellRenderer(mTreeRenderer);
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		mConnectionTree.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// mConnectionTree.setSelectionRow(mConnectionTree.getClosestRowForLocation(e.getX(), e.getY()));
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
+							.getClosestPathForLocation(e.getX(), e.getY())
+							.getLastPathComponent()).getUserObject();
+					if (tmp instanceof ConnectionTab) {
+						new ConnectionTabListMenu((ConnectionTab) tmp).show(
+								mConnectionTree, e.getX(), e.getY());
+					}
+				} else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
+					Object tmp = mConnectionTree.getLastSelectedPathComponent();
+					if (tmp instanceof RestConnection) {
+						RestConnection restConnection = (RestConnection) tmp;
+
+						GraphContainer graphContainer = new GraphContainer(restConnection.getConnectionName(),
+								restConnection.getDataserviceConnection());
+						ConnectionTab connectionTab = new ConnectionTab(graphContainer, null);
+
+						 boolean alreadyOpen = false;
+						Component tmpComponent = null;
+						 for (Component t : mTabbedConnectionPane.getComponents()) {
+							if (t.equals(connectionTab)) {
+								alreadyOpen = true;
+								tmpComponent = t;
+
+							}
+						 }
+						 if (!alreadyOpen) {
+						 addClosableTab(connectionTab);
+						 } else {
+							mTabbedConnectionPane.setSelectedComponent(tmpComponent);
+						 }
+					}
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
+
+		mConnectionTree.setCellRenderer(mTreeRenderer);
 		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();

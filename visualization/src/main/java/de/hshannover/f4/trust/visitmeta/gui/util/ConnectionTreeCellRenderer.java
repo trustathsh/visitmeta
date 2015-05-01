@@ -42,10 +42,7 @@ import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-
-import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 
 public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static final long serialVersionUID = 1L;
@@ -78,21 +75,18 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
 			boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		Object tmpValue = ((DefaultMutableTreeNode) value).getUserObject();
-		// if (!leaf) {
-		if (tmpValue instanceof String) {
-			if (((String) tmpValue).equals("Dataservices")) {
+
+		if(value instanceof Dataservices){
+			if(value.toString().equals("Dataservices")){
 				setIcon(dataserviceIcon);
 			}
-		} else if (tmpValue instanceof DataserviceConnection) {
+		}else if(value instanceof DataserviceConnection){
 			setIcon(connectionIcon);
+		}else if(value instanceof RestConnection){
+			setIcon(getStatusIcon(true));
+		}else if(value instanceof RestSubscription){
+			setIcon(getStatusIcon(true));
 		}
-		// } else {
-		if (tmpValue instanceof ConnectionTab) {
-			ConnectionTab tmp = (ConnectionTab) tmpValue;
-			setIcon(getStatusIcon(tmp.isConnected()));
-		}
-		// }
 
 		return this;
 	}

@@ -28,7 +28,9 @@ public interface MapServerConnectionData extends Data {
 
 	public void addMapServerData(MapServerConnectionData connection);
 
-	public void setMapServerData(List<Data> connection);
+	public void setSubscriptionData(List<Data> connection);
+
+	public List<Data> getSubscriptionData();
 
 	public void removeMapServerData(MapServerConnectionData connection);
 

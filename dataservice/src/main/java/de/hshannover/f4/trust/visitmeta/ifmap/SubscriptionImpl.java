@@ -38,108 +38,128 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+import java.util.List;
+
+import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class SubscriptionImpl implements Subscription {
+public class SubscriptionImpl extends DataImpl implements Subscription {
 
-	public String name;
-	public String identifier;
-	public String identifierType;
-	public String filterLinks;
-	public String filterResult;
-	public String terminalIdentifierTypes;
-	public boolean startupSubscribe;
-	public int maxDepth;
-	public int maxSize;
+	public String mIdentifier;
+
+	public String mIdentifierType;
+
+	public String mFilterLinks;
+
+	public String mFilterResult;
+
+	public String mTerminalIdentifierTypes;
+
+	public boolean mStartupSubscribe;
+
+	public int mMaxDepth;
+
+	public int mMaxSize;
 
 	@Override
-	public String getName() {
-		return name;
+	public List<Data> getSubData() {
+		// Subscriptions do not have subData
+		return null;
 	}
 
 	@Override
-	public void setName(String name) {
-		this.name = name;
+	public Data copy() {
+		SubscriptionImpl tmpCopy = new SubscriptionImpl();
+		tmpCopy.setName(super.getName());
+		tmpCopy.setIdentifierType(getIdentifierType());
+		tmpCopy.setMatchLinksFilter(getMatchLinksFilter());
+		tmpCopy.setResultFilter(getResultFilter());
+		tmpCopy.setTerminalIdentifierTypes(getTerminalIdentifierTypes());
+		tmpCopy.setStartupSubscribe(isStartupSubscribe());
+		tmpCopy.setMaxDepth(getMaxDepth());
+		tmpCopy.setMaxSize(getMaxSize());
+		return tmpCopy;
 	}
 
 	@Override
 	public String getStartIdentifier() {
-		return identifier;
+		return mIdentifier;
 	}
 
 	@Override
 	public void setStartIdentifier(String identifier) {
-		this.identifier = identifier;
+		this.mIdentifier = identifier;
 	}
 
 	@Override
 	public String getIdentifierType() {
-		return identifierType;
+		return mIdentifierType;
 	}
 
 	@Override
 	public void setIdentifierType(String identifierType) {
-		this.identifierType = identifierType;
+		this.mIdentifierType = identifierType;
 	}
 
 	@Override
 	public String getMatchLinksFilter() {
-		return filterLinks;
+		return mFilterLinks;
 	}
 
 	@Override
 	public void setMatchLinksFilter(String filterLinks) {
-		this.filterLinks = filterLinks;
+		this.mFilterLinks = filterLinks;
 	}
 
 	@Override
 	public String getResultFilter() {
-		return filterResult;
+		return mFilterResult;
 	}
 
 	@Override
 	public void setResultFilter(String filterResult) {
-		this.filterResult = filterResult;
+		this.mFilterResult = filterResult;
 	}
 
 	@Override
 	public String getTerminalIdentifierTypes() {
-		return terminalIdentifierTypes;
+		return mTerminalIdentifierTypes;
 	}
 
 	@Override
 	public void setTerminalIdentifierTypes(String terminalIdentifierTypes) {
-		this.terminalIdentifierTypes = terminalIdentifierTypes;
+		this.mTerminalIdentifierTypes = terminalIdentifierTypes;
 	}
 
 	@Override
 	public boolean isStartupSubscribe() {
-		return startupSubscribe;
+		return mStartupSubscribe;
 	}
 
 	@Override
 	public void setStartupSubscribe(boolean startupSubscribe) {
-		this.startupSubscribe = startupSubscribe;
+		this.mStartupSubscribe = startupSubscribe;
 	}
 
 	@Override
 	public int getMaxDepth() {
-		return maxDepth;
+		return mMaxDepth;
 	}
 
 	@Override
 	public void setMaxDepth(int maxDepth) {
-		this.maxDepth = maxDepth;
+		this.mMaxDepth = maxDepth;
 	}
 
 	@Override
 	public int getMaxSize() {
-		return maxSize;
+		return mMaxSize;
 	}
 
 	@Override
 	public void setMaxSize(int maxSize) {
-		this.maxSize = maxSize;
+		this.mMaxSize = maxSize;
 	}
 
 }

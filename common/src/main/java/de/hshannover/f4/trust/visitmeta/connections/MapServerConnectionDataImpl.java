@@ -19,7 +19,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	
 	private String mTruststorePassword;
 	
-	private List<Data> mSubDataList;
+	private List<Data> mSubscriptionDataList;
 
 	private int mMaxPollResultSize;
 
@@ -30,7 +30,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	private boolean mAuthenticationBasic;
 
 	private MapServerConnectionDataImpl() {
-		mSubDataList = new ArrayList<Data>();
+		mSubscriptionDataList = new ArrayList<Data>();
 	}
 
 	public MapServerConnectionDataImpl(String name) {
@@ -49,19 +49,19 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	@Override
 	public Data copy() {
 		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
-		data.setTruststorePath(mTruststorePath);
-		data.setTruststorePassword(mTruststorePassword);
-		data.setMapServerData(mSubDataList);
-		data.setMaxPollResultSize(mMaxPollResultSize);
-		data.setConnected(mConnected);
-		data.setStartupConnect(mStartupConnect);
-		data.setAuthenticationBasic(mAuthenticationBasic);
+		data.setTruststorePath(getTruststorePath());
+		data.setTruststorePassword(getTruststorePassword());
+		data.setSubscriptionData(getSubscriptionData());
+		data.setMaxPollResultSize(getMaxPollResultSize());
+		data.setConnected(isConnected());
+		data.setStartupConnect(isStartupConnect());
+		data.setAuthenticationBasic(isAuthenticationBasic());
 		return data;
 	}
 
 	@Override
 	public List<Data> getSubData() {
-		return new ArrayList<Data>(mSubDataList);
+		return getSubscriptionData();
 	}
 
 	@Override
@@ -116,22 +116,27 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	@Override
 	public void addMapServerData(MapServerConnectionData connection) {
-		mSubDataList.add(connection);
+		mSubscriptionDataList.add(connection);
 	}
 
 	@Override
-	public void setMapServerData(List<Data> connection) {
-		mSubDataList = connection;
+	public void setSubscriptionData(List<Data> connection) {
+		mSubscriptionDataList = connection;
+	}
+
+	@Override
+	public List<Data> getSubscriptionData() {
+		return new ArrayList<Data>(mSubscriptionDataList);
 	}
 
 	@Override
 	public void removeMapServerData(MapServerConnectionData connection) {
-		mSubDataList.remove(connection);
+		mSubscriptionDataList.remove(connection);
 	}
 
 	@Override
 	public void removeMapServerData(int index) {
-		mSubDataList.remove(index);
+		mSubscriptionDataList.remove(index);
 	}
 
 	@Override

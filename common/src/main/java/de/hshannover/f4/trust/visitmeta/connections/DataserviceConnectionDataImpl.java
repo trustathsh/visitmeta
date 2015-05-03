@@ -29,12 +29,14 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 
 	@Override
 	public Data copy() {
-		return new DataserviceConnectionDataImpl(getName(), mUrl, mRawXml);
+		DataserviceConnectionDataImpl tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
+		tmpCopy.setMapServerData(getMapServerData());
+		return tmpCopy;
 	}
 
 	@Override
 	public List<Data> getSubData() {
-		return new ArrayList<Data>(mSubDataList);
+		return getMapServerData();
 	}
 
 	@Override
@@ -65,6 +67,11 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 	@Override
 	public void setMapServerData(List<Data> connection) {
 		mSubDataList = connection;
+	}
+
+	@Override
+	public List<Data> getMapServerData() {
+		return new ArrayList<Data>(mSubDataList);
 	}
 
 	@Override

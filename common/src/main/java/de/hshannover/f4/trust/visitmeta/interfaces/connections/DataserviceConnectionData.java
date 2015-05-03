@@ -24,6 +24,8 @@ public interface DataserviceConnectionData extends Data {
 
 	public void setMapServerData(List<Data> connection);
 
+	public List<Data> getMapServerData();
+
 	public void removeMapServerData(MapServerConnectionData connection);
 
 	public void removeMapServerData(int index);

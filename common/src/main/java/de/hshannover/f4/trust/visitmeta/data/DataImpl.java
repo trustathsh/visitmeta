@@ -39,8 +39,7 @@ public abstract class DataImpl implements Data {
 	@Override
 	public Data clone() {
 		Data tmp = copy();
-		String tmpName = tmp.getName();
-		tmp.setName(tmpName + "(clone)");
+		tmp.setName(tmp.getName() + "(clone)");
 		return tmp;
 	}
 

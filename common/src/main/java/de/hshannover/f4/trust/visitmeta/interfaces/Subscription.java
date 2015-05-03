@@ -38,10 +38,14 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
-public interface Subscription {
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
+public interface Subscription extends Data {
+
+	@Override
 	public String getName();
 
+	@Override
 	public void setName(String name);
 
 	public String getStartIdentifier();

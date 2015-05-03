@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.interfaces.ifmap;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,6 +52,8 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 /**
  * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.
@@ -67,7 +70,7 @@ public interface ConnectionManager {
 	 *            the {@link Connection} to add
 	 * @throws ConnectionException
 	 */
-	public void addConnection(Connection c) throws ConnectionException;
+	public void addConnection(MapServerConnection c) throws ConnectionException;
 
 	/**
 	 * Connect to a MAP-Server.
@@ -93,7 +96,7 @@ public interface ConnectionManager {
 	 * @return
 	 * @throws ConnectionException
 	 */
-	public Connection createConnection(String connectionName, String url,
+	public MapServerConnection createConnection(String connectionName, String url,
 			String userName, String userPassword) throws ConnectionException;
 
 	/**
@@ -144,7 +147,7 @@ public interface ConnectionManager {
 	 * @return a Set<String> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public Set<String> getActiveSubscriptions(String connectionName) throws ConnectionException;
+	public List<Data> getActiveSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
 	 * Returns all subscriptions for a given {@link Connection}.
@@ -160,7 +163,7 @@ public interface ConnectionManager {
 	 *
 	 * @return a Set<String> with all saved subscriptions.
 	 */
-	public Map<String, Connection> getSavedConnections();
+	public Map<String, MapServerConnection> getSavedConnections();
 
 	/**
 	 * Returns the {@link GraphService} for a given {@link Connection}.
@@ -184,8 +187,8 @@ public interface ConnectionManager {
 	 * @throws IOException
 	 * @throws PropertyException
 	 */
-	public void storeSubscription(String connectionName,
-			Subscription subscription) throws IOException, PropertyException;
+	public void storeSubscription(String connectionName, Subscription subscription) throws IOException,
+			PropertyException;
 
 	/**
 	 * Delete a saved {@link Connection}.
@@ -194,7 +197,7 @@ public interface ConnectionManager {
 	 *            a {@link Connection} instance
 	 * @throws ConnectionException
 	 */
-	public void removeConnection(Connection c) throws ConnectionException;
+	public void removeConnection(MapServerConnection c) throws ConnectionException;
 
 	/**
 	 * Tries to connect all saved {@link Connection}s to the MAP server that

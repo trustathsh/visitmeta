@@ -28,10 +28,10 @@ public abstract class DataImpl implements Data {
 	}
 
 	@Override
-	public int getIndexOfSubData(SubData channel) {
+	public int getIndexOfSubData(SubData data) {
 		List<Data> tmp = getSubData();
 		if (tmp != null) {
-			return tmp.indexOf(channel);
+			return tmp.indexOf(data);
 		}
 		return -1;
 	}
@@ -51,6 +51,18 @@ public abstract class DataImpl implements Data {
 	@Override
 	public void setName(String name) {
 		mName = name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		} else if (o instanceof Data) {
+			if (((Data) o).getName().equals(getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

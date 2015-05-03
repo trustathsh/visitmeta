@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -29,7 +30,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	private boolean mAuthenticationBasic;
 
-	private MapServerConnectionDataImpl() {
+	protected MapServerConnectionDataImpl() {
 		mSubscriptionDataList = new ArrayList<Data>();
 	}
 
@@ -38,12 +39,12 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		setName(name);
 	}
 
-	public MapServerConnectionDataImpl(String name, String url, String userName, String userPass) {
+	public MapServerConnectionDataImpl(String name, String url, String userName, String userPassword) {
 		this();
 		setName(name);
 		setUrl(url);
 		setUserName(userName);
-		setUserPass(userPass);
+		setUserPassword(userPassword);
 	}
 
 	@Override
@@ -51,17 +52,27 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
-		data.setSubscriptionData(getSubscriptionData());
+		data.setSubscriptionData(getSubscriptions());
 		data.setMaxPollResultSize(getMaxPollResultSize());
 		data.setConnected(isConnected());
-		data.setStartupConnect(isStartupConnect());
+		data.setStartupConnect(doesConnectOnStartup());
 		data.setAuthenticationBasic(isAuthenticationBasic());
 		return data;
 	}
 
 	@Override
+	public String getConnectionName() {
+		return super.getName();
+	}
+
+	@Override
+	public void setConnectionName(String connectionName) {
+		super.setName(connectionName);
+	}
+
+	@Override
 	public List<Data> getSubData() {
-		return getSubscriptionData();
+		return getSubscriptions();
 	}
 
 	@Override
@@ -90,8 +101,8 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public void setUserPass(String userPass) {
-		mUserPass = userPass;
+	public void setUserPassword(String userPassword) {
+		mUserPass = userPassword;
 	}
 
 	@Override
@@ -115,28 +126,8 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public void addMapServerData(MapServerConnectionData connection) {
-		mSubscriptionDataList.add(connection);
-	}
-
-	@Override
 	public void setSubscriptionData(List<Data> connection) {
 		mSubscriptionDataList = connection;
-	}
-
-	@Override
-	public List<Data> getSubscriptionData() {
-		return new ArrayList<Data>(mSubscriptionDataList);
-	}
-
-	@Override
-	public void removeMapServerData(MapServerConnectionData connection) {
-		mSubscriptionDataList.remove(connection);
-	}
-
-	@Override
-	public void removeMapServerData(int index) {
-		mSubscriptionDataList.remove(index);
 	}
 
 	@Override
@@ -165,7 +156,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public boolean isStartupConnect() {
+	public boolean doesConnectOnStartup() {
 		return mStartupConnect;
 	}
 
@@ -177,6 +168,43 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	@Override
 	public boolean isAuthenticationBasic() {
 		return mAuthenticationBasic;
+	}
+
+	@Override
+	public void addSubscription(Subscription connection) {
+		mSubscriptionDataList.add(connection);
+	}
+
+	@Override
+	public void deleteSubscription(String subscriptionName) {
+		for (Data subData : getSubscriptions()) {
+			if (subData.getName().equals(subscriptionName)) {
+				mSubscriptionDataList.remove(subData);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void deleteAllSubscriptions() {
+		mSubscriptionDataList.clear();
+	}
+
+	@Override
+	public List<Data> getActiveSubscriptions() {
+		List<Data> newActiveList = new ArrayList<Data>();
+		for (Data subData : getSubscriptions()) {
+			if (((Subscription) subData).isActive()) {
+				newActiveList.add(subData);
+			}
+		}
+
+		return newActiveList;
+	}
+
+	@Override
+	public List<Data> getSubscriptions() {
+		return new ArrayList<Data>(mSubscriptionDataList);
 	}
 
 }

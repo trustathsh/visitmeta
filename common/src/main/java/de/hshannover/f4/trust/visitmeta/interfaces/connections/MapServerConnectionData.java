@@ -2,9 +2,14 @@ package de.hshannover.f4.trust.visitmeta.interfaces.connections;
 
 import java.util.List;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public interface MapServerConnectionData extends Data {
+
+	public String getConnectionName();
+
+	public void setConnectionName(String connectionName);
 
 	public String getUrl();
 
@@ -16,7 +21,7 @@ public interface MapServerConnectionData extends Data {
 
 	public String getUserPassword();
 
-	public void setUserPass(String userPass);
+	public void setUserPassword(String userPassword);
 
 	public String getTruststorePath();
 
@@ -26,15 +31,41 @@ public interface MapServerConnectionData extends Data {
 
 	public void setTruststorePassword(String truststorePass);
 
-	public void addMapServerData(MapServerConnectionData connection);
+	/**
+	 * Adds a subscription to the internal list of subscriptions for this {@link MapServerConnectionData}.
+	 *
+	 * @param subscription a subscription
+	 */
+	public void addSubscription(Subscription connection);
+
+	/**
+	 * Delete a subscription.
+	 *
+	 * @param subscriptionName the subscription name.
+	 */
+	public void deleteSubscription(String subscriptionName);
+
+	/**
+	 * Delete all subscriptions.
+	 */
+	public void deleteAllSubscriptions();
+
+	/**
+	 * Returns all active subscriptions.
+	 *
+	 * @return a {@link List} with all active subscriptions.
+	 */
+	public List<Data> getActiveSubscriptions();
+
+	/**
+	 * Returns a {@link List} of {@link Subscription} representing all subscriptions for this
+	 * {@link MapServerConnectionData}.
+	 *
+	 * @return all subscriptions as a {@link List} of {@link Subscription}.
+	 */
+	public List<Data> getSubscriptions();
 
 	public void setSubscriptionData(List<Data> connection);
-
-	public List<Data> getSubscriptionData();
-
-	public void removeMapServerData(MapServerConnectionData connection);
-
-	public void removeMapServerData(int index);
 
 	public int getMaxPollResultSize();
 
@@ -44,9 +75,19 @@ public interface MapServerConnectionData extends Data {
 
 	public boolean isConnected();
 
+	/**
+	 * Set the flag for connecting on startup for this {@link MapServerConnectionData}.
+	 *
+	 * @param startupConnect connect on startup boolean
+	 */
 	public void setStartupConnect(boolean startupConnect);
 
-	public boolean isStartupConnect();
+	/**
+	 * Returns if the flag for connecting on startup is set for this {@link MapServerConnectionData}.
+	 *
+	 * @return true, if this {@link MapServerConnectionData} shall connect on startup
+	 */
+	public boolean doesConnectOnStartup();
 
 	public void setAuthenticationBasic(boolean authenticationBasic);
 

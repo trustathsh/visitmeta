@@ -58,8 +58,6 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeElement;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
-import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.SimpleGraphService;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
@@ -212,11 +210,11 @@ public class ConnectionImpl implements Connection {
 
 			checkIsConnectionEstablished();
 
-			if (mUpdateService == null) {
-				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(),
-						new InMemoryIdentifierFactory(),
-						new InMemoryMetadataFactory());
-			}
+			// if (mUpdateService == null) {
+			// mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(),
+			// new InMemoryIdentifierFactory(),
+			// new InMemoryMetadataFactory());
+			// }
 
 			mUpdateThread = new Thread(mUpdateService, "UpdateThread-"
 					+ mConnectionName);

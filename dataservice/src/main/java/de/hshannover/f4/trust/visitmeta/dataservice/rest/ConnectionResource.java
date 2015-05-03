@@ -65,7 +65,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 @Path("/")
@@ -168,11 +168,10 @@ public class ConnectionResource {
 		// build new Connection
 		log.trace(connectionName + ": build new Connection");
 
-		Connection newConnection = null;
+		MapServerConnection newConnection = null;
 		try {
-			newConnection = Application.getConnectionManager()
-					.createConnection(connectionName, url, userName,
-							userPassword);
+			newConnection = Application.getConnectionManager().createConnection(connectionName, url, userName,
+					userPassword);
 		} catch (ConnectionException e) {
 			String msg = "error while new Connection()";
 			log.error(msg, e);
@@ -304,25 +303,18 @@ public class ConnectionResource {
 	public Object getConnections() {
 		if (mWithAllValues) {
 			JSONObject jsonO = new JSONObject();
-			for (Connection c : Application.getConnectionManager()
+			for (MapServerConnection c : Application.getConnectionManager()
 					.getSavedConnections().values()) {
 				Map<String, String> connectionMap = new HashMap<String, String>();
 
-				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL,
-						c.getIfmapServerUrl());
+				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL, c.getUrl());
 				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
-				connectionMap.put(ConnectionKey.USER_PASSWORD,
-						c.getUserPassword());
-				connectionMap.put(ConnectionKey.AUTHENTICATION_BASIC,
-						String.valueOf(c.isAuthenticationBasic()));
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH,
-						c.getTruststorePath());
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PASSWORD,
-						c.getTruststorePassword());
-				connectionMap.put(ConnectionKey.USE_CONNECTION_AS_STARTUP,
-						String.valueOf(c.doesConnectOnStartup()));
-				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE,
-						String.valueOf(c.getMaxPollResultSize()));
+				connectionMap.put(ConnectionKey.USER_PASSWORD, c.getUserPassword());
+				connectionMap.put(ConnectionKey.AUTHENTICATION_BASIC, String.valueOf(c.isAuthenticationBasic()));
+				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH, c.getTruststorePath());
+				connectionMap.put(ConnectionKey.TRUSTSTORE_PASSWORD, c.getTruststorePassword());
+				connectionMap.put(ConnectionKey.USE_CONNECTION_AS_STARTUP, String.valueOf(c.doesConnectOnStartup()));
+				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE, String.valueOf(c.getMaxPollResultSize()));
 
 				JSONObject jsonConnection = new JSONObject(connectionMap);
 
@@ -339,8 +331,7 @@ public class ConnectionResource {
 
 		} else if (mOnlyActive) {
 			JSONArray jsonA = new JSONArray();
-			for (Connection c : Application.getConnectionManager()
-					.getSavedConnections().values()) {
+			for (MapServerConnection c : Application.getConnectionManager().getSavedConnections().values()) {
 				if (c.isConnected()) {
 					jsonA.put(c.getConnectionName());
 				}
@@ -349,8 +340,7 @@ public class ConnectionResource {
 
 		} else {
 			JSONArray jsonA = new JSONArray();
-			for (Connection c : Application.getConnectionManager()
-					.getSavedConnections().values()) {
+			for (MapServerConnection c : Application.getConnectionManager().getSavedConnections().values()) {
 				jsonA.put(c.getConnectionName());
 			}
 			return jsonA;

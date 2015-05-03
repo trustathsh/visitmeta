@@ -38,128 +38,30 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-import java.util.List;
-
-import de.hshannover.f4.trust.visitmeta.data.DataImpl;
+import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 
-public class SubscriptionImpl extends DataImpl implements Subscription {
-
-	public String mIdentifier;
-
-	public String mIdentifierType;
-
-	public String mFilterLinks;
-
-	public String mFilterResult;
-
-	public String mTerminalIdentifierTypes;
-
-	public boolean mStartupSubscribe;
-
-	public int mMaxDepth;
-
-	public int mMaxSize;
+public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 
 	@Override
-	public List<Data> getSubData() {
-		// Subscriptions do not have subData
-		return null;
+	public void stopSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
+		SubscribeRequest request = Requests.createSubscribeReq();
+		SubscribeDelete subscribe = Requests.createSubscribeDelete(getName());
+
+		request.addSubscribeElement(subscribe);
+		mapServerConnection.subscribe(request);
 	}
 
 	@Override
-	public Data copy() {
-		SubscriptionImpl tmpCopy = new SubscriptionImpl();
-		tmpCopy.setName(super.getName());
-		tmpCopy.setIdentifierType(getIdentifierType());
-		tmpCopy.setMatchLinksFilter(getMatchLinksFilter());
-		tmpCopy.setResultFilter(getResultFilter());
-		tmpCopy.setTerminalIdentifierTypes(getTerminalIdentifierTypes());
-		tmpCopy.setStartupSubscribe(isStartupSubscribe());
-		tmpCopy.setMaxDepth(getMaxDepth());
-		tmpCopy.setMaxSize(getMaxSize());
-		return tmpCopy;
-	}
+	public void startSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
+		SubscribeRequest request = SubscriptionHelper.buildRequest(this);
 
-	@Override
-	public String getStartIdentifier() {
-		return mIdentifier;
-	}
+		mapServerConnection.subscribe(request);
 
-	@Override
-	public void setStartIdentifier(String identifier) {
-		this.mIdentifier = identifier;
-	}
-
-	@Override
-	public String getIdentifierType() {
-		return mIdentifierType;
-	}
-
-	@Override
-	public void setIdentifierType(String identifierType) {
-		this.mIdentifierType = identifierType;
-	}
-
-	@Override
-	public String getMatchLinksFilter() {
-		return mFilterLinks;
-	}
-
-	@Override
-	public void setMatchLinksFilter(String filterLinks) {
-		this.mFilterLinks = filterLinks;
-	}
-
-	@Override
-	public String getResultFilter() {
-		return mFilterResult;
-	}
-
-	@Override
-	public void setResultFilter(String filterResult) {
-		this.mFilterResult = filterResult;
-	}
-
-	@Override
-	public String getTerminalIdentifierTypes() {
-		return mTerminalIdentifierTypes;
-	}
-
-	@Override
-	public void setTerminalIdentifierTypes(String terminalIdentifierTypes) {
-		this.mTerminalIdentifierTypes = terminalIdentifierTypes;
-	}
-
-	@Override
-	public boolean isStartupSubscribe() {
-		return mStartupSubscribe;
-	}
-
-	@Override
-	public void setStartupSubscribe(boolean startupSubscribe) {
-		this.mStartupSubscribe = startupSubscribe;
-	}
-
-	@Override
-	public int getMaxDepth() {
-		return mMaxDepth;
-	}
-
-	@Override
-	public void setMaxDepth(int maxDepth) {
-		this.mMaxDepth = maxDepth;
-	}
-
-	@Override
-	public int getMaxSize() {
-		return mMaxSize;
-	}
-
-	@Override
-	public void setMaxSize(int maxSize) {
-		this.mMaxSize = maxSize;
 	}
 
 }

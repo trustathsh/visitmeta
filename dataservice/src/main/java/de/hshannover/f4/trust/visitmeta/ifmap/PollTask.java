@@ -58,7 +58,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFa
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 
 /**
  * A <tt>PollTask</tt> executes one IF-MAP poll request.
@@ -70,7 +70,7 @@ class PollTask implements Callable<PollResult> {
 
 	private static final Logger log = Logger.getLogger(PollTask.class);
 
-	private Connection mConnection;
+	private MapServerConnection mConnection;
 
 	private InternalMetadataFactory mMetadataFactory;
 
@@ -85,7 +85,7 @@ class PollTask implements Callable<PollResult> {
 	 * @param metadataFactory
 	 *            the factory which is used to build internal metadata objects
 	 */
-	public PollTask(Connection connection, InternalMetadataFactory metadataFactory, IfmapJHelper helper) {
+	public PollTask(MapServerConnection connection, InternalMetadataFactory metadataFactory, IfmapJHelper helper) {
 		if (connection == null) {
 			throw new IllegalArgumentException("Connection cannot be null");
 		}

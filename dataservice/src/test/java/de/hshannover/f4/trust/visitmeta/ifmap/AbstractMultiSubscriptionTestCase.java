@@ -71,7 +71,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JConnection;
@@ -103,7 +103,7 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 
 	protected Writer mWriter;
 
-	protected Connection mConnection;
+	protected MapServerConnection mConnection;
 
 	protected Executor mExecutor;
 
@@ -153,7 +153,7 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 		mMetadataFactory = new InMemoryMetadataFactory();
 		mIfmapJHelper = new IfmapJHelper(mIdentifierFactory);
 
-		mConnection = mock(Connection.class);
+		mConnection = mock(MapServerConnection.class);
 
 	}
 

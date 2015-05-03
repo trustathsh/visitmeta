@@ -94,3 +94,77 @@ default:
       startIdentifier: ARMultiSubscriptionTest
       #  send this subscription when the data service is started
       useSubscriptionAsStartup: false
+default2:
+  userName: test2
+  userPassword: test2
+  # try to connect when the data service is started
+  useConnectionAsStartup: true
+  # url to the ifmap-server for this default connection
+  ifmapServerUrl: https://localhost:8443
+  subscriptions:
+    # the subscription name
+    default:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: device
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: freeradius-pdp
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: false
+    sub1:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: mac-address
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: 00:11:22:33:44:55
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: true
+    sub2:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: mac-address
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: 11:22:33:44:55:66
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: true
+    sub3:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: ip-address
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: IPv4,192.168.0.1
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: false
+    sub4:
+      # identifierType is one of the following:
+      # access-request, device, ip-address, mac-address
+      # identity as well as extended identifier not supported at the moment
+      identifierType: access-request
+      # startIdentifier is the value of the specific identifier
+      # when using ip-address as type, the syntax is:
+      # IPv4,10.0.0.1
+      # or
+      # IPv6,...
+      startIdentifier: ARMultiSubscriptionTest
+      #  send this subscription when the data service is started
+      useSubscriptionAsStartup: false

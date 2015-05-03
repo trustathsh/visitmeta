@@ -54,7 +54,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManagerImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
@@ -154,7 +154,7 @@ public abstract class Application {
 		}
 
 		for (String s : keySet) {
-			Connection tmp = null;
+			MapServerConnection tmp = null;
 			try {
 				tmp = mConnections.buildConnection(s);
 			} catch (ConnectionException | PropertyException e) {

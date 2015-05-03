@@ -49,6 +49,7 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
@@ -56,7 +57,7 @@ public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);
 
-	public static SubscribeRequest buildRequest(Subscription subscribtion) {
+	public static SubscribeRequest buildRequest(SubscriptionData subscribtion) {
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
 

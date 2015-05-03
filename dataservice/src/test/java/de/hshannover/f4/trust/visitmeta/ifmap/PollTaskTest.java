@@ -62,7 +62,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifier
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 
 public class PollTaskTest {
 
@@ -70,7 +70,7 @@ public class PollTaskTest {
 
 	private String mSearchResultName = "PollTaskTest";
 
-	private Connection mConnection;
+	private MapServerConnection mConnection;
 	private InternalMetadataFactory mMetadataFactory;
 	private IfmapJHelper mIfmapJHelper;
 
@@ -78,7 +78,7 @@ public class PollTaskTest {
 
 	@Before
 	public void setup() {
-		mConnection = mock(Connection.class);
+		mConnection = mock(MapServerConnection.class);
 		mMetadataFactory = mock(InternalMetadataFactory.class);
 		mIfmapJHelper = new IfmapJHelper(new IdentifierFactoryStub());
 		InternalMetadata metadataMock = mock(InternalMetadata.class);

@@ -151,11 +151,9 @@ public class SubscribeResource {
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
 				try {
 
-					SubscribeRequest request = SubscriptionHelper
-							.buildRequest(moreSubscribes);
+					SubscribeRequest request = SubscriptionHelper.buildRequest(moreSubscribes);
 					manager.subscribe(name, request);
-					manager.storeSubscription(name, SubscriptionHelper
-							.buildSubscribtion(moreSubscribes));
+					manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(moreSubscribes));
 
 				} catch (ConnectionException | IOException | PropertyException e) {
 					log.error("error while multiple subscribeUpdate from "
@@ -170,8 +168,7 @@ public class SubscribeResource {
 				SubscribeRequest request = SubscriptionHelper
 						.buildRequest(jObj);
 				manager.subscribe(name, request);
-				manager.storeSubscription(name,
-						SubscriptionHelper.buildSubscribtion(jObj));
+				manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(jObj));
 
 			} catch (ConnectionException | IOException | PropertyException ee) {
 				log.error("error while single subscribeUpdate from " + name, ee);

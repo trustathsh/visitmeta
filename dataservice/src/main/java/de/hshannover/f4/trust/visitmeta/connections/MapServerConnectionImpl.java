@@ -23,6 +23,7 @@ import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
@@ -77,15 +78,30 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		super.setUserPassword(userPassword);
 	}
 
+	public MapServerConnectionImpl(MapServerConnectionData connectionData) {
+		this();
+		super.setName(connectionData.getConnectionName());
+		super.setUrl(connectionData.getUrl());
+		super.setUserName(connectionData.getUserName());
+		super.setUserPassword(connectionData.getUserPassword());
+		super.setTruststorePath(connectionData.getTruststorePath());
+		super.setTruststorePassword(connectionData.getTruststorePassword());
+		super.setSubscriptionData(connectionData.getSubscriptions());
+		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
+		super.setConnected(connectionData.isConnected());
+		super.setStartupConnect(connectionData.doesConnectOnStartup());
+		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
+	}
+
 	@Override
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 
 		String url = super.getUrl();
-		String userName = super.getUrl();
-		String userPassword = super.getUrl();
-		String truststorePath = super.getUrl();
-		String truststorePassword = super.getUrl();
+		String userName = super.getUserName();
+		String userPassword = super.getUserPassword();
+		String truststorePath = super.getTruststorePath();
+		String truststorePassword = super.getTruststorePassword();
 		int maxPollResultSize = super.getMaxPollResultSize();
 
 		initSsrc(url, userName, userPassword, truststorePath, truststorePassword);
@@ -104,6 +120,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 			LOGGER.trace("closeTcpConnection() ...");
 			mSsrc.closeTcpConnection();
 			LOGGER.debug("closeTcpConnection() OK");
+
 		} catch (IfmapErrorResult e) {
 			throw new IfmapConnectionException(e);
 		} catch (CommunicationException e) {

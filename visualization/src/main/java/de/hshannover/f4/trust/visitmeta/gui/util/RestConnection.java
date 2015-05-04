@@ -62,7 +62,6 @@ public class RestConnection extends DataImpl {
 
 	private static final String DEFAULT_URL = "https://localhost:8443";
 
-	private String mConnectionName;
 	private String mUrl;
 	private String mUserName;
 	private String mUserPass;
@@ -76,14 +75,14 @@ public class RestConnection extends DataImpl {
 	private DataserviceConnection mDataserviceConnection;
 
 	public RestConnection(DataserviceConnection dataConnection, String name) {
-		setConnectionName(name);
+		setName(name);
 		setDataserviceConnection(dataConnection);
 		mSubscriptions = new ArrayList<Data>();
 	}
 
 	public void saveInDataservice() throws UniformInterfaceException, JSONException {
 		// get required values
-		String connectionName = getConnectionName();
+		String connectionName = getName();
 		String url = getUrl();
 		String userName = getUsername();
 		String userPassword = getPassword();
@@ -134,16 +133,8 @@ public class RestConnection extends DataImpl {
 	}
 
 	@Override
-	public RestConnection clone() {
-		RestConnection tmp = copy();
-		String tmpName = tmp.getConnectionName();
-		tmp.setConnectionName(tmpName + "(clone)");
-		return tmp;
-	}
-
-	@Override
 	public RestConnection copy() {
-		RestConnection tmp = new RestConnection(getDataserviceConnection(), getConnectionName());
+		RestConnection tmp = new RestConnection(getDataserviceConnection(), getName());
 		tmp.setUrl(getUrl());
 		tmp.setUsername(getUsername());
 		tmp.setPassword(getPassword());
@@ -157,7 +148,7 @@ public class RestConnection extends DataImpl {
 	}
 
 	public void update(RestConnection restConnection) {
-		mConnectionName = restConnection.getConnectionName();
+		setName(restConnection.getName());
 		mUrl = restConnection.getUrl();
 		mUserName = restConnection.getUsername();
 		mUserPass = restConnection.getPassword();
@@ -166,14 +157,6 @@ public class RestConnection extends DataImpl {
 		mMaxPollResultSize = restConnection.getMaxPollResultSize();
 		mAuthenticationBasic = restConnection.isAuthenticationBasic();
 		mStartupConnect = restConnection.isStartupConnect();
-	}
-
-	public String getConnectionName() {
-		return mConnectionName;
-	}
-
-	public void setConnectionName(String connectionName) {
-		mConnectionName = connectionName;
 	}
 
 	public String getUrl() {
@@ -186,11 +169,6 @@ public class RestConnection extends DataImpl {
 
 	public void setUrl(String endpoint) {
 		mUrl = endpoint;
-	}
-
-	@Override
-	public String toString() {
-		return mConnectionName;
 	}
 
 	public DataserviceConnection getDataserviceConnection() {

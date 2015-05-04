@@ -67,7 +67,6 @@ public class DataserviceConnection extends DataImpl {
 
 	private static final Logger log = Logger.getLogger(Main.class);
 
-	private String mName;
 	private String mUrl;
 
 	private boolean mRawXml;
@@ -203,23 +202,13 @@ public class DataserviceConnection extends DataImpl {
 
 	@Override
 	public DataserviceConnection copy() {
-		return new DataserviceConnection(mName, mUrl, mRawXml);
+		return new DataserviceConnection(getName(), mUrl, mRawXml);
 	}
 
 	public void update(DataserviceConnection dataservice) {
-		mName = dataservice.getName();
+		setName(dataservice.getName());
 		mUrl = dataservice.getUrl();
 		mRawXml = dataservice.isRawXml();
-	}
-
-	@Override
-	public String getName() {
-		return mName;
-	}
-
-	@Override
-	public void setName(String name) {
-		mName = name;
 	}
 
 	public String getUrl() {
@@ -236,11 +225,6 @@ public class DataserviceConnection extends DataImpl {
 
 	public void setRawXml(boolean rawXml) {
 		mRawXml = rawXml;
-	}
-
-	@Override
-	public String toString() {
-		return mName;
 	}
 
 	@Override

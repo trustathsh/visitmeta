@@ -556,8 +556,7 @@ public class ConnectionDialog extends JDialog {
 			mJbCopy.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					RestConnection param = mJlMapServerConnections
-							.getSelectedValue().clone();
+					RestConnection param = (RestConnection) mJlMapServerConnections.getSelectedValue().clone();
 					mListModelMapServer.add(mListModelMapServer.getSize(),
 							param);
 					mJlMapServerConnections
@@ -694,15 +693,11 @@ public class ConnectionDialog extends JDialog {
 		}
 
 		public void updateRestConnection(RestConnection restConnection) {
-			restConnection.setConnectionName(mParameterPanel.mJtfName.getText()
-					.trim());
+			restConnection.setName(mParameterPanel.mJtfName.getText().trim());
 			restConnection.setUrl(mParameterPanel.mJtfUrl.getText().trim());
-			restConnection.setUsername(mParameterPanel.mJtfUsername.getText()
-					.trim());
-			restConnection.setPassword(new String(mParameterPanel.mJtfPassword
-					.getPassword()).trim());
-			restConnection
-					.setAuthenticationBasic(mParameterPanel.mJcbBasicAuthentication
+			restConnection.setUsername(mParameterPanel.mJtfUsername.getText().trim());
+			restConnection.setPassword(new String(mParameterPanel.mJtfPassword.getPassword()).trim());
+			restConnection.setAuthenticationBasic(mParameterPanel.mJcbBasicAuthentication
 							.isSelected());
 			// TODO TRUSTSTORE_PATH
 			// TODO TRUSTSTORE_PASS
@@ -1078,18 +1073,15 @@ public class ConnectionDialog extends JDialog {
 		}
 
 		private void updatePanel(RestConnection restConnection) {
-			mJtfName.setText(restConnection.getConnectionName());
+			mJtfName.setText(restConnection.getName());
 			mJtfUrl.setText(restConnection.getUrl());
 			mJtfUsername.setText(restConnection.getUsername());
 			mJtfPassword.setText(restConnection.getPassword());
-			mJcbBasicAuthentication.setSelected(restConnection
-					.isAuthenticationBasic());
+			mJcbBasicAuthentication.setSelected(restConnection.isAuthenticationBasic());
 			// TODO TRUSTSTORE_PATH
 			// TODO TRUSTSTORE_PASS
-			mJcbConnectingAtStartUp.setSelected(restConnection
-					.isStartupConnect());
-			mJtfMaxPollResultSize
-					.setText(restConnection.getMaxPollResultSize());
+			mJcbConnectingAtStartUp.setSelected(restConnection.isStartupConnect());
+			mJtfMaxPollResultSize.setText(restConnection.getMaxPollResultSize());
 		}
 	}
 

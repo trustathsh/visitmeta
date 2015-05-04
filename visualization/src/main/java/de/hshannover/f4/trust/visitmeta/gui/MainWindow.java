@@ -273,7 +273,7 @@ public class MainWindow extends JFrame {
 					if (tmp instanceof RestConnection) {
 						RestConnection restConnection = (RestConnection) tmp;
 
-						GraphContainer graphContainer = new GraphContainer(restConnection.getConnectionName(),
+						GraphContainer graphContainer = new GraphContainer(restConnection.getName(),
 								restConnection.getDataserviceConnection());
 						ConnectionTab connectionTab = new ConnectionTab(graphContainer, null);
 

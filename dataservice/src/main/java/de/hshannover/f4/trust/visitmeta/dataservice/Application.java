@@ -100,8 +100,7 @@ public abstract class Application {
 
 		initComponents();
 
-		List<DataserviceModule> modules = DataserviceModuleConnector
-				.initializeModules(mManager);
+		List<DataserviceModule> modules = DataserviceModuleConnector.initializeModules(mManager);
 		log.info(modules.size() + " dataservice modules were loaded.");
 		startRestService(modules);
 
@@ -149,8 +148,7 @@ public abstract class Application {
 		try {
 			keySet = mConnections.getKeySet();
 		} catch (PropertyException e) {
-			log.error("error while getKeySet from ConnectionsProperties -> "
-					+ e.toString(), e);
+			log.error("error while getKeySet from ConnectionsProperties -> " + e.toString(), e);
 		}
 
 		for (String s : keySet) {
@@ -158,16 +156,12 @@ public abstract class Application {
 			try {
 				tmp = mConnections.buildConnection(s);
 			} catch (ConnectionException | PropertyException e) {
-				log.error(
-						"error while build new connection from Properties -> "
-								+ e.toString(), e);
+				log.error("error while build new connection from Properties -> " + e.toString(), e);
 			}
 			try {
 				mManager.addConnection(tmp);
 			} catch (ConnectionException e) {
-				log.error(
-						"error while adding connection to the connection pool",
-						e);
+				log.error("error while adding connection to the connection pool", e);
 			}
 		}
 	}

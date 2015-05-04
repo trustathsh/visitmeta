@@ -39,15 +39,13 @@
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
@@ -76,8 +74,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	public void addConnection(MapServerConnection connection) throws ConnectionException {
 		if (!doesConnectionExist(connection.getConnectionName())) {
 			mConnectionPool.put(connection.getConnectionName(), connection);
-			log.debug(connection.getConnectionName()
-					+ " added to connection pool");
+			log.debug(connection.getConnectionName() + " added to connection pool");
 		} else {
 			throw new ConnectionException(connection.getConnectionName()
 					+ " connection name already exists, adding canceled");
@@ -94,21 +91,12 @@ public class ConnectionManagerImpl implements ConnectionManager {
 		}
 	}
 
-	/*
-	 * FIXME: change this to something that gets all saved subscriptions from
-	 * "connections.yml" and execute these subscriptions on startup. In
-	 * addition: add an initial subscription which *always* subscribe for the
-	 * IF-MAP 2.2 defined MAP server identifier.
-	 */
-	private void executeInitialSubscription(MapServerConnection connection)
-			throws ConnectionException {
-		for (Data s : connection.getSubscriptions()) {
-			if (((SubscriptionData) s).isStartupSubscribe()) {
-				log.debug("initial subscription(" + s.getName()
-						+ ") for connection(" + connection.getConnectionName()
-						+ ")...");
-				SubscribeRequest request = SubscriptionHelper.buildRequest((SubscriptionData) s);
-				subscribe(connection.getConnectionName(), request);
+	private void executeInitialSubscription(MapServerConnection connection) throws ConnectionException {
+		for (Data subscription : connection.getSubscriptions()) {
+			if (((SubscriptionData) subscription).isStartupSubscribe()) {
+				log.debug("initial subscription(" + subscription.getName()
+						+ ") for connection(" + connection.getConnectionName() + ")...");
+				startSubscription(connection.getConnectionName(), subscription.getName());
 			}
 		}
 	}
@@ -148,8 +136,8 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public Set<String> getSubscriptions(String connectionName) throws ConnectionException {
-		Set<String> subscriptionNames = new HashSet<String>();
+	public List<String> getSubscriptions(String connectionName) throws ConnectionException {
+		List<String> subscriptionNames = new ArrayList<String>();
 		List<Data> subscriptions = getConnection(connectionName).getSubscriptions();
 		for (Data s : subscriptions) {
 			subscriptionNames.add(s.getName());
@@ -158,40 +146,42 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void subscribe(String connectionName, SubscribeRequest request)
-			throws ConnectionException {
-		log.trace("new subscription for Connection " + connectionName + " ...");
+	public void startSubscription(String connectionName, String subscriptionName) throws ConnectionException {
+		log.trace("start " + subscriptionName + " for Connection " + connectionName + " ...");
 
-		getConnection(connectionName).subscribe(request);
+		getConnection(connectionName).startSubscription(subscriptionName);
 
 		log.info("subscribtion received");
 	}
 
 	@Override
-	public void deleteSubscription(String connectionName,
-			String subscriptionName) throws ConnectionException {
-		log.trace("delete subscription '" + subscriptionName
-				+ "' from connection '" + connectionName + "' ...");
+	public void stopSubscription(String connectionName, String subscriptionName) throws ConnectionException {
+		log.trace("stop " + subscriptionName + " for Connection " + connectionName + " ...");
 
-		getConnection(connectionName).deleteSubscription(subscriptionName);
+		getConnection(connectionName).stopSubscription(subscriptionName);
 
-		log.info("subscription '" + subscriptionName + "' from connection '"
-				+ connectionName + "' was deleted");
+		log.info("subscribtion received");
 	}
 
 	@Override
-	public void deleteAllSubscriptions(String connectionName)
-			throws ConnectionException {
-		log.trace("delete all subscriptions from connection " + connectionName
-				+ " ...");
+	public void deleteSubscription(String connectionName, String subscriptionName) throws ConnectionException {
+		log.trace("delete subscription '" + subscriptionName + "' from connection '" + connectionName + "' ...");
+
+		getConnection(connectionName).deleteSubscription(subscriptionName);
+
+		log.info("subscription '" + subscriptionName + "' from connection '" + connectionName + "' was deleted");
+	}
+
+	@Override
+	public void deleteAllSubscriptions(String connectionName) throws ConnectionException {
+		log.trace("delete all subscriptions from connection " + connectionName + " ...");
 
 		getConnection(connectionName).deleteAllSubscriptions();
 
 		log.info("all subscriptions were deleted");
 	}
 
-	private MapServerConnection getConnection(String connectionName)
-			throws NoSavedConnectionException {
+	private MapServerConnection getConnection(String connectionName) throws NoSavedConnectionException {
 		if (mConnectionPool.containsKey(connectionName)) {
 			return mConnectionPool.get(connectionName);
 		} else {
@@ -200,8 +190,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public GraphService getGraphService(String connectionName)
-			throws ConnectionException {
+	public GraphService getGraphService(String connectionName) throws ConnectionException {
 		return getConnection(connectionName).getGraphService();
 	}
 
@@ -211,21 +200,19 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void storeSubscription(String connectionName,
-			Subscription subscription) throws IOException, PropertyException {
+	public void storeSubscription(String connectionName, Subscription subscription) throws IOException,
+			PropertyException {
 		mConnectionPool.get(connectionName).addSubscription(subscription);
 		Application.getConnections().persistConnections();
 	}
 
 	@Override
-	public MapServerConnection createConnection(String connectionName, String url,
-			String userName, String userPassword) throws ConnectionException {
+	public MapServerConnection createConnection(String connectionName, String url, String userName, String userPassword)
+			throws ConnectionException {
 		if (doesConnectionExist(connectionName)) {
-			throw new ConnectionException(connectionName
-					+ " connection already exists");
+			throw new ConnectionException(connectionName + " connection already exists");
 		} else {
-			return new MapServerConnectionImpl(connectionName, url, userName,
-					userPassword);
+			return new MapServerConnectionImpl(connectionName, url, userName, userPassword);
 		}
 	}
 

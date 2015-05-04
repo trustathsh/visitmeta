@@ -58,11 +58,11 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
 /**
@@ -151,24 +151,20 @@ public class SubscribeResource {
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
 				try {
 
-					SubscribeRequest request = SubscriptionHelper.buildRequest(moreSubscribes);
-					manager.subscribe(name, request);
-					manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(moreSubscribes));
+					Subscription subscription = SubscriptionHelper.buildSubscribtion(moreSubscribes);
+					manager.storeSubscription(name, subscription);
+					manager.startSubscription(name, subscription.getName());
 
 				} catch (ConnectionException | IOException | PropertyException e) {
-					log.error("error while multiple subscribeUpdate from "
-							+ name, e);
-					return Response
-							.status(Response.Status.INTERNAL_SERVER_ERROR)
-							.entity(e.toString()).build();
+					log.error("error while multiple subscribeUpdate from " + name, e);
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
 		} catch (JSONException e) {
 			try {
-				SubscribeRequest request = SubscriptionHelper
-						.buildRequest(jObj);
-				manager.subscribe(name, request);
-				manager.storeSubscription(name, SubscriptionHelper.buildSubscribtion(jObj));
+				Subscription subscription = SubscriptionHelper.buildSubscribtion(jObj);
+				manager.storeSubscription(name, subscription);
+				manager.startSubscription(name, subscription.getName());
 
 			} catch (ConnectionException | IOException | PropertyException ee) {
 				log.error("error while single subscribeUpdate from " + name, ee);

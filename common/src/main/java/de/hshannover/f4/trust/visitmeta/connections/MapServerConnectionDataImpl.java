@@ -30,7 +30,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	private boolean mAuthenticationBasic;
 
-	protected MapServerConnectionDataImpl() {
+	private MapServerConnectionDataImpl() {
 		mSubscriptionDataList = new ArrayList<Data>();
 	}
 

@@ -15,6 +15,15 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 public interface MapServerConnection extends Connection, MapServerConnectionData {
 
 	/**
+	 * Start a subscription.
+	 *
+	 * @param subscriptionName the subscription name.
+	 * 
+	 * @throws ConnectionException
+	 */
+	public void startSubscription(String subscriptionName) throws ConnectionException;
+
+	/**
 	 * Stop a subscription.
 	 *
 	 * @param subscriptionName the subscription name.

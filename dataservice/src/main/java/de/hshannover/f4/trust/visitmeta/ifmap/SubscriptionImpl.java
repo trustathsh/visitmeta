@@ -54,6 +54,8 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 
 		request.addSubscribeElement(subscribe);
 		mapServerConnection.subscribe(request);
+
+		super.setActive(false);
 	}
 
 	@Override
@@ -62,6 +64,7 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 
 		mapServerConnection.subscribe(request);
 
+		super.setActive(true);
 	}
 
 }

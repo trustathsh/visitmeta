@@ -53,8 +53,35 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 	private SSRC mSsrc;
 
-	private MapServerConnectionImpl() {
-		super();
+
+	public MapServerConnectionImpl(String name) {
+		super(name);
+
+		init();
+	}
+
+	public MapServerConnectionImpl(String name, String url, String userName, String userPassword) {
+		super(name, url, userName, userPassword);
+
+		init();
+	}
+
+	public MapServerConnectionImpl(MapServerConnectionData connectionData) {
+		super(connectionData.getConnectionName(), connectionData.getUrl(), connectionData.getUserName(), connectionData
+				.getUserPassword());
+
+		init();
+
+		super.setTruststorePath(connectionData.getTruststorePath());
+		super.setTruststorePassword(connectionData.getTruststorePassword());
+		super.setSubscriptionData(connectionData.getSubscriptions());
+		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
+		super.setConnected(connectionData.isConnected());
+		super.setStartupConnect(connectionData.doesConnectOnStartup());
+		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
+	}
+
+	private void init() {
 		// set default data
 		super.setAuthenticationBasic(ConnectionsProperties.DEFAULT_AUTHENTICATION_BASIC);
 		super.setTruststorePath(ConnectionsProperties.DEFAULT_TRUSTSTORE_PATH);
@@ -63,34 +90,6 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		super.setStartupConnect(ConnectionsProperties.DEFAULT_STARTUP_CONNECT);
 
 		mNeo4JDb = new Neo4JDatabase(super.getName());
-	}
-
-	public MapServerConnectionImpl(String name) {
-		this();
-		super.setName(name);
-	}
-
-	public MapServerConnectionImpl(String name, String url, String userName, String userPassword) {
-		this();
-		super.setName(name);
-		super.setUrl(url);
-		super.setUserName(userName);
-		super.setUserPassword(userPassword);
-	}
-
-	public MapServerConnectionImpl(MapServerConnectionData connectionData) {
-		this();
-		super.setName(connectionData.getConnectionName());
-		super.setUrl(connectionData.getUrl());
-		super.setUserName(connectionData.getUserName());
-		super.setUserPassword(connectionData.getUserPassword());
-		super.setTruststorePath(connectionData.getTruststorePath());
-		super.setTruststorePassword(connectionData.getTruststorePassword());
-		super.setSubscriptionData(connectionData.getSubscriptions());
-		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
-		super.setConnected(connectionData.isConnected());
-		super.setStartupConnect(connectionData.doesConnectOnStartup());
-		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
 	}
 
 	@Override
@@ -132,15 +131,6 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		}
 	}
 
-	private void resetConnection() {
-		LOGGER.trace("resetConnection() ...");
-
-		super.setConnected(false);
-		mSsrc = null;
-
-		LOGGER.trace("... resetConnection() OK");
-	}
-
 	@Override
 	public PollResult poll() throws ConnectionException {
 		checkIsConnectionEstablished();
@@ -158,23 +148,13 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		}
 	}
 
-	private void startUpdateService() throws ConnectionException {
-		String connectionName = getConnectionName();
-
-		if ((mUpdateThread == null) || !mUpdateThread.isAlive()) {
-			LOGGER.trace("start UpdateService from connection " + connectionName + " ...");
-
-			checkIsConnectionEstablished();
-
-			if (mUpdateService == null) {
-				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(), new InMemoryIdentifierFactory(),
-						new InMemoryMetadataFactory());
+	@Override
+	public void startSubscription(String subscriptionName) throws ConnectionException {
+		for (Data subData : getSubscriptions()) {
+			if (subData.equals(subscriptionName)) {
+				((Subscription) subData).startSubscription(this);
+				break;
 			}
-
-			mUpdateThread = new Thread(mUpdateService, "UpdateThread-" + connectionName);
-			mUpdateThread.start();
-
-			LOGGER.debug("UpdateService for connection " + connectionName + " started");
 		}
 	}
 
@@ -215,6 +195,38 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		}
 	}
 
+	@Override
+	public String getConnectionName() {
+		return super.getName();
+	}
+
+	@Override
+	public GraphService getGraphService() {
+		return mNeo4JDb.getGraphService();
+	}
+
+	@Override
+	public String getPublisherId() throws ConnectionException {
+		checkIsConnectionEstablished();
+		return mSsrc.getPublisherId();
+	}
+
+	@Override
+	public String getSessionId() throws ConnectionException {
+		checkIsConnectionEstablished();
+		return mSsrc.getSessionId();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Connection: ").append(getConnectionName()).append(" | URL: ");
+		sb.append(getUrl()).append(" | User: ").append(getUserName());
+
+		return sb.toString();
+	}
+
 	private void initSsrc(String url, String user, String userPass, String truststore, String truststorePassword)
 			throws IfmapConnectionException {
 		LOGGER.trace("init SSRC ...");
@@ -252,28 +264,6 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		LOGGER.debug("new SSRC session OK");
 	}
 
-	@Override
-	public String getConnectionName() {
-		return super.getName();
-	}
-
-	@Override
-	public GraphService getGraphService() {
-		return mNeo4JDb.getGraphService();
-	}
-
-	@Override
-	public String getPublisherId() throws ConnectionException {
-		checkIsConnectionEstablished();
-		return mSsrc.getPublisherId();
-	}
-
-	@Override
-	public String getSessionId() throws ConnectionException {
-		checkIsConnectionEstablished();
-		return mSsrc.getSessionId();
-	}
-
 	private void checkIsConnectionEstablished() throws NotConnectedException {
 		if ((mSsrc == null) || !super.isConnected() || (mSsrc.getSessionId() == null)) {
 			NotConnectedException e = new NotConnectedException();
@@ -289,14 +279,33 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		}
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
+	private void resetConnection() {
+		LOGGER.trace("resetConnection() ...");
 
-		sb.append("Connection: ").append(getConnectionName()).append(" | URL: ");
-		sb.append(getUrl()).append(" | User: ").append(getUserName());
+		super.setConnected(false);
+		mSsrc = null;
 
-		return sb.toString();
+		LOGGER.trace("... resetConnection() OK");
+	}
+
+	private void startUpdateService() throws ConnectionException {
+		String connectionName = getConnectionName();
+
+		if ((mUpdateThread == null) || !mUpdateThread.isAlive()) {
+			LOGGER.trace("start UpdateService from connection " + connectionName + " ...");
+
+			checkIsConnectionEstablished();
+
+			if (mUpdateService == null) {
+				mUpdateService = new UpdateService(this, mNeo4JDb.getWriter(), new InMemoryIdentifierFactory(),
+						new InMemoryMetadataFactory());
+			}
+
+			mUpdateThread = new Thread(mUpdateService, "UpdateThread-" + connectionName);
+			mUpdateThread.start();
+
+			LOGGER.debug("UpdateService for connection " + connectionName + " started");
+		}
 	}
 
 }

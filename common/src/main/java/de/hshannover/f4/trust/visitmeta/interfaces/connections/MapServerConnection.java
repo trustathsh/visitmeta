@@ -5,6 +5,7 @@ import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 
 /**
  * A interface for Connections within the dataservice.
@@ -46,7 +47,7 @@ public interface MapServerConnection extends Connection, MapServerConnectionData
 	 * 
 	 * @throws ConnectionException
 	 */
-	public void subscribe(SubscribeRequest request) throws ConnectionException;
+	public void subscribe(Subscription subscription, boolean update) throws ConnectionException;
 
 	/**
 	 * Returns the {@link GraphService} associated with this {@link MapServerConnection}.

@@ -19,6 +19,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedEx
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
+import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
@@ -105,6 +106,8 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 		initSsrc(url, userName, userPassword, truststorePath, truststorePassword);
 		initSession(maxPollResultSize);
+
+		super.setConnected(true);
 	}
 
 	@Override
@@ -129,6 +132,8 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		} finally {
 			resetConnection();
 		}
+
+		super.setConnected(false);
 	}
 
 	@Override
@@ -150,9 +155,9 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 	@Override
 	public void startSubscription(String subscriptionName) throws ConnectionException {
-		for (Data subData : getSubscriptions()) {
-			if (subData.equals(subscriptionName)) {
-				((Subscription) subData).startSubscription(this);
+		for (Data subscription : getSubscriptions()) {
+			if (subscription.getName().equals(subscriptionName)) {
+				((Subscription) subscription).startSubscription(this);
 				break;
 			}
 		}
@@ -160,9 +165,9 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 	@Override
 	public void stopSubscription(String subscriptionName) throws ConnectionException {
-		for (Data subData : getSubscriptions()) {
-			if (subData.equals(subscriptionName)) {
-				((Subscription) subData).stopSubscription(this);
+		for (Data subscription : getSubscriptions()) {
+			if (subscription.getName().equals(subscriptionName)) {
+				((Subscription) subscription).stopSubscription(this);
 				break;
 			}
 		}
@@ -175,8 +180,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		}
 	}
 
-	@Override
-	public void subscribe(SubscribeRequest request) throws ConnectionException {
+	private void subscribe(SubscribeRequest request) throws ConnectionException {
 		checkIsConnectionEstablished();
 		startUpdateService();
 
@@ -193,6 +197,18 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		} else {
 			LOGGER.warn("Subscribe-Request was null or empty.");
 		}
+	}
+
+	@Override
+	public void subscribe(Subscription subscription, boolean update) throws ConnectionException {
+		SubscribeRequest subscribeRequest;
+		if (update) {
+			subscribeRequest = SubscriptionHelper.buildUpdateRequest(subscription);
+		} else {
+			subscribeRequest = SubscriptionHelper.buildDeleteRequest(subscription);
+		}
+
+		subscribe(subscribeRequest);
 	}
 
 	@Override
@@ -251,7 +267,6 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		try {
 
 			mSsrc.newSession(maxPollResultSize);
-			setConnected(true);
 
 		} catch (IfmapErrorResult e) {
 			resetConnection();

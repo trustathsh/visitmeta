@@ -38,9 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-import de.hshannover.f4.trust.ifmapj.messages.Requests;
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
-import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
@@ -49,21 +46,14 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 
 	@Override
 	public void stopSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
-		SubscribeRequest request = Requests.createSubscribeReq();
-		SubscribeDelete subscribe = Requests.createSubscribeDelete(getName());
-
-		request.addSubscribeElement(subscribe);
-		mapServerConnection.subscribe(request);
+		mapServerConnection.subscribe(this, false);
 
 		super.setActive(false);
 	}
 
 	@Override
 	public void startSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
-		SubscribeRequest request = SubscriptionHelper.buildRequest(this);
-
-		mapServerConnection.subscribe(request);
-
+		mapServerConnection.subscribe(this, true);
 		super.setActive(true);
 	}
 

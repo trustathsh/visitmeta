@@ -46,6 +46,7 @@ import org.codehaus.jettison.json.JSONObject;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
 import de.hshannover.f4.trust.ifmapj.messages.Requests;
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
@@ -57,17 +58,28 @@ public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);
 
-	public static SubscribeRequest buildRequest(SubscriptionData subscribtion) {
+	public static SubscribeRequest buildUpdateRequest(SubscriptionData subscription) {
 		SubscribeRequest request = Requests.createSubscribeReq();
 		SubscribeUpdate subscribe = Requests.createSubscribeUpdate();
 
-		subscribe.setName(subscribtion.getName());
-		subscribe.setMaxDepth(subscribtion.getMaxDepth());
-		subscribe.setMaxSize(subscribtion.getMaxSize());
-		subscribe.setMatchLinksFilter(subscribtion.getMatchLinksFilter());
-		subscribe.setResultFilter(subscribtion.getResultFilter());
-		subscribe.setTerminalIdentifierTypes(subscribtion.getTerminalIdentifierTypes());
-		subscribe.setStartIdentifier(createStartIdentifier(subscribtion.getIdentifierType(), subscribtion.getStartIdentifier()));
+		subscribe.setName(subscription.getName());
+		subscribe.setMaxDepth(subscription.getMaxDepth());
+		subscribe.setMaxSize(subscription.getMaxSize());
+		subscribe.setMatchLinksFilter(subscription.getMatchLinksFilter());
+		subscribe.setResultFilter(subscription.getResultFilter());
+		subscribe.setTerminalIdentifierTypes(subscription.getTerminalIdentifierTypes());
+		subscribe.setStartIdentifier(createStartIdentifier(subscription.getIdentifierType(), subscription.getStartIdentifier()));
+
+		request.addSubscribeElement(subscribe);
+
+		return request;
+	}
+
+	public static SubscribeRequest buildDeleteRequest(SubscriptionData subscription) {
+		SubscribeRequest request = Requests.createSubscribeReq();
+		SubscribeDelete subscribe = Requests.createSubscribeDelete();
+
+		subscribe.setName(subscription.getName());
 
 		request.addSubscribeElement(subscribe);
 
@@ -75,34 +87,34 @@ public class SubscriptionHelper {
 	}
 
 	public static SubscribeRequest buildRequest(JSONObject jObj) {
-		return buildRequest(buildSubscribtion(jObj));
+		return buildUpdateRequest(buildSubscribtion(jObj));
 	}
 
 	public static Subscription buildSubscribtion(JSONObject jObj) {
-		Subscription subscribtion = new SubscriptionImpl();
+		Subscription subscription = new SubscriptionImpl();
 
-		subscribtion.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
-		subscribtion.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
+		subscription.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
+		subscription.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 
 		Iterator<String> i = jObj.keys();
 		while (i.hasNext()) {
 			String jKey = i.next();
 
 			switch (jKey) {
-			case SubscriptionKey.SUBSCRIPTION_NAME: subscribtion.setName(jObj.optString(jKey)); break;
-			case SubscriptionKey.IDENTIFIER_TYPE: subscribtion.setIdentifierType(jObj.optString(jKey)); break;
-			case SubscriptionKey.START_IDENTIFIER: subscribtion.setStartIdentifier(jObj.optString(jKey)); break;
-			case SubscriptionKey.MAX_DEPTH: subscribtion.setMaxDepth(jObj.optInt(jKey)); break;
-			case SubscriptionKey.MAX_SIZE: subscribtion.setMaxSize(jObj.optInt(jKey)); break;
-			case SubscriptionKey.MATCH_LINKS_FILTER: subscribtion.setMatchLinksFilter(jObj.optString(jKey)); break;
-			case SubscriptionKey.RESULT_FILTER: subscribtion.setResultFilter(jObj.optString(jKey)); break;
-			case SubscriptionKey.TERMINAL_IDENTIFIER_TYPES: subscribtion.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
-			case SubscriptionKey.USE_SUBSCRIPTION_AS_STARTUP: subscribtion.setStartupSubscribe(jObj.optBoolean(jKey)); break;
+			case SubscriptionKey.SUBSCRIPTION_NAME: subscription.setName(jObj.optString(jKey)); break;
+			case SubscriptionKey.IDENTIFIER_TYPE: subscription.setIdentifierType(jObj.optString(jKey)); break;
+			case SubscriptionKey.START_IDENTIFIER: subscription.setStartIdentifier(jObj.optString(jKey)); break;
+			case SubscriptionKey.MAX_DEPTH: subscription.setMaxDepth(jObj.optInt(jKey)); break;
+			case SubscriptionKey.MAX_SIZE: subscription.setMaxSize(jObj.optInt(jKey)); break;
+			case SubscriptionKey.MATCH_LINKS_FILTER: subscription.setMatchLinksFilter(jObj.optString(jKey)); break;
+			case SubscriptionKey.RESULT_FILTER: subscription.setResultFilter(jObj.optString(jKey)); break;
+			case SubscriptionKey.TERMINAL_IDENTIFIER_TYPES: subscription.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
+			case SubscriptionKey.USE_SUBSCRIPTION_AS_STARTUP: subscription.setStartupSubscribe(jObj.optBoolean(jKey)); break;
 			default: log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions."); break;
 			}
 		}
 
-		return subscribtion;
+		return subscription;
 	}
 
 	private static Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {

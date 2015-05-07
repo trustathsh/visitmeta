@@ -44,6 +44,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+
 public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static final long serialVersionUID = 1L;
 	private ImageIcon[] connectionStatusIcon = null;
@@ -82,9 +86,9 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 			}
 		}else if(value instanceof DataserviceConnection){
 			setIcon(connectionIcon);
-		}else if(value instanceof RestConnection){
+		} else if (value instanceof MapServerConnection) {
 			setIcon(getStatusIcon(true));
-		}else if(value instanceof RestSubscription){
+		} else if (value instanceof Subscription) {
 			setIcon(getStatusIcon(true));
 		}
 

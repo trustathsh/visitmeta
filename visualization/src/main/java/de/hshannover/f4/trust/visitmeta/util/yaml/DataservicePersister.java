@@ -43,7 +43,8 @@ import java.util.List;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
@@ -69,15 +70,14 @@ public class DataservicePersister extends Properties {
 		setPropertyRawXml(connectionName, rawXml);
 	}
 
-	public List<Data> loadDataserviceConnections()
-			throws PropertyException {
+	public List<Data> loadDataserviceConnections() throws PropertyException {
 		List<Data> dataserviceConnectionList = new ArrayList<Data>();
 		for (String connectionName : getKeySet()) {
 			// read values from property
 			String dataserviceRestUrl = getPropertyDataserviceRestUrl(connectionName);
 			boolean rawXml = getPropertyRawXml(connectionName);
-			DataserviceConnection tmpDataserviceConnection = new DataserviceConnection(
-					connectionName, dataserviceRestUrl, rawXml);
+			DataserviceConnection tmpDataserviceConnection = new DataserviceRestConnectionImpl(connectionName,
+					dataserviceRestUrl, rawXml);
 			dataserviceConnectionList.add(tmpDataserviceConnection);
 		}
 		return dataserviceConnectionList;

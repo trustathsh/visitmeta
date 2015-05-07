@@ -71,25 +71,17 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONException;
-
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscription;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -126,48 +118,48 @@ public class MainWindow extends JFrame {
 		init();
 	}
 
-	/**
-	 *
-	 * @param connection
-	 */
-	public void addDataserviceConnection(DataserviceConnection dataservice) {
-		if (!existsDataservice(dataservice)) {
-			addDataserviceTreeNode(dataservice);
-			updateRestConnections();
-			mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
-		}
-	}
+	// /**
+	// *
+	// * @param connection
+	// */
+	// public void addDataserviceConnection(DataserviceConnection dataservice) {
+	// if (!existsDataservice(dataservice)) {
+	// addDataserviceTreeNode(dataservice);
+	// updateRestConnections();
+	// mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
+	// }
+	// }
 
-	public void updateRestConnections() {
-		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
-					.getChildAt(i);
-			DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode
-					.getUserObject();
-			List<String> restConnections;
-			try {
-				restConnections = treeNodedataservice.loadRestConnectionNames();
-
-				tmpNode.removeAllChildren();
-				for (String restConnectionName : restConnections) {
-					GraphContainer graphContainer = new GraphContainer(restConnectionName, treeNodedataservice);
-					DefaultMutableTreeNode ifMapConnection = new DefaultMutableTreeNode(new ConnectionTab(
-							graphContainer, this));
-					tmpNode.add(ifMapConnection);
-
-					List<Data> restSubscription = treeNodedataservice
-							.loadRestSubscriptions(restConnectionName);
-					for (Data s : restSubscription) {
-						ifMapConnection.add(new DefaultMutableTreeNode(((RestSubscription) s).getName()));
-					}
-				}
-			} catch (ClientHandlerException | UniformInterfaceException | JSONException e) {
-				LOGGER.warn("Exception while load rest connection names, from " + treeNodedataservice.getName()
-						+ " -> " + e.getMessage());
-			}
-		}
-		mConnectionTree.updateUI();
-	}
+	// public void updateRestConnections() {
+	// for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
+	// DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
+	// .getChildAt(i);
+	// DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode
+	// .getUserObject();
+	// List<String> restConnections;
+	// try {
+	// restConnections = treeNodedataservice.loadRestConnectionNames();
+	//
+	// tmpNode.removeAllChildren();
+	// for (String restConnectionName : restConnections) {
+	// GraphContainer graphContainer = new GraphContainer(restConnectionName, treeNodedataservice);
+	// DefaultMutableTreeNode ifMapConnection = new DefaultMutableTreeNode(new ConnectionTab(
+	// graphContainer, this));
+	// tmpNode.add(ifMapConnection);
+	//
+	// List<Data> restSubscription = treeNodedataservice
+	// .loadRestSubscriptions(restConnectionName);
+	// for (Data s : restSubscription) {
+	// ifMapConnection.add(new DefaultMutableTreeNode(((RestSubscription) s).getName()));
+	// }
+	// }
+	// } catch (ClientHandlerException | UniformInterfaceException | JSONException e) {
+	// LOGGER.warn("Exception while load rest connection names, from " + treeNodedataservice.getName()
+	// + " -> " + e.getMessage());
+	// }
+	// }
+	// mConnectionTree.updateUI();
+	// }
 
 	private boolean existsDataservice(DataserviceConnection dataservice) {
 		String dataserviceName = dataservice.getName();
@@ -270,24 +262,19 @@ public class MainWindow extends JFrame {
 					}
 				} else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
 					Object tmp = mConnectionTree.getLastSelectedPathComponent();
-					if (tmp instanceof RestConnection) {
-						RestConnection restConnection = (RestConnection) tmp;
-
-						GraphContainer graphContainer = new GraphContainer(restConnection.getName(),
-								restConnection.getDataserviceConnection());
-						ConnectionTab connectionTab = new ConnectionTab(graphContainer, null);
+					if (tmp instanceof MapServerRestConnectionImpl) {
+						MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) tmp;
 
 						 boolean alreadyOpen = false;
 						Component tmpComponent = null;
 						 for (Component t : mTabbedConnectionPane.getComponents()) {
-							if (t.equals(connectionTab)) {
+							if (t.equals(mapServerConnection.getConnectionTab())) {
 								alreadyOpen = true;
 								tmpComponent = t;
-
 							}
 						 }
 						 if (!alreadyOpen) {
-						 addClosableTab(connectionTab);
+							addClosableTab(mapServerConnection.getConnectionTab());
 						 } else {
 							mTabbedConnectionPane.setSelectedComponent(tmpComponent);
 						 }

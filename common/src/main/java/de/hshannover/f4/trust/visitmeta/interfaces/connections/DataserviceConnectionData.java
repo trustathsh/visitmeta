@@ -30,4 +30,7 @@ public interface DataserviceConnectionData extends Data {
 
 	public void removeMapServerData(int index);
 
+	public void setConnected(boolean connected);
+
+	public boolean isConnected();
 }

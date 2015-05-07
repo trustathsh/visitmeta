@@ -917,8 +917,11 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
 				|| vNode.getStrokePaint().equals(mColorDeleteNode);
 		boolean isSelected = isSelected(metadata);
-		boolean containsSearchTerm = mSearchAndFilterStrategy
-				.containsSearchTerm(metadata, mSearchTerm);
+		// [MR] XXX BAD FIX, because [Exception in thread "Thread-8" java.lang.NullPointerException]
+		boolean containsSearchTerm = false;
+		if (mSearchAndFilterStrategy != null) {
+			containsSearchTerm = mSearchAndFilterStrategy.containsSearchTerm(metadata, mSearchTerm);
+		}
 
 		String publisher = extractPublisherId(metadata);
 
@@ -955,9 +958,12 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		boolean isHighlighted = vNode.getStrokePaint().equals(mColorNewNode)
 				|| vNode.getStrokePaint().equals(mColorDeleteNode);
 		boolean isSelected = isSelected(identifier);
-		boolean containsSearchTerm = mSearchAndFilterStrategy
-				.containsSearchTerm(identifier, mSearchTerm);
 
+		// [MR] XXX BAD FIX, because [Exception in thread "Thread-8" java.lang.NullPointerException]
+		boolean containsSearchTerm = false;
+		if (mSearchAndFilterStrategy != null) {
+			containsSearchTerm = mSearchAndFilterStrategy.containsSearchTerm(identifier, mSearchTerm);
+		}
 		/**
 		 * Paint the identifier node.
 		 */

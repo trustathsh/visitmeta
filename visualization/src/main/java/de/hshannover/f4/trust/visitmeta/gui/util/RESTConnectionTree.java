@@ -35,4 +35,14 @@ public class RESTConnectionTree extends JTree {
 	public void showAllSubscriptions(boolean b) {
 		((RESTConnectionModel) super.getModel()).showAllSubscriptions(b);
 	}
+
+	public void expandAllNodes() {
+		int j = super.getRowCount();
+		int i = 0;
+		while (i < j) {
+			super.expandRow(i);
+			i++;
+			j = super.getRowCount();
+		}
+	}
 }

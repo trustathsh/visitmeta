@@ -26,28 +26,34 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	private ConnectionTab mConnectionTab;
 
+	private boolean mGraphStarted;
+
 	private DataserviceConnection mDataserviceConnection;
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection, String name) {
 		super(name);
 
-		init(dataserviceConnection);
+		mDataserviceConnection = dataserviceConnection;
 	}
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection, String name, String url,
 			String userName, String userPassword) {
 		super(name, url, userName, userPassword);
 
-		init(dataserviceConnection);
+		mDataserviceConnection = dataserviceConnection;
 	}
 
-	private void init(DataserviceConnection dataserviceConnection) {
-		mDataserviceConnection = dataserviceConnection;
+	/**
+	 * Start the ProxyGraphService and init the GraphContainer & ConnectionTab.
+	 */
+	public void initGraph() {
+		if (!isGraphStarted()) {
+			mGraphService = new ProxyGraphService(getGraphResource(), mDataserviceConnection.isRawXml());
+			mGraphContainer = new GraphContainer(this, mGraphService);
+			mConnectionTab = new ConnectionTab(mGraphContainer, null);
 
-		mGraphService = new ProxyGraphService(getGraphResource(), mDataserviceConnection.isRawXml());
-		mGraphContainer = new GraphContainer(this, mGraphService);
-		mConnectionTab = new ConnectionTab(mGraphContainer, null);
-
+			mGraphStarted = true;
+		}
 	}
 
 	public WebResource getGraphResource() {
@@ -131,5 +137,9 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	public DataserviceConnection getDataserviceConnection() {
 		return mDataserviceConnection;
+	}
+
+	public boolean isGraphStarted() {
+		return mGraphStarted;
 	}
 }

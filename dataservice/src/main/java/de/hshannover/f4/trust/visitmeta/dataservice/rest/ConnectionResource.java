@@ -315,6 +315,7 @@ public class ConnectionResource {
 				connectionMap.put(ConnectionKey.TRUSTSTORE_PASSWORD, c.getTruststorePassword());
 				connectionMap.put(ConnectionKey.USE_CONNECTION_AS_STARTUP, String.valueOf(c.doesConnectOnStartup()));
 				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE, String.valueOf(c.getMaxPollResultSize()));
+				connectionMap.put(ConnectionKey.IS_CONNECTED, String.valueOf(c.isConnected()));
 
 				JSONObject jsonConnection = new JSONObject(connectionMap);
 

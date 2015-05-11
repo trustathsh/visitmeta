@@ -22,7 +22,6 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
@@ -77,20 +76,22 @@ public class RestHelper {
 			try {
 
 				jsonConnection = jsonResponse.getJSONObject(connectionName);
-				MapServerConnection restConn = new MapServerRestConnectionImpl(dataserviceConnection, connectionName);
+				MapServerRestConnectionImpl restConnection = new MapServerRestConnectionImpl(dataserviceConnection,
+						connectionName);
 
-				restConn.setUrl(jsonConnection.getString(ConnectionKey.IFMAP_SERVER_URL));
-				restConn.setUserName(jsonConnection.getString(ConnectionKey.USER_NAME));
-				restConn.setUserPassword(jsonConnection.getString(ConnectionKey.USER_PASSWORD));
-				restConn.setAuthenticationBasic(jsonConnection.getBoolean(ConnectionKey.AUTHENTICATION_BASIC));
-				restConn.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
-				restConn.setTruststorePassword(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASSWORD));
-				restConn.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP));
-				restConn.setMaxPollResultSize(Integer.valueOf(jsonConnection
+				restConnection.setUrl(jsonConnection.getString(ConnectionKey.IFMAP_SERVER_URL));
+				restConnection.setUserName(jsonConnection.getString(ConnectionKey.USER_NAME));
+				restConnection.setUserPassword(jsonConnection.getString(ConnectionKey.USER_PASSWORD));
+				restConnection.setAuthenticationBasic(jsonConnection.getBoolean(ConnectionKey.AUTHENTICATION_BASIC));
+				restConnection.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
+				restConnection.setTruststorePassword(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASSWORD));
+				restConnection.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP));
+				restConnection.setMaxPollResultSize(Integer.valueOf(jsonConnection
 						.getString(ConnectionKey.MAX_POLL_RESULT_SIZE)));
-				restConn.setSubscriptionData(loadRestSubscriptions(dataserviceConnection, connectionName));
+				restConnection.setConnected(jsonConnection.getBoolean(ConnectionKey.IS_CONNECTED));
+				restConnection.setSubscriptionData(loadRestSubscriptions(dataserviceConnection, connectionName));
 
-				connections.add(restConn);
+				connections.add(restConnection);
 
 			} catch (JSONException e) {
 				LOGGER.error("error while loadRestConnections()", e);

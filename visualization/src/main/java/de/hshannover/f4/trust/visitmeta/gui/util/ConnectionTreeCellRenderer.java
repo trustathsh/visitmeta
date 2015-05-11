@@ -87,9 +87,9 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 		}else if(value instanceof DataserviceConnection){
 			setIcon(connectionIcon);
 		} else if (value instanceof MapServerConnection) {
-			setIcon(getStatusIcon(true));
+			setIcon(getStatusIcon(((MapServerConnection) value).isConnected()));
 		} else if (value instanceof Subscription) {
-			setIcon(getStatusIcon(true));
+			setIcon(getStatusIcon(((Subscription) value).isActive()));
 		}
 
 		return this;

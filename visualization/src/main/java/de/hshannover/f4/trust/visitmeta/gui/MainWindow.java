@@ -78,10 +78,10 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -99,7 +99,7 @@ public class MainWindow extends JFrame {
 	private JPanel mRightMainPanel = null;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
-	private JTree mConnectionTree = null;
+	private RESTConnectionTree mConnectionTree = null;
 	private DefaultMutableTreeNode mTreeRoot = null;
 	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
@@ -239,6 +239,8 @@ public class MainWindow extends JFrame {
 		} catch (PropertyException e1) {
 			e1.printStackTrace();
 		}
+		mConnectionTree.expandAllNodes();
+
 		mConnectionTree.addTreeSelectionListener(new TreeSelectionListener() {
 
 			@Override
@@ -265,19 +267,23 @@ public class MainWindow extends JFrame {
 					if (tmp instanceof MapServerRestConnectionImpl) {
 						MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) tmp;
 
-						 boolean alreadyOpen = false;
+						if (!mapServerConnection.isGraphStarted()) {
+							mapServerConnection.initGraph();
+						}
+
+						boolean alreadyOpen = false;
 						Component tmpComponent = null;
-						 for (Component t : mTabbedConnectionPane.getComponents()) {
+						for (Component t : mTabbedConnectionPane.getComponents()) {
 							if (t.equals(mapServerConnection.getConnectionTab())) {
 								alreadyOpen = true;
 								tmpComponent = t;
 							}
-						 }
-						 if (!alreadyOpen) {
+						}
+						if (!alreadyOpen) {
 							addClosableTab(mapServerConnection.getConnectionTab());
-						 } else {
+						} else {
 							mTabbedConnectionPane.setSelectedComponent(tmpComponent);
-						 }
+						}
 					}
 				}
 			}
@@ -395,12 +401,9 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setLocation(mConfig.getInt("window.position.x", 0),
-				mConfig.getInt("window.position.y", 0));
-		setPreferredSize(new Dimension(mConfig.getInt("window.width", 1280),
-				mConfig.getInt("window.height", 720)));
-		mMainSplitPane.setDividerLocation(mConfig.getInt("window.resizeweight",
-				-1));
+		setLocation(mConfig.getInt("window.position.x", 0), mConfig.getInt("window.position.y", 0));
+		setPreferredSize(new Dimension(mConfig.getInt("window.width", 1280), mConfig.getInt("window.height", 720)));
+		mMainSplitPane.setDividerLocation(mConfig.getInt("window.resizeweight", -1));
 	}
 
 	/**

@@ -87,15 +87,15 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.GuiController;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class ConnectionDialog extends JDialog {
 
 	private static final long serialVersionUID = 3274298974215759835L;
+
 
 	private static final Logger log = Logger.getLogger(ConnectionDialog.class);
 

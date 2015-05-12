@@ -22,6 +22,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
@@ -89,7 +90,7 @@ public class RestHelper {
 				restConnection.setMaxPollResultSize(Integer.valueOf(jsonConnection
 						.getString(ConnectionKey.MAX_POLL_RESULT_SIZE)));
 				restConnection.setConnected(jsonConnection.getBoolean(ConnectionKey.IS_CONNECTED));
-				restConnection.setSubscriptionData(loadRestSubscriptions(dataserviceConnection, connectionName));
+				restConnection.setSubscriptionData(loadRestSubscriptions(dataserviceConnection, restConnection));
 
 				connections.add(restConnection);
 
@@ -100,13 +101,14 @@ public class RestHelper {
 		return connections;
 	}
 
-	public static List<Data> loadRestSubscriptions(DataserviceConnection dataserviceConnection, String connectionName)
-			throws ClientHandlerException, UniformInterfaceException {
+	public static List<Data> loadRestSubscriptions(DataserviceConnection dataserviceConnection,
+			MapServerConnection mapServerConnection) throws ClientHandlerException, UniformInterfaceException {
 		List<Data> subscriptions = new ArrayList<Data>();
 
 		JSONArray jsonResponse = null;
 
-		jsonResponse = buildWebResource(dataserviceConnection).path(connectionName).path("subscribe")
+		jsonResponse = buildWebResource(dataserviceConnection).path(mapServerConnection.getConnectionName())
+				.path("subscribe")
 				.accept(MediaType.APPLICATION_JSON).get(JSONArray.class);
 
 		for (int i = 0; i < jsonResponse.length(); i++) {
@@ -114,7 +116,7 @@ public class RestHelper {
 			try {
 
 				String subscriptionName = jsonResponse.getString(i);
-				Subscription subscription = new RestSubscrptionImpl(dataserviceConnection);
+				Subscription subscription = new RestSubscrptionImpl(mapServerConnection);
 				subscription.setName(subscriptionName);
 
 				subscriptions.add(subscription);

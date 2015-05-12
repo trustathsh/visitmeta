@@ -157,7 +157,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 	public void startSubscription(String subscriptionName) throws ConnectionException {
 		for (Data subscription : getSubscriptions()) {
 			if (subscription.getName().equals(subscriptionName)) {
-				((Subscription) subscription).startSubscription(this);
+				((Subscription) subscription).startSubscription();
 				break;
 			}
 		}
@@ -167,7 +167,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 	public void stopSubscription(String subscriptionName) throws ConnectionException {
 		for (Data subscription : getSubscriptions()) {
 			if (subscription.getName().equals(subscriptionName)) {
-				((Subscription) subscription).stopSubscription(this);
+				((Subscription) subscription).stopSubscription();
 				break;
 			}
 		}
@@ -176,7 +176,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 	@Override
 	public void stopAllSubscriptions() throws ConnectionException {
 		for (Data subData : getSubscriptions()) {
-			((Subscription) subData).stopSubscription(this);
+			((Subscription) subData).stopSubscription();
 		}
 	}
 

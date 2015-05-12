@@ -171,8 +171,8 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public void addSubscription(Subscription connection) {
-		mSubscriptionDataList.add(connection);
+	public void addSubscription(Subscription subscription) {
+		mSubscriptionDataList.add(subscription);
 	}
 
 	@Override

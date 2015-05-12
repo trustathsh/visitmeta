@@ -12,24 +12,27 @@ public class ConnectionTreeDialogListener implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mousePressed(MouseEvent event) {
 		mConnectionDialog.switchParameterPanel();
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
+	public void mouseClicked(MouseEvent event) {
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
+	public void mouseEntered(MouseEvent event) {
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
+	public void mouseExited(MouseEvent event) {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
+	public void mouseReleased(MouseEvent event) {
+		if (event.getButton() == MouseEvent.BUTTON3) {
+			mConnectionDialog.showConnectionTreePopupMenu(event.getX(), event.getY());
+		}
 	}
 
 }

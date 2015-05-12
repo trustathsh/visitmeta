@@ -39,26 +39,21 @@
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 
 public interface Subscription extends SubscriptionData {
 
 	/**
 	 * Stop this subscription for the mapServerConnection.
-	 *
-	 * @param MapServerConnection
 	 * 
 	 * @throws ConnectionException
 	 */
-	public void stopSubscription(MapServerConnection mapServerConnection) throws ConnectionException;
+	public void stopSubscription() throws ConnectionException;
 
 	/**
 	 * Start this subscription for the mapServerConnection.
-	 *
-	 * @param MapServerConnection
 	 * 
 	 * @throws ConnectionException
 	 */
-	public void startSubscription(MapServerConnection mapServerConnection) throws ConnectionException;
+	public void startSubscription() throws ConnectionException;
 
 }

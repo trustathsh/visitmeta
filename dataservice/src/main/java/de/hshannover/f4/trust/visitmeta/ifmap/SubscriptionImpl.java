@@ -44,16 +44,22 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 
 public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 
+	private MapServerConnection mMapServerConnection;
+
+	public SubscriptionImpl(MapServerConnection mapServerConnection) {
+		mMapServerConnection = mapServerConnection;
+	}
+
 	@Override
-	public void stopSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
-		mapServerConnection.subscribe(this, false);
+	public void stopSubscription() throws ConnectionException {
+		mMapServerConnection.subscribe(this, false);
 
 		super.setActive(false);
 	}
 
 	@Override
-	public void startSubscription(MapServerConnection mapServerConnection) throws ConnectionException {
-		mapServerConnection.subscribe(this, true);
+	public void startSubscription() throws ConnectionException {
+		mMapServerConnection.subscribe(this, true);
 		super.setActive(true);
 	}
 

@@ -49,8 +49,11 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
@@ -86,12 +89,15 @@ public class SubscriptionHelper {
 		return request;
 	}
 
-	public static SubscribeRequest buildRequest(JSONObject jObj) {
-		return buildUpdateRequest(buildSubscribtion(jObj));
+	public static SubscribeRequest buildRequest(String connectionName, JSONObject jObj) {
+		return buildUpdateRequest(buildSubscribtion(connectionName, jObj));
 	}
 
-	public static Subscription buildSubscribtion(JSONObject jObj) {
-		Subscription subscription = new SubscriptionImpl();
+	public static Subscription buildSubscribtion(String connectionName, JSONObject jObj) {
+		ConnectionManager connectionManager = Application.getConnectionManager();
+		MapServerConnection connection = connectionManager.getSavedConnections().get(connectionName);
+
+		Subscription subscription = new SubscriptionImpl(connection);
 
 		subscription.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
 		subscription.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);

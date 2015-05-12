@@ -151,7 +151,7 @@ public class SubscribeResource {
 				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
 				try {
 
-					Subscription subscription = SubscriptionHelper.buildSubscribtion(moreSubscribes);
+					Subscription subscription = SubscriptionHelper.buildSubscribtion(name, moreSubscribes);
 					manager.storeSubscription(name, subscription);
 					manager.startSubscription(name, subscription.getName());
 
@@ -162,7 +162,7 @@ public class SubscribeResource {
 			}
 		} catch (JSONException e) {
 			try {
-				Subscription subscription = SubscriptionHelper.buildSubscribtion(jObj);
+				Subscription subscription = SubscriptionHelper.buildSubscribtion(name, jObj);
 				manager.storeSubscription(name, subscription);
 				manager.startSubscription(name, subscription.getName());
 

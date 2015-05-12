@@ -77,7 +77,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		for (Data d : super.getSubscriptions()) {
 			Subscription subscription = (Subscription) d;
 			if (subscription.getName().equals(subscriptionName)) {
-				subscription.startSubscription(this);
+				subscription.startSubscription();
 				break;
 			}
 		}
@@ -88,7 +88,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		for (Data d : super.getSubscriptions()) {
 			Subscription subscription = (Subscription) d;
 			if (subscription.getName().equals(subscriptionName)) {
-				subscription.stopSubscription(this);
+				subscription.stopSubscription();
 				break;
 			}
 		}
@@ -98,7 +98,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	public void stopAllSubscriptions() throws ConnectionException {
 		for (Data d : super.getSubscriptions()) {
 			Subscription subscription = (Subscription) d;
-			subscription.stopSubscription(this);
+			subscription.stopSubscription();
 		}
 	}
 

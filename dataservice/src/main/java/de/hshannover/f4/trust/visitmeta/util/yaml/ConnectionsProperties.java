@@ -109,7 +109,7 @@ public class ConnectionsProperties extends Properties {
 				userPassword);
 
 		// build/set subscription list, if exists
-		List<Subscription> subscribtionList = buildSubscribtion(connectionName);
+		List<Subscription> subscribtionList = buildSubscribtion(newConnection);
 		if (subscribtionList != null) {
 			for (Subscription s : subscribtionList) {
 				newConnection.addSubscription(s);
@@ -126,7 +126,9 @@ public class ConnectionsProperties extends Properties {
 		return newConnection;
 	}
 
-	private List<Subscription> buildSubscribtion(String connectionName) throws PropertyException {
+	private List<Subscription> buildSubscribtion(MapServerConnection mapServerConnection) throws PropertyException {
+		String connectionName = mapServerConnection.getConnectionName();
+
 		// try to read SubscribeList from Connection, if not exists return null
         Map<String,String> propertySubscribeList = (Map<String, String>) super.get(connectionName).getValue(ConnectionKey.SUBSCRIPTIONS);
 
@@ -135,7 +137,7 @@ public class ConnectionsProperties extends Properties {
 		// for all Subscriptions
 		for (String subscribeName : propertySubscribeList.keySet()) {
 			// build new Subscription
-			Subscription subscribtion = new SubscriptionImpl();
+			Subscription subscribtion = new SubscriptionImpl(mapServerConnection);
 			// set required values
 			subscribtion.setName(subscribeName);
 			subscribtion

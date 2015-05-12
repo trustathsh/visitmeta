@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 
@@ -22,10 +23,12 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
+import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class NewConnectionDialog extends JDialog{
@@ -195,8 +198,8 @@ public class NewConnectionDialog extends JDialog{
 
 	public void switchParameterPanel() {
 		JPanel parameterPanel = null;
-
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
+
 		if (selectedComponent instanceof DataserviceConnection) {
 			parameterPanel = new DataServiceParameterPanel((DataserviceConnection) selectedComponent);
 
@@ -215,6 +218,17 @@ public class NewConnectionDialog extends JDialog{
 
 		mJpParameter.updateUI();
 		// super.pack();
+	}
+
+	public void showConnectionTreePopupMenu(int x, int y) {
+		Object[] path = mJtConnections.getClosestPathForLocation(x, y).getPath();
+
+		mJtConnections.setSelectionPath(new TreePath(path));
+
+		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
+
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu((Data) selectedComponent);
+		popUp.show(mJtConnections, x, y);
 	}
 
 }

@@ -40,12 +40,15 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.SortedMap;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -54,13 +57,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphFilterImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.IdentifierImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
 
 /**
  * Represents the graph of the application in a "RESTful" manner.
@@ -141,6 +150,22 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
+	
+	@GET
+	@Path("initial")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Object getInitialGraph(@PathParam("connectionName") String name, JSONObject jobj) {
+		List<IdentifierGraph> graph;
+		GraphFilter filter;
+		try {
+			filter = parseFilterFromJson(jobj);
+			graph = Application.getConnectionManager().getGraphService(name).getInitialGraph(filter);
+		} catch (ConnectionException | JSONException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+		return jsonMarshaller().toJson(graph);
+	}
 
 	/**
 	 * Returns the graph at the given timestamp. If the given timestamp
@@ -166,6 +191,22 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
+	
+	@GET
+	@Path("{at}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp, JSONObject jobj) {
+		List<IdentifierGraph> graph;
+		GraphFilter filter;
+		try {
+			filter = parseFilterFromJson(jobj);
+			graph = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp, filter);
+		} catch (ConnectionException | JSONException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+		return jsonMarshaller().toJson(graph);
+	}
 
 	/**
 	 * Returns the current graph. More precisely the graph with the
@@ -189,6 +230,24 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
+	
+	
+	@POST
+	@Path("current")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Object getCurentGraph(@PathParam("connectionName") String name, JSONObject jobj) {
+		List<IdentifierGraph> graph;
+		GraphFilter filter;
+		try {
+			filter = parseFilterFromJson(jobj);
+			graph = Application.getConnectionManager().getGraphService(name).getCurrentGraph(filter);
+		} catch (ConnectionException | JSONException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+		return jsonMarshaller().toJson(graph);
+	}
+
 
 	/**
 	 * Returns the delta object from the given timestamp <tt>from</tt> to the second
@@ -225,5 +284,25 @@ public class GraphResource {
 		} else {
 			return new JsonMarshaller();
 		}
+	}
+	
+	private GraphFilter parseFilterFromJson(JSONObject jobj) throws JSONException {
+		String resultFilter = jobj.getString("resultFilter");
+		resultFilter = resultFilter.equalsIgnoreCase("null") ? null : resultFilter;
+		String matchLinks = jobj.getString("matchLinks");
+		int maxDepth = jobj.getInt("maxDepth");
+		IdentifierImpl startId = null;
+		
+		JSONObject id = jobj.getJSONObject("startId");
+		startId = new IdentifierImpl(id.getString("type"));
+		id.remove("type");
+		Iterator i = id.keys();
+		
+		while(i.hasNext()) {
+			String tmpKey = (String) i.next();
+			startId.addProperty(tmpKey, id.getString(tmpKey));
+		}
+		
+		return new GraphFilterImpl(startId, resultFilter, matchLinks, maxDepth);
 	}
 }

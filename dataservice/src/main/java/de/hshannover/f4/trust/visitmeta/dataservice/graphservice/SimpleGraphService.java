@@ -40,12 +40,21 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.DeltaImpl;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
@@ -74,6 +83,10 @@ public class SimpleGraphService implements GraphService {
 	private GraphCache mCache;
 
 	private Executor mExecutor;
+	
+	private DocumentBuilder mBuilder;
+	
+	private DocumentBuilderFactory mBuilderFactory;
 
 	private SimpleGraphService() {
 		log.trace("new SimpleGraphService");
@@ -418,8 +431,7 @@ public class SimpleGraphService implements GraphService {
 	}
 
 
-	public IdentifierGraph filterGraph(List<InternalIdentifierGraph> graphList,
-			GraphFilter filter) {
+	public IdentifierGraph filterGraph(List<InternalIdentifierGraph> graphList, GraphFilter filter) {
 		Identifier startId = filter.getStartIdentifier();
 		InternalIdentifier internalStartId = null;
 		InternalIdentifierGraph graph = null;
@@ -431,21 +443,18 @@ public class SimpleGraphService implements GraphService {
 				}
 			}
 		}
-		List<String> matchLinks = filter.getMatchLinks();
-		List<String> resultFilter = filter.getResultFilter();
-		int maxDepth = filter.getMaxDepth();
-		// String terminalIndentifierType = filter.get
-		InMemoryIdentifierGraph result = new InMemoryIdentifierGraph(
-				graph.getTimestamp());
-		searchRoutine(graph, internalStartId, result, 0, matchLinks, maxDepth);
-		if(resultFilter != null) {
-			filterResult(result, resultFilter);
+		if(graph == null) {
+			return null;
 		}
+		int maxDepth = filter.getMaxDepth();
+		InMemoryIdentifierGraph result = new InMemoryIdentifierGraph(graph.getTimestamp());
+		searchRoutine(graph, internalStartId, result, 0, maxDepth, filter);
+		filterResult(result, filter);
 		return GraphHelper.internalToExternalGraph(result);
 	}
 
-	private void filterResult(InMemoryIdentifierGraph result, List<String> resultFilter) {
-		if(resultFilter.isEmpty()) {
+	private void filterResult(InMemoryIdentifierGraph result, GraphFilter filter) {
+		if(filter.matchEverything()) {
 			for (InternalIdentifier id : result.getAllIdentifier()) {
 				id.clearMetadata();
 				for (InternalLink l : id.getLinks()) {
@@ -456,7 +465,7 @@ public class SimpleGraphService implements GraphService {
 			for(InternalIdentifier id : result.getAllIdentifier()) {
 				ArrayList<InternalMetadata> toRemove = new ArrayList<>();
 				for(InternalMetadata meta : id.getMetadata()) {
-					if(!resultFilter.contains(meta.getTypeName())) {
+					if(filter.matchMeta(internalMetadaToDocument(meta))) {
 						toRemove.add(meta);
 						id.removeMetadata(meta);
 					}
@@ -467,7 +476,7 @@ public class SimpleGraphService implements GraphService {
 				toRemove.clear();
 				for(InternalLink link : id.getLinks()) {
 					for (InternalMetadata linkMeta : link.getMetadata()) {
-						if(!resultFilter.contains(linkMeta.getTypeName())) {
+						if(filter.matchMeta(internalMetadaToDocument(linkMeta))) {
 							toRemove.add(linkMeta);
 						}
 					}
@@ -479,27 +488,26 @@ public class SimpleGraphService implements GraphService {
 		}
 	}
 
-	private void searchRoutine(InternalIdentifierGraph graph,
-			InternalIdentifier currentId, InMemoryIdentifierGraph result,
-			int currentDepth, List<String> matchLinks, int maxDepth) {
+	private void searchRoutine(InternalIdentifierGraph graph, InternalIdentifier currentId, InMemoryIdentifierGraph result, int currentDepth, int maxDepth, GraphFilter filter) {
 		if (currentDepth <= maxDepth) {
-			InternalIdentifier insertedId = result.insert(currentId);
-			for (InternalMetadata currentMeta : currentId.getMetadata()) {
-				result.insert(currentMeta);
-				result.connectMeta(insertedId, currentMeta);
+			InternalIdentifier insertedId;
+			if(!result.getIdentifiers().contains(currentId)) {
+				insertedId = result.insert(currentId);
+				for (InternalMetadata currentMeta : currentId.getMetadata()) {
+					result.insert(currentMeta);
+					result.connectMeta(insertedId, currentMeta);
+				}
+			} else {
+				return;
 			}
 			for (InternalLink currentLink : currentId.getLinks()) {
-				for (InternalMetadata currentLinkMeta : currentLink
-						.getMetadata()) {
-					if (matchLinks.contains(currentLinkMeta.getTypeName())) {
+				if(checkMatchesLink(currentLink, filter)) {
+					for (InternalMetadata currentLinkMeta : currentLink.getMetadata()) {
 						result.insert(currentLinkMeta);
-						InternalIdentifierPair ip = currentLink
-								.getIdentifiers();
-						InternalIdentifier other = (ip.getFirst().equals(
-								currentId) ? ip.getSecond() : ip.getFirst());
-
+						InternalIdentifierPair ip = currentLink.getIdentifiers();
+						InternalIdentifier other = (ip.getFirst().equals(currentId) ? ip.getSecond() : ip.getFirst());
 						if (!result.getIdentifiers().contains(other)) {
-							other = result.insert(other);
+							searchRoutine(graph, other, result, currentDepth + 1, maxDepth, filter);
 						} else {
 							for (InternalIdentifier tmp : result.getIdentifiers())  {
 								if(tmp.equals(other)) {
@@ -509,14 +517,40 @@ public class SimpleGraphService implements GraphService {
 						}
 						InternalLink insertedLink = result.connect(insertedId, other);
 						result.connectMeta(insertedLink, currentLinkMeta);
-						if (!result.getIdentifiers().contains(other)) {
-							searchRoutine(graph, ip.getSecond(), result,
-									++currentDepth, matchLinks, maxDepth);
-						}
 					}
 				}
 			}
 		}
+	}
+	
+	private boolean checkMatchesLink(InternalLink link, GraphFilter filter) {
+		for(InternalMetadata meta : link.getMetadata()) {
+			if(filter.matchLink(internalMetadaToDocument(meta))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private Document internalMetadaToDocument(InternalMetadata meta) {
+		if(mBuilderFactory == null) {
+			mBuilderFactory = DocumentBuilderFactory.newInstance();
+		}
+		if(mBuilder == null) {
+			try {
+				mBuilder = mBuilderFactory.newDocumentBuilder();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			}
+		}
+		Document doc = null;
+		try {
+			doc = mBuilder.parse(new InputSource(new StringReader(meta.getRawData())));
+		} catch (SAXException | IOException e) {
+			log.error("could not convert InternalMetada to Document!");
+			e.printStackTrace();
+		}
+		return doc;
 	}
 
 	@Override

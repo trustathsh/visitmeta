@@ -57,4 +57,5 @@ public class ConnectionKey {
 	// for visualization
 	public static final String DATASERVICE_REST_URL = "dataserviceRestUrl";
 	public static final String RAW_XML = "rawXml";
+	public static final String CONNECTED = "connected";
 }

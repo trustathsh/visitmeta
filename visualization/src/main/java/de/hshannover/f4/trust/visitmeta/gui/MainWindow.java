@@ -45,8 +45,6 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -68,7 +66,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -76,9 +73,11 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
+import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -153,71 +152,19 @@ public class MainWindow extends JFrame {
 	 * Initializes the left hand side of the main panel
 	 */
 	private void initLeftHandSide() {
-		mTreeRenderer = new ConnectionTreeCellRenderer();
-
 		try {
 			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections());
 		} catch (PropertyException e) {
 			LOGGER.error(e.toString(), e);
 		}
+
 		mConnectionTree.expandAllNodes();
+		mConnectionTree.addMouseListener(new ConnectionTreeMainWindowListener(this));
 
-		mConnectionTree.addMouseListener(new MouseListener() {
 
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getClosestPathForLocation(e.getX(), e.getY())
-							.getLastPathComponent()).getUserObject();
-					if (tmp instanceof ConnectionTab) {
-						new ConnectionTabListMenu((ConnectionTab) tmp).show(
-								mConnectionTree, e.getX(), e.getY());
-					}
-				} else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
-					Object tmp = mConnectionTree.getLastSelectedPathComponent();
-					if (tmp instanceof MapServerRestConnectionImpl) {
-						MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) tmp;
-
-						if (!mapServerConnection.isGraphStarted()) {
-							mapServerConnection.initGraph();
-						}
-
-						boolean alreadyOpen = false;
-						Component tmpComponent = null;
-						for (Component t : mTabbedConnectionPane.getComponents()) {
-							if (t.equals(mapServerConnection.getConnectionTab())) {
-								alreadyOpen = true;
-								tmpComponent = t;
-							}
-						}
-						if (!alreadyOpen) {
-							addClosableTab(mapServerConnection.getConnectionTab());
-						} else {
-							mTabbedConnectionPane.setSelectedComponent(tmpComponent);
-						}
-					}
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-
+		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mConnectionTree.setCellRenderer(mTreeRenderer);
+
 		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();
@@ -397,5 +344,37 @@ public class MainWindow extends JFrame {
 
 	public JTree getConnectionTree() {
 		return mConnectionTree;
+	}
+
+	public void showConnectionTreePopupMenu(int x, int y) {
+		Object selectedComponent = mConnectionTree.getClosestPathForLocation(x, y).getLastPathComponent();
+
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu((Data) selectedComponent);
+		popUp.show(mConnectionTree, x, y);
+	}
+
+	public void showConnectionTab() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			if (!mapServerConnection.isGraphStarted()) {
+				mapServerConnection.initGraph();
+			}
+
+			boolean alreadyOpen = false;
+			Component tmpComponent = null;
+			for (Component t : mTabbedConnectionPane.getComponents()) {
+				if (t.equals(mapServerConnection.getConnectionTab())) {
+					alreadyOpen = true;
+					tmpComponent = t;
+				}
+			}
+			if (!alreadyOpen) {
+				addClosableTab(mapServerConnection.getConnectionTab());
+			} else {
+				mTabbedConnectionPane.setSelectedComponent(tmpComponent);
+			}
+		}
 	}
 }

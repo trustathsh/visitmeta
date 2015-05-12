@@ -68,8 +68,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
@@ -81,7 +79,6 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -100,7 +97,6 @@ public class MainWindow extends JFrame {
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
 	private RESTConnectionTree mConnectionTree = null;
-	private DefaultMutableTreeNode mTreeRoot = null;
 	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
 	private ImageIcon[] mCancelIcon = null;
@@ -116,79 +112,6 @@ public class MainWindow extends JFrame {
 		mMotionControllerHandler = motionControllerHandler;
 
 		init();
-	}
-
-	// /**
-	// *
-	// * @param connection
-	// */
-	// public void addDataserviceConnection(DataserviceConnection dataservice) {
-	// if (!existsDataservice(dataservice)) {
-	// addDataserviceTreeNode(dataservice);
-	// updateRestConnections();
-	// mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
-	// }
-	// }
-
-	// public void updateRestConnections() {
-	// for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-	// DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
-	// .getChildAt(i);
-	// DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode
-	// .getUserObject();
-	// List<String> restConnections;
-	// try {
-	// restConnections = treeNodedataservice.loadRestConnectionNames();
-	//
-	// tmpNode.removeAllChildren();
-	// for (String restConnectionName : restConnections) {
-	// GraphContainer graphContainer = new GraphContainer(restConnectionName, treeNodedataservice);
-	// DefaultMutableTreeNode ifMapConnection = new DefaultMutableTreeNode(new ConnectionTab(
-	// graphContainer, this));
-	// tmpNode.add(ifMapConnection);
-	//
-	// List<Data> restSubscription = treeNodedataservice
-	// .loadRestSubscriptions(restConnectionName);
-	// for (Data s : restSubscription) {
-	// ifMapConnection.add(new DefaultMutableTreeNode(((RestSubscription) s).getName()));
-	// }
-	// }
-	// } catch (ClientHandlerException | UniformInterfaceException | JSONException e) {
-	// LOGGER.warn("Exception while load rest connection names, from " + treeNodedataservice.getName()
-	// + " -> " + e.getMessage());
-	// }
-	// }
-	// mConnectionTree.updateUI();
-	// }
-
-	private boolean existsDataservice(DataserviceConnection dataservice) {
-		String dataserviceName = dataservice.getName();
-		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
-					.getChildAt(i);
-			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode
-					.getUserObject();
-			if (tmpDataserviceConnection.getName().equals(dataserviceName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void addDataserviceTreeNode(DataserviceConnection dataservice) {
-		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(dataservice);
-		mTreeRoot.add(newNode);
-		mConnectionTree.updateUI();
-	}
-
-	/**
-	 * Removes a connection
-	 *
-	 * @param connection
-	 *            the should be removed
-	 */
-	public void removeConnection(ConnectionTab connection) {
-		// TODO implement
 	}
 
 	/**
@@ -231,29 +154,18 @@ public class MainWindow extends JFrame {
 	 */
 	private void initLeftHandSide() {
 		mTreeRenderer = new ConnectionTreeCellRenderer();
-		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
 
-		// mConnectionTree = new JTree(mTreeRoot);
 		try {
 			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections());
-		} catch (PropertyException e1) {
-			e1.printStackTrace();
+		} catch (PropertyException e) {
+			LOGGER.error(e.toString(), e);
 		}
 		mConnectionTree.expandAllNodes();
 
-		mConnectionTree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
 		mConnectionTree.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// mConnectionTree.setSelectionRow(mConnectionTree.getClosestRowForLocation(e.getX(), e.getY()));
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
 							.getClosestPathForLocation(e.getX(), e.getY())
@@ -314,19 +226,15 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * Adds a component to a JTabbedPane with a little "close tab" button on the
-	 * right side of the tab.
+	 * Adds a component to a JTabbedPane with a little "close tab" button on the right side of the tab.
 	 *
-	 * @param cTab
-	 *            the ConnectionTab that should be added
+	 * @param cTab the ConnectionTab that should be added
 	 */
 	private void addClosableTab(final ConnectionTab cTab) {
 		if (mCancelIcon == null) {
 			mCancelIcon = new ImageIcon[2];
-			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader()
-					.getResource("close.png").getPath());
-			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader()
-					.getResource("closeHover.png").getPath());
+			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader().getResource("close.png").getPath());
+			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader().getResource("closeHover.png").getPath());
 		}
 		mTabbedConnectionPane.addTab(cTab.getConnName(), cTab);
 		int pos = mTabbedConnectionPane.indexOfComponent(cTab);
@@ -416,14 +324,11 @@ public class MainWindow extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent we) {
 				try {
-					mConfig.set("window.position.x",
-							(int) getLocationOnScreen().getX());
-					mConfig.set("window.position.y",
-							(int) getLocationOnScreen().getY());
+					mConfig.set("window.position.x", (int) getLocationOnScreen().getX());
+					mConfig.set("window.position.y", (int) getLocationOnScreen().getY());
 					mConfig.set("window.width", getWidth());
 					mConfig.set("window.height", getHeight());
-					mConfig.set("window.divider",
-							mMainSplitPane.getDividerLocation());
+					mConfig.set("window.divider", mMainSplitPane.getDividerLocation());
 				} catch (PropertyException e) {
 					LOGGER.fatal(e.toString(), e);
 					throw new RuntimeException("could not save properties");
@@ -456,8 +361,7 @@ public class MainWindow extends JFrame {
 	private void setLookAndFeel() {
 		LOGGER.trace("Method setLookAndFeel() called.");
 
-		UIManager.LookAndFeelInfo[] installedLafs = UIManager
-				.getInstalledLookAndFeels();
+		UIManager.LookAndFeelInfo[] installedLafs = UIManager.getInstalledLookAndFeels();
 		for (UIManager.LookAndFeelInfo lafInfo : installedLafs) {
 			try {
 				@SuppressWarnings("rawtypes")
@@ -469,7 +373,7 @@ public class MainWindow extends JFrame {
 
 				}
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				LOGGER.error(e.getMessage(), e);
 				continue;
 			}
 		}
@@ -481,7 +385,7 @@ public class MainWindow extends JFrame {
 					UIManager.setLookAndFeel(laf);
 					lAf.menuItem.setSelected(true);
 				} catch (UnsupportedLookAndFeelException e) {
-					System.out.println(e.getMessage());
+					LOGGER.error(e.getMessage(), e);
 				}
 			}
 		}

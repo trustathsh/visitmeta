@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 
 public class GuiController {
 	private static final Logger LOGGER = Logger
@@ -82,9 +81,9 @@ public class GuiController {
 				});
 	}
 
-	public void updateRestConnections() {
-		mMainWindow.updateRestConnections();
-	}
+	// public void updateRestConnections() {
+	// mMainWindow.updateRestConnections();
+	// }
 
 	public GraphConnection getSelectedConnection() {
 		return mSelectedConnection.getConnection();
@@ -98,17 +97,17 @@ public class GuiController {
 		this.mSelectedConnection = connection;
 	}
 
-	/**
-	 * Adds a connection to the GuiController
-	 *
-	 * @param name
-	 *            of the connection
-	 * @param connection
-	 *            ConnectionController object
-	 */
-	public void addDataserviceConnection(DataserviceConnection dataservice) {
-		mMainWindow.addDataserviceConnection(dataservice);
-	}
+	// /**
+	// * Adds a connection to the GuiController
+	// *
+	// * @param name
+	// * of the connection
+	// * @param connection
+	// * ConnectionController object
+	// */
+	// public void addDataserviceConnection(DataserviceConnection dataservice) {
+	// mMainWindow.addDataserviceConnection(dataservice);
+	// }
 
 	/**
 	 * Pack and set visible.

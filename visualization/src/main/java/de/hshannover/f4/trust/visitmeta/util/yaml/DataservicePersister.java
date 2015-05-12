@@ -60,8 +60,7 @@ public class DataservicePersister extends Properties {
 		super(fileName);
 	}
 
-	public void persist(DataserviceConnection connection)
-			throws PropertyException {
+	public void persist(DataserviceConnection connection) throws PropertyException {
 		String connectionName = connection.getName();
 		String dataserviceRestUrl = connection.getUrl();
 		boolean rawXml = connection.isRawXml();
@@ -76,33 +75,36 @@ public class DataservicePersister extends Properties {
 			// read values from property
 			String dataserviceRestUrl = getPropertyDataserviceRestUrl(connectionName);
 			boolean rawXml = getPropertyRawXml(connectionName);
-			DataserviceConnection tmpDataserviceConnection = new DataserviceRestConnectionImpl(connectionName,
+			boolean connected = getPropertyConnected(connectionName);
+			DataserviceRestConnectionImpl tmpDataserviceConnection = new DataserviceRestConnectionImpl(connectionName,
 					dataserviceRestUrl, rawXml);
+			tmpDataserviceConnection.setConnected(connected);
+
+			tmpDataserviceConnection.update();
 			dataserviceConnectionList.add(tmpDataserviceConnection);
 		}
 		return dataserviceConnectionList;
 	}
 
-	private boolean getPropertyRawXml(String connectionName)
-			throws PropertyException {
+	private boolean getPropertyRawXml(String connectionName) throws PropertyException {
 		return super.get(connectionName).getBoolean(ConnectionKey.RAW_XML);
 	}
 
-	private String getPropertyDataserviceRestUrl(String connectionName)
-			throws PropertyException {
-		return super.get(connectionName).getString(
-				ConnectionKey.DATASERVICE_REST_URL);
+	private boolean getPropertyConnected(String connectionName) throws PropertyException {
+		return super.get(connectionName).getBoolean(ConnectionKey.CONNECTED);
 	}
 
-	private void setPropertyRawXml(String connectionName, boolean rawXml)
-			throws PropertyException {
+	private String getPropertyDataserviceRestUrl(String connectionName) throws PropertyException {
+		return super.get(connectionName).getString(ConnectionKey.DATASERVICE_REST_URL);
+	}
+
+	private void setPropertyRawXml(String connectionName, boolean rawXml) throws PropertyException {
 		super.set(connectionName + "." + ConnectionKey.RAW_XML, rawXml);
 	}
 
-	private void setPropertyDataserviceRestUrl(String connectionName,
-			String dataserviceRestUrl) throws PropertyException {
-		super.set(connectionName + "." + ConnectionKey.DATASERVICE_REST_URL,
-				dataserviceRestUrl);
+	private void setPropertyDataserviceRestUrl(String connectionName, String dataserviceRestUrl)
+			throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.DATASERVICE_REST_URL, dataserviceRestUrl);
 	}
 
 }

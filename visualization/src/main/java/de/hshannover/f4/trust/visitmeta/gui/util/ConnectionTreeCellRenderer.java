@@ -47,31 +47,61 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
-	private static final long serialVersionUID = 1L;
-	private ImageIcon[] connectionStatusIcon = null;
-	private ImageIcon dataserviceIcon = null;
-	private ImageIcon connectionIcon = null;
+	
+	private static final long serialVersionUID = 7918592799908870099L;
+
+	private ImageIcon mMapServerConnectedIcon;
+	
+	private ImageIcon mMapServerDisconnectedIcon;
+	
+	private ImageIcon mRrootIcon;
+	
+	private ImageIcon mDataserviceConnectedIcon;
+	
+	private ImageIcon mDataserviceDisconnectedIcon;
+	
+	private ImageIcon mSubscriptionActiveIcon;
+	
+	private ImageIcon mSubscriptionInactiveIcon;
 
 	public ConnectionTreeCellRenderer() {
 		super();
-		if (dataserviceIcon == null) {
-			dataserviceIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("dataservice.png").getPath());
+		if (mRrootIcon == null) {
+			mRrootIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("ConnectionTreeRoot.png").getPath());
 		}
 
-		if (connectionIcon == null) {
-			connectionIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("connection.png").getPath());
+		if (mDataserviceConnectedIcon == null) {
+			mDataserviceConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("DataserviceConnectedIcon.png").getPath());
 		}
 
-		if (connectionStatusIcon == null) {
-			connectionStatusIcon = new ImageIcon[2];
-			connectionStatusIcon[0] = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("connected.png").getPath());
-			connectionStatusIcon[1] = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("disconnected.png").getPath());
+		if (mDataserviceDisconnectedIcon == null) {
+			mDataserviceDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("DataserviceDisconnectedIcon.png").getPath());
+		}
+
+		if (mMapServerConnectedIcon == null) {
+			mMapServerConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("MapServerConnectedIcon.png").getPath());
+		}
+		
+		if (mMapServerDisconnectedIcon == null) {
+			mMapServerDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("MapServerDisconnectedIcon.png").getPath());
+		}
+
+		if (mSubscriptionActiveIcon == null) {
+			mSubscriptionActiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("SubscriptionActiveIcon.png").getPath());
+		}
+		
+		if (mSubscriptionInactiveIcon == null) {
+			mSubscriptionInactiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+					.getResource("SubscriptionInactiveIcon.png").getPath());
 		}
 	}
 
@@ -80,26 +110,29 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 			boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-		if(value instanceof Dataservices){
-			if(value.toString().equals("Dataservices")){
-				setIcon(dataserviceIcon);
-			}
-		}else if(value instanceof DataserviceConnection){
-			setIcon(connectionIcon);
-		} else if (value instanceof MapServerConnection) {
-			setIcon(getStatusIcon(((MapServerConnection) value).isConnected()));
-		} else if (value instanceof Subscription) {
-			setIcon(getStatusIcon(((Subscription) value).isActive()));
+		if (value instanceof Data) {
+			setIcon(getStatusIcon((Data) value));
 		}
-
 		return this;
 	}
 
-	private ImageIcon getStatusIcon(boolean status) {
-		if (status) {
-			return connectionStatusIcon[0];
-		} else {
-			return connectionStatusIcon[1];
+	private ImageIcon getStatusIcon(Data data) {
+		if (data instanceof DataserviceConnection) {
+			if (((DataserviceConnection) data).isConnected()) {
+				return mDataserviceConnectedIcon;
+			}
+			return mDataserviceDisconnectedIcon;
+		} else if (data instanceof MapServerConnection) {
+			if (((MapServerConnection) data).isConnected()) {
+				return mMapServerConnectedIcon;
+			}
+			return mMapServerDisconnectedIcon;
+		} else if (data instanceof Subscription) {
+			if (((Subscription) data).isActive()) {
+				return mSubscriptionActiveIcon;
+			}
+			return mSubscriptionInactiveIcon;
 		}
+		return mRrootIcon;
 	}
 }

@@ -1,5 +1,6 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
@@ -17,18 +18,18 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
-
-		update();
 	}
 
 	@Override
 	public void connect() throws ConnectionException {
 		super.setConnected(true);
+		update();
 	}
 
 	@Override
 	public void disconnect() throws ConnectionException {
 		super.setConnected(false);
+		update();
 	}
 
 	@Override
@@ -47,8 +48,10 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 	}
 
 	public List<Data> loadMapServerConnections() {
-		System.out.println("loadMapServerConnections()...");
-		return RestHelper.loadMapServerConnections(this);
+		if (super.isConnected()) {
+			return RestHelper.loadMapServerConnections(this);
+		}
+		return new ArrayList<Data>();
 	}
 
 	public void connectMapServer(String mapServerConnectionName) throws ConnectionException {

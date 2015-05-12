@@ -349,7 +349,7 @@ public class MainWindow extends JFrame {
 	public void showConnectionTreePopupMenu(int x, int y) {
 		Object selectedComponent = mConnectionTree.getClosestPathForLocation(x, y).getLastPathComponent();
 
-		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu((Data) selectedComponent);
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, (Data) selectedComponent);
 		popUp.show(mConnectionTree, x, y);
 	}
 

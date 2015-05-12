@@ -227,7 +227,7 @@ public class NewConnectionDialog extends JDialog{
 
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 
-		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu((Data) selectedComponent);
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mJtConnections, (Data) selectedComponent);
 		popUp.show(mJtConnections, x, y);
 	}
 

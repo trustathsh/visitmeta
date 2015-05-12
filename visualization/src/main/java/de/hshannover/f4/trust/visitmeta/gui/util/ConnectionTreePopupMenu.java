@@ -31,10 +31,13 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private JMenuItem mDelete;
 
+	private RESTConnectionTree mConnectionTree;
+
 	private Data mSelectedData;
 
-	public ConnectionTreePopupMenu(Data selectedData) {
+	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData) {
 		mSelectedData = selectedData;
+		mConnectionTree = connectionTree;
 
 		if (mSelectedData instanceof DataserviceConnection) {
 			initConnectButton();
@@ -59,6 +62,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
+
+				mConnectionTree.updateUI();
 			}
 		});
 
@@ -75,6 +80,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
+
+				mConnectionTree.updateUI();
 			}
 		});
 
@@ -91,6 +98,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
+
+				mConnectionTree.updateUI();
 			}
 		});
 
@@ -107,6 +116,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
+
+				mConnectionTree.updateUI();
 			}
 		});
 
@@ -119,6 +130,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				// TODO delete the Connection
+
+				mConnectionTree.updateUI();
 			}
 		});
 	}

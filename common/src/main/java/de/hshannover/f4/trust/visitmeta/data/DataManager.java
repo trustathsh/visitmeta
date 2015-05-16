@@ -5,7 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
-import de.hshannover.f4.trust.visitmeta.interfaces.handler.Handler;
+import de.hshannover.f4.trust.visitmeta.interfaces.handler.JSONHandler;
 
 public class DataManager {
 
@@ -13,7 +13,7 @@ public class DataManager {
 	public static JSONObject transformData(Data data) throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, JSONException {
 
-		Handler handler = JSONManager.getHandlerFor(data.getClass());
+		JSONHandler handler = JSONManager.getHandlerFor(data.getClass());
 
 		return handler.toJSONObject(data);
 	}
@@ -21,7 +21,7 @@ public class DataManager {
 	public static Data transformJSONObject(JSONObject jsonData, Class<?> dataClazz) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException, JSONHandlerException, JSONException {
 
-		Handler<?> handler = JSONManager.getHandlerFor(dataClazz);
+		JSONHandler<?> handler = JSONManager.getHandlerFor(dataClazz);
 
 		return handler.toData(jsonData);
 	}

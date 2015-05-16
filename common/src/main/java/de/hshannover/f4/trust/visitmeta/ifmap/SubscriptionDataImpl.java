@@ -74,6 +74,7 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 	public Data copy() {
 		SubscriptionDataImpl tmpCopy = new SubscriptionDataImpl();
 		tmpCopy.setName(super.getName());
+		tmpCopy.setStartIdentifier(getStartIdentifier());
 		tmpCopy.setIdentifierType(getIdentifierType());
 		tmpCopy.setMatchLinksFilter(getMatchLinksFilter());
 		tmpCopy.setResultFilter(getResultFilter());
@@ -81,6 +82,7 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 		tmpCopy.setStartupSubscribe(isStartupSubscribe());
 		tmpCopy.setMaxDepth(getMaxDepth());
 		tmpCopy.setMaxSize(getMaxSize());
+		tmpCopy.setActive(isActive());
 		return tmpCopy;
 	}
 

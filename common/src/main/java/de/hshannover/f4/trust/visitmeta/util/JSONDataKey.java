@@ -28,7 +28,8 @@ public enum JSONDataKey {
 	RESULT_FILTER("resultFilter", "result_Filter"),
 	TERMINAL_IDENTIFIER_TYPES("terminalIdentifierTypes", "terminal_Identifier_Types"),
 	MAX_DEPTH("maxDepth", "max_Depth"),
-	MAX_SIZE("maxSize", "max_Size");
+	MAX_SIZE("maxSize", "max_Size"),
+	IS_ACTIVE("isActive", "is_Active");
 
 	private String[] mValues;
 

@@ -7,17 +7,17 @@ import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 
-public class RestSubscrptionImpl extends SubscriptionDataImpl implements Subscription {
+public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 
-	private static final Logger LOGGER = Logger.getLogger(RestSubscrptionImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(RestSubscriptionImpl.class);
 
 	private MapServerRestConnectionImpl mMapServerConnection;
 
-	public RestSubscrptionImpl(MapServerRestConnectionImpl mapServerConnection) {
+	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection) {
 		mMapServerConnection = mapServerConnection;
 	}
 
-	public RestSubscrptionImpl(MapServerRestConnectionImpl mapServerConnection, SubscriptionData subscriptionData) {
+	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection, SubscriptionData subscriptionData) {
 
 		super.setName(subscriptionData.getName());
 		super.setStartIdentifier(subscriptionData.getStartIdentifier());

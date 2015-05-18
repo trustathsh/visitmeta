@@ -76,7 +76,7 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscrptionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -376,8 +376,8 @@ public class MainWindow extends JFrame {
 			} else {
 				mTabbedConnectionPane.setSelectedComponent(tmpComponent);
 			}
-		} else if (selectedComponent instanceof RestSubscrptionImpl) {
-			RestSubscrptionImpl subscription = (RestSubscrptionImpl) selectedComponent;
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
 
 			if (subscription.isActive()) {
 				subscription.stopSubscription();

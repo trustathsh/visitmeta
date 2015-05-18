@@ -48,8 +48,8 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
 
 		for (Data subscriptonData : connectionData.getSubscriptions()) {
-			if (!(subscriptonData instanceof RestSubscrptionImpl) && subscriptonData instanceof SubscriptionData) {
-				super.addSubscription(new RestSubscrptionImpl(this, (SubscriptionData) subscriptonData));
+			if (!(subscriptonData instanceof RestSubscriptionImpl) && subscriptonData instanceof SubscriptionData) {
+				super.addSubscription(new RestSubscriptionImpl(this, (SubscriptionData) subscriptonData));
 			}
 		}
 

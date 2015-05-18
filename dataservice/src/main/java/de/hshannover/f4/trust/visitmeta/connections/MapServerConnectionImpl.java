@@ -307,6 +307,14 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		super.setConnected(false);
 		mSsrc = null;
 
+		// disabled all subscriptions
+		for (Data subscriptionData : super.getSubscriptions()) {
+			if (subscriptionData instanceof Subscription) {
+				Subscription subscription = (Subscription) subscriptionData;
+				subscription.setActive(false);
+			}
+		}
+
 		LOGGER.trace("... resetConnection() OK");
 	}
 

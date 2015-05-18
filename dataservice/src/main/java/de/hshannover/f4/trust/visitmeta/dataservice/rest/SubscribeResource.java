@@ -101,7 +101,7 @@ public class SubscribeResource {
 			try {
 				jaSubscriptions = new JSONArray(Application.getConnectionManager().getSubscriptions(name));
 			} catch (ConnectionException e) {
-				log.error("error at getSubscriptions from " + name, e);
+				log.error("error at getSubscriptions from " + name + " | " + e.toString());
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 			}
 
@@ -110,7 +110,7 @@ public class SubscribeResource {
 			try {
 				jaSubscriptions = new JSONArray(Application.getConnectionManager().getActiveSubscriptions(name));
 			} catch (ConnectionException e) {
-				log.error("error at getActiveSubscriptions from " + name, e);
+				log.error("error at getActiveSubscriptions from " + name + " | " + e.toString());
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 			}
 
@@ -156,7 +156,7 @@ public class SubscribeResource {
 					manager.startSubscription(name, subscription.getName());
 
 				} catch (ConnectionException | IOException | PropertyException e) {
-					log.error("error while multiple subscribeUpdate from " + name, e);
+					log.error("error while multiple subscribeUpdate from " + name + " | " + e.toString());
 					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 				}
 			}
@@ -167,11 +167,39 @@ public class SubscribeResource {
 				manager.startSubscription(name, subscription.getName());
 
 			} catch (ConnectionException | IOException | PropertyException ee) {
-				log.error("error while single subscribeUpdate from " + name, ee);
+				log.error("error while single subscribeUpdate from " + name + " | " + e.toString());
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}
 		}
 		return Response.ok().entity("INFO: subscribe successfully").build();
+	}
+
+	@PUT
+	@Path("start/{subscriptionName}")
+	public Response start(@PathParam("connectionName") String connectName,
+			@PathParam("subscriptionName") String subscriptionName) {
+		try {
+			Application.getConnectionManager().startSubscription(connectName, subscriptionName);
+		} catch (ConnectionException e) {
+			log.error("error while start " + subscriptionName + " from " + connectName + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+
+		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") enabled").build();
+	}
+
+	@PUT
+	@Path("stop/{subscriptionName}")
+	public Response stop(@PathParam("connectionName") String connectName,
+			@PathParam("subscriptionName") String subscriptionName) {
+		try {
+			Application.getConnectionManager().stopSubscription(connectName, subscriptionName);
+		} catch (ConnectionException e) {
+			log.error("error while stop " + subscriptionName + " from " + connectName + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+
+		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") disabled").build();
 	}
 
 	/**
@@ -187,7 +215,7 @@ public class SubscribeResource {
 			try {
 				Application.getConnectionManager().deleteAllSubscriptions(name);
 			} catch (ConnectionException e) {
-				log.error("error while delete all subscriptions from " + name, e);
+				log.error("error while delete all subscriptions from " + name + " | " + e.toString());
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 			}
 			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
@@ -209,7 +237,7 @@ public class SubscribeResource {
 		try {
 			Application.getConnectionManager().deleteSubscription(name, subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while delete " + subscriptionName + " from " + name, e);
+			log.error("error while delete " + subscriptionName + " from " + name + " | " + e.toString());
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 

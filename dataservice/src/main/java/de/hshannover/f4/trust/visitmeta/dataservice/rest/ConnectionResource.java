@@ -152,7 +152,7 @@ public class ConnectionResource {
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			LOGGER.error("error while connection persist", e);
+			LOGGER.error("error while connection persist | " + e.toString());
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("error while connection persist -> " + e.toString()).build();
 		}
@@ -176,12 +176,10 @@ public class ConnectionResource {
 			Application.getConnectionManager().connect(name);
 		} catch (ConnectionEstablishedException e) {
 			LOGGER.warn(e.toString());
-			return Response.ok().entity("INFO: connection allready aktive")
-					.build();
+			return Response.ok().entity("INFO: connection allready aktive").build();
 		} catch (ConnectionException e) {
-			LOGGER.error("error while connecting to " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
+			LOGGER.error("error while connecting to " + name + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
 		return Response.ok("INFO: connecting successfully").build();
@@ -199,13 +197,11 @@ public class ConnectionResource {
 		try {
 			Application.getConnectionManager().disconnect(name);
 		} catch (NotConnectedException e) {
-			LOGGER.error("error while disconnect from " + name, e);
-			return Response.ok()
-					.entity("INFO: connection allready disconnected").build();
+			LOGGER.error("error while disconnect from " + name + " | " + e.toString());
+			return Response.ok().entity("INFO: connection allready disconnected").build();
 		} catch (ConnectionException e) {
-			LOGGER.error("error while disconnect from " + name, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
+			LOGGER.error("error while disconnect from " + name + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
 		return Response.ok().entity("INFO: disconnection successfully").build();
@@ -228,7 +224,7 @@ public class ConnectionResource {
 			try {
 				jsonConnectionData = DataManager.transformData(c);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-				LOGGER.error(e.toString(), e);
+				LOGGER.error("error while getConnections | " + e.toString());
 			}
 
 			jsonConnections.put(jsonConnectionData);

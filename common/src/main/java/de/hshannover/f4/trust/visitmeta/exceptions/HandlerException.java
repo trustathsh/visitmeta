@@ -10,6 +10,6 @@ public class HandlerException extends Exception {
 
 	@Override
 	public String toString() {
-		return super.toString() + " [Message: " + super.getMessage() + "]";
+		return super.getClass().getSimpleName() + " [Message: " + super.getMessage() + "]";
 	}
 }

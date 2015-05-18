@@ -78,7 +78,7 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 			jsonConnectionData = jsonData.getJSONObject(connectionName);
 
 		} catch (JSONException e) {
-			new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
+			throw new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
 		}
 
 		MapServerConnectionData connectionData = new MapServerConnectionDataImpl(connectionName);

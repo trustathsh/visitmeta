@@ -38,19 +38,13 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -61,26 +55,20 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 
 @Path("/")
 public class ConnectionResource {
 
-	private static final Logger log = Logger
-			.getLogger(ConnectionResource.class);
-
-	@QueryParam("onlyActive")
-	@DefaultValue("false")
-	private boolean mOnlyActive = false;
-
-	@QueryParam("allValues")
-	@DefaultValue("false")
-	private boolean mWithAllValues = false;
+	private static final Logger LOGGER = Logger.getLogger(ConnectionResource.class);
 
 	/**
 	 * Delete a saved connection.
@@ -105,16 +93,18 @@ public class ConnectionResource {
 	 * <br>
 	 * Example-JSONObject:<br>
 	 * {<br>
-	 * url:"https://localhost:8443",<br>
-	 * user.name:visitmeta,<br>
-	 * user.password:visitmeta,<br>
+	 * <tab> [connectionName] : {<br>
+	 * <tab>ifmapServerUrl:"https://localhost:8443",<br>
+	 * <tab>userName:visitmeta,<br>
+	 * <tab>userPassword:visitmeta,<br>
+	 * <tab>}<br>
 	 * }<br>
 	 * <br>
 	 * <b>required values:</b>
 	 * <ul>
-	 * <li>url</li>
-	 * <li>user.name</li>
-	 * <li>user.password</li>
+	 * <li>ifmapServerUrl</li>
+	 * <li>userName</li>
+	 * <li>userPassword</li>
 	 * </ul>
 	 * <br>
 	 * <b>optional values:</b><br>
@@ -131,114 +121,44 @@ public class ConnectionResource {
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response saveConnection(JSONObject jObj) {
-		log.trace("new rest PUT save Connection...");
-		String connectionName;
-		String url;
-		String userName;
-		String userPassword;
+	public Response saveConnection(JSONObject jsonConnectionData) {
+		LOGGER.trace("new rest PUT save Connection...");
 
+		MapServerConnectionData newConnectionData = null;
 		try {
-
-			// get required values
-			log.trace("get required values");
-
-			connectionName = jObj.getString(ConnectionKey.CONNECTION_NAME);
-			url = jObj.getString(ConnectionKey.IFMAP_SERVER_URL);
-			userName = jObj.getString(ConnectionKey.USER_NAME);
-			userPassword = jObj.getString(ConnectionKey.USER_PASSWORD);
-
-		} catch (JSONException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
+			newConnectionData = (MapServerConnectionData) DataManager.transformJSONObject(jsonConnectionData,
+					MapServerConnectionData.class);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
+				| JSONException e) {
+			String msg = "error while transform JSONObject";
+			LOGGER.error(msg + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
+					.build();
 		}
 
-		// get optional values
-		log.trace(connectionName + ": get optional values");
-
-		boolean authenticationBasic = jObj
-				.optBoolean(ConnectionKey.AUTHENTICATION_BASIC);
-		String truststorePath = jObj.optString(ConnectionKey.TRUSTSTORE_PATH);
-		String truststorePass = jObj
-				.optString(ConnectionKey.TRUSTSTORE_PASSWORD);
-		boolean startupConnect = jObj
-				.optBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP);
-		int maxPollResultSize = jObj.optInt(ConnectionKey.MAX_POLL_RESULT_SIZE);
-
-		// build new Connection
-		log.trace(connectionName + ": build new Connection");
-
-		MapServerConnection newConnection = null;
-		try {
-			newConnection = Application.getConnectionManager().createConnection(connectionName, url, userName,
-					userPassword);
-		} catch (ConnectionException e) {
-			String msg = "error while new Connection()";
-			log.error(msg, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.toString()).build();
-		}
-
-		// set optional values
-		log.trace(connectionName + ": set optional values");
-		Iterator<String> i = jObj.keys();
-
-		while (i.hasNext()) {
-			String jKey = i.next();
-
-			switch (jKey) {
-				case ConnectionKey.AUTHENTICATION_BASIC:
-					newConnection.setAuthenticationBasic(authenticationBasic);
-					break;
-
-				case ConnectionKey.TRUSTSTORE_PATH:
-					newConnection.setTruststorePath(truststorePath);
-					break;
-
-				case ConnectionKey.TRUSTSTORE_PASSWORD:
-					newConnection.setTruststorePassword(truststorePass);
-					break;
-
-				case ConnectionKey.USE_CONNECTION_AS_STARTUP:
-					newConnection.setStartupConnect(startupConnect);
-					break;
-
-				case ConnectionKey.MAX_POLL_RESULT_SIZE:
-					newConnection.setMaxPollResultSize(maxPollResultSize);
-					break;
-
-				case ConnectionKey.AUTHENTICATION_CERT:
-					return Response
-							.status(Response.Status.INTERNAL_SERVER_ERROR)
-							.entity(ConnectionKey.AUTHENTICATION_CERT
-									+ " is not implemented yet").build();
-			}
-		}
+		MapServerConnection newConnection = new MapServerConnectionImpl(newConnectionData);
 
 		// add to connection pool
 		try {
 			Application.getConnectionManager().addConnection(newConnection);
 		} catch (ConnectionException e) {
 			String msg = "error while adding connection to the connection pool";
-			log.error(msg, e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(msg + " | Exception: " + e.toString()).build();
+			LOGGER.error(msg + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
+					.build();
 		}
 
 		// persist connection in property
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			log.error("error while connection persist", e);
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while connection persist -> " + e.toString())
-					.build();
+			LOGGER.error("error while connection persist", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while connection persist -> " + e.toString()).build();
 		}
 
-		log.trace("... new rest PUT saveConnection " + connectionName
-				+ " success");
-		return Response.ok().entity(connectionName + " was saved").build();
+		LOGGER.trace("... new rest PUT saveConnection " + newConnection + " success");
+		return Response.ok().entity(newConnection + " was saved").build();
 	}
 
 	/**
@@ -255,11 +175,11 @@ public class ConnectionResource {
 		try {
 			Application.getConnectionManager().connect(name);
 		} catch (ConnectionEstablishedException e) {
-			log.warn(e.toString());
+			LOGGER.warn(e.toString());
 			return Response.ok().entity("INFO: connection allready aktive")
 					.build();
 		} catch (ConnectionException e) {
-			log.error("error while connecting to " + name, e);
+			LOGGER.error("error while connecting to " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(e.toString()).build();
 		}
@@ -279,11 +199,11 @@ public class ConnectionResource {
 		try {
 			Application.getConnectionManager().disconnect(name);
 		} catch (NotConnectedException e) {
-			log.error("error while disconnect from " + name, e);
+			LOGGER.error("error while disconnect from " + name, e);
 			return Response.ok()
 					.entity("INFO: connection allready disconnected").build();
 		} catch (ConnectionException e) {
-			log.error("error while disconnect from " + name, e);
+			LOGGER.error("error while disconnect from " + name, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(e.toString()).build();
 		}
@@ -301,50 +221,19 @@ public class ConnectionResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getConnections() {
-		if (mWithAllValues) {
-			JSONObject jsonO = new JSONObject();
-			for (MapServerConnection c : Application.getConnectionManager()
-					.getSavedConnections().values()) {
-				Map<String, String> connectionMap = new HashMap<String, String>();
+		JSONArray jsonConnections = new JSONArray();
+		for (MapServerConnection c : Application.getConnectionManager().getSavedConnections().values()) {
 
-				connectionMap.put(ConnectionKey.IFMAP_SERVER_URL, c.getUrl());
-				connectionMap.put(ConnectionKey.USER_NAME, c.getUserName());
-				connectionMap.put(ConnectionKey.USER_PASSWORD, c.getUserPassword());
-				connectionMap.put(ConnectionKey.AUTHENTICATION_BASIC, String.valueOf(c.isAuthenticationBasic()));
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PATH, c.getTruststorePath());
-				connectionMap.put(ConnectionKey.TRUSTSTORE_PASSWORD, c.getTruststorePassword());
-				connectionMap.put(ConnectionKey.USE_CONNECTION_AS_STARTUP, String.valueOf(c.doesConnectOnStartup()));
-				connectionMap.put(ConnectionKey.MAX_POLL_RESULT_SIZE, String.valueOf(c.getMaxPollResultSize()));
-				connectionMap.put(ConnectionKey.IS_CONNECTED, String.valueOf(c.isConnected()));
-
-				JSONObject jsonConnection = new JSONObject(connectionMap);
-
-				try {
-					jsonO.put(c.getConnectionName(), jsonConnection);
-				} catch (JSONException e) {
-					log.error("error while put to JSONObject", e);
-					return Response
-							.status(Response.Status.INTERNAL_SERVER_ERROR)
-							.entity(e.toString()).build();
-				}
+			JSONObject jsonConnectionData = null;
+			try {
+				jsonConnectionData = DataManager.transformData(c);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+				LOGGER.error(e.toString(), e);
 			}
-			return jsonO;
 
-		} else if (mOnlyActive) {
-			JSONArray jsonA = new JSONArray();
-			for (MapServerConnection c : Application.getConnectionManager().getSavedConnections().values()) {
-				if (c.isConnected()) {
-					jsonA.put(c.getConnectionName());
-				}
-			}
-			return jsonA;
+			jsonConnections.put(jsonConnectionData);
 
-		} else {
-			JSONArray jsonA = new JSONArray();
-			for (MapServerConnection c : Application.getConnectionManager().getSavedConnections().values()) {
-				jsonA.put(c.getConnectionName());
-			}
-			return jsonA;
 		}
+		return jsonConnections;
 	}
 }

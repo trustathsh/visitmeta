@@ -11,8 +11,10 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.network.ProxyGraphService;
 
@@ -29,6 +31,29 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	private boolean mGraphStarted;
 
 	private DataserviceConnection mDataserviceConnection;
+
+	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection,
+			MapServerConnectionData connectionData) {
+		super(connectionData.getConnectionName());
+
+		super.setUrl(connectionData.getUrl());
+		super.setUserName(connectionData.getUserName());
+		super.setUserPassword(connectionData.getUserPassword());
+		super.setTruststorePath(connectionData.getTruststorePath());
+		super.setTruststorePassword(connectionData.getTruststorePassword());
+		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
+		super.setConnected(connectionData.isConnected());
+		super.setStartupConnect(connectionData.doesConnectOnStartup());
+		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
+
+		for (Data subscriptonData : connectionData.getSubscriptions()) {
+			if (!(subscriptonData instanceof RestSubscrptionImpl) && subscriptonData instanceof SubscriptionData) {
+				super.addSubscription(new RestSubscrptionImpl(this, (SubscriptionData) subscriptonData));
+			}
+		}
+
+		mDataserviceConnection = dataserviceConnection;
+	}
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection, String name) {
 		super(name);

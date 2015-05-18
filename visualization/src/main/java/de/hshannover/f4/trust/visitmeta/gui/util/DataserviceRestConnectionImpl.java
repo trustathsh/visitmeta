@@ -3,18 +3,19 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-
 import de.hshannover.f4.trust.visitmeta.connections.DataserviceConnectionDataImpl;
+import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl implements DataserviceConnection {
+
+	private static final Logger LOGGER = Logger.getLogger(DataserviceRestConnectionImpl.class);
 
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
@@ -37,17 +38,8 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 		return super.getName();
 	}
 
-	public List<String> loadMapServerConnectionNames() throws ClientHandlerException, UniformInterfaceException,
-			JSONException {
-		return RestHelper.loadMapServerConnectionNames(this);
-	}
-
-	public List<String> loadActiveMapServerConnectionNames() throws ClientHandlerException, UniformInterfaceException,
-			JSONException {
-		return RestHelper.loadActiveMapServerConnectionNames(this);
-	}
-
-	public List<Data> loadMapServerConnections() {
+	public List<Data> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
+			IllegalAccessException, JSONHandlerException, JSONException {
 		if (super.isConnected()) {
 			return RestHelper.loadMapServerConnections(this);
 		}
@@ -75,7 +67,13 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 	}
 
 	public void update() {
-		List<Data> updateList = loadMapServerConnections();
+		List<Data> updateList = null;
+		try {
+			updateList = loadMapServerConnections();
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
+				| JSONException e) {
+			LOGGER.error(e.toString(), e);
+		}
 		super.setMapServerData(updateList);
 	}
 

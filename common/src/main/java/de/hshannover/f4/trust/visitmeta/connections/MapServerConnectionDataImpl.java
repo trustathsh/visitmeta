@@ -50,6 +50,9 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	@Override
 	public Data copy() {
 		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
+		data.setUrl(getUrl());
+		data.setUserName(getUserName());
+		data.setUserPassword(getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
 		data.setSubscriptionData(getSubscriptions());

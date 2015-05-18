@@ -2,7 +2,6 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -14,117 +13,58 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.data.DataManager;
+import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
-import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 public class RestHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(RestHelper.class);
 
-	public static List<String> loadMapServerConnectionNames(DataserviceConnection dataserviceConnection)
-			throws JSONException,
-			ClientHandlerException,
-			UniformInterfaceException {
-		List<String> connections = new ArrayList<String>();
-
-		JSONArray jsonResponse = null;
-		jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
-				.get(JSONArray.class);
-		for (int i = 0; i < jsonResponse.length(); i++) {
-			connections.add(jsonResponse.getString(i));
+	public static List<Data> loadMapServerConnections(DataserviceConnection dataserviceConnection)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONHandlerException,
+			JSONException {
+		List<Data> dataList = loadMapServerConnectionsData(dataserviceConnection);
+		
+		List<Data> connectionsList = new ArrayList<Data>();
+		
+		for(Data data: dataList){
+			if (data instanceof MapServerConnectionData) {
+				MapServerConnectionData connectionData = (MapServerConnectionData) data;
+				MapServerConnection connection = new MapServerRestConnectionImpl(dataserviceConnection, connectionData);
+				connectionsList.add(connection);
+			} else {
+				LOGGER.fatal("Loaded connection data ist not a MapServerConnectionData");
+			}
 		}
-		return connections;
+		
+		return connectionsList;
 	}
 
-	public static List<String> loadActiveMapServerConnectionNames(DataserviceConnection dataserviceConnection)
-			throws JSONException, ClientHandlerException,
-			UniformInterfaceException {
-		List<String> connections = new ArrayList<String>();
-
-		JSONArray jsonResponse = null;
-		jsonResponse = buildWebResource(dataserviceConnection).path("/").queryParam("onlyActive", String.valueOf(true))
-				.accept(MediaType.APPLICATION_JSON).get(JSONArray.class);
-
-		for (int i = 0; i < jsonResponse.length(); i++) {
-			connections.add(jsonResponse.getString(i));
-		}
-		return connections;
-	}
-
-	public static List<Data> loadMapServerConnections(DataserviceConnection dataserviceConnection) {
+	public static List<Data> loadMapServerConnectionsData(DataserviceConnection dataserviceConnection)
+			throws JSONException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+			JSONHandlerException {
 		List<Data> connections = new ArrayList<Data>();
 
-		JSONObject jsonResponse = null;
-
-		jsonResponse = buildWebResource(dataserviceConnection).path("/").queryParam("allValues", String.valueOf(true))
-				.accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-
-		@SuppressWarnings("unchecked")
-		Iterator<String> i = jsonResponse.keys();
-		while (i.hasNext()) {
-			String connectionName = i.next();
-			JSONObject jsonConnection;
-
-			try {
-
-				jsonConnection = jsonResponse.getJSONObject(connectionName);
-				MapServerRestConnectionImpl restConnection = new MapServerRestConnectionImpl(dataserviceConnection,
-						connectionName);
-
-				restConnection.setUrl(jsonConnection.getString(ConnectionKey.IFMAP_SERVER_URL));
-				restConnection.setUserName(jsonConnection.getString(ConnectionKey.USER_NAME));
-				restConnection.setUserPassword(jsonConnection.getString(ConnectionKey.USER_PASSWORD));
-				restConnection.setAuthenticationBasic(jsonConnection.getBoolean(ConnectionKey.AUTHENTICATION_BASIC));
-				restConnection.setTruststorePath(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PATH));
-				restConnection.setTruststorePassword(jsonConnection.getString(ConnectionKey.TRUSTSTORE_PASSWORD));
-				restConnection.setStartupConnect(jsonConnection.getBoolean(ConnectionKey.USE_CONNECTION_AS_STARTUP));
-				restConnection.setMaxPollResultSize(Integer.valueOf(jsonConnection
-						.getString(ConnectionKey.MAX_POLL_RESULT_SIZE)));
-				restConnection.setConnected(jsonConnection.getBoolean(ConnectionKey.IS_CONNECTED));
-				restConnection.setSubscriptionData(loadRestSubscriptions(dataserviceConnection, restConnection));
-
-				connections.add(restConnection);
-
-			} catch (JSONException e) {
-				LOGGER.error("error while loadRestConnections()", e);
-			}
-		}
-		return connections;
-	}
-
-	public static List<Data> loadRestSubscriptions(DataserviceConnection dataserviceConnection,
-			MapServerConnection mapServerConnection) throws ClientHandlerException, UniformInterfaceException {
-		List<Data> subscriptions = new ArrayList<Data>();
-
-		JSONArray jsonResponse = null;
-
-		jsonResponse = buildWebResource(dataserviceConnection).path(mapServerConnection.getConnectionName())
-				.path("subscribe")
-				.accept(MediaType.APPLICATION_JSON).get(JSONArray.class);
+		JSONArray jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
+				.get(JSONArray.class);
 
 		for (int i = 0; i < jsonResponse.length(); i++) {
+			JSONObject jsonConnectionData = jsonResponse.getJSONObject(i);
 
-			try {
+			Data connectionData = DataManager.transformJSONObject(jsonConnectionData, MapServerConnectionData.class);
 
-				String subscriptionName = jsonResponse.getString(i);
-				Subscription subscription = new RestSubscrptionImpl(mapServerConnection);
-				subscription.setName(subscriptionName);
-
-				subscriptions.add(subscription);
-			} catch (JSONException e) {
-				LOGGER.error("error while loadRestSubscriptions()", e);
-			}
+			connections.add(connectionData);
 		}
-		return subscriptions;
+		
+		return connections;
 	}
 
 	public static void connectMapServer(DataserviceConnection dataserviceConnection, String restConnectionName) {

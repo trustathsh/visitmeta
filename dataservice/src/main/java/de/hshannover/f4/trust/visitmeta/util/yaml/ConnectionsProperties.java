@@ -130,7 +130,13 @@ public class ConnectionsProperties extends Properties {
 		String connectionName = mapServerConnection.getConnectionName();
 
 		// try to read SubscribeList from Connection, if not exists return null
-        Map<String,String> propertySubscribeList = (Map<String, String>) super.get(connectionName).getValue(ConnectionKey.SUBSCRIPTIONS);
+		Map<String, String> propertySubscribeList;
+		try {
+			propertySubscribeList = (Map<String, String>) super.get(connectionName).getValue(
+					ConnectionKey.SUBSCRIPTIONS);
+		} catch (PropertyException e) {
+			return null;
+		}
 
 		List<Subscription> subscribtionList = new ArrayList<Subscription>();
 

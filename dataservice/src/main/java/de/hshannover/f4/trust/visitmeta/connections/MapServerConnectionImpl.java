@@ -73,13 +73,20 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 		init();
 
-		super.setTruststorePath(connectionData.getTruststorePath());
-		super.setTruststorePassword(connectionData.getTruststorePassword());
-		super.setSubscriptionData(connectionData.getSubscriptions());
-		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
-		super.setConnected(connectionData.isConnected());
+		if (connectionData.getTruststorePath() != null) {
+			super.setTruststorePath(connectionData.getTruststorePath());
+		}
+		if (connectionData.getTruststorePassword() != null) {
+			super.setTruststorePassword(connectionData.getTruststorePassword());
+		}
+		if (connectionData.getMaxPollResultSize() != 0) {
+			super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
+		}
+
 		super.setStartupConnect(connectionData.doesConnectOnStartup());
 		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
+		super.setSubscriptionData(connectionData.getSubscriptions());
+		super.setConnected(connectionData.isConnected());
 	}
 
 	private void init() {

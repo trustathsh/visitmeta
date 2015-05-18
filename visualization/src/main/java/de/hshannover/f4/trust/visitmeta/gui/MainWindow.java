@@ -74,6 +74,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
+import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
@@ -112,6 +113,8 @@ public class MainWindow extends JFrame {
 		mMotionControllerHandler = motionControllerHandler;
 
 		init();
+
+		// showDefaultGraphIfAvailable();
 	}
 
 	/**
@@ -251,6 +254,37 @@ public class MainWindow extends JFrame {
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPane);
+	}
+	
+	private MapServerRestConnectionImpl searchDefaultConnection() {
+		Dataservices dataservices = (Dataservices) mConnectionTree.getModel().getRoot();
+
+		for (Data dataservice : dataservices.getSubData()) {
+			if (dataservice.getName().equals("default")) {
+				for (Data mapServerConnection : dataservice.getSubData()) {
+					if (mapServerConnection.getName().equals("default")) {
+						if (mapServerConnection instanceof MapServerRestConnectionImpl) {
+							return (MapServerRestConnectionImpl) mapServerConnection;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public void showDefaultGraphIfAvailable() {
+		final MapServerRestConnectionImpl mapServerConnection = searchDefaultConnection();
+
+		if (mapServerConnection != null) {
+			if (!mapServerConnection.isGraphStarted()) {
+				mapServerConnection.initGraph();
+			}
+
+			addClosableTab(mapServerConnection.getConnectionTab());
+			mTabbedConnectionPane.setSelectedComponent(mapServerConnection.getConnectionTab());
+		}
 	}
 
 	/**

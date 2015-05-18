@@ -73,4 +73,6 @@ public interface Data extends SubData {
 	public String getName();
 
 	public void setName(String name);
+
+	public Class<?> getDataTypeClass();
 }

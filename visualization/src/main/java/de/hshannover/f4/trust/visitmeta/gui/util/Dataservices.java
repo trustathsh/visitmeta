@@ -25,4 +25,10 @@ public class Dataservices extends DataImpl {
 		return null;
 	}
 
+	@Override
+	public Class<?> getDataTypeClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

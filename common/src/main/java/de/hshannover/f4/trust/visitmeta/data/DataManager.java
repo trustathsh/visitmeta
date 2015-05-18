@@ -13,7 +13,7 @@ public class DataManager {
 	public static JSONObject transformData(Data data) throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, JSONException {
 
-		JSONHandler handler = JSONManager.getHandlerFor(data.getClass());
+		JSONHandler handler = JSONHandlerManager.getHandlerFor(data);
 
 		return handler.toJSONObject(data);
 	}
@@ -21,7 +21,7 @@ public class DataManager {
 	public static Data transformJSONObject(JSONObject jsonData, Class<?> dataClazz) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException, JSONHandlerException, JSONException {
 
-		JSONHandler<?> handler = JSONManager.getHandlerFor(dataClazz);
+		JSONHandler<?> handler = JSONHandlerManager.getHandlerFor(dataClazz);
 
 		return handler.toData(jsonData);
 	}

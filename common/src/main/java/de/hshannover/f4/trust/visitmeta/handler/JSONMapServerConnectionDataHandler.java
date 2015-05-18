@@ -56,7 +56,7 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 			new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
 		}
 
-		MapServerConnectionData connectionData = new MapServerConnectionDataImpl("<BLANK>Name");
+		MapServerConnectionData connectionData = new MapServerConnectionDataImpl(connectionName);
 		JSONArray jsonKeys = jsonConnectionData.names();
 		if (jsonKeys != null) {
 

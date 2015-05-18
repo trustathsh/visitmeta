@@ -176,4 +176,9 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 		this.mActive = active;
 	}
 
+	@Override
+	public Class<?> getDataTypeClass() {
+		return SubscriptionData.class;
+	}
+
 }

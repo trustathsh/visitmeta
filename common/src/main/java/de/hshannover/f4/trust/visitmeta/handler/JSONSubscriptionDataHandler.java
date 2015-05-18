@@ -57,6 +57,8 @@ public class JSONSubscriptionDataHandler implements SubscriptionDataHandler<Subs
 		}
 
 		SubscriptionData subscriptionData = new SubscriptionDataImpl();
+		subscriptionData.setName(subscriptionName);
+
 		JSONArray jsonKeys = jsonSubscriptionData.names();
 		if (jsonKeys != null) {
 

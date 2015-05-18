@@ -96,4 +96,9 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 		return mConnected;
 	}
 
+	@Override
+	public Class<?> getDataTypeClass() {
+		return DataserviceConnectionData.class;
+	}
+
 }

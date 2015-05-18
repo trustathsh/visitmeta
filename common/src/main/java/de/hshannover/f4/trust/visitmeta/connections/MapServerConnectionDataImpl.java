@@ -207,4 +207,9 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		return new ArrayList<Data>(mSubscriptionDataList);
 	}
 
+	@Override
+	public Class<?> getDataTypeClass() {
+		return MapServerConnectionData.class;
+	}
+
 }

@@ -4,26 +4,34 @@ import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.AUTHENTICATION_B
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.IFMAP_SERVER_URL;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.IS_CONNECTED;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.MAX_POLL_RESULT_SIZE;
+import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.SUBSCRIPTIONS;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.TRUSTSTORE_PASSWORD;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.TRUSTSTORE_PATH;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.USER_NAME;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.USER_PASSWORD;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.USE_AS_STARTUP;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
+import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.handler.MapServerConnectionDataHandler;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
 public class JSONMapServerConnectionDataHandler implements MapServerConnectionDataHandler<MapServerConnectionData> {
 
 	@Override
-	public JSONObject toJSONObject(MapServerConnectionData data) throws JSONException {
+	public JSONObject toJSONObject(MapServerConnectionData data) throws JSONException, ClassNotFoundException,
+			InstantiationException, IllegalAccessException {
 		JSONObject jsonConnectionData = new JSONObject();
 		JSONObject jsonData = new JSONObject();
 
@@ -36,14 +44,31 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 		jsonConnectionData.putOpt(USE_AS_STARTUP.toString(), data.doesConnectOnStartup());
 		jsonConnectionData.putOpt(MAX_POLL_RESULT_SIZE.toString(), data.getMaxPollResultSize());
 		jsonConnectionData.putOpt(IS_CONNECTED.toString(), data.isConnected());
+		jsonConnectionData.putOpt(SUBSCRIPTIONS.toString(), buildSubscriptionsJSONArray(data));
 
 		jsonData.putOpt(data.getConnectionName(), jsonConnectionData);
 
 		return jsonData;
 	}
 
+	private JSONArray buildSubscriptionsJSONArray(MapServerConnectionData data) throws ClassNotFoundException,
+			InstantiationException, IllegalAccessException, JSONException {
+		JSONArray jsonSubscriptions = new JSONArray();
+
+		for (Data subscrptionData : data.getSubscriptions()) {
+			if (subscrptionData instanceof SubscriptionData) {
+
+				JSONObject jsonSubscriptionData = DataManager.transformData(subscrptionData);
+				jsonSubscriptions.put(jsonSubscriptionData);
+			}
+		}
+
+		return jsonSubscriptions;
+	}
+
 	@Override
-	public MapServerConnectionData toData(JSONObject jsonData) throws JSONHandlerException, JSONException {
+	public MapServerConnectionData toData(JSONObject jsonData) throws JSONHandlerException, JSONException,
+			ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		String connectionName = null;
 		JSONObject jsonConnectionData = null;
@@ -93,6 +118,10 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 						case IS_CONNECTED:
 							connectionData.setConnected(jsonConnectionData.getBoolean(jsonKey));
 							break;
+						case SUBSCRIPTIONS:
+							connectionData.setSubscriptionData(buildSubscriptionsDataList(jsonConnectionData
+									.getJSONArray(jsonKey)));
+							break;
 						default:
 							throw new JSONHandlerException(String.format(
 									JSONHandlerException.ERROR_MSG_JSON_KEY_IS_NOT_VALID_FOR_THIS_DATA, jsonKey,
@@ -107,6 +136,22 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 		}
 
 		return connectionData;
+	}
+
+	private List<Data> buildSubscriptionsDataList(JSONArray subscrptionsArray) throws ClassNotFoundException,
+			InstantiationException, IllegalAccessException, JSONException, JSONHandlerException {
+
+		List<Data> subscriptionsList = new ArrayList<Data>();
+
+		for (int i = 0; i < subscrptionsArray.length(); i++) {
+			JSONObject jsonSubscriptionData = subscrptionsArray.getJSONObject(i);
+
+			SubscriptionData subscriptionData = (SubscriptionData) DataManager.transformJSONObject(
+					jsonSubscriptionData, SubscriptionData.class);
+			subscriptionsList.add(subscriptionData);
+		}
+
+		return subscriptionsList;
 	}
 
 	@Override

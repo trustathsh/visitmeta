@@ -8,7 +8,9 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public interface JSONHandler<T extends Data> extends Handler<T> {
 
-	public JSONObject toJSONObject(T data) throws JSONException;
+	public JSONObject toJSONObject(T data) throws JSONException, ClassNotFoundException, InstantiationException,
+			IllegalAccessException;
 
-	public T toData(JSONObject jsonData) throws JSONException, JSONHandlerException;
+	public T toData(JSONObject jsonData) throws JSONException, JSONHandlerException, ClassNotFoundException,
+			InstantiationException, IllegalAccessException;
 }

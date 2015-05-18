@@ -19,7 +19,7 @@ public class ConnectionTreeMainWindowListener implements MouseListener {
 
 		} else if (event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() > 1) {
 
-			mMainWindow.showConnectionTab();
+			mMainWindow.mouseDoubleClicked();
 
 		}
 	}

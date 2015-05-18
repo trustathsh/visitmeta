@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.WebResource;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -87,14 +88,33 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	@Override
 	public void connect() {
-		RestHelper.connectMapServer(mDataserviceConnection, super.getConnectionName());
-		super.setConnected(true);
+		try {
+
+			RestHelper.connectMapServer(mDataserviceConnection, super.getConnectionName());
+			super.setConnected(true);
+
+		} catch (RESTException e) {
+			LOGGER.error(e.toString());
+	}
 	}
 
 	@Override
 	public void disconnect() {
-		RestHelper.disconnectMapServer(mDataserviceConnection, super.getConnectionName());
-		super.setConnected(false);
+		try {
+
+			RestHelper.disconnectMapServer(mDataserviceConnection, super.getConnectionName());
+			super.setConnected(false);
+
+			for (Data subscriptionData : super.getSubscriptions()) {
+				if (subscriptionData instanceof Subscription) {
+					Subscription subscription = (Subscription) subscriptionData;
+					subscription.setActive(false);
+				}
+			}
+
+		} catch (RESTException e) {
+			LOGGER.error(e.toString());
+		}
 	}
 
 	@Override

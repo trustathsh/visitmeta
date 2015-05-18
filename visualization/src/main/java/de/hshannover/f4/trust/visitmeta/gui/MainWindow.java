@@ -76,6 +76,7 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscrptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -353,7 +354,7 @@ public class MainWindow extends JFrame {
 		popUp.show(mConnectionTree, x, y);
 	}
 
-	public void showConnectionTab() {
+	public void mouseDoubleClicked() {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 		if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
@@ -374,6 +375,14 @@ public class MainWindow extends JFrame {
 				addClosableTab(mapServerConnection.getConnectionTab());
 			} else {
 				mTabbedConnectionPane.setSelectedComponent(tmpComponent);
+			}
+		} else if (selectedComponent instanceof RestSubscrptionImpl) {
+			RestSubscrptionImpl subscription = (RestSubscrptionImpl) selectedComponent;
+
+			if (subscription.isActive()) {
+				subscription.stopSubscription();
+			} else {
+				subscription.startSubscription();
 			}
 		}
 	}

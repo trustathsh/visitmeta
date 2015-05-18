@@ -13,12 +13,14 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
+import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
@@ -67,18 +69,63 @@ public class RestHelper {
 		return connections;
 	}
 
-	public static void connectMapServer(DataserviceConnection dataserviceConnection, String restConnectionName) {
-		LOGGER.trace("send connect request...");
-		String response = buildWebResource(dataserviceConnection).path(restConnectionName).path("connect")
-				.put(String.class);
-		LOGGER.info("connect response: " + response);
+	public static void startSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,
+			String subscriptionName) throws RESTException {
+		LOGGER.trace("send subscribe update request...");
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).path("subscribe")
+				.path("start").path(subscriptionName).put(ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("subscribe update response: Status Code(" + response.getClientResponseStatus() + ")");
 	}
 
-	public static void disconnectMapServer(DataserviceConnection dataserviceConnection, String restConnectionName) {
+	public static void stopSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,
+			String subscriptionName) throws RESTException {
+		LOGGER.trace("send subscribe delete request...");
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).path("subscribe")
+				.path("stop").path(subscriptionName).put(ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("subscribe delete response: Status Code(" + response.getClientResponseStatus() + ") Entity("
+				+ response.getEntity(String.class) + ")");
+	}
+
+	public static void connectMapServer(DataserviceConnection dataserviceConnection, String restConnectionName)
+			throws RESTException {
+		LOGGER.trace("send connect request...");
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).path("connect")
+				.put(ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("connect response: Status Code(" + response.getClientResponseStatus() + ") Entity("
+				+ response.getEntity(String.class) + ")");
+	}
+
+	public static void disconnectMapServer(DataserviceConnection dataserviceConnection, String restConnectionName)
+			throws RESTException {
 		LOGGER.trace("send disconnect request...");
-		String response = buildWebResource(dataserviceConnection).path(restConnectionName).path("disconnect")
-				.put(String.class);
-		LOGGER.info("disconnect response: " + response);
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).path("disconnect")
+				.put(ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("disconnect response: Status Code(" + response.getClientResponseStatus() + ") Entity("
+				+ response.getEntity(String.class) + ")");
 	}
 
 	public static WebResource getGraphResource(DataserviceConnection dataserviceConnection, String restConnectionName) {

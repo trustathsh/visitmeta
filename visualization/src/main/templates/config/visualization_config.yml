@@ -33,13 +33,17 @@ visualization:
       # SINGLE_LINE: a minimized style with all information in a single line
       # MULTI_LINE:  a more detailed style with possibly more information,
       #              using multiple lines
-      style: SINGLE_LINE
+      # COMPACT:     a style that tries to use a single line, but will use
+      #              additional lines when necessary and useful (for example
+      #              for Extended Identifiers)
+      style: COMPACT
   metadata:
     text:
       # Sets the text style for metadata nodes; possible values are:
       # SINGLE_LINE:    just the typename of the metadata is used
       # WITH_TIMESTAMP: adds a line with the publisher timestamp to the typename
-      style: SINGLE_LINE
+      # COMPACT:        further information on additional lines
+      style: COMPACT
   history:
     navigation:
       # Sets the control mechanism for history navigation; possible values are:

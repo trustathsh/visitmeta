@@ -16,8 +16,8 @@ public class SubscriptionParameterPanel extends JPanel {
 	private JLabel mJlName;
 	private JLabel mJlStartIdentifier;
 	private JLabel mJlStartIdentifierType;
-	private JLabel mJlFilterLinks;
-	private JLabel mJlFilterResult;
+	private JLabel mJlMatchFilterLinks;
+	private JLabel mJlResultFilter;
 	private JLabel mJlTerminalIdentifierTypes;
 	private JLabel mJlStartupSubscribe;
 	private JLabel mJlMaxDepth;
@@ -50,11 +50,11 @@ public class SubscriptionParameterPanel extends JPanel {
 		mJlName = new JLabel("Name");
 		mJlStartIdentifier = new JLabel("Start Identifier");
 		mJlStartIdentifierType = new JLabel("Start Identifier Type");
-		mJlFilterLinks = new JLabel("Filter Links");
-		mJlFilterResult = new JLabel("Filter Result");
+		mJlMatchFilterLinks = new JLabel("Match Links Filter");
+		mJlResultFilter = new JLabel("Result Filter");
 		mJlTerminalIdentifierTypes = new JLabel("Terminal Identifier Types");
 		mJlMaxDepth = new JLabel("Max Depth");
-		mJlMaxSize = new JLabel("max Size");
+		mJlMaxSize = new JLabel("Max Size");
 		mJlStartupSubscribe = new JLabel("Subscribe at start-up");
 
 		mJtfName = new JTextField();
@@ -73,8 +73,8 @@ public class SubscriptionParameterPanel extends JPanel {
 		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlStartIdentifier, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlStartIdentifierType, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlFilterLinks, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlFilterResult, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlMatchFilterLinks, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlResultFilter, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlTerminalIdentifierTypes, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlMaxDepth, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlMaxSize, LayoutHelper.mLblInsets);

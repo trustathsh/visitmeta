@@ -1,10 +1,17 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_ACTIVE_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_INACTIVE_ICON;
+
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
@@ -12,6 +19,7 @@ import javax.swing.KeyStroke;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -36,17 +44,9 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private JCheckBoxMenuItem mOnlyActive;
 
-	private ImageIcon mDataserviceConnectedIcon;
+	private JCheckBoxMenuItem mOpen;
 
-	private ImageIcon mDataserviceDisconnectedIcon;
-
-	private ImageIcon mMapServerConnectedIcon;
-
-	private ImageIcon mMapServerDisconnectedIcon;
-
-	private ImageIcon mSubscriptionActiveIcon;
-
-	private ImageIcon mSubscriptionInactiveIcon;
+	private MainWindow mMainWindow;
 
 	private RESTConnectionTree mConnectionTree;
 
@@ -55,24 +55,6 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData) {
 		mSelectedData = selectedData;
 		mConnectionTree = connectionTree;
-
-		mDataserviceConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("DataserviceConnectedIcon.png").getPath());
-
-		mDataserviceDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("DataserviceDisconnectedIcon.png").getPath());
-
-		mMapServerConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("MapServerConnectedIcon.png").getPath());
-
-		mMapServerDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("MapServerDisconnectedIcon.png").getPath());
-
-		mSubscriptionActiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("SubscriptionActiveIcon.png").getPath());
-
-		mSubscriptionInactiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-				.getResource("SubscriptionInactiveIcon.png").getPath());
 
 		if (mSelectedData instanceof DataserviceConnection) {
 			initConnectButton();
@@ -89,8 +71,50 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	}
 
+	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, MainWindow mainWindow, Data selectedComponent) {
+		this(connectionTree, selectedComponent);
+		mMainWindow = mainWindow;
+
+		if (mSelectedData instanceof DataserviceConnection) {
+
+		} else if (mSelectedData instanceof MapServerConnection) {
+			initOpenButton();
+		} else if (mSelectedData instanceof Subscription) {
+
+		}
+	}
+
+	private void initOpenButton() {
+		mOpen = new JCheckBoxMenuItem("Open");
+
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			boolean alreadyOpen = false;
+			for (Component t : mMainWindow.getTabbedConnectionPane().getComponents()) {
+				if (t.equals(mapServerConnection.getConnectionTab())) {
+					alreadyOpen = true;
+				}
+			}
+
+			mOpen.setSelected(alreadyOpen);
+		}
+
+		mOpen.setAccelerator(KeyStroke.getKeyStroke('X', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mOpen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mMainWindow.openMapServerConnectionTab();
+
+			}
+		});
+
+		super.add(mOpen, 0);
+	}
+
 	private void initOnlyActiveButton() {
-		mOnlyActive = new JCheckBoxMenuItem("only active");
+		mOnlyActive = new JCheckBoxMenuItem("show only active");
 		if (mSelectedData instanceof MapServerConnection) {
 			mOnlyActive.setSelected(mConnectionTree.isShowAllMapServerConnections());
 		} else if (mSelectedData instanceof Subscription) {
@@ -113,9 +137,9 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private void initConnectButton() {
 		if (mSelectedData instanceof DataserviceConnection) {
-			mConnect = new JCheckBoxMenuItem("Connect", mDataserviceConnectedIcon);
+			mConnect = new JCheckBoxMenuItem("Connect", DATASERVICE_CONNECTED_ICON);
 		} else if (mSelectedData instanceof MapServerConnection) {
-			mConnect = new JCheckBoxMenuItem("Connect", mMapServerConnectedIcon);
+			mConnect = new JCheckBoxMenuItem("Connect", MAPSERVER_CONNECTED_ICON);
 		}
 		mConnect.setSelected(((Connection) mSelectedData).isConnected());
 		mConnect.setAccelerator(KeyStroke.getKeyStroke('C', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -137,9 +161,9 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private void initDisconnectButton() {
 		if (mSelectedData instanceof DataserviceConnection) {
-			mDisconnect = new JCheckBoxMenuItem("Disconnect", mDataserviceDisconnectedIcon);
+			mDisconnect = new JCheckBoxMenuItem("Disconnect", DATASERVICE_DISCONNECTED_ICON);
 		} else if (mSelectedData instanceof MapServerConnection) {
-			mDisconnect = new JCheckBoxMenuItem("Disconnect", mMapServerDisconnectedIcon);
+			mDisconnect = new JCheckBoxMenuItem("Disconnect", MAPSERVER_DISCONNECTED_ICON);
 		}
 		mDisconnect.setSelected(!((Connection) mSelectedData).isConnected());
 		mDisconnect.setAccelerator(KeyStroke.getKeyStroke('D', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -160,7 +184,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initActiveButton() {
-		mActivate = new JCheckBoxMenuItem("Activate", mSubscriptionActiveIcon);
+		mActivate = new JCheckBoxMenuItem("Activate", SUBSCRIPTION_ACTIVE_ICON);
 		mActivate.setSelected(((Subscription) mSelectedData).isActive());
 		mActivate.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mActivate.addActionListener(new ActionListener() {
@@ -180,7 +204,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initInactiveButton() {
-		mDeactivate = new JCheckBoxMenuItem("Deactivate", mSubscriptionInactiveIcon);
+		mDeactivate = new JCheckBoxMenuItem("Deactivate", SUBSCRIPTION_INACTIVE_ICON);
 		mDeactivate.setSelected(!((Subscription) mSelectedData).isActive());
 		mDeactivate.setAccelerator(KeyStroke.getKeyStroke('D', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mDeactivate.addActionListener(new ActionListener() {

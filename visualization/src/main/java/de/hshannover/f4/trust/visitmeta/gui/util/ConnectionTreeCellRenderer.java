@@ -38,6 +38,14 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICES_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_ACTIVE_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_INACTIVE_ICON;
+
 import java.awt.Component;
 
 import javax.swing.ImageIcon;
@@ -53,56 +61,8 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	
 	private static final long serialVersionUID = 7918592799908870099L;
 
-	private ImageIcon mMapServerConnectedIcon;
-	
-	private ImageIcon mMapServerDisconnectedIcon;
-	
-	private ImageIcon mRrootIcon;
-	
-	private ImageIcon mDataserviceConnectedIcon;
-	
-	private ImageIcon mDataserviceDisconnectedIcon;
-	
-	private ImageIcon mSubscriptionActiveIcon;
-	
-	private ImageIcon mSubscriptionInactiveIcon;
-
 	public ConnectionTreeCellRenderer() {
 		super();
-		if (mRrootIcon == null) {
-			mRrootIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("ConnectionTreeRoot.png").getPath());
-		}
-
-		if (mDataserviceConnectedIcon == null) {
-			mDataserviceConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("DataserviceConnectedIcon.png").getPath());
-		}
-
-		if (mDataserviceDisconnectedIcon == null) {
-			mDataserviceDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("DataserviceDisconnectedIcon.png").getPath());
-		}
-
-		if (mMapServerConnectedIcon == null) {
-			mMapServerConnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("MapServerConnectedIcon.png").getPath());
-		}
-		
-		if (mMapServerDisconnectedIcon == null) {
-			mMapServerDisconnectedIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("MapServerDisconnectedIcon.png").getPath());
-		}
-
-		if (mSubscriptionActiveIcon == null) {
-			mSubscriptionActiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("SubscriptionActiveIcon.png").getPath());
-		}
-		
-		if (mSubscriptionInactiveIcon == null) {
-			mSubscriptionInactiveIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("SubscriptionInactiveIcon.png").getPath());
-		}
 	}
 
 	@Override
@@ -119,20 +79,20 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	private ImageIcon getStatusIcon(Data data) {
 		if (data instanceof DataserviceConnection) {
 			if (((DataserviceConnection) data).isConnected()) {
-				return mDataserviceConnectedIcon;
+				return DATASERVICE_CONNECTED_ICON;
 			}
-			return mDataserviceDisconnectedIcon;
+			return DATASERVICE_DISCONNECTED_ICON;
 		} else if (data instanceof MapServerConnection) {
 			if (((MapServerConnection) data).isConnected()) {
-				return mMapServerConnectedIcon;
+				return MAPSERVER_CONNECTED_ICON;
 			}
-			return mMapServerDisconnectedIcon;
+			return MAPSERVER_DISCONNECTED_ICON;
 		} else if (data instanceof Subscription) {
 			if (((Subscription) data).isActive()) {
-				return mSubscriptionActiveIcon;
+				return SUBSCRIPTION_ACTIVE_ICON;
 			}
-			return mSubscriptionInactiveIcon;
+			return SUBSCRIPTION_INACTIVE_ICON;
 		}
-		return mRrootIcon;
+		return DATASERVICES_ICON;
 	}
 }

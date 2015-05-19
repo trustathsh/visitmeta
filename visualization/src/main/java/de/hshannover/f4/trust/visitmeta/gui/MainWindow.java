@@ -420,6 +420,10 @@ public class MainWindow extends JFrame {
 		return mConnectionTree;
 	}
 
+	public JTabbedPane getTabbedConnectionPane() {
+		return mTabbedConnectionPane;
+	}
+
 	public void showAllMapServerConnections(boolean b) {
 		mConnectionTree.showAllMapServerConnections(b);
 	}
@@ -433,11 +437,11 @@ public class MainWindow extends JFrame {
 		mConnectionTree.setSelectionPath(mouseTreePath);
 		Object selectedComponent = mouseTreePath.getLastPathComponent();
 
-		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, (Data) selectedComponent);
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, this, (Data) selectedComponent);
 		popUp.show(mConnectionTree, x, y);
 	}
 
-	public void mouseDoubleClicked() {
+	public void openMapServerConnectionTab() {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 		if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
@@ -457,9 +461,15 @@ public class MainWindow extends JFrame {
 			if (!alreadyOpen) {
 				addClosableTab(mapServerConnection.getConnectionTab());
 			} else {
-				mTabbedConnectionPane.setSelectedComponent(tmpComponent);
+				mTabbedConnectionPane.remove(tmpComponent);
+				mMotionControllerHandler.removeConnectionTab((ConnectionTab) tmpComponent);
 			}
-		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+		}
+	}
+
+	public void mouseDoubleClicked() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof RestSubscriptionImpl) {
 			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
 
 			if (subscription.isActive()) {

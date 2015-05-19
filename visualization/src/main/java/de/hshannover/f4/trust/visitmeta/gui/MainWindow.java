@@ -41,6 +41,7 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -66,12 +68,17 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DataServiceParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.MapServerParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.SubscriptionParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
@@ -79,6 +86,9 @@ import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
@@ -113,8 +123,6 @@ public class MainWindow extends JFrame {
 		mMotionControllerHandler = motionControllerHandler;
 
 		init();
-
-		// showDefaultGraphIfAvailable();
 	}
 
 	/**
@@ -172,8 +180,38 @@ public class MainWindow extends JFrame {
 		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();
-		mLeftMainPanel.setLayout(new GridLayout());
-		mLeftMainPanel.add(mConnectionScrollPane);
+		mLeftMainPanel.setLayout(new GridBagLayout());
+		// mLeftMainPanel.add(mConnectionScrollPane);
+
+		// x y w h wx wy
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.mLblInsets);
+	}
+
+	public void changeParameterPanel() {
+		if (mLeftMainPanel.getComponents().length > 1) {
+			mLeftMainPanel.remove(mLeftMainPanel.getComponents().length - 1);
+		}
+
+		JPanel mJpParameter = new JPanel();
+		mJpParameter.setLayout(new GridBagLayout());
+		mJpParameter.setBorder(BorderFactory.createTitledBorder("Parameter"));
+
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		JPanel parameter = new JPanel();
+
+		if (selectedComponent instanceof DataserviceConnection) {
+			parameter = new DataServiceParameterPanel();
+
+		} else if (selectedComponent instanceof MapServerConnection) {
+			parameter = new MapServerParameterPanel();
+
+		} else if (selectedComponent instanceof Subscription) {
+			parameter = new SubscriptionParameterPanel();
+
+		}
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, parameter, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
+		mLeftMainPanel.updateUI();
 	}
 
 	/**
@@ -381,8 +419,18 @@ public class MainWindow extends JFrame {
 		return mConnectionTree;
 	}
 
+	public void showAllMapServerConnections(boolean b) {
+		mConnectionTree.showAllMapServerConnections(b);
+	}
+
+	public void showAllSubscriptions(boolean b) {
+		mConnectionTree.showAllSubscriptions(b);
+	}
+
 	public void showConnectionTreePopupMenu(int x, int y) {
-		Object selectedComponent = mConnectionTree.getClosestPathForLocation(x, y).getLastPathComponent();
+		TreePath mouseTreePath = mConnectionTree.getClosestPathForLocation(x, y);
+		mConnectionTree.setSelectionPath(mouseTreePath);
+		Object selectedComponent = mouseTreePath.getLastPathComponent();
 
 		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, (Data) selectedComponent);
 		popUp.show(mConnectionTree, x, y);
@@ -418,6 +466,8 @@ public class MainWindow extends JFrame {
 			} else {
 				subscription.startSubscription();
 			}
+
+			mConnectionTree.updateUI();
 		}
 	}
 }

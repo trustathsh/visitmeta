@@ -17,6 +17,10 @@ public class ConnectionTreeMainWindowListener implements MouseListener {
 
 			mMainWindow.showConnectionTreePopupMenu(event.getX(), event.getY());
 
+		} else if (event.getButton() == MouseEvent.BUTTON1) {
+
+			mMainWindow.changeParameterPanel();
+
 		} else if (event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() > 1) {
 
 			mMainWindow.mouseDoubleClicked();

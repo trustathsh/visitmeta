@@ -35,6 +35,14 @@ public class RESTConnectionTree extends JTree {
 	public void showAllSubscriptions(boolean b) {
 		((RESTConnectionModel) super.getModel()).showAllSubscriptions(b);
 	}
+	
+	public boolean isShowAllMapServerConnections() {
+		return ((RESTConnectionModel) super.getModel()).isOnlyActiveMapServerConnections();
+	}
+
+	public boolean isShowAllSubscriptions() {
+		return ((RESTConnectionModel) super.getModel()).isOnlyActiveSubscriptions();
+	}
 
 	public void expandAllNodes() {
 		int j = super.getRowCount();

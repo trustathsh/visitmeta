@@ -18,9 +18,11 @@ public class RESTConnectionModel implements TreeModel {
 
 	private Set<TreeModelListener> mTreeModelListeners;
 
-	// private List<DataserviceConnection> mGraphNodes;
-
 	private Dataservices mRootNode;
+
+	private boolean mOnlyActiveMapServerConnections;
+
+	private boolean mOnlyActiveSubscriptions;
 
 	private RESTConnectionModel() {
 		mTreeModelListeners = new HashSet<TreeModelListener>();
@@ -28,7 +30,6 @@ public class RESTConnectionModel implements TreeModel {
 
 	public RESTConnectionModel(List<Data> graphNodes) {
 		this();
-		// mGraphNodes = graphNodes;
 		mRootNode = new Dataservices();
 		mRootNode.mList = graphNodes;
 	}
@@ -39,13 +40,19 @@ public class RESTConnectionModel implements TreeModel {
 	}
 
 	public void showAllMapServerConnections(boolean b) {
-		// TODO Auto-generated method stub
-
+		mOnlyActiveMapServerConnections = b;
 	}
 
 	public void showAllSubscriptions(boolean b) {
-		// TODO Auto-generated method stub
+		mOnlyActiveSubscriptions = b;
+	}
 
+	public boolean isOnlyActiveMapServerConnections() {
+		return mOnlyActiveMapServerConnections;
+	}
+
+	public boolean isOnlyActiveSubscriptions() {
+		return mOnlyActiveSubscriptions;
 	}
 
 	@Override
@@ -56,7 +63,17 @@ public class RESTConnectionModel implements TreeModel {
 	@Override
 	public Object getChild(Object parent, int index) {
 		Data element = (Data) parent;
-		return element.getSubDataAt(index);
+		Data child = element.getSubDataAt(index);
+		// if (child instanceof MapServerConnection) {
+		// if (isOnlyActiveMapServerConnections() && !((MapServerConnection) child).isConnected()) {
+		// return null;
+		// }
+		// } else if (child instanceof Subscription) {
+		// if (isOnlyActiveSubscriptions() && !((Subscription) child).isActive()) {
+		// return null;
+		// }
+		// }
+		return child;
 	}
 
 	@Override

@@ -401,7 +401,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void addIdentifier(NodeIdentifier pNode) {
+	public synchronized void addIdentifier(NodeIdentifier pNode) {
 		LOGGER.trace("Method addIdentifier(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
 			PText vText = new PText(
@@ -448,7 +448,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		}
 	}
 
-	private void addMetadata(NodeMetadata pNode) {
+	private synchronized void addMetadata(NodeMetadata pNode) {
 		LOGGER.trace("Method addMetadata(" + pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
 			final String vPublisher = findPublisherId(pNode.getMetadata());
@@ -536,7 +536,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	 *            the node where the edge ends.
 	 */
 	@SuppressWarnings("unchecked")
-	private void addEdge(NodeMetadata pKey, Position pNodeFirst,
+	private synchronized void addEdge(NodeMetadata pKey, Position pNodeFirst,
 			Position pNodeSecond) {
 		LOGGER.trace("Method addEdge(" + pKey + ", " + pNodeFirst + ", "
 				+ pNodeSecond + ") called.");
@@ -595,7 +595,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	 *            the node in the graph.
 	 */
 	@SuppressWarnings("unchecked")
-	private void updatePosition(final Position pNode) {
+	private synchronized void updatePosition(final Position pNode) {
 		LOGGER.trace("Method updatePosition(" + pNode + ") called.");
 		if (!pNode.isInUse()) {
 			final double vX = mAreaOffsetX + pNode.getX() * mAreaWidth;
@@ -698,7 +698,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void deleteNode(Position pPosition) {
+	public synchronized void deleteNode(Position pPosition) {
 		LOGGER.trace("Method deleteNode(" + pPosition + ") called.");
 		PComposite vNode = mMapNode.get(pPosition);
 		if (vNode != null) {
@@ -724,7 +724,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void markAsNew(final Position pPosition) {
+	public synchronized void markAsNew(final Position pPosition) {
 		LOGGER.trace("Method markAsNew(" + pPosition + ") called.");
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -741,7 +741,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void markAsDelete(final Position pPosition) {
+	public synchronized void markAsDelete(final Position pPosition) {
 		LOGGER.trace("Method markAsDelete(" + pPosition + ") called.");
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -758,7 +758,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void clearHighlight(final Position pPosition) {
+	public synchronized void clearHighlight(final Position pPosition) {
 		LOGGER.trace("Method clearHighlight(" + pPosition + ") called.");
 		/* Reset the Stroke of the node */
 		final PComposite vNode = mMapNode.get(pPosition);
@@ -823,7 +823,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void clearGraph() {
+	public synchronized void clearGraph() {
 		mLayerEdge.removeAllChildren();
 		mLayerNode.removeAllChildren();
 		mLayerGlow.removeAllChildren();
@@ -835,7 +835,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	 * Adjust the size of the panel depending on the number and size of labels.
 	 */
 	@Override
-	public void adjustPanelSize() {
+	public synchronized void adjustPanelSize() {
 		LOGGER.trace("Method adjustPanelSize() called.");
 		int vNumberOfNodes = mMapNode.size();
 		int vNumberOfChars = 0;
@@ -854,7 +854,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	/**
 	 * Move the camera to the center of the graph.
 	 */
-	public void setFocusToCenter() {
+	public synchronized void setFocusToCenter() {
 		LOGGER.trace("Method setFocusToCenter() called.");
 		double xMin = Double.POSITIVE_INFINITY;
 		double xMax = Double.NEGATIVE_INFINITY;
@@ -888,7 +888,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void repaintNodes(NodeType pType) {
+	public synchronized void repaintNodes(NodeType pType) {
 		LOGGER.trace("Method repaintNodes(" + pType + ") called.");
 		for (Object key : mMapNode.keySet()) {
 			PComposite vCom = mMapNode.get(key);

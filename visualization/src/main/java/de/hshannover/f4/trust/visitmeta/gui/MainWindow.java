@@ -87,8 +87,11 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
@@ -200,13 +203,13 @@ public class MainWindow extends JFrame {
 		JPanel parameter = new JPanel();
 
 		if (selectedComponent instanceof DataserviceConnection) {
-			parameter = new DataServiceParameterPanel();
+			parameter = new DataServiceParameterPanel((DataserviceConnectionData) selectedComponent);
 
 		} else if (selectedComponent instanceof MapServerConnection) {
-			parameter = new MapServerParameterPanel();
+			parameter = new MapServerParameterPanel((MapServerConnectionData) selectedComponent);
 
 		} else if (selectedComponent instanceof Subscription) {
-			parameter = new SubscriptionParameterPanel();
+			parameter = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
 
 		}
 		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, parameter, LayoutHelper.mLblInsets);
@@ -281,9 +284,7 @@ public class MainWindow extends JFrame {
 				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane
 						.getSelectedComponent();
 				if (currentTab != null) {
-					mMotionControllerHandler
-							.setCurrentConnectionTab(currentTab);
-					;
+					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
 					LOGGER.debug("Tab changed to " + currentTab.getConnName());
 				}
 			}
@@ -293,7 +294,7 @@ public class MainWindow extends JFrame {
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPane);
 	}
-	
+
 	private MapServerRestConnectionImpl searchDefaultConnection() {
 		Dataservices dataservices = (Dataservices) mConnectionTree.getModel().getRoot();
 

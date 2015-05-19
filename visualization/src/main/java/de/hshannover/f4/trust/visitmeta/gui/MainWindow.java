@@ -295,35 +295,27 @@ public class MainWindow extends JFrame {
 		mRightMainPanel.add(mTabbedConnectionPane);
 	}
 
-	private MapServerRestConnectionImpl searchDefaultConnection() {
+	public void openConnectedMapServerConnections() {
 		Dataservices dataservices = (Dataservices) mConnectionTree.getModel().getRoot();
 
 		for (Data dataservice : dataservices.getSubData()) {
-			if (dataservice.getName().equals("default")) {
-				for (Data mapServerConnection : dataservice.getSubData()) {
-					if (mapServerConnection.getName().equals("default")) {
-						if (mapServerConnection instanceof MapServerRestConnectionImpl) {
-							return (MapServerRestConnectionImpl) mapServerConnection;
-						}
+			for (Data mapServerConnection : dataservice.getSubData()) {
+				if (mapServerConnection instanceof MapServerRestConnectionImpl) {
+					if (((MapServerRestConnectionImpl) mapServerConnection).isConnected()) {
+						showConnectedGraph((MapServerRestConnectionImpl) mapServerConnection);
 					}
 				}
 			}
 		}
-
-		return null;
 	}
 
-	public void showDefaultGraphIfAvailable() {
-		final MapServerRestConnectionImpl mapServerConnection = searchDefaultConnection();
-
-		if (mapServerConnection != null) {
-			if (!mapServerConnection.isGraphStarted()) {
-				mapServerConnection.initGraph();
-			}
-
-			addClosableTab(mapServerConnection.getConnectionTab());
-			mTabbedConnectionPane.setSelectedComponent(mapServerConnection.getConnectionTab());
+	private void showConnectedGraph(MapServerRestConnectionImpl mapServerConnection) {
+		if (!mapServerConnection.isGraphStarted()) {
+			mapServerConnection.initGraph();
 		}
+
+		addClosableTab(mapServerConnection.getConnectionTab());
+		mTabbedConnectionPane.setSelectedComponent(mapServerConnection.getConnectionTab());
 	}
 
 	/**

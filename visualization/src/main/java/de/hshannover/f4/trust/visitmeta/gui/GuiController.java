@@ -101,7 +101,7 @@ public class GuiController {
 		LOGGER.trace("Method show() called.");
 		mMainWindow.pack();
 		mMainWindow.setVisible(true);
-		mMainWindow.showDefaultGraphIfAvailable();
+		mMainWindow.openConnectedMapServerConnections();
 	}
 
 	/**

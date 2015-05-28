@@ -64,15 +64,6 @@ public class RESTConnectionModel implements TreeModel {
 	public Object getChild(Object parent, int index) {
 		Data element = (Data) parent;
 		Data child = element.getSubDataAt(index);
-		// if (child instanceof MapServerConnection) {
-		// if (isOnlyActiveMapServerConnections() && !((MapServerConnection) child).isConnected()) {
-		// return null;
-		// }
-		// } else if (child instanceof Subscription) {
-		// if (isOnlyActiveSubscriptions() && !((Subscription) child).isActive()) {
-		// return null;
-		// }
-		// }
 		return child;
 	}
 

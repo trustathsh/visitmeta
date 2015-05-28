@@ -115,6 +115,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private void initOnlyActiveButton() {
 		mOnlyActive = new JCheckBoxMenuItem("show only active");
+		mOnlyActive.setEnabled(false);
 		if (mSelectedData instanceof MapServerConnection) {
 			mOnlyActive.setSelected(mConnectionTree.isShowAllMapServerConnections());
 		} else if (mSelectedData instanceof Subscription) {

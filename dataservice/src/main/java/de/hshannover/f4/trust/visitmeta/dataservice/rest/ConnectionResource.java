@@ -61,6 +61,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
@@ -121,7 +122,7 @@ public class ConnectionResource {
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response saveConnection(JSONObject jsonConnectionData) {
+	public Response putConnection(JSONObject jsonConnectionData) {
 		LOGGER.trace("new rest PUT save Connection...");
 
 		MapServerConnectionData newConnectionData = null;
@@ -136,17 +137,24 @@ public class ConnectionResource {
 					.build();
 		}
 
-		MapServerConnection newConnection = new MapServerConnectionImpl(newConnectionData);
-
-		// add to connection pool
 		try {
-			Application.getConnectionManager().addConnection(newConnection);
-		} catch (ConnectionException e) {
-			String msg = "error while adding connection to the connection pool";
-			LOGGER.error(msg + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
-					.build();
+
+			Application.getConnectionManager().updateConnection(newConnectionData);
+
+		} catch (NoSavedConnectionException e) {
+			// OK, then try to save
+			MapServerConnection newConnection = new MapServerConnectionImpl(newConnectionData);
+
+			try {
+				Application.getConnectionManager().addConnection(newConnection);
+			} catch (ConnectionException ee) {
+				String msg = "error while adding connection to the connection pool";
+				LOGGER.error(msg + " | " + ee.toString());
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(msg + " | Exception: " + ee.toString()).build();
+			}
 		}
+
 
 		// persist connection in property
 		try {
@@ -157,8 +165,8 @@ public class ConnectionResource {
 					.entity("error while connection persist -> " + e.toString()).build();
 		}
 
-		LOGGER.trace("... new rest PUT saveConnection " + newConnection + " success");
-		return Response.ok().entity(newConnection + " was saved").build();
+		LOGGER.trace("... new rest putConnection " + newConnectionData + " success");
+		return Response.ok().entity(newConnectionData + " was saved or updated").build();
 	}
 
 	/**

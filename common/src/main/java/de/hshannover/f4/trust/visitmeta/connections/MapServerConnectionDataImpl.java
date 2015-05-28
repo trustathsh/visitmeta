@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -50,9 +51,6 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	@Override
 	public Data copy() {
 		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
-		data.setUrl(getUrl());
-		data.setUserName(getUserName());
-		data.setUserPassword(getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
 		data.setSubscriptionData(getSubscriptions());
@@ -61,6 +59,21 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		data.setStartupConnect(doesConnectOnStartup());
 		data.setAuthenticationBasic(isAuthenticationBasic());
 		return data;
+	}
+
+	@Override
+	public void changeData(MapServerConnectionData newData) {
+		setName(newData.getName());
+		setUrl(newData.getUrl());
+		setUserName(newData.getUserName());
+		setUserPassword(newData.getUserPassword());
+		setTruststorePath(newData.getTruststorePath());
+		setTruststorePassword(newData.getTruststorePassword());
+		setSubscriptionData(newData.getSubscriptions());
+		setMaxPollResultSize(newData.getMaxPollResultSize());
+		setConnected(newData.isConnected());
+		setStartupConnect(newData.doesConnectOnStartup());
+		setAuthenticationBasic(newData.isAuthenticationBasic());
 	}
 
 	@Override
@@ -176,6 +189,16 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	@Override
 	public void addSubscription(Subscription subscription) {
 		mSubscriptionDataList.add(subscription);
+	}
+
+	@Override
+	public void updateSubscription(SubscriptionData newData) {
+		for (Data subData : mSubscriptionDataList) {
+			if (subData.getName().equals(newData.getName())) {
+				((SubscriptionData) subData).changeData(newData);
+				break;
+			}
+		}
 	}
 
 	@Override

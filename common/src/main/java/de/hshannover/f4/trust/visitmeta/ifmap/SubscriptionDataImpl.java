@@ -87,6 +87,20 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 	}
 
 	@Override
+	public void changeData(SubscriptionData newData) {
+		setName(newData.getName());
+		setStartIdentifier(newData.getStartIdentifier());
+		setIdentifierType(newData.getIdentifierType());
+		setMatchLinksFilter(newData.getMatchLinksFilter());
+		setResultFilter(newData.getResultFilter());
+		setTerminalIdentifierTypes(newData.getTerminalIdentifierTypes());
+		setStartupSubscribe(newData.isStartupSubscribe());
+		setMaxDepth(newData.getMaxDepth());
+		setMaxSize(newData.getMaxSize());
+		setActive(newData.isActive());
+	}
+
+	@Override
 	public String getStartIdentifier() {
 		return mIdentifier;
 	}

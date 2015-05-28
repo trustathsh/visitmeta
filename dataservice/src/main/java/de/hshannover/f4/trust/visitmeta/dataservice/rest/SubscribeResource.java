@@ -59,10 +59,13 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
 /**
@@ -172,6 +175,36 @@ public class SubscribeResource {
 			}
 		}
 		return Response.ok().entity("INFO: subscribe successfully").build();
+	}
+
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response putSubscription(@PathParam("connectionName") String connectionName, JSONObject jsonData) {
+
+		SubscriptionData subscriptionData;
+		try {
+
+			subscriptionData = (SubscriptionData) DataManager.transformJSONObject(jsonData, SubscriptionData.class);
+
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
+				| JSONException e) {
+			String msg = "error while transform JSONObject";
+			log.error(msg + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
+					.build();
+		}
+
+		Application.getConnectionManager().updateSubscription(connectionName, subscriptionData);
+
+		try {
+			Application.getConnections().persistConnections();
+		} catch (PropertyException e) {
+			log.error("error while connection persist | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while connection persist -> " + e.toString()).build();
+		}
+
+		return Response.ok().entity("INFO: subscribe put successfully").build();
 	}
 
 	@PUT

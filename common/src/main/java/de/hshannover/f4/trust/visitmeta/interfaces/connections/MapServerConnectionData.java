@@ -3,6 +3,7 @@ package de.hshannover.f4.trust.visitmeta.interfaces.connections;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public interface MapServerConnectionData extends Data {
@@ -92,4 +93,8 @@ public interface MapServerConnectionData extends Data {
 	public void setAuthenticationBasic(boolean authenticationBasic);
 
 	public boolean isAuthenticationBasic();
+
+	public void changeData(MapServerConnectionData newData);
+
+	public void updateSubscription(SubscriptionData newData);
 }

@@ -84,4 +84,6 @@ public interface SubscriptionData extends Data {
 
 	public void setActive(boolean active);
 
+	public void changeData(SubscriptionData newData);
+
 }

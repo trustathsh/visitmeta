@@ -50,10 +50,13 @@ import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 /**
@@ -71,6 +74,14 @@ public interface ConnectionManager {
 	 * @throws ConnectionException
 	 */
 	public void addConnection(MapServerConnection connection) throws ConnectionException;
+
+	/**
+	 * Sets all connection properties by the new.
+	 * 
+	 * @param newData
+	 * @throws NoSavedConnectionException
+	 */
+	public void updateConnection(MapServerConnectionData newData) throws NoSavedConnectionException;
 
 	/**
 	 * Connect to a MAP-Server.
@@ -205,5 +216,12 @@ public interface ConnectionManager {
 	 * @throws ConnectionException
 	 */
 	public void stopSubscription(String connectionName, String subscriptionName) throws ConnectionException;
+
+	/**
+	 * Sets all subscription properties by the new.
+	 * 
+	 * @param newData
+	 */
+	public void updateSubscription(String connectionName, SubscriptionData newData);
 
 }

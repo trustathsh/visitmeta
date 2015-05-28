@@ -55,6 +55,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
@@ -79,6 +80,12 @@ public class ConnectionManagerImpl implements ConnectionManager {
 			throw new ConnectionException(connection.getConnectionName()
 					+ " connection name already exists, adding canceled");
 		}
+	}
+
+	@Override
+	public void updateConnection(MapServerConnectionData newData) throws NoSavedConnectionException {
+		MapServerConnection savedConnection = getConnection(newData.getConnectionName());
+		savedConnection.changeData(newData);
 	}
 
 	@Override
@@ -204,6 +211,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
 			PropertyException {
 		mConnectionPool.get(connectionName).addSubscription(subscription);
 		Application.getConnections().persistConnections();
+	}
+
+	@Override
+	public void updateSubscription(String connectionName, SubscriptionData newData) {
+		mConnectionPool.get(connectionName).updateSubscription(newData);
 	}
 
 	@Override

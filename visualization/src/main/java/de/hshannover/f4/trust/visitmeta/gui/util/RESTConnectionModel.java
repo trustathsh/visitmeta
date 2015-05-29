@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -34,9 +35,20 @@ public class RESTConnectionModel implements TreeModel {
 		mRootNode.mList = graphNodes;
 	}
 
-	public void updateConnections() {
-		// TODO Auto-generated method stub
+	public void updateConnections(List<Data> graphNodes) {
+		Dataservices oldRoot = mRootNode;
 
+		mRootNode = new Dataservices();
+		mRootNode.mList = graphNodes;
+
+		fireTreeStructureChanged(oldRoot);
+	}
+
+	protected void fireTreeStructureChanged(Dataservices oldRoot) {
+		TreeModelEvent e = new TreeModelEvent(this, new Object[] { oldRoot });
+		for (TreeModelListener tml : mTreeModelListeners) {
+			tml.treeStructureChanged(e);
+		}
 	}
 
 	public void showAllMapServerConnections(boolean b) {

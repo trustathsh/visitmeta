@@ -1,5 +1,6 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.CONNECTED_TREE_UPDATE_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
@@ -18,6 +19,8 @@ import javax.swing.KeyStroke;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
@@ -44,6 +47,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private JCheckBoxMenuItem mOnlyActive;
 
+	private JCheckBoxMenuItem mUpdateTree;
+
 	private JCheckBoxMenuItem mOpen;
 
 	private MainWindow mMainWindow;
@@ -59,16 +64,19 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		if (mSelectedData instanceof DataserviceConnection) {
 			initConnectButton();
 			initDisconnectButton();
+			super.addSeparator();
 		} else if (mSelectedData instanceof MapServerConnection) {
 			initConnectButton();
 			initDisconnectButton();
 			initOnlyActiveButton();
+			super.addSeparator();
 		} else if (mSelectedData instanceof Subscription) {
 			initActiveButton();
 			initInactiveButton();
 			initOnlyActiveButton();
+			super.addSeparator();
 		}
-
+		initUpdateTreeButton();
 	}
 
 	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, MainWindow mainWindow, Data selectedComponent) {
@@ -222,6 +230,25 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		});
 
 		super.add(mDeactivate);
+	}
+
+	private void initUpdateTreeButton() {
+		mUpdateTree = new JCheckBoxMenuItem("Update Tree", CONNECTED_TREE_UPDATE_ICON);
+		mUpdateTree.setAccelerator(KeyStroke.getKeyStroke('U', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mUpdateTree.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				try {
+					mConnectionTree.updateConnections(Main.getDataservicePersister().loadDataserviceConnections());
+				} catch (PropertyException e) {
+					LOGGER.error(e.toString(), e);
+				}
+
+				mConnectionTree.expandAllNodes();
+			}
+		});
+
+		super.add(mUpdateTree);
 	}
 
 	private void initDeleteButton() {

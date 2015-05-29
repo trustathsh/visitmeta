@@ -24,8 +24,8 @@ public class RESTConnectionTree extends JTree {
 		// setRootVisible(false);
 	}
 
-	public void updateConnections() {
-		((RESTConnectionModel) super.getModel()).updateConnections();
+	public void updateConnections(List<Data> graphNodes) {
+		((RESTConnectionModel) super.getModel()).updateConnections(graphNodes);
 	}
 
 	public void showAllMapServerConnections(boolean b) {

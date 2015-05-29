@@ -10,6 +10,8 @@ public class ImageIconLoader {
 
 	public static final ImageIcon DATASERVICE_CONNECTED_ICON;
 
+	public static final ImageIcon CONNECTED_TREE_UPDATE_ICON;
+
 	public static final ImageIcon DATASERVICE_DISCONNECTED_ICON;
 
 	public static final ImageIcon MAPSERVER_CONNECTED_ICON;
@@ -27,6 +29,9 @@ public class ImageIconLoader {
 
 		DATASERVICE_CONNECTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("DataserviceConnectedIcon.png").getPath());
+
+		CONNECTED_TREE_UPDATE_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("ConnectionTreeUpdate.png").getPath());
 
 		DATASERVICE_DISCONNECTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("DataserviceDisconnectedIcon.png").getPath());

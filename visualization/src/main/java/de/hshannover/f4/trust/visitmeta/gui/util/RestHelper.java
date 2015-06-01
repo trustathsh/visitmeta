@@ -69,6 +69,15 @@ public class RestHelper {
 		return connections;
 	}
 
+	public static void saveMapServerConnection(DataserviceConnection dataserviceConnection,
+			MapServerConnectionData connectionData) throws ClassNotFoundException, InstantiationException,
+			IllegalAccessException, JSONException {
+
+		JSONObject jsonMapServerConnectionData = DataManager.transformData(connectionData);
+
+		buildWebResource(dataserviceConnection).type(MediaType.APPLICATION_JSON).put(jsonMapServerConnectionData);
+	}
+
 	public static void startSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,
 			String subscriptionName) throws RESTException {
 		LOGGER.trace("send subscribe update request...");

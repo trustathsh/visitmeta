@@ -71,6 +71,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONException;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
@@ -84,6 +85,7 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
@@ -108,6 +110,8 @@ public class MainWindow extends JFrame {
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
+	private JPanel mJpParameter;
+	private JButton mJbParameterSave;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
 	private RESTConnectionTree mConnectionTree = null;
@@ -184,7 +188,6 @@ public class MainWindow extends JFrame {
 
 		mLeftMainPanel = new JPanel();
 		mLeftMainPanel.setLayout(new GridBagLayout());
-		// mLeftMainPanel.add(mConnectionScrollPane);
 
 		// x y w h wx wy
 		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.mLblInsets);
@@ -195,11 +198,11 @@ public class MainWindow extends JFrame {
 			mLeftMainPanel.remove(mLeftMainPanel.getComponents().length - 1);
 		}
 
-		JPanel mJpParameter = new JPanel();
+		mJpParameter = new JPanel();
 		mJpParameter.setLayout(new GridBagLayout());
 		mJpParameter.setBorder(BorderFactory.createTitledBorder("Parameter"));
 
-		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		final Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 		JPanel parameter = new JPanel();
 
 		if (selectedComponent instanceof DataserviceConnection) {
@@ -212,7 +215,35 @@ public class MainWindow extends JFrame {
 			parameter = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
 
 		}
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, parameter, LayoutHelper.mLblInsets);
+
+		JPanel JpSouth = new JPanel();
+		JpSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		mJbParameterSave = new JButton("Save");
+		mJbParameterSave.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				if (selectedComponent instanceof DataserviceConnection) {
+
+				} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+					try {
+						RestHelper.saveMapServerConnection(
+								((MapServerRestConnectionImpl) selectedComponent).getDataserviceConnection(),
+								(MapServerConnectionData) selectedComponent);
+					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+						LOGGER.error(e.toString(), e);
+					}
+				} else if (selectedComponent instanceof Subscription) {
+
+				}
+			}
+		});
+
+		JpSouth.add(mJbParameterSave);
+
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, parameter, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, JpSouth, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
 		mLeftMainPanel.updateUI();
 	}

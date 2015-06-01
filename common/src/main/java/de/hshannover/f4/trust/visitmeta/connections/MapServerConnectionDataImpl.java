@@ -69,7 +69,6 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		setUserPassword(newData.getUserPassword());
 		setTruststorePath(newData.getTruststorePath());
 		setTruststorePassword(newData.getTruststorePassword());
-		setSubscriptionData(newData.getSubscriptions());
 		setMaxPollResultSize(newData.getMaxPollResultSize());
 		setConnected(newData.isConnected());
 		setStartupConnect(newData.doesConnectOnStartup());

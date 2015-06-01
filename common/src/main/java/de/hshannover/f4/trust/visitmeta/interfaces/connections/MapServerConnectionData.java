@@ -94,6 +94,11 @@ public interface MapServerConnectionData extends Data {
 
 	public boolean isAuthenticationBasic();
 
+	/**
+	 * Only the connection properties. For Subscriptions use updateSubscription().
+	 * 
+	 * @param newData
+	 */
 	public void changeData(MapServerConnectionData newData);
 
 	public void updateSubscription(SubscriptionData newData);

@@ -465,7 +465,7 @@ public class SimpleGraphService implements GraphService {
 			for(InternalIdentifier id : result.getAllIdentifier()) {
 				ArrayList<InternalMetadata> toRemove = new ArrayList<>();
 				for(InternalMetadata meta : id.getMetadata()) {
-					if(filter.matchMeta(internalMetadaToDocument(meta))) {
+					if(!filter.matchMeta(internalMetadaToDocument(meta))) {
 						toRemove.add(meta);
 						id.removeMetadata(meta);
 					}
@@ -476,7 +476,7 @@ public class SimpleGraphService implements GraphService {
 				toRemove.clear();
 				for(InternalLink link : id.getLinks()) {
 					for (InternalMetadata linkMeta : link.getMetadata()) {
-						if(filter.matchMeta(internalMetadaToDocument(linkMeta))) {
+						if(!filter.matchMeta(internalMetadaToDocument(linkMeta))) {
 							toRemove.add(linkMeta);
 						}
 					}
@@ -535,6 +535,7 @@ public class SimpleGraphService implements GraphService {
 	private Document internalMetadaToDocument(InternalMetadata meta) {
 		if(mBuilderFactory == null) {
 			mBuilderFactory = DocumentBuilderFactory.newInstance();
+			mBuilderFactory.setNamespaceAware(true);
 		}
 		if(mBuilder == null) {
 			try {
@@ -550,9 +551,10 @@ public class SimpleGraphService implements GraphService {
 			log.error("could not convert InternalMetada to Document!");
 			e.printStackTrace();
 		}
+		
 		return doc;
 	}
-
+	
 	@Override
 	public long count(GraphType type) {
 		return mExecutor.count(type);

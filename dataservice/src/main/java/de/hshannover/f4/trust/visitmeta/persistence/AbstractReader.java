@@ -46,6 +46,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.NamespaceHolder;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
@@ -58,7 +59,22 @@ public abstract class AbstractReader implements Reader {
 	private static final Logger log = Logger.getLogger(AbstractReader.class);
 
 	protected Repository mRepo;
+	protected String mConnectionName;
 
+	protected void savePrexif(InternalMetadata m) {
+		String prefix = null, value = null;
+		for (String key : m.getProperties()) {
+			if (key.contains("@xmlns")) {
+				prefix = key.substring(key.indexOf("@xmlns") + 7,
+						key.length() - 1);
+				value = m.valueFor(key);
+			}
+		}
+		if (prefix != null && value != null) {
+			NamespaceHolder.addPrefix(mConnectionName, prefix, value);
+		}
+	}
+	
 	@Override
 	public List<InternalIdentifierGraph> getCurrentState() {
 		log.debug("reading current graph state from repository ...");
@@ -154,6 +170,7 @@ public abstract class AbstractReader implements Reader {
 			) {
 
 		for (InternalMetadata m : from.getMetadata()) {
+			this.savePrexif(m);
 			if (m.isValidAt(timestamp)) {
 				InternalMetadata loadedMeta = graph.insert(m);
 				graph.connectMeta(to, loadedMeta);
@@ -176,6 +193,7 @@ public abstract class AbstractReader implements Reader {
 			) {
 
 		for (InternalMetadata m : from.getMetadata()) {
+			this.savePrexif(m);
 			if (m.isValidAt(timestamp)) {
 				InternalMetadata loadedMeta = graph.insert(m);
 				graph.connectMeta(to, loadedMeta);

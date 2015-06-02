@@ -69,12 +69,12 @@ public interface GraphFilter {
 	public boolean matchLink(Document linkMeta);
 
 	/**
-	 * @return whether the filter matches everything or not.
+	 * @return whether the filter matches every Metadata or not.
 	 */
 	public boolean matchEverything();
 
 	/**
-	 * @return whether the filter matches nothing or not.
+	 * @return whether the filter matches not any Metadata or not.
 	 */
 	public boolean matchNothing();
 }

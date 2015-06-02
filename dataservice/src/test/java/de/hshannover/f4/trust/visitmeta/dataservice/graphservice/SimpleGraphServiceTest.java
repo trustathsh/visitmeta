@@ -96,7 +96,7 @@ public class SimpleGraphServiceTest {
 		mTimestampManager = new Neo4JTimestampManager(mDbConnection);
 		when(mDbConnection.getTimestampManager()).thenReturn(mTimestampManager);
 		when(mDbConnection.getConnection()).thenReturn(mGraphDb);
-		mReader = new Neo4JReader(repo, mDbConnection);
+		mReader = new Neo4JReader(repo, mDbConnection, "testDB");
 		mExecutor = new Neo4JExecutor(mDbConnection);
 	}
 

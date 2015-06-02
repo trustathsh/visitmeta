@@ -65,6 +65,8 @@ public class Neo4JDatabase {
 	private int mDbCachSize;
 
 	private String mNeo4JdbPath;
+	
+	private String mConnectioName;
 
 	private Neo4JConnection neo4jDb;
 
@@ -82,6 +84,8 @@ public class Neo4JDatabase {
 
 	public Neo4JDatabase(String connectionName) {
 		log.trace("new Neo4JDatabase() ...");
+		
+		mConnectioName = connectionName;
 
 		try {
 			mClearDatabase = mConfig.getBoolean("database.erase");
@@ -115,7 +119,7 @@ public class Neo4JDatabase {
 	}
 
 	private void initWriter(String connectionName) {
-		mWriter = new ThreadedWriter(new Neo4JWriter(neo4jRepo, neo4jDb));
+		mWriter = new ThreadedWriter(new Neo4JWriter(neo4jRepo, neo4jDb, mConnectioName));
 
 		writerThread = new Thread(mWriter, "WriterThread-" + connectionName);
 	}
@@ -127,7 +131,7 @@ public class Neo4JDatabase {
 	}
 
 	private void initGraphService() {
-		mReader = new Neo4JReader(neo4jRepo, neo4jDb);
+		mReader = new Neo4JReader(neo4jRepo, neo4jDb, mConnectioName);
 		mExecutor = new Neo4JExecutor(neo4jDb);
 
 		GraphCache cache = null;

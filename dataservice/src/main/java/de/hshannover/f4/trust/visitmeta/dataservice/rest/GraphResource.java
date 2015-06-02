@@ -63,13 +63,12 @@ import org.codehaus.jettison.json.JSONObject;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.GraphFilterImpl;
 import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.IdentifierImpl;
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.NamespaceHolder;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
-import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifier;
 
 /**
  * Represents the graph of the application in a "RESTful" manner.
@@ -159,7 +158,7 @@ public class GraphResource {
 		List<IdentifierGraph> graph;
 		GraphFilter filter;
 		try {
-			filter = parseFilterFromJson(jobj);
+			filter = parseFilterFromJson(jobj, name);
 			graph = Application.getConnectionManager().getGraphService(name).getInitialGraph(filter);
 		} catch (ConnectionException | JSONException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -200,7 +199,7 @@ public class GraphResource {
 		List<IdentifierGraph> graph;
 		GraphFilter filter;
 		try {
-			filter = parseFilterFromJson(jobj);
+			filter = parseFilterFromJson(jobj, name);
 			graph = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp, filter);
 		} catch (ConnectionException | JSONException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -240,7 +239,7 @@ public class GraphResource {
 		List<IdentifierGraph> graph;
 		GraphFilter filter;
 		try {
-			filter = parseFilterFromJson(jobj);
+			filter = parseFilterFromJson(jobj, name);
 			graph = Application.getConnectionManager().getGraphService(name).getCurrentGraph(filter);
 		} catch (ConnectionException | JSONException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -286,7 +285,7 @@ public class GraphResource {
 		}
 	}
 	
-	private GraphFilter parseFilterFromJson(JSONObject jobj) throws JSONException {
+	private GraphFilter parseFilterFromJson(JSONObject jobj, String connection) throws JSONException {
 		String resultFilter = jobj.getString("resultFilter");
 		resultFilter = resultFilter.equalsIgnoreCase("null") ? null : resultFilter;
 		String matchLinks = jobj.getString("matchLinks");
@@ -303,6 +302,6 @@ public class GraphResource {
 			startId.addProperty(tmpKey, id.getString(tmpKey));
 		}
 		
-		return new GraphFilterImpl(startId, resultFilter, matchLinks, maxDepth);
+		return new GraphFilterImpl(startId, resultFilter, matchLinks, maxDepth, NamespaceHolder.getPrefixMap(connection));
 	}
 }

@@ -67,10 +67,11 @@ public class Neo4JWriter extends AbstractWriter {
 	private Neo4JConnection mConnection;
 	private Long mLastTimestamp;
 
-	public Neo4JWriter(Neo4JRepository graph, Neo4JConnection connection) {
+	public Neo4JWriter(Neo4JRepository graph, Neo4JConnection connection, String connectionName) {
 		mRepo = graph;
 		mLock = new ReentrantLock();
 		mConnection = connection;
+		mConnectionName = connectionName;
 	}
 
 	@Override
@@ -94,6 +95,7 @@ public class Neo4JWriter extends AbstractWriter {
 		for (InternalMetadata m : meta) {
 			mConnection.getTimestampManager().incrementCounter(
 					m.getPublishTimestamp());
+			this.savePrexif(m);
 		}
 	}
 

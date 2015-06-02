@@ -51,10 +51,11 @@ public class Neo4JReader extends AbstractReader {
 
 	private Neo4JConnection mConnection;
 
-	public Neo4JReader(Neo4JRepository repo, Neo4JConnection connection) {
+	public Neo4JReader(Neo4JRepository repo, Neo4JConnection connection, String connectionName) {
 		log.trace("new Neo4JReader()");
 		mRepo = repo;
 		mConnection = connection;
+		mConnectionName = connectionName;
 	}
 
 	@Override

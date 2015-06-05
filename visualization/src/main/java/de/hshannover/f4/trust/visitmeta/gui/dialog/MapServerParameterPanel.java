@@ -4,14 +4,16 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class MapServerParameterPanel extends JPanel {
+public class MapServerParameterPanel extends ParameterPanel {
 
 	private static final long serialVersionUID = -3686612903315798696L;
 
@@ -33,14 +35,21 @@ public class MapServerParameterPanel extends JPanel {
 	private JCheckBox mJcbBasicAuthentication;
 	private JCheckBox mJcbConnectingAtStartUp;
 
+	private MapServerConnectionData mConnectionData;
+
+	private DocumentChangedListener mDocumentChangedListener;
+
 	public MapServerParameterPanel() {
 		createPanels();
 	}
 
-	public MapServerParameterPanel(MapServerConnectionData connection) {
-		createPanels();
+	public MapServerParameterPanel(MapServerConnectionData connectionData) {
+		mConnectionData = connectionData;
 
-		updatePanel(connection);
+		createPanels();
+		updatePanel();
+		addChangeListener();
+
 	}
 
 	private void createPanels() {
@@ -82,15 +91,45 @@ public class MapServerParameterPanel extends JPanel {
 		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, LayoutHelper.mLblInsets);
 	}
 
-	private void updatePanel(MapServerConnectionData connectionData) {
-		mJtfName.setText(connectionData.getName());
-		mJtfUrl.setText(connectionData.getUrl());
-		mJtfUsername.setText(connectionData.getUserName());
-		mJtfPassword.setText(connectionData.getUserPassword());
-		mJcbBasicAuthentication.setSelected(connectionData.isAuthenticationBasic());
+	private void addChangeListener() {
+		mDocumentChangedListener = new DocumentChangedListener() {
+
+			@Override
+			protected void dataChanged() {
+				System.out.println("dataChanged");
+				fireParameterChanged();
+			}
+		};
+		mJtfName.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfUrl.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfUsername.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfPassword.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfMaxPollResultSize.getDocument().addDocumentListener(mDocumentChangedListener);
+	}
+
+	private void updatePanel() {
+		mJtfName.setText(mConnectionData.getName());
+		mJtfUrl.setText(mConnectionData.getUrl());
+		mJtfUsername.setText(mConnectionData.getUserName());
+		mJtfPassword.setText(mConnectionData.getUserPassword());
+		mJcbBasicAuthentication.setSelected(mConnectionData.isAuthenticationBasic());
 		// TODO TRUSTSTORE_PATH
 		// TODO TRUSTSTORE_PASS
-		mJcbConnectingAtStartUp.setSelected(connectionData.doesConnectOnStartup());
-		mJtfMaxPollResultSize.setText(String.valueOf(connectionData.getMaxPollResultSize()));
+		mJcbConnectingAtStartUp.setSelected(mConnectionData.doesConnectOnStartup());
+		mJtfMaxPollResultSize.setText(String.valueOf(mConnectionData.getMaxPollResultSize()));
+	}
+
+	@Override
+	public Data getData() {
+		mConnectionData.setName(mJtfName.getText().trim());
+		mConnectionData.setUrl(mJtfUrl.getText().trim());
+		mConnectionData.setUserName(mJtfUsername.getText().trim());
+		mConnectionData.setUserPassword(String.valueOf(mJtfPassword.getPassword()).trim());
+		mConnectionData.setAuthenticationBasic(mJcbBasicAuthentication.isSelected());
+		// TODO TRUSTSTORE_PATH
+		// TODO TRUSTSTORE_PASS
+		mConnectionData.setStartupConnect(mJcbConnectingAtStartUp.isSelected());
+		mConnectionData.setMaxPollResultSize(Integer.parseInt(mJtfMaxPollResultSize.getText().trim()));
+		return mConnectionData;
 	}
 }

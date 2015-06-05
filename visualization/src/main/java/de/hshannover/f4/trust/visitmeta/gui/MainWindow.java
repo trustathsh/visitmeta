@@ -84,6 +84,8 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterListener;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
@@ -111,6 +113,8 @@ public class MainWindow extends JFrame {
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
 	private JPanel mJpParameter;
+	private ParameterPanel mJpParameterValues;
+	private JPanel mJpParameterSouth;
 	private JButton mJbParameterSave;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
@@ -202,48 +206,39 @@ public class MainWindow extends JFrame {
 		mJpParameter.setLayout(new GridBagLayout());
 		mJpParameter.setBorder(BorderFactory.createTitledBorder("Parameter"));
 
-		final Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
-		JPanel parameter = new JPanel();
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceConnection) {
-			parameter = new DataServiceParameterPanel((DataserviceConnectionData) selectedComponent);
-
+			mJpParameterValues = new DataServiceParameterPanel((DataserviceConnectionData) selectedComponent);
 		} else if (selectedComponent instanceof MapServerConnection) {
-			parameter = new MapServerParameterPanel((MapServerConnectionData) selectedComponent);
-
+			mJpParameterValues = new MapServerParameterPanel((MapServerConnectionData) selectedComponent);
 		} else if (selectedComponent instanceof Subscription) {
-			parameter = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
-
+			mJpParameterValues = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
 		}
+		mJpParameterValues.addParameterListener(new ParameterListener() {
+			@Override
+			public void parameterChanged() {
+				propertiesDataChanged();
+			}
+		});
 
-		JPanel JpSouth = new JPanel();
-		JpSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		mJpParameterSouth = new JPanel();
+		mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 		mJbParameterSave = new JButton("Save");
+		mJbParameterSave.setEnabled(false);
 		mJbParameterSave.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				if (selectedComponent instanceof DataserviceConnection) {
-
-				} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
-					try {
-						RestHelper.saveMapServerConnection(
-								((MapServerRestConnectionImpl) selectedComponent).getDataserviceConnection(),
-								(MapServerConnectionData) selectedComponent);
-					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-						LOGGER.error(e.toString(), e);
-					}
-				} else if (selectedComponent instanceof Subscription) {
-
-				}
+				savePropertiesChanges();
 			}
 		});
 
-		JpSouth.add(mJbParameterSave);
+		mJpParameterSouth.add(mJbParameterSave);
 
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, parameter, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, JpSouth, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
 		mLeftMainPanel.updateUI();
 	}
@@ -453,6 +448,47 @@ public class MainWindow extends JFrame {
 
 	public void showAllSubscriptions(boolean b) {
 		mConnectionTree.showAllSubscriptions(b);
+	}
+
+	public void propertiesDataChanged() {
+		mJbParameterSave.setEnabled(true);
+
+		Data changedData = ((MapServerParameterPanel) mJpParameterValues).getData();
+
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof DataserviceConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			mapServerConnection.changeData((MapServerConnectionData) changedData);
+
+		} else if (selectedComponent instanceof Subscription) {
+			Subscription subscription = (Subscription) selectedComponent;
+
+		}
+	}
+
+	public void savePropertiesChanges() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			try {
+				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
+				mJbParameterSave.setEnabled(false);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+				LOGGER.error(e.toString(), e);
+			}
+
+		} else if (selectedComponent instanceof Subscription) {
+			Subscription subscription = (Subscription) selectedComponent;
+
+		}
 	}
 
 	public void showConnectionTreePopupMenu(int x, int y) {

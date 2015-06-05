@@ -4,12 +4,13 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class DataServiceParameterPanel extends JPanel {
+public class DataServiceParameterPanel extends ParameterPanel {
 
 	private static final long serialVersionUID = -4830135051242549298L;
 
@@ -22,14 +23,17 @@ public class DataServiceParameterPanel extends JPanel {
 
 	private JCheckBox mJcbRawXML;
 
+	private DataserviceConnectionData mConnectionData;
+
 	public DataServiceParameterPanel() {
 		createPanels();
 	}
 
-	public DataServiceParameterPanel(DataserviceConnectionData connection) {
+	public DataServiceParameterPanel(DataserviceConnectionData connectionData) {
 		createPanels();
 
-		updatePanel(connection);
+		mConnectionData = connectionData;
+		updatePanel();
 	}
 
 	private void createPanels() {
@@ -54,10 +58,18 @@ public class DataServiceParameterPanel extends JPanel {
 		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, LayoutHelper.mLblInsets);
 	}
 
-	private void updatePanel(DataserviceConnectionData dataConnection) {
-		mJtfName.setText(dataConnection.getName());
-		mJtfUrl.setText(dataConnection.getUrl());
-		mJcbRawXML.setSelected(dataConnection.isRawXml());
+	private void updatePanel() {
+		mJtfName.setText(mConnectionData.getName());
+		mJtfUrl.setText(mConnectionData.getUrl());
+		mJcbRawXML.setSelected(mConnectionData.isRawXml());
+	}
+
+	@Override
+	public Data getData() {
+		mConnectionData.setName(mJtfName.getText().trim());
+		mConnectionData.setUrl(mJtfUrl.getText().trim());
+		mConnectionData.setRawXml(mJcbRawXML.isSelected());
+		return mConnectionData;
 	}
 
 }

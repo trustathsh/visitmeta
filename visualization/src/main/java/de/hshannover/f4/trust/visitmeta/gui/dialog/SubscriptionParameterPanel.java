@@ -4,12 +4,13 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class SubscriptionParameterPanel extends JPanel {
+public class SubscriptionParameterPanel extends ParameterPanel {
 
 	private static final long serialVersionUID = -3686612903315798696L;
 
@@ -34,6 +35,8 @@ public class SubscriptionParameterPanel extends JPanel {
 
 	private JCheckBox mJcbStartupSubscribe;
 
+	private SubscriptionData mSubscription;
+
 	public SubscriptionParameterPanel() {
 		createPanels();
 	}
@@ -41,7 +44,8 @@ public class SubscriptionParameterPanel extends JPanel {
 	public SubscriptionParameterPanel(SubscriptionData subscription) {
 		createPanels();
 
-		updatePanel(subscription);
+		mSubscription = subscription;
+		updatePanel();
 	}
 
 	private void createPanels() {
@@ -90,15 +94,29 @@ public class SubscriptionParameterPanel extends JPanel {
 		LayoutHelper.addComponent(1, 8, 1, 1, 1.0, 1.0, this, mJcbStartupSubscribe, LayoutHelper.mLblInsets);
 	}
 
-	private void updatePanel(SubscriptionData subscription) {
-		mJtfName.setText(subscription.getName());
-		mJtfStartIdentifier.setText(subscription.getStartIdentifier());
-		mJtfStartIdentifierType.setText(subscription.getIdentifierType());
-		mJtfFilterLinks.setText(subscription.getMatchLinksFilter());
-		mJtfFilterResult.setText(subscription.getResultFilter());
-		mJtfTerminalIdentifierTypes.setText(subscription.getTerminalIdentifierTypes());
-		mJtfMaxDepth.setText(String.valueOf(subscription.getMaxDepth()));
-		mJtfMaxSize.setText(String.valueOf(subscription.getMaxSize()));
-		mJcbStartupSubscribe.setSelected(subscription.isStartupSubscribe());
+	private void updatePanel() {
+		mJtfName.setText(mSubscription.getName());
+		mJtfStartIdentifier.setText(mSubscription.getStartIdentifier());
+		mJtfStartIdentifierType.setText(mSubscription.getIdentifierType());
+		mJtfFilterLinks.setText(mSubscription.getMatchLinksFilter());
+		mJtfFilterResult.setText(mSubscription.getResultFilter());
+		mJtfTerminalIdentifierTypes.setText(mSubscription.getTerminalIdentifierTypes());
+		mJtfMaxDepth.setText(String.valueOf(mSubscription.getMaxDepth()));
+		mJtfMaxSize.setText(String.valueOf(mSubscription.getMaxSize()));
+		mJcbStartupSubscribe.setSelected(mSubscription.isStartupSubscribe());
+	}
+
+	@Override
+	public Data getData() {
+		mSubscription.setName(mJtfName.getText().trim());
+		mSubscription.setStartIdentifier(mJtfStartIdentifier.getText().trim());
+		mSubscription.setIdentifierType(mJtfStartIdentifierType.getText().trim());
+		mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());
+		mSubscription.setResultFilter(mJtfFilterResult.getText().trim());
+		mSubscription.setTerminalIdentifierTypes(mJtfTerminalIdentifierTypes.getText().trim());
+		mSubscription.setMaxDepth(Integer.valueOf(mJtfMaxDepth.getText().trim()));
+		mSubscription.setMaxSize(Integer.valueOf(mJtfMaxSize.getText().trim()));
+		mSubscription.setStartupSubscribe(mJcbStartupSubscribe.isSelected());
+		return mSubscription;
 	}
 }

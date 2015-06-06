@@ -33,4 +33,17 @@ public interface DataserviceConnectionData extends Data {
 	public void setConnected(boolean connected);
 
 	public boolean isConnected();
+	
+	/**
+	 * Only the connection properties. For MapServerConnections use MapServerConnectionData.changeData().
+	 * 
+	 * @param newData
+	 */
+	public void changeData(DataserviceConnectionData newData);
+
+	@Override
+	public DataserviceConnectionData copy();
+
+	@Override
+	public DataserviceConnectionData clone();
 }

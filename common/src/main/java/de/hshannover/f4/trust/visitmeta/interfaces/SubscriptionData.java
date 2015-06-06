@@ -86,4 +86,10 @@ public interface SubscriptionData extends Data {
 
 	public void changeData(SubscriptionData newData);
 
+	@Override
+	public SubscriptionData copy();
+
+	@Override
+	public SubscriptionData clone();
+
 }

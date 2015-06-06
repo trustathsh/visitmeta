@@ -102,4 +102,10 @@ public interface MapServerConnectionData extends Data {
 	public void changeData(MapServerConnectionData newData);
 
 	public void updateSubscription(SubscriptionData newData);
+
+	@Override
+	public MapServerConnectionData copy();
+
+	@Override
+	public MapServerConnectionData clone();
 }

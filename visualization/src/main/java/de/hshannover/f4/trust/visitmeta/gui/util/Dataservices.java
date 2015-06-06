@@ -16,13 +16,14 @@ public class Dataservices extends DataImpl {
 
 	@Override
 	public List<Data> getSubData() {
-		return mList;
+		return new ArrayList<Data>(mList);
 	}
 
 	@Override
 	public Data copy() {
-		// TODO Auto-generated method stub
-		return null;
+		Dataservices tmpCopy = new Dataservices();
+		tmpCopy.mList = getSubData();
+		return tmpCopy;
 	}
 
 	@Override

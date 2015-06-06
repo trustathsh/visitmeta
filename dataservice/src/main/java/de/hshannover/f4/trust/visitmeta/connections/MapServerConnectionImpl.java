@@ -101,6 +101,18 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 	}
 
 	@Override
+	public MapServerConnectionImpl copy() {
+		MapServerConnectionData dataCopy = super.copy();
+		MapServerConnectionImpl tmpCopy = new MapServerConnectionImpl(dataCopy);
+		return tmpCopy;
+	}
+
+	@Override
+	public MapServerConnectionImpl clone() {
+		return (MapServerConnectionImpl) super.clone();
+	}
+
+	@Override
 	public void connect() throws ConnectionException {
 		checkIsConnectionDisconnected();
 

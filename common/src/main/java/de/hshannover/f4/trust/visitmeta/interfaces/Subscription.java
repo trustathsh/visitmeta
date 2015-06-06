@@ -56,4 +56,9 @@ public interface Subscription extends SubscriptionData {
 	 */
 	public void startSubscription() throws ConnectionException;
 
+	@Override
+	public Subscription copy();
+
+	@Override
+	public Subscription clone();
 }

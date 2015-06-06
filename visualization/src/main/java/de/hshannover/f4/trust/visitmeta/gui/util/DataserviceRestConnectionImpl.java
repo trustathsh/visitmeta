@@ -22,6 +22,19 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 	}
 
 	@Override
+	public DataserviceRestConnectionImpl copy() {
+		DataserviceConnectionData dataCopy = super.copy();
+		DataserviceRestConnectionImpl tmpCopy = new DataserviceRestConnectionImpl(dataCopy);
+		tmpCopy.setNotPersised(true);
+		return tmpCopy;
+	}
+
+	@Override
+	public DataserviceRestConnectionImpl clone() {
+		return (DataserviceRestConnectionImpl) super.clone();
+	}
+
+	@Override
 	public void connect() throws ConnectionException {
 		super.setConnected(true);
 		update();

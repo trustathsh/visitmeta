@@ -69,6 +69,19 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		mDataserviceConnection = dataserviceConnection;
 	}
 
+	@Override
+	public MapServerRestConnectionImpl copy() {
+		MapServerConnectionData dataCopy = super.copy();
+		MapServerRestConnectionImpl tmpCopy = new MapServerRestConnectionImpl(mDataserviceConnection, dataCopy);
+		tmpCopy.setNotPersised(true);
+		return tmpCopy;
+	}
+
+	@Override
+	public MapServerRestConnectionImpl clone() {
+		return (MapServerRestConnectionImpl) super.clone();
+	}
+
 	/**
 	 * Start the ProxyGraphService and init the GraphContainer & ConnectionTab.
 	 */

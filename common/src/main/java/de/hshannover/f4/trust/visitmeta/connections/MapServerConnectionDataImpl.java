@@ -49,7 +49,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public Data copy() {
+	public MapServerConnectionData copy() {
 		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
@@ -59,6 +59,11 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		data.setStartupConnect(doesConnectOnStartup());
 		data.setAuthenticationBasic(isAuthenticationBasic());
 		return data;
+	}
+
+	@Override
+	public MapServerConnectionData clone() {
+		return (MapServerConnectionData) super.clone();
 	}
 
 	@Override

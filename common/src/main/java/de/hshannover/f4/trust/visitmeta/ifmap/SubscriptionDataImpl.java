@@ -71,8 +71,8 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 	}
 
 	@Override
-	public Data copy() {
-		SubscriptionDataImpl tmpCopy = new SubscriptionDataImpl();
+	public SubscriptionData copy() {
+		SubscriptionData tmpCopy = new SubscriptionDataImpl();
 		tmpCopy.setName(super.getName());
 		tmpCopy.setStartIdentifier(getStartIdentifier());
 		tmpCopy.setIdentifierType(getIdentifierType());
@@ -84,6 +84,11 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 		tmpCopy.setMaxSize(getMaxSize());
 		tmpCopy.setActive(isActive());
 		return tmpCopy;
+	}
+
+	@Override
+	public SubscriptionData clone() {
+		return (SubscriptionData) super.clone();
 	}
 
 	@Override

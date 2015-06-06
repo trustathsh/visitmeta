@@ -30,10 +30,24 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 	}
 
 	@Override
-	public Data copy() {
-		DataserviceConnectionDataImpl tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
+	public DataserviceConnectionData copy() {
+		DataserviceConnectionData tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
 		tmpCopy.setMapServerData(getMapServerData());
+		tmpCopy.setConnected(isConnected());
 		return tmpCopy;
+	}
+	
+	@Override
+	public DataserviceConnectionData clone() {
+		return (DataserviceConnectionData) super.clone();
+	}
+
+	@Override
+	public void changeData(DataserviceConnectionData newData) {
+		setName(newData.getName());
+		setUrl(newData.getUrl());
+		setRawXml(newData.isRawXml());
+		setConnected(newData.isConnected());
 	}
 
 	@Override

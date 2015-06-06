@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Data extends SubData {
 
-	public abstract List<Data> getSubData();
+	public List<Data> getSubData();
 
 	/**
 	 * Creates and returns a copy(1-1) of this object. The general intent is that, for any object {@code x}, the
@@ -36,7 +36,7 @@ public interface Data extends SubData {
 	 * 
 	 * @return a 1-1 copy of this instance.
 	 */
-	public abstract Data copy();
+	public Data copy();
 
 	/**
 	 * Creates and returns a clone of this object. The general intent is that, for any object {@code x}, the

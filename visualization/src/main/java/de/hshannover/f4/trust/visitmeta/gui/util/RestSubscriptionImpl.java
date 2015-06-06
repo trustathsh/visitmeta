@@ -34,6 +34,19 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 	}
 
 	@Override
+	public RestSubscriptionImpl copy() {
+		SubscriptionData dataCopy = super.copy();
+		RestSubscriptionImpl tmpCopy = new RestSubscriptionImpl(mMapServerConnection, dataCopy);
+		tmpCopy.setNotPersised(true);
+		return tmpCopy;
+	}
+
+	@Override
+	public RestSubscriptionImpl clone() {
+		return (RestSubscriptionImpl) super.clone();
+	}
+
+	@Override
 	public void stopSubscription() {
 		LOGGER.trace("Method stopSubscription() called.");
 		try {

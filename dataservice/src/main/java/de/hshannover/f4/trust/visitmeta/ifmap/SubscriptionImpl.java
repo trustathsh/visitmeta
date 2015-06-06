@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 
 public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {
@@ -48,6 +49,34 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 
 	public SubscriptionImpl(MapServerConnection mapServerConnection) {
 		mMapServerConnection = mapServerConnection;
+	}
+
+	public SubscriptionImpl(MapServerConnection mapServerConnection, SubscriptionData subscriptionData) {
+		this(mapServerConnection);
+
+		super.setName(subscriptionData.getName());
+		super.setStartIdentifier(subscriptionData.getStartIdentifier());
+		super.setIdentifierType(subscriptionData.getIdentifierType());
+		super.setMatchLinksFilter(subscriptionData.getMatchLinksFilter());
+		super.setResultFilter(subscriptionData.getResultFilter());
+		super.setTerminalIdentifierTypes(subscriptionData.getTerminalIdentifierTypes());
+		super.setStartupSubscribe(subscriptionData.isStartupSubscribe());
+		super.setMaxDepth(subscriptionData.getMaxDepth());
+		super.setMaxSize(subscriptionData.getMaxSize());
+		super.setActive(subscriptionData.isActive());
+
+	}
+
+	@Override
+	public SubscriptionImpl copy() {
+		SubscriptionData dataCopy = super.copy();
+		SubscriptionImpl tmpCopy = new SubscriptionImpl(mMapServerConnection, dataCopy);
+		return tmpCopy;
+	}
+
+	@Override
+	public SubscriptionImpl clone() {
+		return (SubscriptionImpl) super.clone();
 	}
 
 	@Override

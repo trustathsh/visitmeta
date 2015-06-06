@@ -82,4 +82,10 @@ public interface MapServerConnection extends Connection, MapServerConnectionData
 	 * @throws ConnectionException
 	 */
 	public PollResult poll() throws ConnectionException;
+
+	@Override
+	public MapServerConnection copy();
+
+	@Override
+	public MapServerConnection clone();
 }

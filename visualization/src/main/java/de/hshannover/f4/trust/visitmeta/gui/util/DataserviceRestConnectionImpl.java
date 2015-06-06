@@ -10,6 +10,7 @@ import de.hshannover.f4.trust.visitmeta.connections.DataserviceConnectionDataImp
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -17,8 +18,15 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	private static final Logger LOGGER = Logger.getLogger(DataserviceRestConnectionImpl.class);
 
+	private boolean mNotPersised;
+
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
+	}
+
+	public DataserviceRestConnectionImpl(DataserviceConnectionData connectionData) {
+		super(connectionData.getName(), connectionData.getUrl(), connectionData.isRawXml());
+		super.setConnected(connectionData.isConnected());
 	}
 
 	@Override
@@ -88,6 +96,14 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 			LOGGER.error(e.toString(), e);
 		}
 		super.setMapServerData(updateList);
+	}
+
+	public boolean isNotPersised() {
+		return mNotPersised;
+	}
+
+	public void setNotPersised(boolean b) {
+		mNotPersised = b;
 	}
 
 }

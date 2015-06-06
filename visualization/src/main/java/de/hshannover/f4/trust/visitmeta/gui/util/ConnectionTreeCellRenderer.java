@@ -41,10 +41,13 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICES_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_NOT_PERSISTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_NOT_PERSISTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_ACTIVE_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_INACTIVE_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_NOT_PERSISTED_ICON;
 
 import java.awt.Component;
 
@@ -52,9 +55,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -77,18 +77,24 @@ public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
 	}
 
 	private ImageIcon getStatusIcon(Data data) {
-		if (data instanceof DataserviceConnection) {
-			if (((DataserviceConnection) data).isConnected()) {
+		if (data instanceof DataserviceRestConnectionImpl) {
+			if (((DataserviceRestConnectionImpl) data).isNotPersised()) {
+				return DATASERVICE_NOT_PERSISTED_ICON;
+			} else if (((DataserviceRestConnectionImpl) data).isConnected()) {
 				return DATASERVICE_CONNECTED_ICON;
 			}
 			return DATASERVICE_DISCONNECTED_ICON;
-		} else if (data instanceof MapServerConnection) {
-			if (((MapServerConnection) data).isConnected()) {
+		} else if (data instanceof MapServerRestConnectionImpl) {
+			if (((MapServerRestConnectionImpl) data).isNotPersised()) {
+				return MAPSERVER_NOT_PERSISTED_ICON;
+			} else if (((MapServerRestConnectionImpl) data).isConnected()) {
 				return MAPSERVER_CONNECTED_ICON;
 			}
 			return MAPSERVER_DISCONNECTED_ICON;
-		} else if (data instanceof Subscription) {
-			if (((Subscription) data).isActive()) {
+		} else if (data instanceof RestSubscriptionImpl) {
+			if (((RestSubscriptionImpl) data).isNotPersised()) {
+				return SUBSCRIPTION_NOT_PERSISTED_ICON;
+			} else if (((RestSubscriptionImpl) data).isActive()) {
 				return SUBSCRIPTION_ACTIVE_ICON;
 			}
 			return SUBSCRIPTION_INACTIVE_ICON;

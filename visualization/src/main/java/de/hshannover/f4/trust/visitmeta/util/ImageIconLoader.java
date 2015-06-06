@@ -14,13 +14,19 @@ public class ImageIconLoader {
 
 	public static final ImageIcon DATASERVICE_DISCONNECTED_ICON;
 
+	public static final ImageIcon DATASERVICE_NOT_PERSISTED_ICON;
+
 	public static final ImageIcon MAPSERVER_CONNECTED_ICON;
 
 	public static final ImageIcon MAPSERVER_DISCONNECTED_ICON;
 
+	public static final ImageIcon MAPSERVER_NOT_PERSISTED_ICON;
+
 	public static final ImageIcon SUBSCRIPTION_ACTIVE_ICON;
 
 	public static final ImageIcon SUBSCRIPTION_INACTIVE_ICON;
+
+	public static final ImageIcon SUBSCRIPTION_NOT_PERSISTED_ICON;
 
 	static {
 
@@ -36,17 +42,26 @@ public class ImageIconLoader {
 		DATASERVICE_DISCONNECTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("DataserviceDisconnectedIcon.png").getPath());
 
+		DATASERVICE_NOT_PERSISTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("DataserviceNotPersistedIcon.png").getPath());
+
 		MAPSERVER_CONNECTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("MapServerConnectedIcon.png").getPath());
 
 		MAPSERVER_DISCONNECTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("MapServerDisconnectedIcon.png").getPath());
 
+		MAPSERVER_NOT_PERSISTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("MapServerNotPersistedIcon.png").getPath());
+
 		SUBSCRIPTION_ACTIVE_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("SubscriptionActiveIcon.png").getPath());
 
 		SUBSCRIPTION_INACTIVE_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("SubscriptionInactiveIcon.png").getPath());
+
+		SUBSCRIPTION_NOT_PERSISTED_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("SubscriptionNotPersistedcon.png").getPath());
 	}
 
 }

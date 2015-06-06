@@ -44,7 +44,7 @@ public class RESTConnectionModel implements TreeModel {
 		fireTreeStructureChanged(oldRoot);
 	}
 
-	protected void fireTreeStructureChanged(Dataservices oldRoot) {
+	protected void fireTreeStructureChanged(Object oldRoot) {
 		TreeModelEvent e = new TreeModelEvent(this, new Object[] { oldRoot });
 		for (TreeModelListener tml : mTreeModelListeners) {
 			tml.treeStructureChanged(e);
@@ -109,8 +109,7 @@ public class RESTConnectionModel implements TreeModel {
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
-		// Not used by this model.
-		LOGGER.warn("Methode not used by this model! [ valueForPathChanged() ]");
+		fireTreeStructureChanged(mRootNode);
 	}
 
 }

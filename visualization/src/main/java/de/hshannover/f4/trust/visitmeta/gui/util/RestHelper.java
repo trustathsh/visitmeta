@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
@@ -34,9 +35,9 @@ public class RestHelper {
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONHandlerException,
 			JSONException {
 		List<Data> dataList = loadMapServerConnectionsData(dataserviceConnection);
-		
+
 		List<Data> connectionsList = new ArrayList<Data>();
-		
+
 		for(Data data: dataList){
 			if (data instanceof MapServerConnectionData) {
 				MapServerConnectionData connectionData = (MapServerConnectionData) data;
@@ -46,7 +47,7 @@ public class RestHelper {
 				LOGGER.fatal("Loaded connection data ist not a MapServerConnectionData");
 			}
 		}
-		
+
 		return connectionsList;
 	}
 
@@ -65,7 +66,7 @@ public class RestHelper {
 
 			connections.add(connectionData);
 		}
-		
+
 		return connections;
 	}
 
@@ -76,6 +77,16 @@ public class RestHelper {
 		JSONObject jsonMapServerConnectionData = DataManager.transformData(connectionData);
 
 		buildWebResource(dataserviceConnection).type(MediaType.APPLICATION_JSON).put(jsonMapServerConnectionData);
+	}
+
+	public static void saveSubscription(DataserviceConnection dataserviceConnection,
+			String mapServerConnectionName, SubscriptionData subscriptionData) throws ClassNotFoundException,
+			InstantiationException, IllegalAccessException, JSONException {
+
+		JSONObject jsonSubscriptionData = DataManager.transformData(subscriptionData);
+
+		buildWebResource(dataserviceConnection).path(mapServerConnectionName).path("subscribe")
+		.type(MediaType.APPLICATION_JSON).put(jsonSubscriptionData);
 	}
 
 	public static void startSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,

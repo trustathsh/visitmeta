@@ -13,11 +13,19 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 
 	private MapServerRestConnectionImpl mMapServerConnection;
 
+	private boolean mNotPersised;
+
 	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection) {
 		mMapServerConnection = mapServerConnection;
 	}
 
+	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection, String subscriptionName) {
+		this(mapServerConnection);
+		super.setName(subscriptionName);
+	}
+
 	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection, SubscriptionData subscriptionData) {
+		this(mapServerConnection);
 
 		super.setName(subscriptionData.getName());
 		super.setStartIdentifier(subscriptionData.getStartIdentifier());
@@ -30,7 +38,6 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 		super.setMaxSize(subscriptionData.getMaxSize());
 		super.setActive(subscriptionData.isActive());
 
-		mMapServerConnection = mapServerConnection;
 	}
 
 	@Override
@@ -72,6 +79,14 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
 		}
+	}
+
+	public boolean isNotPersised() {
+		return mNotPersised;
+	}
+
+	public void setNotPersised(boolean b) {
+		mNotPersised = b;
 	}
 
 }

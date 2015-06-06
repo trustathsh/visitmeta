@@ -23,6 +23,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -51,16 +52,50 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private JCheckBoxMenuItem mOpen;
 
+	private JCheckBoxMenuItem mNew;
+
+	private JCheckBoxMenuItem mClone;
+
 	private MainWindow mMainWindow;
+
+	private NewConnectionDialog mConnectionDialog;
 
 	private RESTConnectionTree mConnectionTree;
 
 	private Data mSelectedData;
 
-	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData) {
+	private ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData){
 		mSelectedData = selectedData;
 		mConnectionTree = connectionTree;
+	}
 
+	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, NewConnectionDialog connectionDialog,
+			Data selectedData) {
+		this(connectionTree, selectedData);
+		mConnectionDialog = connectionDialog;
+
+		if (mSelectedData instanceof DataserviceConnection || mSelectedData instanceof MapServerConnection
+				|| mSelectedData instanceof Subscription) {
+			initNewButton();
+			initCopyButton();
+			super.addSeparator();;
+		}
+
+		initDefaultButton();
+	}
+
+	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, MainWindow mainWindow, Data selectedData) {
+		this(connectionTree, selectedData);
+		mMainWindow = mainWindow;
+
+		if (mSelectedData instanceof MapServerConnection) {
+			initOpenButton();
+		}
+
+		initDefaultButton();
+	}
+
+	private void initDefaultButton() {
 		if (mSelectedData instanceof DataserviceConnection) {
 			initConnectButton();
 			initDisconnectButton();
@@ -79,25 +114,11 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		initUpdateTreeButton();
 	}
 
-	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, MainWindow mainWindow, Data selectedComponent) {
-		this(connectionTree, selectedComponent);
-		mMainWindow = mainWindow;
-
-		if (mSelectedData instanceof DataserviceConnection) {
-
-		} else if (mSelectedData instanceof MapServerConnection) {
-			initOpenButton();
-		} else if (mSelectedData instanceof Subscription) {
-
-		}
-	}
-
 	private void initOpenButton() {
 		mOpen = new JCheckBoxMenuItem("Open");
 
-		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
-		if (selectedComponent instanceof MapServerRestConnectionImpl) {
-			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+		if (mSelectedData instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) mSelectedData;
 
 			boolean alreadyOpen = false;
 			for (Component t : mMainWindow.getTabbedConnectionPane().getComponents()) {
@@ -118,7 +139,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			}
 		});
 
-		super.add(mOpen, 0);
+		super.add(mOpen);
 	}
 
 	private void initOnlyActiveButton() {
@@ -210,6 +231,32 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		});
 
 		super.add(mActivate);
+	}
+
+	private void initNewButton() {
+		mNew = new JCheckBoxMenuItem("New", SUBSCRIPTION_ACTIVE_ICON);
+		mNew.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mNew.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+					mConnectionDialog.eventNewData();
+			}
+		});
+
+		super.add(mNew);
+	}
+
+	private void initCopyButton() {
+		mClone = new JCheckBoxMenuItem("Clone", SUBSCRIPTION_ACTIVE_ICON);
+		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mClone.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+					mConnectionDialog.eventCloneData();
+			}
+		});
+
+		super.add(mClone);
 	}
 
 	private void initInactiveButton() {

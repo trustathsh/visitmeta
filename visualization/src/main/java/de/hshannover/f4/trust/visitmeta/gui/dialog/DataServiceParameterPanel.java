@@ -1,11 +1,15 @@
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -25,15 +29,20 @@ public class DataServiceParameterPanel extends ParameterPanel {
 
 	private DataserviceConnectionData mConnectionData;
 
+	private DocumentChangedListener mDocumentChangedListener;
+
+	private ItemListener mItemListener;
+
 	public DataServiceParameterPanel() {
 		createPanels();
 	}
 
 	public DataServiceParameterPanel(DataserviceConnectionData connectionData) {
-		createPanels();
-
 		mConnectionData = connectionData;
+
+		createPanels();
 		updatePanel();
+		addChangeListeners();
 	}
 
 	private void createPanels() {
@@ -45,7 +54,11 @@ public class DataServiceParameterPanel extends ParameterPanel {
 
 		mJtfUrl = new JTextField();
 		mJtfName = new JTextField();
-		mJtfName.setEditable(false);
+		if (mConnectionData instanceof DataserviceRestConnectionImpl) {
+			mJtfName.setEditable(((DataserviceRestConnectionImpl) mConnectionData).isNotPersised());
+		} else {
+			mJtfName.setEditable(false);
+		}
 
 		mJcbRawXML = new JCheckBox();
 
@@ -57,6 +70,29 @@ public class DataServiceParameterPanel extends ParameterPanel {
 		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlRawXml, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, LayoutHelper.mLblInsets);
 	}
+
+	private void addChangeListeners() {
+		mDocumentChangedListener = new DocumentChangedListener() {
+
+			@Override
+			protected void dataChanged() {
+				fireParameterChanged();
+			}
+		};
+
+		mItemListener = new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				fireParameterChanged();
+			}
+		};
+
+		mJtfName.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfUrl.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJcbRawXML.addItemListener(mItemListener);
+	}
+
 
 	private void updatePanel() {
 		mJtfName.setText(mConnectionData.getName());

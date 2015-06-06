@@ -3,6 +3,7 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 import java.util.List;
 
 import javax.swing.JTree;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -24,6 +25,11 @@ public class RESTConnectionTree extends JTree {
 		// setRootVisible(false);
 	}
 
+	public void updateModel() {
+		super.getModel().valueForPathChanged(null, null);
+		expandAllNodes();
+	}
+
 	public void updateConnections(List<Data> graphNodes) {
 		((RESTConnectionModel) super.getModel()).updateConnections(graphNodes);
 	}
@@ -35,7 +41,7 @@ public class RESTConnectionTree extends JTree {
 	public void showAllSubscriptions(boolean b) {
 		((RESTConnectionModel) super.getModel()).showAllSubscriptions(b);
 	}
-	
+
 	public boolean isShowAllMapServerConnections() {
 		return ((RESTConnectionModel) super.getModel()).isOnlyActiveMapServerConnections();
 	}
@@ -52,5 +58,18 @@ public class RESTConnectionTree extends JTree {
 			i++;
 			j = super.getRowCount();
 		}
+	}
+
+	public Data getSelectedParentData(){
+		TreePath selectedTreePath = super.getSelectionPath();
+		TreePath parentTreePath = selectedTreePath.getParentPath();
+
+		Object selectedParentData = parentTreePath.getLastPathComponent();
+
+		if (selectedParentData instanceof Data) {
+			return (Data) selectedParentData;
+		}
+
+		return null;
 	}
 }

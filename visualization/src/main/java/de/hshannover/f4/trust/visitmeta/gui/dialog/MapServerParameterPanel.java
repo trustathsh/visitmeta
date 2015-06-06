@@ -1,6 +1,8 @@
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -9,6 +11,7 @@ import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -39,6 +42,8 @@ public class MapServerParameterPanel extends ParameterPanel {
 
 	private DocumentChangedListener mDocumentChangedListener;
 
+	private ItemListener mItemListener;
+
 	public MapServerParameterPanel() {
 		createPanels();
 	}
@@ -48,7 +53,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 
 		createPanels();
 		updatePanel();
-		addChangeListener();
+		addChangeListeners();
 
 	}
 
@@ -65,7 +70,11 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mJlConnectingAtStartUp = new JLabel("Connecting at start-up");
 
 		mJtfName = new JTextField();
-		mJtfName.setEditable(false);
+		if (mConnectionData instanceof MapServerRestConnectionImpl) {
+			mJtfName.setEditable(((MapServerRestConnectionImpl) mConnectionData).isNotPersised());
+		} else {
+			mJtfName.setEditable(false);
+		}
 		mJtfUrl = new JTextField();
 		mJcbBasicAuthentication = new JCheckBox();
 		mJcbBasicAuthentication.setEnabled(false);
@@ -91,20 +100,30 @@ public class MapServerParameterPanel extends ParameterPanel {
 		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, LayoutHelper.mLblInsets);
 	}
 
-	private void addChangeListener() {
+	private void addChangeListeners() {
 		mDocumentChangedListener = new DocumentChangedListener() {
 
 			@Override
 			protected void dataChanged() {
-				System.out.println("dataChanged");
 				fireParameterChanged();
 			}
 		};
+
+		mItemListener = new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				fireParameterChanged();
+			}
+		};
+
 		mJtfName.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfUrl.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfUsername.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfPassword.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfMaxPollResultSize.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJcbConnectingAtStartUp.addItemListener(mItemListener);
+		mJcbBasicAuthentication.addItemListener(mItemListener);
 	}
 
 	private void updatePanel() {

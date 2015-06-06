@@ -1,12 +1,16 @@
 package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -37,15 +41,20 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 
 	private SubscriptionData mSubscription;
 
+	private DocumentChangedListener mDocumentChangedListener;
+
+	private ItemListener mItemListener;
+
 	public SubscriptionParameterPanel() {
 		createPanels();
 	}
 
 	public SubscriptionParameterPanel(SubscriptionData subscription) {
-		createPanels();
-
 		mSubscription = subscription;
+
+		createPanels();
 		updatePanel();
+		addChangeListeners();
 	}
 
 	private void createPanels() {
@@ -62,7 +71,11 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJlStartupSubscribe = new JLabel("Subscribe at start-up");
 
 		mJtfName = new JTextField();
-		mJtfName.setEditable(false);
+		if (mSubscription instanceof RestSubscriptionImpl) {
+			mJtfName.setEditable(((RestSubscriptionImpl) mSubscription).isNotPersised());
+		} else {
+			mJtfName.setEditable(false);
+		}
 		mJtfStartIdentifier = new JTextField();
 		mJtfStartIdentifierType = new JTextField();
 		mJtfFilterLinks = new JTextField();
@@ -94,6 +107,35 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		LayoutHelper.addComponent(1, 8, 1, 1, 1.0, 1.0, this, mJcbStartupSubscribe, LayoutHelper.mLblInsets);
 	}
 
+	private void addChangeListeners() {
+		mDocumentChangedListener = new DocumentChangedListener() {
+
+			@Override
+			protected void dataChanged() {
+				fireParameterChanged();
+			}
+		};
+
+		mItemListener = new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				fireParameterChanged();
+			}
+		};
+
+		mJtfName.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfFilterLinks.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfFilterResult.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfMaxDepth.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfMaxSize.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfStartIdentifier.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfStartIdentifierType.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfTerminalIdentifierTypes.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJcbStartupSubscribe.addItemListener(mItemListener);
+	}
+
+
 	private void updatePanel() {
 		mJtfName.setText(mSubscription.getName());
 		mJtfStartIdentifier.setText(mSubscription.getStartIdentifier());
@@ -119,4 +161,5 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mSubscription.setStartupSubscribe(mJcbStartupSubscribe.isSelected());
 		return mSubscription;
 	}
+
 }

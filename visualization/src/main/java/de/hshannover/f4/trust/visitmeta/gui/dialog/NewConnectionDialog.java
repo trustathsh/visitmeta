@@ -24,10 +24,16 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
@@ -50,6 +56,8 @@ public class NewConnectionDialog extends JDialog{
 	private JSplitPane mJspMain;
 
 	private JPanel mJpParameter;
+
+	private ParameterPanel mParameterValues;
 
 	private JPanel mJpLog;
 
@@ -197,23 +205,22 @@ public class NewConnectionDialog extends JDialog{
 	}
 
 	public void switchParameterPanel() {
-		JPanel parameterPanel = null;
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceConnection) {
-			parameterPanel = new DataServiceParameterPanel((DataserviceConnection) selectedComponent);
+			mParameterValues = new DataServiceParameterPanel((DataserviceConnection) selectedComponent);
 
 		} else if (selectedComponent instanceof MapServerConnection) {
-			parameterPanel = new MapServerParameterPanel((MapServerConnection) selectedComponent);
+			mParameterValues = new MapServerParameterPanel((MapServerConnection) selectedComponent);
 
 		} else if (selectedComponent instanceof Subscription) {
-			parameterPanel = new SubscriptionParameterPanel((Subscription) selectedComponent);
+			mParameterValues = new SubscriptionParameterPanel((Subscription) selectedComponent);
 		}
 
-		if (parameterPanel != null) {
+		if (mParameterValues != null) {
 			mJpParameter.removeAll();
 
-			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, parameterPanel, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mParameterValues, LayoutHelper.mLblInsets);
 		}
 
 		mJpParameter.updateUI();
@@ -227,8 +234,92 @@ public class NewConnectionDialog extends JDialog{
 
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 
-		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mJtConnections, (Data) selectedComponent);
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mJtConnections, this, (Data) selectedComponent);
 		popUp.show(mJtConnections, x, y);
+	}
+
+	public void eventCloneData() {
+		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
+
+		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
+		if (selectedComponent instanceof DataserviceConnection) {
+			DataserviceConnection newDataserviceConnection = ((DataserviceConnection) selectedComponent)
+					.clone();
+
+			addNewData(parentPath, newDataserviceConnection);
+
+		} else if (selectedComponent instanceof MapServerConnection) {
+			MapServerConnection newMapServerConnection = ((MapServerConnection) selectedComponent).clone();
+
+			addNewData(parentPath, newMapServerConnection);
+
+		} else if (selectedComponent instanceof Subscription) {
+			Subscription newSubscription = ((Subscription) selectedComponent).clone();
+
+			addNewData(parentPath, newSubscription);
+		}
+	}
+
+	public void eventNewData() {
+		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
+		Data parentData = mJtConnections.getSelectedParentData();
+		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
+
+		if (selectedComponent instanceof DataserviceConnection) {
+			DataserviceRestConnectionImpl newDataserviceConnection = new DataserviceRestConnectionImpl(
+					"New Dataservice-Connection", "", false);
+			newDataserviceConnection.setNotPersised(true);
+
+			addNewData(parentPath, newDataserviceConnection);
+
+		} else if (selectedComponent instanceof MapServerConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+			MapServerRestConnectionImpl newMapServerConnection = new MapServerRestConnectionImpl(
+					dataserviceConnection, "New Map-Server-Connection");
+			newMapServerConnection.setNotPersised(true);
+
+			addNewData(parentPath, newMapServerConnection);
+
+		} else if (selectedComponent instanceof Subscription) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) parentData;
+			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(mapServerConnection,
+					"New Subscription");
+			newSubscription.setNotPersised(true);
+
+			addNewData(parentPath, newSubscription);
+		}
+	}
+
+	public void addNewData(TreePath parentPath, Data newData) {
+		Object parentData = parentPath.getLastPathComponent();
+		TreePath newPath = parentPath.pathByAddingChild(newData);
+
+		if (parentData instanceof Dataservices) {
+			Dataservices dataservices = (Dataservices) parentData;
+			dataservices.addDataserviceConnection((DataserviceConnection) newData);
+
+			mJtConnections.updateModel();
+			selectPath(newPath);
+
+		} else if (parentData instanceof DataserviceConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+			dataserviceConnection.addMapServerData((MapServerConnectionData) newData);
+
+			mJtConnections.updateModel();
+			selectPath(newPath);
+
+		} else if (parentData instanceof MapServerConnection) {
+			MapServerConnection mapServerConnection = (MapServerConnection) parentData;
+			mapServerConnection.addSubscription((Subscription) newData);
+
+			mJtConnections.updateModel();
+			selectPath(newPath);
+		}
+	}
+
+	public void selectPath(TreePath newPath) {
+		mJtConnections.setSelectionPath(newPath);
+		switchParameterPanel();
 	}
 
 }

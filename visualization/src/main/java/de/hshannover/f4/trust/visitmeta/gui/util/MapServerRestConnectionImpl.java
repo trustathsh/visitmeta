@@ -32,6 +32,8 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	private boolean mGraphStarted;
 
 	private DataserviceConnection mDataserviceConnection;
+	
+	private boolean mNotPersised;
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection,
 			MapServerConnectionData connectionData) {
@@ -108,7 +110,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
-	}
+		}
 	}
 
 	@Override
@@ -199,5 +201,13 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	public boolean isGraphStarted() {
 		return mGraphStarted;
+	}
+	
+	public boolean isNotPersised() {
+		return mNotPersised;
+	}
+
+	public void setNotPersised(boolean b) {
+		mNotPersised = b;
 	}
 }

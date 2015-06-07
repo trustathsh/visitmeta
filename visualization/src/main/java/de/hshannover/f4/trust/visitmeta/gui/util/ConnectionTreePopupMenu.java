@@ -181,8 +181,6 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
-
-				mConnectionTree.updateUI();
 			}
 		});
 
@@ -205,8 +203,6 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
-
-				mConnectionTree.updateUI();
 			}
 		});
 
@@ -225,38 +221,10 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
-
-				mConnectionTree.updateUI();
 			}
 		});
 
 		super.add(mActivate);
-	}
-
-	private void initNewButton() {
-		mNew = new JCheckBoxMenuItem("New", SUBSCRIPTION_ACTIVE_ICON);
-		mNew.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		mNew.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-					mConnectionDialog.eventNewData();
-			}
-		});
-
-		super.add(mNew);
-	}
-
-	private void initCopyButton() {
-		mClone = new JCheckBoxMenuItem("Clone", SUBSCRIPTION_ACTIVE_ICON);
-		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		mClone.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-					mConnectionDialog.eventCloneData();
-			}
-		});
-
-		super.add(mClone);
 	}
 
 	private void initInactiveButton() {
@@ -271,12 +239,36 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
 				}
-
-				mConnectionTree.updateUI();
 			}
 		});
 
 		super.add(mDeactivate);
+	}
+
+	private void initNewButton() {
+		mNew = new JCheckBoxMenuItem("New", SUBSCRIPTION_ACTIVE_ICON);
+		mNew.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mNew.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mConnectionDialog.eventNewData();
+			}
+		});
+
+		super.add(mNew);
+	}
+
+	private void initCopyButton() {
+		mClone = new JCheckBoxMenuItem("Clone", SUBSCRIPTION_ACTIVE_ICON);
+		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mClone.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				mConnectionDialog.eventCloneData();
+			}
+		});
+
+		super.add(mClone);
 	}
 
 	private void initUpdateTreeButton() {

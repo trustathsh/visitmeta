@@ -82,6 +82,7 @@ import de.hshannover.f4.trust.visitmeta.gui.dialog.MapServerParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.SubscriptionParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterListener;
@@ -90,11 +91,8 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -206,14 +204,27 @@ public class MainWindow extends JFrame {
 		mJpParameter.setLayout(new GridBagLayout());
 		mJpParameter.setBorder(BorderFactory.createTitledBorder("Parameter"));
 
+		mJbParameterSave = new JButton("Save");
+		mJbParameterSave.setEnabled(false);
+		mJbParameterSave.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				savePropertiesChanges();
+			}
+		});
+
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
-		if (selectedComponent instanceof DataserviceConnection) {
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			mJpParameterValues = new DataServiceParameterPanel((DataserviceConnectionData) selectedComponent);
-		} else if (selectedComponent instanceof MapServerConnection) {
+			mJbParameterSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			mJpParameterValues = new MapServerParameterPanel((MapServerConnectionData) selectedComponent);
-		} else if (selectedComponent instanceof Subscription) {
+			mJbParameterSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
 			mJpParameterValues = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
+			mJbParameterSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
 		}
 		mJpParameterValues.addParameterListener(new ParameterListener() {
 			@Override
@@ -226,15 +237,6 @@ public class MainWindow extends JFrame {
 		mJpParameterSouth = new JPanel();
 		mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		mJbParameterSave = new JButton("Save");
-		mJbParameterSave.setEnabled(false);
-		mJbParameterSave.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				savePropertiesChanges();
-			}
-		});
 
 		mJpParameterSouth.add(mJbParameterSave);
 
@@ -455,27 +457,33 @@ public class MainWindow extends JFrame {
 		mJbParameterSave.setEnabled(true);
 
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
-		if (selectedComponent instanceof DataserviceConnection) {
-			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			dataserviceConnection.changeData((DataserviceConnectionData) changedData);
+			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			mapServerConnection.changeData((MapServerConnectionData) changedData);
+			mapServerConnection.setNotPersised(true);
 
-		} else if (selectedComponent instanceof Subscription) {
-			Subscription subscription = (Subscription) selectedComponent;
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
 			subscription.changeData((SubscriptionData) changedData);
+			subscription.setNotPersised(true);
 		}
+
+		mConnectionTree.updateUI();
 	}
 
 	public void savePropertiesChanges() {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
-		if (selectedComponent instanceof DataserviceConnection) {
-			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			try {
 				Main.getDataservicePersister().persist(dataserviceConnection);
+				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
 				LOGGER.error(e.toString(), e);
 			}
@@ -485,23 +493,26 @@ public class MainWindow extends JFrame {
 
 			try {
 				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
+				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 				LOGGER.error(e.toString(), e);
 			}
 
-		} else if (selectedComponent instanceof Subscription) {
-			Subscription subscription = (Subscription) selectedComponent;
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
 			Data parentData = mConnectionTree.getSelectedParentData();
 			if (parentData instanceof MapServerRestConnectionImpl) {
 				MapServerRestConnectionImpl connectionData = (MapServerRestConnectionImpl) parentData;
 				try {
 					RestHelper.saveSubscription(connectionData.getDataserviceConnection(), connectionData.getName(),
 							subscription);
+					subscription.setNotPersised(false);
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 					LOGGER.error(e.toString(), e);
 				}
 			}
 		}
+		mConnectionTree.updateUI();
 		mJbParameterSave.setEnabled(false);
 	}
 

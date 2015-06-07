@@ -82,7 +82,6 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 		tmpCopy.setStartupSubscribe(isStartupSubscribe());
 		tmpCopy.setMaxDepth(getMaxDepth());
 		tmpCopy.setMaxSize(getMaxSize());
-		tmpCopy.setActive(isActive());
 		return tmpCopy;
 	}
 

@@ -10,17 +10,17 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MapServerConnectionDataImpl extends DataImpl implements MapServerConnectionData {
-	
+
 	private String mUrl;
 
 	private String mUserName;
 
 	private String mUserPass;
-	
+
 	private String mTruststorePath;
-	
+
 	private String mTruststorePassword;
-	
+
 	private List<Data> mSubscriptionDataList;
 
 	private int mMaxPollResultSize;
@@ -55,7 +55,6 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		data.setTruststorePassword(getTruststorePassword());
 		data.setSubscriptionData(getSubscriptions());
 		data.setMaxPollResultSize(getMaxPollResultSize());
-		data.setConnected(isConnected());
 		data.setStartupConnect(doesConnectOnStartup());
 		data.setAuthenticationBasic(isAuthenticationBasic());
 		return data;

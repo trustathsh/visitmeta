@@ -406,6 +406,7 @@ public class NewConnectionDialog extends JDialog{
 			}
 		}
 		mJbSave.setEnabled(false);
+		changeParameterPanel();
 	}
 
 	public void selectPath(TreePath newPath) {

@@ -64,9 +64,11 @@ public class DataservicePersister extends Properties {
 		String connectionName = connection.getName();
 		String dataserviceRestUrl = connection.getUrl();
 		boolean rawXml = connection.isRawXml();
+		boolean connected = connection.isConnected();
 
 		setPropertyDataserviceRestUrl(connectionName, dataserviceRestUrl);
 		setPropertyRawXml(connectionName, rawXml);
+		setPropertyConnected(connectionName, connected);
 	}
 
 	public List<Data> loadDataserviceConnections() throws PropertyException {
@@ -100,6 +102,10 @@ public class DataservicePersister extends Properties {
 
 	private void setPropertyRawXml(String connectionName, boolean rawXml) throws PropertyException {
 		super.set(connectionName + "." + ConnectionKey.RAW_XML, rawXml);
+	}
+
+	private void setPropertyConnected(String connectionName, boolean connected) throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.CONNECTED, connected);
 	}
 
 	private void setPropertyDataserviceRestUrl(String connectionName, String dataserviceRestUrl)

@@ -11,7 +11,6 @@ import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
-import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -70,11 +69,8 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mJlConnectingAtStartUp = new JLabel("Connecting at start-up");
 
 		mJtfName = new JTextField();
-		if (mConnectionData instanceof MapServerRestConnectionImpl) {
-			mJtfName.setEditable(((MapServerRestConnectionImpl) mConnectionData).isNotPersised());
-		} else {
-			mJtfName.setEditable(false);
-		}
+		mJtfName.setEditable(false);
+
 		mJtfUrl = new JTextField();
 		mJcbBasicAuthentication = new JCheckBox();
 		mJcbBasicAuthentication.setEnabled(false);
@@ -150,5 +146,10 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mConnectionData.setStartupConnect(mJcbConnectingAtStartUp.isSelected());
 		mConnectionData.setMaxPollResultSize(Integer.parseInt(mJtfMaxPollResultSize.getText().trim()));
 		return mConnectionData;
+	}
+
+	@Override
+	public void setNameTextFieldEditable() {
+		mJtfName.setEditable(true);
 	}
 }

@@ -10,7 +10,6 @@ import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
-import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -71,11 +70,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJlStartupSubscribe = new JLabel("Subscribe at start-up");
 
 		mJtfName = new JTextField();
-		if (mSubscription instanceof RestSubscriptionImpl) {
-			mJtfName.setEditable(((RestSubscriptionImpl) mSubscription).isNotPersised());
-		} else {
-			mJtfName.setEditable(false);
-		}
+		mJtfName.setEditable(false);
+
 		mJtfStartIdentifier = new JTextField();
 		mJtfStartIdentifierType = new JTextField();
 		mJtfFilterLinks = new JTextField();
@@ -162,4 +158,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		return mSubscription;
 	}
 
+	@Override
+	public void setNameTextFieldEditable() {
+		mJtfName.setEditable(true);
+	}
 }

@@ -8,7 +8,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
@@ -54,11 +53,7 @@ public class DataServiceParameterPanel extends ParameterPanel {
 
 		mJtfUrl = new JTextField();
 		mJtfName = new JTextField();
-		if (mConnectionData instanceof DataserviceRestConnectionImpl) {
-			mJtfName.setEditable(((DataserviceRestConnectionImpl) mConnectionData).isNotPersised());
-		} else {
-			mJtfName.setEditable(false);
-		}
+		mJtfName.setEditable(false);
 
 		mJcbRawXML = new JCheckBox();
 
@@ -106,6 +101,11 @@ public class DataServiceParameterPanel extends ParameterPanel {
 		mConnectionData.setUrl(mJtfUrl.getText().trim());
 		mConnectionData.setRawXml(mJcbRawXML.isSelected());
 		return mConnectionData;
+	}
+
+	@Override
+	public void setNameTextFieldEditable() {
+		mJtfName.setEditable(true);
 	}
 
 }

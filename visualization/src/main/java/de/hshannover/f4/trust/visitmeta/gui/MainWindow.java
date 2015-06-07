@@ -518,7 +518,9 @@ public class MainWindow extends JFrame {
 
 	public void showConnectionTreePopupMenu(int x, int y) {
 		TreePath mouseTreePath = mConnectionTree.getClosestPathForLocation(x, y);
-		mConnectionTree.setSelectionPath(mouseTreePath);
+
+		selectPath(mouseTreePath);
+
 		Object selectedComponent = mouseTreePath.getLastPathComponent();
 
 		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, this, (Data) selectedComponent);
@@ -564,5 +566,10 @@ public class MainWindow extends JFrame {
 
 			mConnectionTree.updateUI();
 		}
+	}
+
+	public void selectPath(TreePath newPath) {
+		mConnectionTree.setSelectionPath(newPath);
+		changeParameterPanel();
 	}
 }

@@ -28,4 +28,6 @@ public abstract class ParameterPanel extends JPanel {
 	}
 
 	public abstract Data getData();
+
+	public abstract void setNameTextFieldEditable();
 }

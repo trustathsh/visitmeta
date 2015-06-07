@@ -13,7 +13,7 @@ public class ConnectionTreeDialogListener implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent event) {
-		mConnectionDialog.switchParameterPanel();
+		mConnectionDialog.changeParameterPanel();
 	}
 
 	@Override

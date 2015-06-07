@@ -3,7 +3,6 @@ package de.hshannover.f4.trust.visitmeta.gui.dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,11 +26,14 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -109,6 +111,9 @@ public class NewConnectionDialog extends JDialog{
 		initMainPanel();
 		initSouthPanel();
 
+		mJtConnections.setSelectionRow(1);
+		changeParameterPanel();
+
 		// x y w h wx wy
 		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJspMain, LayoutHelper.mLblInsets);
 		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.mLblInsets);
@@ -144,7 +149,6 @@ public class NewConnectionDialog extends JDialog{
 		mJspMain.setLeftComponent(mJpLeft);
 		mJspMain.setRightComponent(mJpRight);
 
-		switchParameterPanel();
 	}
 
 
@@ -160,7 +164,6 @@ public class NewConnectionDialog extends JDialog{
 		}
 		mJtConnections.expandAllNodes();
 		mJtConnections.addMouseListener(new ConnectionTreeDialogListener(this));
-		mJtConnections.setSelectionRow(1);
 
 		ConnectionTreeCellRenderer treeRenderer = new ConnectionTreeCellRenderer();
 		mJtConnections.setCellRenderer(treeRenderer);
@@ -168,8 +171,11 @@ public class NewConnectionDialog extends JDialog{
 		mJspLeft = new JScrollPane(mJtConnections);
 
 		mJpLeft = new JPanel();
-		mJpLeft.setLayout(new GridLayout());
-		mJpLeft.add(mJspLeft);
+		mJpLeft.setLayout(new GridBagLayout());
+
+		// x y w h wx wy
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpLeft, mJspLeft, LayoutHelper.mLblInsets);
+
 	}
 
 	/**
@@ -204,38 +210,71 @@ public class NewConnectionDialog extends JDialog{
 		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRight, mJpLog, LayoutHelper.mLblInsets);
 	}
 
-	public void switchParameterPanel() {
+	public void changeParameterPanel() {
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceConnection) {
 			mParameterValues = new DataServiceParameterPanel((DataserviceConnection) selectedComponent);
+			mJbSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
 
 		} else if (selectedComponent instanceof MapServerConnection) {
 			mParameterValues = new MapServerParameterPanel((MapServerConnection) selectedComponent);
+			mJbSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
 
 		} else if (selectedComponent instanceof Subscription) {
 			mParameterValues = new SubscriptionParameterPanel((Subscription) selectedComponent);
+			mJbSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
 		}
 
 		if (mParameterValues != null) {
+
+			mParameterValues.addParameterListener(new ParameterListener() {
+				@Override
+				public void parameterChanged() {
+					Data changedData = mParameterValues.getData();
+					propertiesDataChanged(changedData);
+				}
+			});
 			mJpParameter.removeAll();
 
 			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mParameterValues, LayoutHelper.mLblInsets);
-		}
 
-		mJpParameter.updateUI();
-		// super.pack();
+			mJpParameter.updateUI();
+		}
 	}
 
 	public void showConnectionTreePopupMenu(int x, int y) {
-		Object[] path = mJtConnections.getClosestPathForLocation(x, y).getPath();
+		TreePath treePath = mJtConnections.getClosestPathForLocation(x, y);
 
-		mJtConnections.setSelectionPath(new TreePath(path));
+		selectPath(treePath);
 
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 
 		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mJtConnections, this, (Data) selectedComponent);
 		popUp.show(mJtConnections, x, y);
+	}
+
+	public void propertiesDataChanged(Data changedData) {
+		mJbSave.setEnabled(true);
+
+		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			dataserviceConnection.changeData((DataserviceConnectionData) changedData);
+			dataserviceConnection.setNotPersised(true);
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			mapServerConnection.changeData((MapServerConnectionData) changedData);
+			mapServerConnection.setNotPersised(true);
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			subscription.changeData((SubscriptionData) changedData);
+			subscription.setNotPersised(true);
+		}
+
+		mJspLeft.updateUI();
 	}
 
 	public void eventCloneData() {
@@ -300,6 +339,7 @@ public class NewConnectionDialog extends JDialog{
 
 			mJtConnections.updateModel();
 			selectPath(newPath);
+			mParameterValues.setNameTextFieldEditable();
 
 		} else if (parentData instanceof DataserviceConnection) {
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
@@ -307,6 +347,7 @@ public class NewConnectionDialog extends JDialog{
 
 			mJtConnections.updateModel();
 			selectPath(newPath);
+			mParameterValues.setNameTextFieldEditable();
 
 		} else if (parentData instanceof MapServerConnection) {
 			MapServerConnection mapServerConnection = (MapServerConnection) parentData;
@@ -314,12 +355,13 @@ public class NewConnectionDialog extends JDialog{
 
 			mJtConnections.updateModel();
 			selectPath(newPath);
+			mParameterValues.setNameTextFieldEditable();
 		}
 	}
 
 	public void selectPath(TreePath newPath) {
 		mJtConnections.setSelectionPath(newPath);
-		switchParameterPanel();
+		changeParameterPanel();
 	}
 
 }

@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONException;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
@@ -29,6 +30,7 @@ import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
@@ -133,6 +135,14 @@ public class NewConnectionDialog extends JDialog{
 
 		mJbSave = new JButton("Save");
 		mJbSave.setEnabled(false);
+		mJbSave.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				savePropertyChanges();
+			}
+		});
+
 
 		mJpSouth.add(mJbClose);
 		mJpSouth.add(mJbSave);
@@ -357,6 +367,45 @@ public class NewConnectionDialog extends JDialog{
 			selectPath(newPath);
 			mParameterValues.setNameTextFieldEditable();
 		}
+	}
+
+	public void savePropertyChanges() {
+		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			try {
+				Main.getDataservicePersister().persist(dataserviceConnection);
+				dataserviceConnection.setNotPersised(false);
+			} catch (PropertyException e) {
+				LOGGER.error(e.toString(), e);
+			}
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			try {
+				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
+				mapServerConnection.setNotPersised(false);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+				LOGGER.error(e.toString(), e);
+			}
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			Data parentData = mJtConnections.getSelectedParentData();
+			if (parentData instanceof MapServerRestConnectionImpl) {
+				MapServerRestConnectionImpl connectionData = (MapServerRestConnectionImpl) parentData;
+				try {
+					RestHelper.saveSubscription(connectionData.getDataserviceConnection(), connectionData.getName(),
+							subscription);
+					subscription.setNotPersised(false);
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+					LOGGER.error(e.toString(), e);
+				}
+			}
+		}
+		mJbSave.setEnabled(false);
 	}
 
 	public void selectPath(TreePath newPath) {

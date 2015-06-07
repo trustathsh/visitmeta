@@ -210,7 +210,7 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				savePropertiesChanges();
+				savePropertyChanges();
 			}
 		});
 
@@ -476,7 +476,7 @@ public class MainWindow extends JFrame {
 		mConnectionTree.updateUI();
 	}
 
-	public void savePropertiesChanges() {
+	public void savePropertyChanges() {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {

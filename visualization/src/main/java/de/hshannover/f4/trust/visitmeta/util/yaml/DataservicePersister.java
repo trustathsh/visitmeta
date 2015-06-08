@@ -40,6 +40,8 @@ package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
@@ -69,6 +71,19 @@ public class DataservicePersister extends Properties {
 		setPropertyDataserviceRestUrl(connectionName, dataserviceRestUrl);
 		setPropertyRawXml(connectionName, rawXml);
 		setPropertyConnected(connectionName, connected);
+	}
+
+	public void removeDataserviceConnection(String connectionName) throws PropertyException {
+		Map<String, Object> propertyMap = load();
+
+		for (Entry<String, Object> entry : propertyMap.entrySet()) {
+			if (entry.getKey().equals(connectionName)) {
+				propertyMap.remove(entry.getKey());
+				break;
+			}
+		}
+
+		save(propertyMap);
 	}
 
 	public List<Data> loadDataserviceConnections() throws PropertyException {

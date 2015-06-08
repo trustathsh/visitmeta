@@ -289,7 +289,7 @@ public class NewConnectionDialog extends JDialog{
 		mJspLeft.updateUI();
 	}
 
-	public void eventDeleteData() {
+	public void eventDeleteData() throws PropertyException {
 		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
 		Object parentData = parentPath.getLastPathComponent();
@@ -298,7 +298,7 @@ public class NewConnectionDialog extends JDialog{
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
 			Dataservices dataservices = (Dataservices) parentData;
 
-			// mDataservicePersister.
+			mDataservicePersister.removeDataserviceConnection(dataserviceConnection.getConnectionName());
 
 			dataservices.removeDataserviceConnection(dataserviceConnection);
 

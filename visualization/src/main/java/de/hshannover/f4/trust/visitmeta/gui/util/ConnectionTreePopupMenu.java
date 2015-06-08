@@ -297,7 +297,11 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		mDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				mConnectionDialog.eventDeleteData();
+				try {
+					mConnectionDialog.eventDeleteData();
+				} catch (PropertyException e) {
+					LOGGER.error(e.toString(), e);
+				}
 			}
 		});
 

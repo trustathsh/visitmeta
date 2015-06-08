@@ -78,6 +78,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				|| mSelectedData instanceof Subscription) {
 			initNewButton();
 			initCopyButton();
+			initDeleteButton();
 			super.addSeparator();;
 		}
 
@@ -292,13 +293,14 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private void initDeleteButton() {
 		mDelete = new JCheckBoxMenuItem("Delete");
+		mDelete.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				// TODO delete the Connection
-
-				mConnectionTree.updateUI();
+				mConnectionDialog.eventDeleteData();
 			}
 		});
+
+		super.add(mDelete);
 	}
 }

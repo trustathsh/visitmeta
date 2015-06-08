@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.gui.dialog;
+﻿package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -91,6 +91,8 @@ public class NewConnectionDialog extends JDialog{
 	}
 
 	public NewConnectionDialog() {
+		mDataservicePersister = Main.getDataservicePersister();
+
 		createDialog();
 		createPanels();
 
@@ -287,25 +289,45 @@ public class NewConnectionDialog extends JDialog{
 		mJspLeft.updateUI();
 	}
 
+	public void eventDeleteData() {
+		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
+		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
+		Object parentData = parentPath.getLastPathComponent();
+
+		if (selectedComponent instanceof DataserviceConnection && parentData instanceof Dataservices) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+			Dataservices dataservices = (Dataservices) parentData;
+
+			// mDataservicePersister.
+
+			dataservices.removeDataserviceConnection(dataserviceConnection);
+
+			mJtConnections.updateModel();
+		} else if (selectedComponent instanceof MapServerConnection && parentData instanceof DataserviceConnection) {
+			MapServerConnection mapServerConnection = (MapServerConnection) selectedComponent;
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+			dataserviceConnection.removeMapServerData(mapServerConnection);
+
+			mJtConnections.updateModel();
+
+		} else if (selectedComponent instanceof Subscription && parentData instanceof MapServerConnection) {
+			Subscription subscription = (Subscription) selectedComponent;
+			MapServerConnection mapServerConnection = (MapServerConnection) parentData;
+			mapServerConnection.deleteSubscription(subscription.getName());
+
+			mJtConnections.updateModel();
+		}
+
+	}
+
 	public void eventCloneData() {
 		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
-
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
-		if (selectedComponent instanceof DataserviceConnection) {
-			DataserviceConnection newDataserviceConnection = ((DataserviceConnection) selectedComponent)
-					.clone();
 
-			addNewData(parentPath, newDataserviceConnection);
+		if (selectedComponent instanceof Data) {
+			Data newData = ((Data) selectedComponent).clone();
 
-		} else if (selectedComponent instanceof MapServerConnection) {
-			MapServerConnection newMapServerConnection = ((MapServerConnection) selectedComponent).clone();
-
-			addNewData(parentPath, newMapServerConnection);
-
-		} else if (selectedComponent instanceof Subscription) {
-			Subscription newSubscription = ((Subscription) selectedComponent).clone();
-
-			addNewData(parentPath, newSubscription);
+			addNewData(parentPath, newData);
 		}
 	}
 

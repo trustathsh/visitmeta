@@ -21,6 +21,10 @@ public class Dataservices extends DataImpl {
 		return new ArrayList<Data>(mList);
 	}
 
+	public void removeDataserviceConnection(DataserviceConnection dataservice){
+		mList.remove(dataservice);
+	}
+
 	@Override
 	public Data copy() {
 		Dataservices tmpCopy = new Dataservices();

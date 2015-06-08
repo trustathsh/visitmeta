@@ -6,6 +6,12 @@ import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 
 public class ImageIconLoader {
 
+	public static final ImageIcon ADD_ICON;
+
+	public static final ImageIcon CLONE_ICON;
+	
+	public static final ImageIcon DELETE_ICON;
+	
 	public static final ImageIcon DATASERVICES_ICON;
 
 	public static final ImageIcon DATASERVICE_CONNECTED_ICON;
@@ -29,6 +35,15 @@ public class ImageIconLoader {
 	public static final ImageIcon SUBSCRIPTION_NOT_PERSISTED_ICON;
 
 	static {
+
+		ADD_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("AddIcon.png").getPath());
+
+		CLONE_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("CloneIcon.png").getPath());
+		
+		DELETE_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
+				.getResource("DeleteIcon.png").getPath());
 
 		DATASERVICES_ICON = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
 				.getResource("ConnectionTreeRoot.png").getPath());

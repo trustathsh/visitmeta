@@ -294,11 +294,13 @@ public class NewConnectionDialog extends JDialog{
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
 		Object parentData = parentPath.getLastPathComponent();
 
-		if (selectedComponent instanceof DataserviceConnection && parentData instanceof Dataservices) {
-			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
+		if (selectedComponent instanceof DataserviceRestConnectionImpl && parentData instanceof Dataservices) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			Dataservices dataservices = (Dataservices) parentData;
 
-			mDataservicePersister.removeDataserviceConnection(dataserviceConnection.getConnectionName());
+			if (!dataserviceConnection.isNotPersised()) {
+				mDataservicePersister.removeDataserviceConnection(dataserviceConnection.getConnectionName());
+			}
 
 			dataservices.removeDataserviceConnection(dataserviceConnection);
 
@@ -333,56 +335,56 @@ public class NewConnectionDialog extends JDialog{
 
 	public void eventNewData() {
 		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
-		Data parentData = mJtConnections.getSelectedParentData();
-		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
+		TreePath selectionPath = mJtConnections.getSelectionPath();
 
-		if (selectedComponent instanceof DataserviceConnection) {
+		if (selectedComponent instanceof Dataservices) {
+			Dataservices dataservices = (Dataservices) selectedComponent;
 			DataserviceRestConnectionImpl newDataserviceConnection = new DataserviceRestConnectionImpl(
-					"New Dataservice-Connection", "", false);
+					"New Dataservice-Connection " + (dataservices.getSubDataCount() + 1), "", false);
 			newDataserviceConnection.setNotPersised(true);
 
-			addNewData(parentPath, newDataserviceConnection);
+			addNewData(selectionPath, newDataserviceConnection);
 
-		} else if (selectedComponent instanceof MapServerConnection) {
-			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+		} else if (selectedComponent instanceof DataserviceConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
 			MapServerRestConnectionImpl newMapServerConnection = new MapServerRestConnectionImpl(
-					dataserviceConnection, "New Map-Server-Connection");
+					dataserviceConnection, "New Map-Server-Connection " + (dataserviceConnection.getSubDataCount() + 1));
 			newMapServerConnection.setNotPersised(true);
 
-			addNewData(parentPath, newMapServerConnection);
+			addNewData(selectionPath, newMapServerConnection);
 
-		} else if (selectedComponent instanceof Subscription) {
-			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) parentData;
+		} else if (selectedComponent instanceof MapServerConnection) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(mapServerConnection,
-					"New Subscription");
+					"New Subscription " + (mapServerConnection.getSubDataCount() + 1));
 			newSubscription.setNotPersised(true);
 
-			addNewData(parentPath, newSubscription);
+			addNewData(selectionPath, newSubscription);
 		}
 	}
 
-	public void addNewData(TreePath parentPath, Data newData) {
-		Object parentData = parentPath.getLastPathComponent();
-		TreePath newPath = parentPath.pathByAddingChild(newData);
+	public void addNewData(TreePath pathToAdd, Data newData) {
+		Object lastPathComponent = pathToAdd.getLastPathComponent();
+		TreePath newPath = pathToAdd.pathByAddingChild(newData);
 
-		if (parentData instanceof Dataservices) {
-			Dataservices dataservices = (Dataservices) parentData;
+		if (lastPathComponent instanceof Dataservices) {
+			Dataservices dataservices = (Dataservices) lastPathComponent;
 			dataservices.addDataserviceConnection((DataserviceConnection) newData);
 
 			mJtConnections.updateModel();
 			selectPath(newPath);
 			mParameterValues.setNameTextFieldEditable();
 
-		} else if (parentData instanceof DataserviceConnection) {
-			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+		} else if (lastPathComponent instanceof DataserviceConnection) {
+			DataserviceConnection dataserviceConnection = (DataserviceConnection) lastPathComponent;
 			dataserviceConnection.addMapServerData((MapServerConnectionData) newData);
 
 			mJtConnections.updateModel();
 			selectPath(newPath);
 			mParameterValues.setNameTextFieldEditable();
 
-		} else if (parentData instanceof MapServerConnection) {
-			MapServerConnection mapServerConnection = (MapServerConnection) parentData;
+		} else if (lastPathComponent instanceof MapServerConnection) {
+			MapServerConnection mapServerConnection = (MapServerConnection) lastPathComponent;
 			mapServerConnection.addSubscription((Subscription) newData);
 
 			mJtConnections.updateModel();

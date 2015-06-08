@@ -1,8 +1,11 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.ADD_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.CLONE_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.CONNECTED_TREE_UPDATE_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DELETE_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_DISCONNECTED_ICON;
 import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_ACTIVE_ICON;
@@ -52,7 +55,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private JCheckBoxMenuItem mOpen;
 
-	private JCheckBoxMenuItem mNew;
+	private JCheckBoxMenuItem mAdd;
 
 	private JCheckBoxMenuItem mClone;
 
@@ -74,13 +77,28 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		this(connectionTree, selectedData);
 		mConnectionDialog = connectionDialog;
 
-		if (mSelectedData instanceof DataserviceConnection || mSelectedData instanceof MapServerConnection
-				|| mSelectedData instanceof Subscription) {
-			initNewButton();
-			initCopyButton();
-			initDeleteButton();
-			super.addSeparator();;
+		if (mSelectedData instanceof Dataservices) {
+			initAddButton("Dataservice");
+
+		}else if (mSelectedData instanceof DataserviceConnection){
+			initCloneButton("Dataservice");
+			initDeleteButton("Dataservice");
+			super.addSeparator();
+			initAddButton("Connection");
+			
+		}else if (mSelectedData instanceof MapServerConnection){
+			initCloneButton("Connection");
+			initDeleteButton("Connection");
+			super.addSeparator();
+			initAddButton("Subscription");
+	
+		}else if (mSelectedData instanceof Subscription) {
+			initCloneButton("Subscription");
+			initDeleteButton("Subscription");
+			
 		}
+			
+		super.addSeparator();
 
 		initDefaultButton();
 	}
@@ -246,21 +264,21 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		super.add(mDeactivate);
 	}
 
-	private void initNewButton() {
-		mNew = new JCheckBoxMenuItem("New", SUBSCRIPTION_ACTIVE_ICON);
-		mNew.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		mNew.addActionListener(new ActionListener() {
+	private void initAddButton(String expression) {
+		mAdd = new JCheckBoxMenuItem("Add " + expression, ADD_ICON);
+		mAdd.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				mConnectionDialog.eventNewData();
 			}
 		});
 
-		super.add(mNew);
+		super.add(mAdd);
 	}
 
-	private void initCopyButton() {
-		mClone = new JCheckBoxMenuItem("Clone", SUBSCRIPTION_ACTIVE_ICON);
+	private void initCloneButton(String expression) {
+		mClone = new JCheckBoxMenuItem("Clone " + expression, CLONE_ICON);
 		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mClone.addActionListener(new ActionListener() {
 			@Override
@@ -291,8 +309,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		super.add(mUpdateTree);
 	}
 
-	private void initDeleteButton() {
-		mDelete = new JCheckBoxMenuItem("Delete");
+	private void initDeleteButton(String expression) {
+		mDelete = new JCheckBoxMenuItem("Delete " + expression, DELETE_ICON);
 		mDelete.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mDelete.addActionListener(new ActionListener() {
 			@Override

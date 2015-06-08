@@ -226,24 +226,26 @@ public class MainWindow extends JFrame {
 			mJpParameterValues = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
 			mJbParameterSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
 		}
-		mJpParameterValues.addParameterListener(new ParameterListener() {
-			@Override
-			public void parameterChanged() {
-				Data changedData = mJpParameterValues.getData();
-				propertiesDataChanged(changedData);
-			}
-		});
 
-		mJpParameterSouth = new JPanel();
-		mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		if (mJpParameterValues != null) {
+			mJpParameterValues.addParameterListener(new ParameterListener() {
+				@Override
+				public void parameterChanged() {
+					Data changedData = mJpParameterValues.getData();
+					propertiesDataChanged(changedData);
+				}
+			});
 
+			mJpParameterSouth = new JPanel();
+			mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		mJpParameterSouth.add(mJbParameterSave);
+			mJpParameterSouth.add(mJbParameterSave);
 
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
-		mLeftMainPanel.updateUI();
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
+			mLeftMainPanel.updateUI();
+		}
 	}
 
 	/**

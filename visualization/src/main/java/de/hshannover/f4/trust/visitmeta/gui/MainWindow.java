@@ -114,6 +114,7 @@ public class MainWindow extends JFrame {
 	private ParameterPanel mJpParameterValues;
 	private JPanel mJpParameterSouth;
 	private JButton mJbParameterSave;
+	private JButton mJbParameterCancel;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
 	private RESTConnectionTree mConnectionTree = null;
@@ -214,17 +215,30 @@ public class MainWindow extends JFrame {
 			}
 		});
 
+		mJbParameterCancel = new JButton("Cancel");
+		mJbParameterCancel.setEnabled(false);
+		mJbParameterCancel.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				resetPropertyChanges();
+			}
+		});
+
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
-			mJpParameterValues = new DataServiceParameterPanel((DataserviceConnectionData) selectedComponent);
+			mJpParameterValues = new DataServiceParameterPanel(((DataserviceConnectionData) selectedComponent).copy());
 			mJbParameterSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbParameterCancel.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
-			mJpParameterValues = new MapServerParameterPanel((MapServerConnectionData) selectedComponent);
+			mJpParameterValues = new MapServerParameterPanel(((MapServerConnectionData) selectedComponent).copy());
 			mJbParameterSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbParameterCancel.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
-			mJpParameterValues = new SubscriptionParameterPanel((SubscriptionData) selectedComponent);
+			mJpParameterValues = new SubscriptionParameterPanel(((SubscriptionData) selectedComponent).copy());
 			mJbParameterSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
+			mJbParameterCancel.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
 		}
 
 		if (mJpParameterValues != null) {
@@ -239,6 +253,7 @@ public class MainWindow extends JFrame {
 			mJpParameterSouth = new JPanel();
 			mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+			mJpParameterSouth.add(mJbParameterCancel);
 			mJpParameterSouth.add(mJbParameterSave);
 
 			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
@@ -457,25 +472,58 @@ public class MainWindow extends JFrame {
 
 	public void propertiesDataChanged(Data changedData) {
 		mJbParameterSave.setEnabled(true);
+		mJbParameterCancel.setEnabled(true);
 
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			if(!dataserviceConnection.isNotPersised()){
+				dataserviceConnection.setOldData(((DataserviceConnectionData)dataserviceConnection).copy());
+			}
 			dataserviceConnection.changeData((DataserviceConnectionData) changedData);
 			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			if(!mapServerConnection.isNotPersised()){
+				mapServerConnection.setOldData(((MapServerConnectionData)mapServerConnection).copy());
+			}
 			mapServerConnection.changeData((MapServerConnectionData) changedData);
 			mapServerConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
 			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			if(!subscription.isNotPersised()){
+				subscription.setOldData(((SubscriptionData)subscription).copy());
+			}
 			subscription.changeData((SubscriptionData) changedData);
 			subscription.setNotPersised(true);
 		}
 
 		mConnectionTree.updateUI();
+	}
+
+	public void resetPropertyChanges() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			dataserviceConnection.resetData();
+			dataserviceConnection.setNotPersised(false);
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			mapServerConnection.resetData();
+			mapServerConnection.setNotPersised(false);
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			subscription.resetData();
+			subscription.setNotPersised(false);
+
+		}
+		mConnectionTree.updateUI();
+		changeParameterPanel();
 	}
 
 	public void savePropertyChanges() {
@@ -516,6 +564,7 @@ public class MainWindow extends JFrame {
 		}
 		mConnectionTree.updateUI();
 		mJbParameterSave.setEnabled(false);
+		mJbParameterCancel.setEnabled(false);
 	}
 
 	public void showConnectionTreePopupMenu(int x, int y) {

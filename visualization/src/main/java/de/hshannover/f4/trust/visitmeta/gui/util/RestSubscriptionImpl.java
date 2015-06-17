@@ -13,6 +13,8 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 
 	private MapServerRestConnectionImpl mMapServerConnection;
 
+	private SubscriptionData mOldData;
+
 	private boolean mNotPersised;
 
 	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection) {
@@ -81,12 +83,23 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 		}
 	}
 
+	public void resetData(){
+		if(mOldData != null){
+			super.changeData(mOldData);
+			mOldData = null;
+		}
+	}
+
 	public boolean isNotPersised() {
 		return mNotPersised;
 	}
 
 	public void setNotPersised(boolean b) {
 		mNotPersised = b;
+	}
+
+	public void setOldData(SubscriptionData oldData) {
+		mOldData = oldData;
 	}
 
 }

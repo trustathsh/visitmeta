@@ -20,6 +20,8 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	private boolean mNotPersised;
 
+	private DataserviceConnectionData mOldData;
+
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
 	}
@@ -59,8 +61,15 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 		return super.getName();
 	}
 
+	public void resetData(){
+		if(mOldData != null){
+			super.changeData(mOldData);
+			mOldData = null;
+		}
+	}
+
 	public List<Data> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException, JSONHandlerException, JSONException {
+	IllegalAccessException, JSONHandlerException, JSONException {
 		if (super.isConnected()) {
 			return RestHelper.loadMapServerConnections(this);
 		}
@@ -104,6 +113,10 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	public void setNotPersised(boolean b) {
 		mNotPersised = b;
+	}
+
+	public void setOldData(DataserviceConnectionData oldData) {
+		mOldData = oldData;
 	}
 
 }

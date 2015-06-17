@@ -32,8 +32,10 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	private boolean mGraphStarted;
 
 	private DataserviceConnection mDataserviceConnection;
-	
+
 	private boolean mNotPersised;
+
+	private MapServerConnectionData mOldData;
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection,
 			MapServerConnectionData connectionData) {
@@ -191,6 +193,13 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		throw new UnsupportedOperationException();
 	}
 
+	public void resetData(){
+		if(mOldData != null){
+			super.changeData(mOldData);
+			mOldData = null;
+		}
+	}
+
 	public ConnectionTab getConnectionTab() {
 		return mConnectionTab;
 	}
@@ -202,12 +211,16 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	public boolean isGraphStarted() {
 		return mGraphStarted;
 	}
-	
+
 	public boolean isNotPersised() {
 		return mNotPersised;
 	}
 
 	public void setNotPersised(boolean b) {
 		mNotPersised = b;
+	}
+
+	public void setOldData(MapServerConnectionData oldData) {
+		mOldData = oldData;
 	}
 }

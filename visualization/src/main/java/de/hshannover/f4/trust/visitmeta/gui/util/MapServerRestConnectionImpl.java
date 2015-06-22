@@ -223,4 +223,8 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	public void setOldData(MapServerConnectionData oldData) {
 		mOldData = oldData;
 	}
+
+	public MapServerConnectionData getOldData() {
+		return mOldData;
+	}
 }

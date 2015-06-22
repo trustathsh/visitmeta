@@ -102,4 +102,7 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 		mOldData = oldData;
 	}
 
+	public SubscriptionData getOldData() {
+		return mOldData;
+	}
 }

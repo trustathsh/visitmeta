@@ -119,4 +119,7 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 		mOldData = oldData;
 	}
 
+	public DataserviceConnectionData getOldData() {
+		return mOldData;
+	}
 }

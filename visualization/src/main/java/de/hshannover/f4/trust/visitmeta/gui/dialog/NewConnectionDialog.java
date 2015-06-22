@@ -77,7 +77,7 @@ public class NewConnectionDialog extends JDialog{
 
 	private JButton mJbClose;
 
-	private JButton mJbCancel;
+	private JButton mJbReset;
 
 	static {
 		LOGGER.addAppender(new JTextAreaAppander());
@@ -147,9 +147,9 @@ public class NewConnectionDialog extends JDialog{
 			}
 		});
 
-		mJbCancel = new JButton("Cancel");
-		mJbCancel.setEnabled(false);
-		mJbCancel.addActionListener(new ActionListener() {
+		mJbReset = new JButton("Reset");
+		mJbReset.setEnabled(false);
+		mJbReset.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -159,7 +159,7 @@ public class NewConnectionDialog extends JDialog{
 
 
 		mJpSouth.add(mJbClose);
-		mJpSouth.add(mJbCancel);
+		mJpSouth.add(mJbReset);
 		mJpSouth.add(mJbSave);
 	}
 
@@ -241,17 +241,29 @@ public class NewConnectionDialog extends JDialog{
 		if (selectedComponent instanceof DataserviceConnection) {
 			mParameterValues = new DataServiceParameterPanel(((DataserviceConnection) selectedComponent).copy());
 			mJbSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
-			mJbCancel.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbReset.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+			if (((DataserviceRestConnectionImpl) selectedComponent).isNotPersised()
+					&& ((DataserviceRestConnectionImpl) selectedComponent).getOldData() == null) {
+				mParameterValues.setNameTextFieldEditable();
+			}
 
 		} else if (selectedComponent instanceof MapServerConnection) {
 			mParameterValues = new MapServerParameterPanel(((MapServerConnection) selectedComponent).copy());
 			mJbSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
-			mJbCancel.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbReset.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+			if (((MapServerRestConnectionImpl) selectedComponent).isNotPersised()
+					&& ((MapServerRestConnectionImpl) selectedComponent).getOldData() == null) {
+				mParameterValues.setNameTextFieldEditable();
+			}
 
 		} else if (selectedComponent instanceof Subscription) {
 			mParameterValues = new SubscriptionParameterPanel(((Subscription) selectedComponent).copy());
 			mJbSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
-			mJbCancel.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
+			mJbReset.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
+			if (((RestSubscriptionImpl) selectedComponent).isNotPersised()
+					&& ((RestSubscriptionImpl) selectedComponent).getOldData() == null) {
+				mParameterValues.setNameTextFieldEditable();
+			}
 		}
 
 		if (mParameterValues != null) {
@@ -284,7 +296,7 @@ public class NewConnectionDialog extends JDialog{
 
 	public void propertiesDataChanged(Data changedData) {
 		mJbSave.setEnabled(true);
-		mJbCancel.setEnabled(true);
+		mJbReset.setEnabled(true);
 
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {

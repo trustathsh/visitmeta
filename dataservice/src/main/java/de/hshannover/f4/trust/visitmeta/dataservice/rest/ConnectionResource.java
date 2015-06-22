@@ -79,8 +79,14 @@ public class ConnectionResource {
 	@DELETE
 	@Path("{connectionName}")
 	public Response deleteConnection(@PathParam("connectionName") String name) {
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-				.entity("Not implemented").build();
+		try {
+			Application.getConnectionManager().removeConnection(name);
+		} catch (ConnectionException e) {
+			LOGGER.error("error while delete " + name + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+		}
+
+		return Response.ok().entity("INFO: delete connection(" + name + ") successfully").build();
 	}
 
 	/**

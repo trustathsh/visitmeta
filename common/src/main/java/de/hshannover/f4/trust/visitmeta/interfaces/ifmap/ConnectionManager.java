@@ -186,10 +186,10 @@ public interface ConnectionManager {
 	/**
 	 * Delete a saved {@link Connection}.
 	 *
-	 * @param connection a {@link Connection} instance
+	 * @param connectionName a {@link Connection} instance
 	 * @throws ConnectionException
 	 */
-	public void removeConnection(MapServerConnection connection) throws ConnectionException;
+	public void removeConnection(String connectionName) throws ConnectionException;
 
 	/**
 	 * Tries to connect all saved {@link Connection}s to the MAP server that

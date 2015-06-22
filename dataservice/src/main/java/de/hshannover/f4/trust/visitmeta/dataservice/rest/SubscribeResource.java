@@ -242,7 +242,6 @@ public class SubscribeResource {
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
 	 */
 	@DELETE
-	@Path("delete")
 	public Response delete(@PathParam("connectionName") String name) {
 		if (mDeleteAll) {
 			try {
@@ -264,7 +263,7 @@ public class SubscribeResource {
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
 	 */
 	@DELETE
-	@Path("delete/{subscriptionName}")
+	@Path("{subscriptionName}")
 	public Response delete(@PathParam("connectionName") String name,
 			@PathParam("subscriptionName") String subscriptionName) {
 		try {

@@ -109,9 +109,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void removeConnection(MapServerConnection c) throws ConnectionException {
-		log.info("removeConnection not implemented yet.");
-		// TODO remove Connection
+	public void removeConnection(String connectionName) throws ConnectionException {
+		log.trace("delete connection '" + connectionName + "' ...");
+		mConnectionPool.remove(connectionName);
+		log.info("connection '" + connectionName + "' was deleted");
 	}
 
 	@Override

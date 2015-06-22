@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
@@ -198,7 +199,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				try {
 					((Connection) mSelectedData).connect();
 				} catch (ConnectionException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 			}
 		});
@@ -220,7 +221,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				try {
 					((Connection) mSelectedData).disconnect();
 				} catch (ConnectionException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 			}
 		});
@@ -238,7 +239,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				try {
 					((Subscription) mSelectedData).startSubscription();
 				} catch (ConnectionException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 			}
 		});
@@ -299,7 +300,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				try {
 					mConnectionTree.updateConnections(Main.getDataservicePersister().loadDataserviceConnections());
 				} catch (PropertyException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 
 				mConnectionTree.expandAllNodes();
@@ -317,8 +318,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			public void actionPerformed(ActionEvent event) {
 				try {
 					mConnectionDialog.eventDeleteData();
-				} catch (PropertyException e) {
-					LOGGER.error(e.toString(), e);
+				} catch (PropertyException | RESTException e) {
+					LOGGER.error(e.toString());
 				}
 			}
 		});

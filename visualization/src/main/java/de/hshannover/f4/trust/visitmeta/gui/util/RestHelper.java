@@ -79,6 +79,21 @@ public class RestHelper {
 		buildWebResource(dataserviceConnection).type(MediaType.APPLICATION_JSON).put(jsonMapServerConnectionData);
 	}
 
+	public static void deleteMapServerConnection(DataserviceConnection dataserviceConnection, String restConnectionName)
+			throws RESTException {
+		LOGGER.trace("send delete request...");
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).delete(
+				ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("connection '" + restConnectionName + "' was deleted : Status Code("
+				+ response.getClientResponseStatus() + ")");
+	}
+
 	public static void saveSubscription(DataserviceConnection dataserviceConnection,
 			String mapServerConnectionName, SubscriptionData subscriptionData) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException, JSONException {
@@ -101,6 +116,21 @@ public class RestHelper {
 		}
 
 		LOGGER.info("subscribe update response: Status Code(" + response.getClientResponseStatus() + ")");
+	}
+
+	public static void deleteSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,
+			String subscriptionName) throws RESTException {
+		LOGGER.trace("send delete request...");
+		ClientResponse response = buildWebResource(dataserviceConnection).path(restConnectionName).path("subscribe")
+				.path(subscriptionName).delete(ClientResponse.class);
+
+		if (response.getClientResponseStatus() != ClientResponse.Status.OK) {
+			throw new RESTException("Status Code(" + response.getClientResponseStatus() + ") Entity("
+					+ response.getEntity(String.class) + ")");
+		}
+
+		LOGGER.info("subscription '" + subscriptionName + "' from connection '" + restConnectionName
+				+ "' was deleted : Status Code(" + response.getClientResponseStatus() + ")");
 	}
 
 	public static void stopSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,

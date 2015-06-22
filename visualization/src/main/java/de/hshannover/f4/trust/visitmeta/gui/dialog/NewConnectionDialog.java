@@ -22,6 +22,7 @@ import org.codehaus.jettison.json.JSONException;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
@@ -327,7 +328,7 @@ public class NewConnectionDialog extends JDialog{
 		mJspLeft.updateUI();
 	}
 
-	public void eventDeleteData() throws PropertyException {
+	public void eventDeleteData() throws PropertyException, RESTException {
 		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
 		Object parentData = parentPath.getLastPathComponent();
@@ -346,13 +347,20 @@ public class NewConnectionDialog extends JDialog{
 		} else if (selectedComponent instanceof MapServerConnection && parentData instanceof DataserviceConnection) {
 			MapServerConnection mapServerConnection = (MapServerConnection) selectedComponent;
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
+
+			RestHelper.deleteMapServerConnection(dataserviceConnection, mapServerConnection.getConnectionName());
+
 			dataserviceConnection.removeMapServerData(mapServerConnection);
 
 			mJtConnections.updateModel();
 
-		} else if (selectedComponent instanceof Subscription && parentData instanceof MapServerConnection) {
+		} else if (selectedComponent instanceof Subscription && parentData instanceof MapServerRestConnectionImpl) {
 			Subscription subscription = (Subscription) selectedComponent;
-			MapServerConnection mapServerConnection = (MapServerConnection) parentData;
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) parentData;
+
+			RestHelper.deleteSubscription(mapServerConnection.getDataserviceConnection(),
+					mapServerConnection.getConnectionName(), subscription.getName());
+
 			mapServerConnection.deleteSubscription(subscription.getName());
 
 			mJtConnections.updateModel();

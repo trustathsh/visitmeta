@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -175,7 +176,13 @@ public class ConnectionsProperties extends Properties {
 		return subscribtionList;
 	}
 
+	private void resetProperties() throws PropertyException {
+		super.save(new HashMap<String, Object>());
+	}
+
 	public void persistConnections() throws PropertyException {
+		resetProperties();
+
 		Map<String, MapServerConnection> connectionMap = mManager.getSavedConnections();
 
 		for (MapServerConnection connection : connectionMap.values()) {

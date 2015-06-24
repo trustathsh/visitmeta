@@ -86,6 +86,15 @@ public class ConnectionResource {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
+		// persist connection in property
+		try {
+			Application.getConnections().persistConnections();
+		} catch (PropertyException e) {
+			LOGGER.error("error while delete connection | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while delete connection -> " + e.toString()).build();
+		}
+
 		return Response.ok().entity("INFO: delete connection(" + name + ") successfully").build();
 	}
 

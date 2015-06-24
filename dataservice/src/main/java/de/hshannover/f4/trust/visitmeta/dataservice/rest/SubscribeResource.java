@@ -273,6 +273,15 @@ public class SubscribeResource {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
 		}
 
+		// persist connection in property
+		try {
+			Application.getConnections().persistConnections();
+		} catch (PropertyException e) {
+			log.error("error while delete subscription | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while delete connection -> " + e.toString()).build();
+		}
+
 		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();
 	}
 }

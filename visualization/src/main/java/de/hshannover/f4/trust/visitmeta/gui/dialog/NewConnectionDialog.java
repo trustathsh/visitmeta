@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -328,7 +329,18 @@ public class NewConnectionDialog extends JDialog{
 		mJspLeft.updateUI();
 	}
 
+	private int confirmDeleteRequest() {
+		return JOptionPane.showConfirmDialog(this, "Would you really want to delete?", "Confirm delete request!",
+				JOptionPane.YES_NO_OPTION);
+	}
+
 	public void eventDeleteData() throws PropertyException, RESTException {
+		int requestResult = confirmDeleteRequest();
+
+		if (requestResult == JOptionPane.NO_OPTION || requestResult == JOptionPane.CLOSED_OPTION) {
+			return;
+		}
+
 		Object selectedComponent = mJtConnections.getSelectionPath().getLastPathComponent();
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
 		Object parentData = parentPath.getLastPathComponent();

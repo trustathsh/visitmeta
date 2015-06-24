@@ -57,6 +57,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
+@Deprecated
 public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);

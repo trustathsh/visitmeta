@@ -176,11 +176,11 @@ public interface ConnectionManager {
 	 * Stores a {@link Connection} in the connection pool and in the connections-configuration file.
 	 *
 	 * @param connectionName name of the {@link Connection}
-	 * @param subscription a {@link JSONObject} representing the subscription
+	 * @param subscriptionData a {@link JSONObject} representing the SubscriptionData
 	 * @throws IOException
 	 * @throws PropertyException
 	 */
-	public void storeSubscription(String connectionName, Subscription subscription) throws IOException,
+	public void storeSubscription(String connectionName, SubscriptionData subscriptionData) throws IOException,
 			PropertyException;
 
 	/**

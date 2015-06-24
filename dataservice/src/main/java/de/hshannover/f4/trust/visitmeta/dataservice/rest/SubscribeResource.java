@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -174,6 +175,15 @@ public class SubscribeResource {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
 			}
 		}
+
+		try {
+			Application.getConnections().persistConnections();
+		} catch (PropertyException e) {
+			log.error("error while connection persist | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while connection persist -> " + e.toString()).build();
+		}
+
 		return Response.ok().entity("INFO: subscribe successfully").build();
 	}
 
@@ -194,7 +204,26 @@ public class SubscribeResource {
 					.build();
 		}
 
-		Application.getConnectionManager().updateSubscription(connectionName, subscriptionData);
+		List<String> subscriptionList;
+		try {
+			subscriptionList = Application.getConnectionManager().getSubscriptions(connectionName);
+		} catch (ConnectionException e) {
+			log.error("error while connection PUT | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("error while connection PUT -> " + e.toString()).build();
+		}
+
+		if (subscriptionList.contains(subscriptionData.getName())) {
+			Application.getConnectionManager().updateSubscription(connectionName, subscriptionData);
+		} else {
+			try {
+				Application.getConnectionManager().storeSubscription(connectionName, subscriptionData);
+			} catch (IOException | PropertyException e) {
+				log.error("error while connection PUT | " + e.toString());
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity("error while connection PUT -> " + e.toString()).build();
+			}
+		}
 
 		try {
 			Application.getConnections().persistConnections();

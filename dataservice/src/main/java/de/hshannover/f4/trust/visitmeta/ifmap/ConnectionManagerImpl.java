@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionImpl;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
@@ -208,10 +207,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void storeSubscription(String connectionName, Subscription subscription) throws IOException,
+	public void storeSubscription(String connectionName, SubscriptionData subscriptionData) throws IOException,
 			PropertyException {
-		mConnectionPool.get(connectionName).addSubscription(subscription);
-		Application.getConnections().persistConnections();
+		MapServerConnection mapServerConnection = mConnectionPool.get(connectionName);
+		Subscription subscription = new SubscriptionImpl(mapServerConnection, subscriptionData);
+		mapServerConnection.addSubscription(subscription);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -46,14 +45,14 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	@Override
 	public void connect() throws ConnectionException {
-		super.setConnected(true);
 		update();
+		super.setConnected(true);
 	}
 
 	@Override
 	public void disconnect() throws ConnectionException {
+		update(); // TODO muss das sein?
 		super.setConnected(false);
-		update();
 	}
 
 	@Override
@@ -69,11 +68,9 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 	}
 
 	public List<Data> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
-	IllegalAccessException, JSONHandlerException, JSONException {
-		if (super.isConnected()) {
-			return RestHelper.loadMapServerConnections(this);
-		}
-		return new ArrayList<Data>();
+			IllegalAccessException, JSONHandlerException, JSONException, ConnectionException {
+
+		return RestHelper.loadMapServerConnections(this);
 	}
 
 	public void connectMapServer(String mapServerConnectionName) throws ConnectionException {
@@ -96,7 +93,7 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 		}
 	}
 
-	public void update() {
+	public void update() throws ConnectionException {
 		List<Data> updateList = null;
 		try {
 			updateList = loadMapServerConnections();

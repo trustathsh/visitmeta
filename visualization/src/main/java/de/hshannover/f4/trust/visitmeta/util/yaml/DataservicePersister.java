@@ -43,14 +43,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.RetryConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 public class DataservicePersister extends Properties {
+
+	private static final Logger LOGGER = Logger.getLogger(DataservicePersister.class);
 
 	/**
 	 * Create a JyamlPersister for data-services
@@ -97,9 +103,28 @@ public class DataservicePersister extends Properties {
 					dataserviceRestUrl, rawXml);
 			tmpDataserviceConnection.setConnected(connected);
 
-			tmpDataserviceConnection.update();
 			dataserviceConnectionList.add(tmpDataserviceConnection);
 		}
+
+		for (Data data : dataserviceConnectionList) {
+			if (data instanceof DataserviceConnection) {
+				DataserviceConnection connection = (DataserviceConnection) data;
+				if (connection.isConnected()) {
+					try {
+						connection.connect(); // To update all sub connections
+					} catch (ConnectionException e) {
+						connection.setConnected(false);
+						LOGGER.warn(e.toString());
+						LOGGER.info("Start retry connection...");
+						String title = "Connecting to " + connection.getConnectionName();
+						RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, connection, null);
+						retryDialog.showDialog();
+						retryDialog.connect();
+					}
+				}
+			}
+		}
+
 		return dataserviceConnectionList;
 	}
 

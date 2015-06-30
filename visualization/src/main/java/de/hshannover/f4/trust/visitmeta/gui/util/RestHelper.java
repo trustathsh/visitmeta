@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -21,6 +22,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
@@ -33,7 +35,7 @@ public class RestHelper {
 
 	public static List<Data> loadMapServerConnections(DataserviceConnection dataserviceConnection)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONHandlerException,
-			JSONException {
+			JSONException, ConnectionException {
 		List<Data> dataList = loadMapServerConnectionsData(dataserviceConnection);
 
 		List<Data> connectionsList = new ArrayList<Data>();
@@ -53,12 +55,17 @@ public class RestHelper {
 
 	public static List<Data> loadMapServerConnectionsData(DataserviceConnection dataserviceConnection)
 			throws JSONException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-			JSONHandlerException {
+			JSONHandlerException, ConnectionException {
 		List<Data> connections = new ArrayList<Data>();
 
-		JSONArray jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
+		JSONArray jsonResponse = null;
+		try {
+			jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
 				.get(JSONArray.class);
-
+		} catch (ClientHandlerException e) {
+			throw new ConnectionException(e.getMessage());
+		}
+		
 		for (int i = 0; i < jsonResponse.length(); i++) {
 			JSONObject jsonConnectionData = jsonResponse.getJSONObject(i);
 

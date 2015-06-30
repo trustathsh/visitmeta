@@ -104,14 +104,14 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	}
 
 	@Override
-	public void connect() {
+	public void connect() throws ConnectionException {
 		try {
 
 			RestHelper.connectMapServer(mDataserviceConnection, super.getConnectionName());
 			super.setConnected(true);
 
 		} catch (RESTException e) {
-			LOGGER.error(e.toString());
+			throw new ConnectionException(e.toString());
 		}
 	}
 

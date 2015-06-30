@@ -199,7 +199,13 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				try {
 					((Connection) mSelectedData).connect();
 				} catch (ConnectionException e) {
-					LOGGER.error(e.toString());
+					LOGGER.warn(e.toString());
+					LOGGER.info("Start retry connection...");
+					String title = "Connecting to " + ((Connection) mSelectedData).getConnectionName();
+					RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, (Connection) mSelectedData,
+							mMainWindow);
+					retryDialog.showDialog();
+					retryDialog.connect();
 				}
 			}
 		});

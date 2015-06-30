@@ -115,7 +115,7 @@ public abstract class Application {
 		try {
 			startupConnect();
 		} catch (ConnectionException e) {
-			log.error("error while startupConnect", e);
+			log.error(e.toString());
 		}
 
 		log.info("dataservice started successfully");
@@ -135,10 +135,9 @@ public abstract class Application {
 		return mManager;
 	}
 
-	private static void startupConnect() throws ConnectionException {
+	private static void startupConnect() throws ConnectionException, InterruptedException {
 		log.debug("startupConnect...");
 		mManager.executeStartupConnections();
-		;
 	}
 
 	private static void loadPersistentConnections() throws IOException {

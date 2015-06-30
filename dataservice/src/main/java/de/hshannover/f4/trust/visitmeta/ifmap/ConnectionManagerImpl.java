@@ -53,6 +53,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionExcept
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -88,10 +89,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void executeStartupConnections() throws ConnectionException {
+	public void executeStartupConnections() throws ConnectionException, InterruptedException {
 		for (MapServerConnection c : mConnectionPool.values()) {
 			if (c.doesConnectOnStartup()) {
-				connect(c.getConnectionName());
+				retryConnect(c, 3);
 				executeInitialSubscription(c);
 			}
 		}
@@ -121,6 +122,22 @@ public class ConnectionManagerImpl implements ConnectionManager {
 		getConnection(connectionName).connect();
 
 		log.info("connected to " + connectionName);
+	}
+
+	private void retryConnect(Connection connection, int retry) throws ConnectionException, InterruptedException {
+		for (int i = 0; i < retry; i++) {
+			try {
+				connection.connect();
+				break;
+			} catch (ConnectionException e) {
+				if (i + 1 < retry) {
+					log.warn(e.toString() + " -> Try it again (" + (i + 2) + "/" + retry + ") in 3 seconds...");
+					Thread.sleep(3000);
+				} else {
+					throw e;
+				}
+			}
+		}
 	}
 
 	@Override

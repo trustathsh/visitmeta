@@ -196,8 +196,9 @@ public interface ConnectionManager {
 	 * have the flag for <i>connect at startup</i> set.
 	 *
 	 * @throws ConnectionException
+	 * @throws InterruptedException
 	 */
-	public void executeStartupConnections() throws ConnectionException;
+	public void executeStartupConnections() throws ConnectionException, InterruptedException;
 
 	/**
 	 * Send a ifmapj {@link SubscribeRequest} to the MAP server.

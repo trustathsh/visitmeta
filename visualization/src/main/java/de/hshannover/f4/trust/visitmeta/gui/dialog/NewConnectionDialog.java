@@ -43,7 +43,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
-public class NewConnectionDialog extends JDialog{
+public class NewConnectionDialog extends JDialog {
 
 	private static final long serialVersionUID = -8052562697583611679L;
 
@@ -330,7 +330,7 @@ public class NewConnectionDialog extends JDialog{
 	}
 
 	private int confirmDeleteRequest() {
-		return JOptionPane.showConfirmDialog(this, "Would you really want to delete?", "Confirm delete request!",
+		return JOptionPane.showConfirmDialog(this, "Do you really want to delete?", "Confirm delete request!",
 				JOptionPane.YES_NO_OPTION);
 	}
 

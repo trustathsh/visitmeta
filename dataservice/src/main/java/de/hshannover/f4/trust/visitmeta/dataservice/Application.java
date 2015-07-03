@@ -102,7 +102,6 @@ public abstract class Application {
 
 		List<DataserviceModule> modules = DataserviceModuleConnector.initializeModules(mManager);
 		log.info(modules.size() + " dataservice modules were loaded.");
-		startRestService(modules);
 
 		try {
 			loadPersistentConnections();
@@ -117,6 +116,8 @@ public abstract class Application {
 		} catch (ConnectionException e) {
 			log.error(e.toString());
 		}
+
+		startRestService(modules);
 
 		log.info("dataservice started successfully");
 	}

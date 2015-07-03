@@ -101,7 +101,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			
 		super.addSeparator();
 
-		initDefaultButton();
+		initDefaultButton(mConnectionDialog);
 	}
 
 	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, MainWindow mainWindow, Data selectedData) {
@@ -112,10 +112,10 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			initOpenButton();
 		}
 
-		initDefaultButton();
+		initDefaultButton(mMainWindow);
 	}
 
-	private void initDefaultButton() {
+	private void initDefaultButton(Component component) {
 		if (mSelectedData instanceof DataserviceConnection) {
 			initConnectButton();
 			initDisconnectButton();
@@ -131,7 +131,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 			initOnlyActiveButton();
 			super.addSeparator();
 		}
-		initUpdateTreeButton();
+		initUpdateTreeButton(component);
 	}
 
 	private void initOpenButton() {
@@ -297,14 +297,15 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		super.add(mClone);
 	}
 
-	private void initUpdateTreeButton() {
+	private void initUpdateTreeButton(final Component component) {
 		mUpdateTree = new JCheckBoxMenuItem("Update Tree", CONNECTED_TREE_UPDATE_ICON);
 		mUpdateTree.setAccelerator(KeyStroke.getKeyStroke('U', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mUpdateTree.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				try {
-					mConnectionTree.updateConnections(Main.getDataservicePersister().loadDataserviceConnections());
+					mConnectionTree.updateConnections(Main.getDataservicePersister().loadDataserviceConnections(
+							component));
 				} catch (PropertyException e) {
 					LOGGER.error(e.toString());
 				}

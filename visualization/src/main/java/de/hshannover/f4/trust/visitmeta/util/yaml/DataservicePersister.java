@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class DataservicePersister extends Properties {
 		save(propertyMap);
 	}
 
-	public List<Data> loadDataserviceConnections() throws PropertyException {
+	public List<Data> loadDataserviceConnections(Component component) throws PropertyException {
 		List<Data> dataserviceConnectionList = new ArrayList<Data>();
 		for (String connectionName : getKeySet()) {
 			// read values from property
@@ -117,7 +118,7 @@ public class DataservicePersister extends Properties {
 						LOGGER.warn(e.toString());
 						LOGGER.info("Start retry connection...");
 						String title = "Connecting to " + connection.getConnectionName();
-						RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, connection, null);
+						RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, connection, component);
 						retryDialog.showDialog();
 						retryDialog.connect();
 					}

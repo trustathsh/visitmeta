@@ -175,7 +175,7 @@ public class MainWindow extends JFrame {
 	 */
 	private void initLeftHandSide() {
 		try {
-			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections());
+			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
 		} catch (PropertyException e) {
 			LOGGER.error(e.toString(), e);
 		}

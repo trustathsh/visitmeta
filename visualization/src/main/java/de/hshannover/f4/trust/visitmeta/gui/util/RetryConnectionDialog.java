@@ -42,10 +42,10 @@ public class RetryConnectionDialog extends JDialog {
 
 	private Connection mConnection;
 
-	public RetryConnectionDialog(String title, Connection connection, Component c) {
+	public RetryConnectionDialog(String title, Connection connection, Component component) {
 		mConnection = connection;
 
-		createDialog(title, c);
+		createDialog(title, component);
 		createPanels();
 
 		super.pack();

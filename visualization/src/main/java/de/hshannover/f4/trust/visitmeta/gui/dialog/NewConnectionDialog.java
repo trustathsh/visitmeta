@@ -185,7 +185,7 @@ public class NewConnectionDialog extends JDialog {
 	private void initLeftHandSide() {
 
 		try {
-			mJtConnections = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections());
+			mJtConnections = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
 		} catch (PropertyException e1) {
 			e1.printStackTrace();
 		}

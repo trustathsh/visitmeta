@@ -101,6 +101,11 @@ public class Neo4JDatabase {
 		log.trace("... new Neo4JDatabase() OK");
 	}
 
+	public void stop() {
+		writerThread.interrupt();
+		neo4jDb.getConnection().shutdown();
+	}
+
 	private void initNeo4JConnection(String connectionName) {
 		neo4jDb = new Neo4JConnection(mNeo4JdbPath + "/connection/"
 				+ connectionName);

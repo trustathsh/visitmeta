@@ -163,6 +163,12 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		super.setConnected(false);
 	}
 
+	public void disconnectFromDB() {
+		LOGGER.trace("Stop Neo4JDatabase...");
+		mNeo4JDb.stop();
+		LOGGER.info("Neo4JDatabase stopped");
+	}
+
 	@Override
 	public PollResult poll() throws ConnectionException {
 		checkIsConnectionEstablished();

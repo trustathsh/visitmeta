@@ -110,9 +110,24 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
 	@Override
 	public void removeConnection(String connectionName) throws ConnectionException {
-		log.trace("delete connection '" + connectionName + "' ...");
-		mConnectionPool.remove(connectionName);
-		log.info("connection '" + connectionName + "' was deleted");
+		MapServerConnection connection = mConnectionPool.get(connectionName);
+		if (connection instanceof MapServerConnectionImpl) {
+			MapServerConnectionImpl connectionImpl = (MapServerConnectionImpl) connection;
+
+			if (connectionImpl.isConnected()) {
+				connectionImpl.disconnect();
+				log.info("Disconnected from Map-Server");
+			}
+
+			connectionImpl.disconnectFromDB();
+			log.info("Disconnected from DB");
+
+			mConnectionPool.remove(connectionName);
+			log.info("connection '" + connectionName + "' was deleted");
+		} else {
+			log.fatal("While removeConnection('" + connectionName
+					+ "'), this connection is not right for the dataservice.");
+		}
 	}
 
 	@Override

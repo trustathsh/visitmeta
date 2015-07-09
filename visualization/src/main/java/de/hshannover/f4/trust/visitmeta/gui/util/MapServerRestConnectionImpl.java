@@ -29,8 +29,6 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	private ConnectionTab mConnectionTab;
 
-	private boolean mGraphStarted;
-
 	private DataserviceConnection mDataserviceConnection;
 
 	private boolean mNotPersised;
@@ -94,8 +92,6 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 			mGraphService = new ProxyGraphService(getGraphResource(), mDataserviceConnection.isRawXml());
 			mGraphContainer = new GraphContainer(this, mGraphService);
 			mConnectionTab = new ConnectionTab(mGraphContainer, null);
-
-			mGraphStarted = true;
 		}
 	}
 
@@ -209,7 +205,10 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 	}
 
 	public boolean isGraphStarted() {
-		return mGraphStarted;
+		if (mConnectionTab != null) {
+			return mConnectionTab.isGraphStarted();
+		}
+		return false;
 	}
 
 	public boolean isNotPersised() {

@@ -134,6 +134,18 @@ public class ConnectionTab extends JPanel {
 		this.add(mSplitPane);
 	}
 
+	public void finishGraphContainer() {
+		mConnection.finish();
+	}
+
+	public boolean isGraphStarted() {
+		return mConnection.isGraphStarted();
+	}
+
+	public String getMapServerConnectionName() {
+		return mConnection.getMapServerConnectionName();
+	}
+
 	/**
 	 * Initializes the panels
 	 */

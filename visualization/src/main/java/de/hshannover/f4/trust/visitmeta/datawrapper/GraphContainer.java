@@ -72,6 +72,13 @@ public class GraphContainer {
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
 
+	private Thread mFacadeNetworkThread;
+	private Thread mFacadeLogicThread;
+	private Thread mTimeManagerCreationThread;
+	private Thread mTimeManagerDeletionThread;
+
+	private boolean mGraphStarted;
+
 	// private String mRestUrl;
 
 	/**
@@ -85,29 +92,44 @@ public class GraphContainer {
 	 */
 	public GraphContainer(MapServerRestConnectionImpl mapServerConnection, GraphService graphService) {
 		mMapSeverConnection = mapServerConnection;
-		// mName = mapServerConnection.getDataserviceConnection().getConnectionName() + ":"
-		// + mapServerConnection.getConnectionName();
-		// mMapServerConnectionName = mapServerConnection.getConnectionName();
-		// mRestUrl = mapServerConnection.getDataserviceConnection().getUrl() + "/"
-		// + mapServerConnection.getConnectionName() + "/graph";
+
 		mTimeHolder = new TimeHolder();
 		mGraphPool = new GraphPool();
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
 
-
-		// mConnection = FactoryConnection.getConnection(ConnectionType.REST, this);
 		mConnection = new Connection(graphService, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
 		mGraphConnection = new GraphConnection(this);
 
-		new Thread(mFacadeNetwork).start();
-		new Thread(mFacadeLogic).start();
-		new Thread(mTimeManagerCreation).start();
-		new Thread(mTimeManagerDeletion).start();
+		String ConnectionThreadName = "-Thread('" + mMapSeverConnection.getConnectionName() + "')";
+		mFacadeNetworkThread = new Thread(mFacadeNetwork, "FacadeNetwork" + ConnectionThreadName);
+		mFacadeLogicThread = new Thread(mFacadeLogic, "FacadeLogic" + ConnectionThreadName);
+		mTimeManagerCreationThread = new Thread(mTimeManagerCreation, "TimeManagerCreation" + ConnectionThreadName);
+		mTimeManagerDeletionThread = new Thread(mTimeManagerDeletion, "TimeManagerDeletion" + ConnectionThreadName);
+
+		mFacadeNetworkThread.start();
+		mFacadeLogicThread.start();
+		mTimeManagerCreationThread.start();
+		mTimeManagerDeletionThread.start();
+		mGraphStarted = true;
+	}
+
+	public void finish() {
+		mTimeManagerDeletion.finish();
+		mTimeManagerCreation.finish();
+		mFacadeLogic.finish();
+		mFacadeNetwork.finish();
+		mFacadeNetworkThread.interrupt();
+
+		mGraphStarted = false;
+	}
+
+	public boolean isGraphStarted() {
+		return mGraphStarted;
 	}
 
 	public TimeHolder getTimeHolder() {
@@ -161,10 +183,6 @@ public class GraphContainer {
 	public Connection getConnection() {
 		return mConnection;
 	}
-
-	// public MapServerRestConnectionImpl getMapServerRestConnection() {
-	// return mMapSeverConnection;
-	// }
 
 	public String getRestUrl() {
 		return mMapSeverConnection.getDataserviceConnection().getUrl() + "/" + mMapSeverConnection.getConnectionName()

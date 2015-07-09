@@ -43,8 +43,8 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 
@@ -88,7 +88,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Ends the main loop.
 	 */
-	public synchronized void finish() {
+	public void finish() {
 		mIsDone = true;
 	}
 
@@ -118,7 +118,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 		try {
 			mNetworkConnection.loadCurrentGraph();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.debug("Interrupted loadCurrentGraph()");
 		}
 		setChanged();
 		notifyObservers();
@@ -144,20 +144,26 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 
 	@Override
 	public void run() {
-		try {
-			synchronized (this) {
-				loadCurrentGraph();
-				while (!mIsDone) {
-					mNetworkConnection.loadChangesMap();
+		synchronized (this) {
+			loadCurrentGraph();
+			while (!mIsDone) {
+				mNetworkConnection.loadChangesMap();
+
+				try {
 					if (mLoadNewest && mNetworkConnection.updateGraph()) {
 						setChanged();
 						notifyObservers();
 					}
+				} catch (InterruptedException e) {
+					LOGGER.debug("Interrupted updateGraph()");
+				}
+
+				try {
 					wait(mInterval);
+				} catch (InterruptedException e) {
+					LOGGER.debug("Interrupted wait()");
 				}
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		LOGGER.info("Loop which updates the Graph has ended.");
 	}

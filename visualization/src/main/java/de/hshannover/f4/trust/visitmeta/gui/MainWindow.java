@@ -304,8 +304,7 @@ public class MainWindow extends JFrame {
 		ActionListener listener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mTabbedConnectionPane.remove(cTab);
-				mMotionControllerHandler.removeConnectionTab(cTab);
+				closeConnectionTab(cTab);
 			}
 		};
 		btnClose.addActionListener(listener);
@@ -327,8 +326,7 @@ public class MainWindow extends JFrame {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane
-						.getSelectedComponent();
+				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
 				if (currentTab != null) {
 					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
 					LOGGER.debug("Tab changed to " + currentTab.getConnName());
@@ -590,7 +588,7 @@ public class MainWindow extends JFrame {
 			boolean alreadyOpen = false;
 			Component tmpComponent = null;
 			for (Component t : mTabbedConnectionPane.getComponents()) {
-				if (t.equals(mapServerConnection.getConnectionTab())) {
+				if (mapServerConnection.getConnectionTab().equals(t)) {
 					alreadyOpen = true;
 					tmpComponent = t;
 				}
@@ -598,10 +596,15 @@ public class MainWindow extends JFrame {
 			if (!alreadyOpen) {
 				addClosableTab(mapServerConnection.getConnectionTab());
 			} else {
-				mTabbedConnectionPane.remove(tmpComponent);
-				mMotionControllerHandler.removeConnectionTab((ConnectionTab) tmpComponent);
+				closeConnectionTab((ConnectionTab) tmpComponent);
 			}
 		}
+	}
+
+	public void closeConnectionTab(ConnectionTab connectionTab) {
+		connectionTab.finishGraphContainer();
+		mTabbedConnectionPane.remove(connectionTab);
+		mMotionControllerHandler.removeConnectionTab(connectionTab);
 	}
 
 	public void mouseDoubleClicked() {

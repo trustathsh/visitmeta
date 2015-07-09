@@ -26,6 +26,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
@@ -311,6 +312,17 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				}
 
 				mConnectionTree.expandAllNodes();
+
+				if (mMainWindow != null) {
+					for (Component c : mMainWindow.getTabbedConnectionPane().getComponents()) {
+						if (c instanceof ConnectionTab) {
+							ConnectionTab connectionTab = (ConnectionTab) c;
+							mMainWindow.closeConnectionTab(connectionTab);
+						}
+					}
+				
+					mMainWindow.openConnectedMapServerConnections();
+				}
 			}
 		});
 

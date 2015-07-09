@@ -117,7 +117,7 @@ public class DocumentUtils {
 	 *            XML document as one {@link String}
 	 * @return a {@link Document}
 	 */
-	public static Document parseXmlString(String input) {
+	public static synchronized Document parseXmlString(String input) {
 		Document document = null;
 		try {
 			document = mBuilder.parse(new InputSource(new StringReader(input)));

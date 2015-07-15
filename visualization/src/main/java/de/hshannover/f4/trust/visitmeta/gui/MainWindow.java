@@ -533,7 +533,7 @@ public class MainWindow extends JFrame {
 				Main.getDataservicePersister().persist(dataserviceConnection);
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
-				LOGGER.error(e.toString(), e);
+				LOGGER.error(e.toString());
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -543,7 +543,7 @@ public class MainWindow extends JFrame {
 				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-				LOGGER.error(e.toString(), e);
+				LOGGER.error(e.toString());
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -556,7 +556,7 @@ public class MainWindow extends JFrame {
 							subscription);
 					subscription.setNotPersised(false);
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 			}
 		}

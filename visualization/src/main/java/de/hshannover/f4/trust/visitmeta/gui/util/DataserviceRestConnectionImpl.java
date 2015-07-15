@@ -99,7 +99,7 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 			updateList = loadMapServerConnections();
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
 				| JSONException e) {
-			LOGGER.error(e.toString(), e);
+			LOGGER.error(e.toString());
 		}
 		super.setMapServerData(updateList);
 	}

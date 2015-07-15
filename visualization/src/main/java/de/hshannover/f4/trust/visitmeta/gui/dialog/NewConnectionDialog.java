@@ -483,7 +483,7 @@ public class NewConnectionDialog extends JDialog {
 				Main.getDataservicePersister().persist(dataserviceConnection);
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
-				LOGGER.error(e.toString(), e);
+				LOGGER.error(e.toString());
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -493,7 +493,7 @@ public class NewConnectionDialog extends JDialog {
 				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-				LOGGER.error(e.toString(), e);
+				LOGGER.error(e.toString());
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -506,7 +506,7 @@ public class NewConnectionDialog extends JDialog {
 							subscription);
 					subscription.setNotPersised(false);
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-					LOGGER.error(e.toString(), e);
+					LOGGER.error(e.toString());
 				}
 			}
 		}

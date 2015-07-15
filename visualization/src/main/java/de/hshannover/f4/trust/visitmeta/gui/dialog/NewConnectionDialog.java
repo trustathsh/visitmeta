@@ -357,22 +357,28 @@ public class NewConnectionDialog extends JDialog {
 			dataservices.removeDataserviceConnection(dataserviceConnection);
 
 			mJtConnections.updateModel();
-		} else if (selectedComponent instanceof MapServerConnection && parentData instanceof DataserviceConnection) {
-			MapServerConnection mapServerConnection = (MapServerConnection) selectedComponent;
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl
+				&& parentData instanceof DataserviceConnection) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
 
+			if (!mapServerConnection.isNotPersised()) {
 			RestHelper.deleteMapServerConnection(dataserviceConnection, mapServerConnection.getConnectionName());
+			}
 
 			dataserviceConnection.removeMapServerData(mapServerConnection);
 
 			mJtConnections.updateModel();
 
-		} else if (selectedComponent instanceof Subscription && parentData instanceof MapServerRestConnectionImpl) {
-			Subscription subscription = (Subscription) selectedComponent;
+		} else if (selectedComponent instanceof RestSubscriptionImpl
+				&& parentData instanceof MapServerRestConnectionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) parentData;
 
+			if (!subscription.isNotPersised()) {
 			RestHelper.deleteSubscription(mapServerConnection.getDataserviceConnection(),
 					mapServerConnection.getConnectionName(), subscription.getName());
+			}
 
 			mapServerConnection.deleteSubscription(subscription.getName());
 

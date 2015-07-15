@@ -45,7 +45,7 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator.Calcul
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.network.Connection;
+import de.hshannover.f4.trust.visitmeta.network.GraphNetworkConnection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 
@@ -59,7 +59,7 @@ import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 public class GraphContainer {
 	// private String mName = null;
 	// private String mMapServerConnectionName;
-	private Connection mConnection = null;
+	private GraphNetworkConnection mConnection = null;
 	private Calculator mCalculator = null;
 	// private DataserviceConnection mDataserviceConnection = null;
 	private MapServerRestConnectionImpl mMapSeverConnection = null;
@@ -99,7 +99,7 @@ public class GraphContainer {
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
 
-		mConnection = new Connection(graphService, this);
+		mConnection = new GraphNetworkConnection(graphService, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
@@ -180,7 +180,7 @@ public class GraphContainer {
 		return mFacadeLogic;
 	}
 
-	public Connection getConnection() {
+	public GraphNetworkConnection getConnection() {
 		return mConnection;
 	}
 

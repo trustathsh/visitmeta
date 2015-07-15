@@ -56,7 +56,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	private static final Logger LOGGER = Logger.getLogger(FacadeNetwork.class);
 
 	private GraphContainer mConnection = null;
-	private Connection mNetworkConnection = null;
+	private GraphNetworkConnection mNetworkConnection = null;
 	private TimeHolder mTimeHolder = null;
 	private GraphPool mGraphPool = null;
 	private SettingManager mSettingManager = null;
@@ -95,7 +95,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Loads the initial graph. This method notifies the observer.
 	 * 
-	 * @see Connection#loadGraphAtDeltaStart()
+	 * @see GraphNetworkConnection#loadGraphAtDeltaStart()
 	 */
 	public synchronized void loadGraphAtDeltaStart() {
 		clearGraph();
@@ -111,7 +111,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Loads the current graph. This method notifies the observer.
 	 * 
-	 * @see Connection#loadCurrentGraph()
+	 * @see GraphNetworkConnection#loadCurrentGraph()
 	 */
 	public synchronized void loadCurrentGraph() {
 		clearGraph();
@@ -127,7 +127,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Loads the delta. This method notifies the observer.
 	 * 
-	 * @see Connection#loadDelta()
+	 * @see GraphNetworkConnection#loadDelta()
 	 */
 	public synchronized void loadDelta() {
 		mNetworkConnection.loadDelta();

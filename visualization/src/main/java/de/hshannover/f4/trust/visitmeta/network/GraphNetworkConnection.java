@@ -64,8 +64,8 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
  * Class for managing a graph received from a dataservice. Contains methods to
  * update or load the graph.
  */
-public class Connection {
-	private static final Logger LOGGER = Logger.getLogger(Connection.class);
+public class GraphNetworkConnection {
+	private static final Logger LOGGER = Logger.getLogger(GraphNetworkConnection.class);
 
 	protected UpdateContainer mUpdateContainer;
 
@@ -85,7 +85,7 @@ public class Connection {
 	 * @param container
 	 *            Contains information about the Connection.
 	 */
-	public Connection(GraphService graphService, GraphContainer container) {
+	public GraphNetworkConnection(GraphService graphService, GraphContainer container) {
 		mUpdateContainer = new UpdateContainer();
 		mGraphService = graphService;
 		mTimeHolder = container.getTimeHolder();

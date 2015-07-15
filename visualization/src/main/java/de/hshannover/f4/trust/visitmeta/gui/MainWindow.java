@@ -76,6 +76,7 @@ import org.codehaus.jettison.json.JSONException;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.DataServiceParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.MapServerParameterPanel;
@@ -555,7 +556,8 @@ public class MainWindow extends JFrame {
 					RestHelper.saveSubscription(connectionData.getDataserviceConnection(), connectionData.getName(),
 							subscription);
 					subscription.setNotPersised(false);
-				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
+						| ConnectionException e) {
 					LOGGER.error(e.toString());
 				}
 			}

@@ -15,6 +15,7 @@ import org.codehaus.jettison.json.JSONObject;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -63,6 +64,7 @@ public class RestHelper {
 			jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
 				.get(JSONArray.class);
 		} catch (ClientHandlerException e) {
+			// if not available
 			throw new ConnectionException(e.getMessage());
 		}
 		
@@ -103,12 +105,16 @@ public class RestHelper {
 
 	public static void saveSubscription(DataserviceConnection dataserviceConnection,
 			String mapServerConnectionName, SubscriptionData subscriptionData) throws ClassNotFoundException,
-			InstantiationException, IllegalAccessException, JSONException {
+			InstantiationException, IllegalAccessException, JSONException, ConnectionException {
 
 		JSONObject jsonSubscriptionData = DataManager.transformData(subscriptionData);
 
-		buildWebResource(dataserviceConnection).path(mapServerConnectionName).path("subscribe")
-		.type(MediaType.APPLICATION_JSON).put(jsonSubscriptionData);
+		try {
+			buildWebResource(dataserviceConnection).path(mapServerConnectionName).path("subscribe")
+					.type(MediaType.APPLICATION_JSON).put(jsonSubscriptionData);
+		} catch (UniformInterfaceException e) {
+			throw new ConnectionException(e.getMessage());
+		}
 	}
 
 	public static void startSubscription(DataserviceConnection dataserviceConnection, String restConnectionName,

@@ -208,7 +208,7 @@ public class SubscribeResource {
 		try {
 			subscriptionList = Application.getConnectionManager().getSubscriptions(connectionName);
 		} catch (ConnectionException e) {
-			log.error("error while connection PUT | " + e.toString());
+			log.error("error while subscription PUT | " + e.toString());
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("error while connection PUT -> " + e.toString()).build();
 		}
@@ -219,7 +219,7 @@ public class SubscribeResource {
 			try {
 				Application.getConnectionManager().storeSubscription(connectionName, subscriptionData);
 			} catch (IOException | PropertyException e) {
-				log.error("error while connection PUT | " + e.toString());
+				log.error("error while subscription PUT | " + e.toString());
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity("error while connection PUT -> " + e.toString()).build();
 			}

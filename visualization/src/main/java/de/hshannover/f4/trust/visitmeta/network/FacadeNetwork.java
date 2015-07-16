@@ -170,12 +170,12 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 
 	@Override
 	public void update(Observable observable, Object obj) {
-		synchronized (this) {
 			if (observable instanceof TimeHolder) {
+			synchronized (this) {
 				mLoadNewest = mTimeHolder.isLiveView();
+			}
 			} else if (observable instanceof SettingManager) {
 				mInterval = mSettingManager.getNetworkInterval();
 			}
-		}
 	}
 }

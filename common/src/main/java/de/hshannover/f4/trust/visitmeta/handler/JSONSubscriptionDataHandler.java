@@ -56,8 +56,7 @@ public class JSONSubscriptionDataHandler implements SubscriptionDataHandler<Subs
 			new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
 		}
 
-		SubscriptionData subscriptionData = new SubscriptionDataImpl();
-		subscriptionData.setName(subscriptionName);
+		SubscriptionData subscriptionData = new SubscriptionDataImpl(subscriptionName);
 
 		JSONArray jsonKeys = jsonSubscriptionData.names();
 		if (jsonKeys != null) {

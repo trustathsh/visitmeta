@@ -64,6 +64,10 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 
 	private boolean mActive;
 
+	public SubscriptionDataImpl(String subscriptionName) {
+		super.setName(subscriptionName);
+	}
+
 	@Override
 	public List<Data> getSubData() {
 		// Subscriptions do not have subData
@@ -72,8 +76,7 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 
 	@Override
 	public SubscriptionData copy() {
-		SubscriptionData tmpCopy = new SubscriptionDataImpl();
-		tmpCopy.setName(super.getName());
+		SubscriptionData tmpCopy = new SubscriptionDataImpl(super.getName());
 		tmpCopy.setStartIdentifier(getStartIdentifier());
 		tmpCopy.setIdentifierType(getIdentifierType());
 		tmpCopy.setMatchLinksFilter(getMatchLinksFilter());

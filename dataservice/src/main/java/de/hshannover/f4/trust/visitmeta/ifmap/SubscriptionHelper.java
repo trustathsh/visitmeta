@@ -98,7 +98,7 @@ public class SubscriptionHelper {
 		ConnectionManager connectionManager = Application.getConnectionManager();
 		MapServerConnection connection = connectionManager.getSavedConnections().get(connectionName);
 
-		Subscription subscription = new SubscriptionImpl(connection);
+		Subscription subscription = new SubscriptionImpl("[BLANK]", connection);
 
 		subscription.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
 		subscription.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);

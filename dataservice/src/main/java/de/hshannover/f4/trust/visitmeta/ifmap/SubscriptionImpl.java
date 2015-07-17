@@ -47,14 +47,14 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 
 	private MapServerConnection mMapServerConnection;
 
-	public SubscriptionImpl(MapServerConnection mapServerConnection) {
+	public SubscriptionImpl(String subscriptionName, MapServerConnection mapServerConnection) {
+		super(subscriptionName);
 		mMapServerConnection = mapServerConnection;
 	}
 
 	public SubscriptionImpl(MapServerConnection mapServerConnection, SubscriptionData subscriptionData) {
-		this(mapServerConnection);
+		this(subscriptionData.getName(), mapServerConnection);
 
-		super.setName(subscriptionData.getName());
 		super.setStartIdentifier(subscriptionData.getStartIdentifier());
 		super.setIdentifierType(subscriptionData.getIdentifierType());
 		super.setMatchLinksFilter(subscriptionData.getMatchLinksFilter());

@@ -144,11 +144,9 @@ public class ConnectionsProperties extends Properties {
 		// for all Subscriptions
 		for (String subscribeName : propertySubscribeList.keySet()) {
 			// build new Subscription
-			Subscription subscribtion = new SubscriptionImpl(mapServerConnection);
+			Subscription subscribtion = new SubscriptionImpl(subscribeName, mapServerConnection);
 			// set required values
-			subscribtion.setName(subscribeName);
-			subscribtion
-					.setStartIdentifier(getPropertySubscriptionStartIdentifier(
+			subscribtion.setStartIdentifier(getPropertySubscriptionStartIdentifier(
 							connectionName, subscribeName));
 			subscribtion
 					.setIdentifierType(getPropertySubscriptionIdentifierType(

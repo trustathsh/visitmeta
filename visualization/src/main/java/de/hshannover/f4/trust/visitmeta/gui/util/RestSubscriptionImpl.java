@@ -17,19 +17,14 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 
 	private boolean mNotPersised;
 
-	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection) {
+	public RestSubscriptionImpl(String subscriptionName, MapServerRestConnectionImpl mapServerConnection) {
+		super(subscriptionName);
 		mMapServerConnection = mapServerConnection;
 	}
 
-	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection, String subscriptionName) {
-		this(mapServerConnection);
-		super.setName(subscriptionName);
-	}
-
 	public RestSubscriptionImpl(MapServerRestConnectionImpl mapServerConnection, SubscriptionData subscriptionData) {
-		this(mapServerConnection);
+		this(subscriptionData.getName(), mapServerConnection);
 
-		super.setName(subscriptionData.getName());
 		super.setStartIdentifier(subscriptionData.getStartIdentifier());
 		super.setIdentifierType(subscriptionData.getIdentifierType());
 		super.setMatchLinksFilter(subscriptionData.getMatchLinksFilter());

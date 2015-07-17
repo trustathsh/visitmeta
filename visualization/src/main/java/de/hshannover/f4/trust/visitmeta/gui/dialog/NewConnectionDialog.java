@@ -420,8 +420,8 @@ public class NewConnectionDialog extends JDialog {
 
 		} else if (selectedComponent instanceof MapServerConnection) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
-			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(mapServerConnection,
-					"New Subscription " + (mapServerConnection.getSubDataCount() + 1));
+			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(
+					"New Subscription " + (mapServerConnection.getSubDataCount() + 1), mapServerConnection);
 			newSubscription.setNotPersised(true);
 
 			addNewData(selectionPath, newSubscription);

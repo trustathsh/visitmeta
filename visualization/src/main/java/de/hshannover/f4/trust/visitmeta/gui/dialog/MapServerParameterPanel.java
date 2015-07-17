@@ -3,14 +3,17 @@ package de.hshannover.f4.trust.visitmeta.gui.dialog;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
 
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
-import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -30,7 +33,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 	private JTextField mJtfUrl;
 	private JTextField mJtfName;
 	private JTextField mJtfUsername;
-	private JTextField mJtfMaxPollResultSize;
+	private JFormattedTextField mJtfMaxPollResultSize;
 
 	private JPasswordField mJtfPassword;
 
@@ -77,7 +80,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mJcbConnectingAtStartUp = new JCheckBox();
 		mJtfUsername = new JTextField();
 		mJtfPassword = new JPasswordField();
-		mJtfMaxPollResultSize = new HintTextField("Optional");
+		mJtfMaxPollResultSize = new JFormattedTextField(NumberFormat.getIntegerInstance());
 
 		// x y w h wx wy
 		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.mLblInsets);
@@ -97,6 +100,14 @@ public class MapServerParameterPanel extends ParameterPanel {
 	}
 
 	private void addChangeListeners() {
+		PropertyChangeListener mPropertyChangeListener = new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				fireParameterChanged();
+			}
+		};
+
 		mDocumentChangedListener = new DocumentChangedListener() {
 
 			@Override
@@ -117,7 +128,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mJtfUrl.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfUsername.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfPassword.getDocument().addDocumentListener(mDocumentChangedListener);
-		mJtfMaxPollResultSize.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfMaxPollResultSize.addPropertyChangeListener("value", mPropertyChangeListener);
 		mJcbConnectingAtStartUp.addItemListener(mItemListener);
 		mJcbBasicAuthentication.addItemListener(mItemListener);
 	}
@@ -131,7 +142,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 		// TODO TRUSTSTORE_PATH
 		// TODO TRUSTSTORE_PASS
 		mJcbConnectingAtStartUp.setSelected(mConnectionData.doesConnectOnStartup());
-		mJtfMaxPollResultSize.setText(String.valueOf(mConnectionData.getMaxPollResultSize()));
+		mJtfMaxPollResultSize.setValue(mConnectionData.getMaxPollResultSize());
 	}
 
 	@Override
@@ -144,7 +155,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 		// TODO TRUSTSTORE_PATH
 		// TODO TRUSTSTORE_PASS
 		mConnectionData.setStartupConnect(mJcbConnectingAtStartUp.isSelected());
-		mConnectionData.setMaxPollResultSize(Integer.parseInt(mJtfMaxPollResultSize.getText().trim()));
+		mConnectionData.setMaxPollResultSize(((Number) mJtfMaxPollResultSize.getValue()).intValue());
 		return mConnectionData;
 	}
 

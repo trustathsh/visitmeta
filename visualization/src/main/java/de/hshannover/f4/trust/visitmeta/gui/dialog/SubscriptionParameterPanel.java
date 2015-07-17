@@ -3,8 +3,12 @@ package de.hshannover.f4.trust.visitmeta.gui.dialog;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
 
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -33,8 +37,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 	private JTextField mJtfFilterLinks;
 	private JTextField mJtfFilterResult;
 	private JTextField mJtfTerminalIdentifierTypes;
-	private JTextField mJtfMaxDepth;
-	private JTextField mJtfMaxSize;
+	private JFormattedTextField mJtfMaxDepth;
+	private JFormattedTextField mJtfMaxSize;
 
 	private JCheckBox mJcbStartupSubscribe;
 
@@ -77,8 +81,9 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJtfFilterLinks = new JTextField();
 		mJtfFilterResult = new JTextField();
 		mJtfTerminalIdentifierTypes = new JTextField();
-		mJtfMaxDepth = new JTextField();
-		mJtfMaxSize = new JTextField();
+
+		mJtfMaxDepth = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		mJtfMaxSize = new JFormattedTextField(NumberFormat.getIntegerInstance());
 
 		mJcbStartupSubscribe = new JCheckBox();
 
@@ -104,6 +109,15 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 	}
 
 	private void addChangeListeners() {
+
+		PropertyChangeListener mPropertyChangeListener = new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				fireParameterChanged();
+			}
+		};
+
 		mDocumentChangedListener = new DocumentChangedListener() {
 
 			@Override
@@ -123,8 +137,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJtfName.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfFilterLinks.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfFilterResult.getDocument().addDocumentListener(mDocumentChangedListener);
-		mJtfMaxDepth.getDocument().addDocumentListener(mDocumentChangedListener);
-		mJtfMaxSize.getDocument().addDocumentListener(mDocumentChangedListener);
+		mJtfMaxDepth.addPropertyChangeListener("value", mPropertyChangeListener);
+		mJtfMaxSize.addPropertyChangeListener("value", mPropertyChangeListener);
 		mJtfStartIdentifier.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfStartIdentifierType.getDocument().addDocumentListener(mDocumentChangedListener);
 		mJtfTerminalIdentifierTypes.getDocument().addDocumentListener(mDocumentChangedListener);
@@ -139,8 +153,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJtfFilterLinks.setText(mSubscription.getMatchLinksFilter());
 		mJtfFilterResult.setText(mSubscription.getResultFilter());
 		mJtfTerminalIdentifierTypes.setText(mSubscription.getTerminalIdentifierTypes());
-		mJtfMaxDepth.setText(String.valueOf(mSubscription.getMaxDepth()));
-		mJtfMaxSize.setText(String.valueOf(mSubscription.getMaxSize()));
+		mJtfMaxDepth.setValue(mSubscription.getMaxDepth());
+		mJtfMaxSize.setValue(mSubscription.getMaxSize());
 		mJcbStartupSubscribe.setSelected(mSubscription.isStartupSubscribe());
 	}
 
@@ -152,8 +166,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());
 		mSubscription.setResultFilter(mJtfFilterResult.getText().trim());
 		mSubscription.setTerminalIdentifierTypes(mJtfTerminalIdentifierTypes.getText().trim());
-		mSubscription.setMaxDepth(Integer.valueOf(mJtfMaxDepth.getText().trim()));
-		mSubscription.setMaxSize(Integer.valueOf(mJtfMaxSize.getText().trim()));
+		mSubscription.setMaxDepth(((Number) mJtfMaxDepth.getValue()).intValue());
+		mSubscription.setMaxSize(((Number) mJtfMaxSize.getValue()).intValue());
 		mSubscription.setStartupSubscribe(mJcbStartupSubscribe.isSelected());
 		return mSubscription;
 	}

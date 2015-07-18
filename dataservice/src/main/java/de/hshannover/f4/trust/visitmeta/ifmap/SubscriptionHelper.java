@@ -38,10 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
@@ -49,15 +46,8 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
-import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
-import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
-import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
-@Deprecated
 public class SubscriptionHelper {
 
 	private static final Logger log = Logger.getLogger(SubscriptionHelper.class);
@@ -88,40 +78,6 @@ public class SubscriptionHelper {
 		request.addSubscribeElement(subscribe);
 
 		return request;
-	}
-
-	public static SubscribeRequest buildRequest(String connectionName, JSONObject jObj) {
-		return buildUpdateRequest(buildSubscribtion(connectionName, jObj));
-	}
-
-	public static Subscription buildSubscribtion(String connectionName, JSONObject jObj) {
-		ConnectionManager connectionManager = Application.getConnectionManager();
-		MapServerConnection connection = connectionManager.getSavedConnections().get(connectionName);
-
-		Subscription subscription = new SubscriptionImpl("[BLANK]", connection);
-
-		subscription.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
-		subscription.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
-
-		Iterator<String> i = jObj.keys();
-		while (i.hasNext()) {
-			String jKey = i.next();
-
-			switch (jKey) {
-			case SubscriptionKey.SUBSCRIPTION_NAME: subscription.setName(jObj.optString(jKey)); break;
-			case SubscriptionKey.IDENTIFIER_TYPE: subscription.setIdentifierType(jObj.optString(jKey)); break;
-			case SubscriptionKey.START_IDENTIFIER: subscription.setStartIdentifier(jObj.optString(jKey)); break;
-			case SubscriptionKey.MAX_DEPTH: subscription.setMaxDepth(jObj.optInt(jKey)); break;
-			case SubscriptionKey.MAX_SIZE: subscription.setMaxSize(jObj.optInt(jKey)); break;
-			case SubscriptionKey.MATCH_LINKS_FILTER: subscription.setMatchLinksFilter(jObj.optString(jKey)); break;
-			case SubscriptionKey.RESULT_FILTER: subscription.setResultFilter(jObj.optString(jKey)); break;
-			case SubscriptionKey.TERMINAL_IDENTIFIER_TYPES: subscription.setTerminalIdentifierTypes(jObj.optString(jKey)); break;
-			case SubscriptionKey.USE_SUBSCRIPTION_AS_STARTUP: subscription.setStartupSubscribe(jObj.optBoolean(jKey)); break;
-			default: log.warn("The key: \"" + jKey + "\" is not a valide JSON-Key for subscriptions."); break;
-			}
-		}
-
-		return subscription;
 	}
 
 	private static Identifier createStartIdentifier(String sIdentifierType, String sIdentifier) {

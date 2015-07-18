@@ -39,7 +39,6 @@
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -64,10 +63,9 @@ import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
-import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
+import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
 /**
  * For each request a new object of this class will be created. The resource is
@@ -126,54 +124,46 @@ public class SubscribeResource {
 	/**
 	 * Send a subscribeUpdate to the MAP-Server with a JSONObject. Max-Depth and
 	 * Max-Size have the defaultValue 1000 and 1000000000. To change this values
-	 * use the params "maxDepth" and "maxSize", or set this in the JSONObject.
+	 * set "maxDepth" and "maxSize" in the JSONObject.
 	 *
 	 * On identifier type: ip-address: "[type],[value]" e.g. "IPv4,10.1.1.1"
 	 * device: "[name]" access-request: "[name]" mac-address: "[value]"
 	 *
-	 * Use the valid JSON-Keys for subscriptions: SUBSCRIBE NAME =
-	 * "subscribeName" IDENTIFIER = "identifier" IDENTIFIER-TYPE =
-	 * "identifierType" MAX-DEPTH = "maxDepth" MAX-SIZE = "maxSize" LINKS-FILTER
-	 * = "linksFilter" RESULT-FILTER = "resultFilter" TERMINAL-IDENTIFIER-TYPES
-	 * = "terminalIdentifierTypes"
+	 * Use the valid JSON-Keys for subscriptions: START IDENTIFIER = "startIdentifier" IDENTIFIER-TYPE =
+	 * "identifierType" MAX-DEPTH = "maxDepth" MAX-SIZE = "maxSize" MATCH-LINKS-FILTER
+	 * = "matchLinksFilter" RESULT-FILTER = "resultFilter" TERMINAL-IDENTIFIER-TYPES
+	 * = "terminalIdentifierTypes" see also {@link JSONDataKey}.
 	 *
 	 * Example-URL: <tt>http://example.com:8000/default/subscribe/update</tt>
 	 *
-	 * Example-JSONObject: { subscribeName:exampleSub, identifierType:device,
-	 * identifier:device12 }
+	 * Example-JSONObject:
+	 * {
+	 * "subExample":
+	 * {
+	 * "startIdentifier": "freeradius-pdp",
+	 * "identifierType": "device"
+	 * }
+	 * }
 	 */
 	@PUT
 	@Path("update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("connectionName") String name, JSONObject jObj) {
+	public Response update(@PathParam("connectionName") String name, JSONObject jsonData) {
 		ConnectionManager manager = Application.getConnectionManager();
+
+		SubscriptionData subscriptionData;
 		try {
 
-			Iterator<String> i = jObj.keys();
-			while (i.hasNext()) {
-				String jKey = i.next();
-				JSONObject moreSubscribes = jObj.getJSONObject(jKey);
-				try {
+			subscriptionData = (SubscriptionData) DataManager.transformJSONObject(jsonData, SubscriptionData.class);
+			manager.storeSubscription(name, subscriptionData);
+			manager.startSubscription(name, subscriptionData.getName());
 
-					Subscription subscription = SubscriptionHelper.buildSubscribtion(name, moreSubscribes);
-					manager.storeSubscription(name, subscription);
-					manager.startSubscription(name, subscription.getName());
-
-				} catch (ConnectionException | IOException | PropertyException e) {
-					log.error("error while multiple subscribeUpdate from " + name + " | " + e.toString());
-					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
-				}
-			}
-		} catch (JSONException e) {
-			try {
-				Subscription subscription = SubscriptionHelper.buildSubscribtion(name, jObj);
-				manager.storeSubscription(name, subscription);
-				manager.startSubscription(name, subscription.getName());
-
-			} catch (ConnectionException | IOException | PropertyException ee) {
-				log.error("error while single subscribeUpdate from " + name + " | " + e.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ee.toString()).build();
-			}
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
+				| JSONException | IOException | PropertyException | ConnectionException e) {
+			String msg = "error while transform JSONObject";
+			log.error(msg + " | " + e.toString());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
+					.build();
 		}
 
 		try {

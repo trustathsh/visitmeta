@@ -46,14 +46,14 @@ public class Check {
 	}
 
 	/**
-	 * Check if the JSONObject contains the JSONEventKey. If not throws JSONHandlerException.
+	 * Check if the JSONObject contains the JSON-Key. If not throws JSONHandlerException.
 	 * 
 	 * @param jsonData
 	 * @param jsonKey
 	 * @throws JSONHandlerException
 	 * @throws JSONException
 	 */
-	public static void existJSONEventKey(JSONObject jsonData, JSONDataKey jsonKey) throws JSONHandlerException,
+	public static void existJSONKey(JSONObject jsonData, JSONDataKey jsonKey) throws JSONHandlerException,
 			JSONException {
 		if (!containsJSONEventKey(jsonData, jsonKey)) {
 			throw new JSONHandlerException(String.format(
@@ -69,8 +69,8 @@ public class Check {
 	 * @throws JSONHandlerException
 	 * @throws JSONException
 	 */
-	public static void defaultJSONEventKeys(JSONObject jsonData) throws JSONHandlerException, JSONException {
-		existJSONEventKey(jsonData, JSONDataKey.NAME);
+	public static void defaultJSONKeys(JSONObject jsonData) throws JSONHandlerException, JSONException {
+		existJSONKey(jsonData, JSONDataKey.NAME);
 	}
 
 }

@@ -39,7 +39,6 @@
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,13 +174,8 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public List<String> getSubscriptions(String connectionName) throws ConnectionException {
-		List<String> subscriptionNames = new ArrayList<String>();
-		List<Data> subscriptions = getConnection(connectionName).getSubscriptions();
-		for (Data s : subscriptions) {
-			subscriptionNames.add(s.getName());
-		}
-		return subscriptionNames;
+	public List<Data> getSubscriptions(String connectionName) throws ConnectionException {
+		return getConnection(connectionName).getSubscriptions();
 	}
 
 	@Override

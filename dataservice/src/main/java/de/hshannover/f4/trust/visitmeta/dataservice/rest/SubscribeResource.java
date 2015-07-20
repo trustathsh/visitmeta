@@ -64,6 +64,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
@@ -194,7 +195,7 @@ public class SubscribeResource {
 					.build();
 		}
 
-		List<String> subscriptionList;
+		List<Data> subscriptionList;
 		try {
 			subscriptionList = Application.getConnectionManager().getSubscriptions(connectionName);
 		} catch (ConnectionException e) {
@@ -203,7 +204,7 @@ public class SubscribeResource {
 					.entity("error while connection PUT -> " + e.toString()).build();
 		}
 
-		if (subscriptionList.contains(subscriptionData.getName())) {
+		if (subscriptionList.contains(subscriptionData)) {
 			Application.getConnectionManager().updateSubscription(connectionName, subscriptionData);
 		} else {
 			try {

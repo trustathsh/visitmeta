@@ -41,7 +41,6 @@ package de.hshannover.f4.trust.visitmeta.interfaces.ifmap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -142,7 +141,7 @@ public interface ConnectionManager {
 	 * Returns all active subscriptions for a given {@link Connection}.
 	 *
 	 * @param connectionName name of the {@link Connection}
-	 * @return a Set<String> with the active subscriptions.
+	 * @return a List<String> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
 	public List<Data> getActiveSubscriptions(String connectionName) throws ConnectionException;
@@ -151,15 +150,15 @@ public interface ConnectionManager {
 	 * Returns all subscriptions for a given {@link Connection}.
 	 *
 	 * @param connectionName name of the {@link Connection}
-	 * @return a Set<String> with the active subscriptions.
+	 * @return a List<Data> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public List<String> getSubscriptions(String connectionName) throws ConnectionException;
+	public List<Data> getSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
-	 * Returns all saved connections as a String {@link Set}.
+	 * Returns all saved connections as a String {@link Map}.
 	 *
-	 * @return a Set<String> with all saved subscriptions.
+	 * @return a Map<String, MapServerConnection> with all saved subscriptions.
 	 */
 	public Map<String, MapServerConnection> getSavedConnections();
 

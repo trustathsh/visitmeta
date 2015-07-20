@@ -225,6 +225,13 @@ public class SubscribeResource {
 		return Response.ok().entity("INFO: subscribe put successfully").build();
 	}
 
+	/**
+	 * Send subscribe update request
+	 * 
+	 * @param connectName saved connection
+	 * @param subscriptionName saved subscription
+	 * @return
+	 */
 	@PUT
 	@Path("start/{subscriptionName}")
 	public Response start(@PathParam("connectionName") String connectName,
@@ -232,13 +239,18 @@ public class SubscribeResource {
 		try {
 			Application.getConnectionManager().startSubscription(connectName, subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while start " + subscriptionName + " from " + connectName + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("start " + subscriptionName + " from " + connectName, e.toString());
 		}
-
 		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") enabled").build();
 	}
 
+	/**
+	 * Send subscribe delete request
+	 * 
+	 * @param connectName saved connection
+	 * @param subscriptionName saved subscription
+	 * @return
+	 */
 	@PUT
 	@Path("stop/{subscriptionName}")
 	public Response stop(@PathParam("connectionName") String connectName,
@@ -246,28 +258,37 @@ public class SubscribeResource {
 		try {
 			Application.getConnectionManager().stopSubscription(connectName, subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while stop " + subscriptionName + " from " + connectName + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("stop " + subscriptionName + " from " + connectName, e.toString());
 		}
 
 		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") disabled").build();
 	}
 
 	/**
-	 * Send a subscribeDelete for all active subscriptions to the MAP-Server.
-	 * You must set the deleteAll value of true.
+	 * Send a subscribe delete request for all active subscriptions to the MAP-Server.
+	 * You must set the deleteAll parameter of true.
 	 *
-	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete?deleteAll=true</tt>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe?deleteAll=true</tt>
+	 * 
+	 * @param connectionName saved connection
+	 * @return
 	 */
 	@DELETE
-	public Response delete(@PathParam("connectionName") String name) {
+	public Response delete(@PathParam("connectionName") String connectionName) {
 		if (mDeleteAll) {
 			try {
-				Application.getConnectionManager().deleteAllSubscriptions(name);
+				Application.getConnectionManager().deleteAllSubscriptions(connectionName);
 			} catch (ConnectionException e) {
-				log.error("error while delete all subscriptions from " + name + " | " + e.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+				return responseError("delete all subscriptions from " + connectionName, e.toString());
 			}
+
+			// persist
+			try {
+				Application.getConnections().persistConnections();
+			} catch (PropertyException e) {
+				return responseError("connection persist", e.toString());
+			}
+
 			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
 		} else {
 			return Response.status(Response.Status.NOT_MODIFIED)
@@ -278,26 +299,28 @@ public class SubscribeResource {
 	/**
 	 * Send a subscribeDelete for the active subscription to the MAP-Server.
 	 *
-	 * Example-URL: <tt>http://example.com:8000/default/subscribe/delete/{subscriptionName}</tt>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/{subscriptionName}</tt>
+	 * 
+	 * @param connectionName saved connection
+	 * @param subscriptionName saved subscription
+	 * @return
 	 */
 	@DELETE
 	@Path("{subscriptionName}")
-	public Response delete(@PathParam("connectionName") String name,
+	public Response delete(@PathParam("connectionName") String connectionName,
 			@PathParam("subscriptionName") String subscriptionName) {
 		try {
-			Application.getConnectionManager().deleteSubscription(name, subscriptionName);
+			Application.getConnectionManager().deleteSubscription(connectionName, subscriptionName);
 		} catch (ConnectionException e) {
-			log.error("error while delete " + subscriptionName + " from " + name + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("delete all subscription(" + subscriptionName + ") from " + connectionName,
+					e.toString());
 		}
 
-		// persist connection in property
+		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			log.error("error while delete subscription | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while delete connection -> " + e.toString()).build();
+			return responseError("connection persist", e.toString());
 		}
 
 		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();

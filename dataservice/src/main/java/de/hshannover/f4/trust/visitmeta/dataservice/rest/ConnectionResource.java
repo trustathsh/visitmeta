@@ -48,7 +48,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpException;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -66,6 +65,16 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
 
+/**
+ * For each request a new object of this class will be created. The resource is
+ * accessible under the root-path <tt>/</tt>. About this
+ * interface can be update and delete multiple map-server-connections. Under the root path
+ * return a list for all saved connections.
+ *
+ * @author Marcel Reichenbach
+ *
+ */
+
 @Path("/")
 public class ConnectionResource {
 
@@ -78,24 +87,21 @@ public class ConnectionResource {
 	 */
 	@DELETE
 	@Path("{connectionName}")
-	public Response deleteConnection(@PathParam("connectionName") String name) {
+	public Response deleteConnection(@PathParam("connectionName") String connectionName) {
 		try {
-			Application.getConnectionManager().removeConnection(name);
+			Application.getConnectionManager().removeConnection(connectionName);
 		} catch (ConnectionException e) {
-			LOGGER.error("error while delete " + name + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("delete connection('" + connectionName + "')", e.toString());
 		}
 
-		// persist connection in property
+		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			LOGGER.error("error while delete connection | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while delete connection -> " + e.toString()).build();
+			return responseError("[persist] delete connection('" + connectionName + "')", e.toString());
 		}
 
-		return Response.ok().entity("INFO: delete connection(" + name + ") successfully").build();
+		return Response.ok().entity("INFO: delete connection(" + connectionName + ") successfully").build();
 	}
 
 	/**
@@ -103,19 +109,25 @@ public class ConnectionResource {
 	 * <ul>
 	 * <li><b><i>saveConnection</i></b><br>
 	 * <br>
-	 * Persist a new connection to a MAP-Server.<br>
+	 * Persist a new connection to a MAP-Server with or without subscriptions<br>
 	 * <br>
-	 * Example-URL: <tt>http://example.com:8000/default</tt><br>
+	 * Example-URL: <tt>http://example.com:8000</tt><br>
 	 * <br>
 	 * Example-JSONObject:<br>
 	 * {<br>
-	 * <tab> [connectionName] : {<br>
-	 * <tab>ifmapServerUrl:"https://localhost:8443",<br>
-	 * <tab>userName:visitmeta,<br>
-	 * <tab>userPassword:visitmeta,<br>
-	 * <tab>}<br>
-	 * }<br>
+	 * <tab>"conExample": {<br>
 	 * <br>
+	 * "ifmapServerUrl": "https://localhost:8443", <br>
+	 * "userName": "visitmeta", <br>
+	 * "userPassword": "visitmeta", <br>
+	 * "subscriptions": [<br>
+	 * {<br>
+	 * "subExample": { <br>
+	 * <br>
+	 * "startIdentifier": "freeradius-pdp", <br>
+	 * "identifierType": "device" <br>
+	 * ]}} <br>
+	 * 
 	 * <b>required values:</b>
 	 * <ul>
 	 * <li>ifmapServerUrl</li>
@@ -125,11 +137,11 @@ public class ConnectionResource {
 	 * <br>
 	 * <b>optional values:</b><br>
 	 * <ul>
-	 * <li>authentication.basic</li>
-	 * <li>authentication.cert</li> <b>(!is not implemented yet!)</b>
-	 * <li>truststore.path</li>
-	 * <li>truststore.pw</li>
-	 * <li>startup.connect</li>
+	 * <li>authenticationBasic</li>
+	 * <li>authenticationCert</li> <b>(!is not implemented yet!)</b>
+	 * <li>truststorePath</li>
+	 * <li>truststorePassword</li>
+	 * <li>useAsStartup</li>
 	 * <li>maxPollResultSize</li>
 	 * </ul>
 	 * </li>
@@ -138,24 +150,19 @@ public class ConnectionResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putConnection(JSONObject jsonConnectionData) {
-		LOGGER.trace("new rest PUT save Connection...");
-
+		// transform
 		MapServerConnectionData newConnectionData = null;
 		try {
 			newConnectionData = (MapServerConnectionData) DataManager.transformJSONObject(jsonConnectionData,
 					MapServerConnectionData.class);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
 				| JSONException e) {
-			String msg = "error while transform JSONObject";
-			LOGGER.error(msg + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
-					.build();
+			return responseError("JSONObject transform", e.toString());
 		}
 
+		// update || save connection
 		try {
-
 			Application.getConnectionManager().updateConnection(newConnectionData);
-
 		} catch (NoSavedConnectionException e) {
 			// OK, then try to save
 			MapServerConnection newConnection = new MapServerConnectionImpl(newConnectionData);
@@ -163,24 +170,17 @@ public class ConnectionResource {
 			try {
 				Application.getConnectionManager().addConnection(newConnection);
 			} catch (ConnectionException ee) {
-				String msg = "error while adding connection to the connection pool";
-				LOGGER.error(msg + " | " + ee.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(msg + " | Exception: " + ee.toString()).build();
+				return responseError("connection store", ee.toString());
 			}
 		}
 
-
-		// persist connection in property
+		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			LOGGER.error("error while connection persist | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while connection persist -> " + e.toString()).build();
+			return responseError("connection persist", e.toString());
 		}
 
-		LOGGER.trace("... new rest putConnection " + newConnectionData + " success");
 		return Response.ok().entity(newConnectionData + " was saved or updated").build();
 	}
 
@@ -189,20 +189,18 @@ public class ConnectionResource {
 	 *
 	 * Example-URL: <tt>http://example.com:8000/default/connect</tt>
 	 *
-	 * @throws HttpException
 	 *
 	 **/
 	@PUT
 	@Path("{connectionName}/connect")
-	public Response connect(@PathParam("connectionName") String name) {
+	public Response connect(@PathParam("connectionName") String connectionName) {
 		try {
-			Application.getConnectionManager().connect(name);
+			Application.getConnectionManager().connect(connectionName);
 		} catch (ConnectionEstablishedException e) {
 			LOGGER.warn(e.toString());
-			return Response.ok().entity("INFO: connection allready aktive").build();
+			return Response.ok().entity("INFO: connection allready aktive | " + e.toString()).build();
 		} catch (ConnectionException e) {
-			LOGGER.error("error while connecting to " + name + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("connecting to " + connectionName, e.toString());
 		}
 
 		return Response.ok("INFO: connecting successfully").build();
@@ -216,26 +214,26 @@ public class ConnectionResource {
 	 **/
 	@PUT
 	@Path("{connectionName}/disconnect")
-	public Response disconnect(@PathParam("connectionName") String name) {
+	public Response disconnect(@PathParam("connectionName") String connectionName) {
 		try {
-			Application.getConnectionManager().disconnect(name);
+			Application.getConnectionManager().disconnect(connectionName);
 		} catch (NotConnectedException e) {
-			LOGGER.error("error while disconnect from " + name + " | " + e.toString());
-			return Response.ok().entity("INFO: connection allready disconnected").build();
+			LOGGER.warn("INFO: connection allready disconnected | " + e.toString());
+			return Response.ok().entity("INFO: connection allready disconnected | " + e.toString()).build();
 		} catch (ConnectionException e) {
-			LOGGER.error("error while disconnect from " + name + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+			return responseError("disconnecting to " + connectionName, e.toString());
 		}
 
 		return Response.ok().entity("INFO: disconnection successfully").build();
 	}
 
 	/**
-	 * Returns a JSONObject with saved connections to a MAP-Server. Example-URL:
-	 * <tt>http://example.com:8000/</tt>
-	 *
-	 * You can set the onlyActive value of true. Example-URL:
-	 * <tt>http://example.com:8000/?onlyActive=true</tt>
+	 * Returns a JSONArray with saved connections to a MAP-Server.<br>
+	 * <br>
+	 * Example-URL: <tt>http://example.com:8000/</tt> <br>
+	 * <br>
+	 * You can set the onlyActive value of true. Example-URL: <tt>http://example.com:8000/?onlyActive=true</tt>
+	 * 
 	 **/
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -247,12 +245,18 @@ public class ConnectionResource {
 			try {
 				jsonConnectionData = DataManager.transformData(c);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
-				LOGGER.error("error while getConnections | " + e.toString());
+				return responseError("Data transform", e.toString());
 			}
 
 			jsonConnections.put(jsonConnectionData);
 
 		}
 		return jsonConnections;
+	}
+
+	private Response responseError(String errorWhile, String exception) {
+		String msg = "error while " + errorWhile + " | Exception: " + exception;
+		LOGGER.error(msg);
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg).build();
 	}
 }

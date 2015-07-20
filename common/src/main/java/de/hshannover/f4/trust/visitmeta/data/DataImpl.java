@@ -58,8 +58,14 @@ public abstract class DataImpl implements Data {
 		if (o == this) {
 			return true;
 		} else if (o instanceof Data) {
-			if (((Data) o).getName().equals(getName())) {
+			if (((Data) o).getName() != null) {
+				if (((Data) o).getName().equals(getName())) {
+					return true;
+				}
+			} else if (getName() == null) {
 				return true;
+			} else {
+				return false;
 			}
 		}
 		return false;

@@ -104,8 +104,7 @@ public class SubscribeResource {
 			try {
 				jaSubscriptions = new JSONArray(Application.getConnectionManager().getSubscriptions(name));
 			} catch (ConnectionException e) {
-				log.error("error at getSubscriptions from " + name + " | " + e.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+				return responseError("GET subscriptions from " + name, e.toString());
 			}
 
 		} else {
@@ -113,8 +112,7 @@ public class SubscribeResource {
 			try {
 				jaSubscriptions = new JSONArray(Application.getConnectionManager().getActiveSubscriptions(name));
 			} catch (ConnectionException e) {
-				log.error("error at getActiveSubscriptions from " + name + " | " + e.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
+				return responseError("GET active subscriptions from " + name, e.toString());
 			}
 
 		}
@@ -153,26 +151,34 @@ public class SubscribeResource {
 		ConnectionManager manager = Application.getConnectionManager();
 
 		SubscriptionData subscriptionData;
+
+		// transform
 		try {
-
 			subscriptionData = (SubscriptionData) DataManager.transformJSONObject(jsonData, SubscriptionData.class);
-			manager.storeSubscription(name, subscriptionData);
-			manager.startSubscription(name, subscriptionData.getName());
-
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
-				| JSONException | IOException | PropertyException | ConnectionException e) {
-			String msg = "error while transform JSONObject";
-			log.error(msg + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
-					.build();
+				| JSONException e) {
+			return responseError("JSONObject transform", e.toString());
 		}
 
+		// save
+		try {
+			manager.storeSubscription(name, subscriptionData);
+		} catch (IOException | PropertyException e) {
+			return responseError("subscription store", e.toString());
+		}
+
+		// start
+		try {
+			manager.startSubscription(name, subscriptionData.getName());
+		} catch (ConnectionException e) {
+			return responseError("subscription start", e.toString());
+		}
+
+		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			log.error("error while connection persist | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while connection persist -> " + e.toString()).build();
+			return responseError("connection persist", e.toString());
 		}
 
 		return Response.ok().entity("INFO: subscribe successfully").build();
@@ -303,5 +309,11 @@ public class SubscribeResource {
 		}
 
 		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();
+	}
+
+	private Response responseError(String errorWhile, String exception) {
+		String msg = "error while " + errorWhile + " | Exception: " + exception;
+		log.error(msg);
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg).build();
 	}
 }

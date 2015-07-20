@@ -258,10 +258,10 @@ public class ConnectionsProperties extends Properties {
 			if (matchLinksFilter != null && !matchLinksFilter.isEmpty()) {
 				setPropertySubscriptionMatchLinksFilter(connectionName, subscriptionName, matchLinksFilter);
 			}
-			if (resultFilter != null) {
+			if (resultFilter != null && !resultFilter.isEmpty()) {
 				setPropertySubscriptionResultFilter(connectionName, subscriptionName, resultFilter);
 			}
-			if (terminalIdentifierTypes != null) {
+			if (terminalIdentifierTypes != null && !terminalIdentifierTypes.isEmpty()) {
 				setPropertySubscriptionTerminalIdentifierTypes(connectionName, subscriptionName,
 						terminalIdentifierTypes);
 			}

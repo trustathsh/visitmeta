@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
+import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
@@ -82,8 +83,8 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJtfFilterResult = new JTextField();
 		mJtfTerminalIdentifierTypes = new JTextField();
 
-		mJtfMaxDepth = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		mJtfMaxSize = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		mJtfMaxDepth = new HintTextField("Optional", NumberFormat.getIntegerInstance());
+		mJtfMaxSize = new HintTextField("Optional", NumberFormat.getIntegerInstance());
 
 		mJcbStartupSubscribe = new JCheckBox();
 
@@ -153,9 +154,14 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJtfFilterLinks.setText(mSubscription.getMatchLinksFilter());
 		mJtfFilterResult.setText(mSubscription.getResultFilter());
 		mJtfTerminalIdentifierTypes.setText(mSubscription.getTerminalIdentifierTypes());
-		mJtfMaxDepth.setValue(mSubscription.getMaxDepth());
-		mJtfMaxSize.setValue(mSubscription.getMaxSize());
 		mJcbStartupSubscribe.setSelected(mSubscription.isStartupSubscribe());
+		if (mSubscription.getMaxDepth() > 0) {
+			mJtfMaxDepth.setValue(mSubscription.getMaxDepth());
+		}
+
+		if (mSubscription.getMaxSize() > 0) {
+			mJtfMaxSize.setValue(mSubscription.getMaxSize());
+		}
 	}
 
 	@Override
@@ -166,9 +172,15 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());
 		mSubscription.setResultFilter(mJtfFilterResult.getText().trim());
 		mSubscription.setTerminalIdentifierTypes(mJtfTerminalIdentifierTypes.getText().trim());
-		mSubscription.setMaxDepth(((Number) mJtfMaxDepth.getValue()).intValue());
-		mSubscription.setMaxSize(((Number) mJtfMaxSize.getValue()).intValue());
 		mSubscription.setStartupSubscribe(mJcbStartupSubscribe.isSelected());
+
+		if (mJtfMaxDepth.getValue() != null) {
+			mSubscription.setMaxDepth(((Number) mJtfMaxDepth.getValue()).intValue());
+		}
+
+		if (mJtfMaxSize.getValue() != null) {
+			mSubscription.setMaxSize(((Number) mJtfMaxSize.getValue()).intValue());
+		}
 		return mSubscription;
 	}
 

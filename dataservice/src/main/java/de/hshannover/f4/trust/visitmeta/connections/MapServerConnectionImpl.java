@@ -81,7 +81,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		if (connectionData.getTruststorePassword() != null) {
 			super.setTruststorePassword(connectionData.getTruststorePassword());
 		}
-		if (connectionData.getMaxPollResultSize() != 0) {
+		if (connectionData.getMaxPollResultSize() > 0) {
 			super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
 		}
 

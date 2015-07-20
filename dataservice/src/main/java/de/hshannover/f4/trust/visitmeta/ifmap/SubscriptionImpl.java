@@ -42,6 +42,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 
@@ -50,6 +51,8 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 	public SubscriptionImpl(String subscriptionName, MapServerConnection mapServerConnection) {
 		super(subscriptionName);
 		mMapServerConnection = mapServerConnection;
+
+		init();
 	}
 
 	public SubscriptionImpl(MapServerConnection mapServerConnection, SubscriptionData subscriptionData) {
@@ -61,10 +64,20 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 		super.setResultFilter(subscriptionData.getResultFilter());
 		super.setTerminalIdentifierTypes(subscriptionData.getTerminalIdentifierTypes());
 		super.setStartupSubscribe(subscriptionData.isStartupSubscribe());
-		super.setMaxDepth(subscriptionData.getMaxDepth());
-		super.setMaxSize(subscriptionData.getMaxSize());
 		super.setActive(subscriptionData.isActive());
 
+		if (subscriptionData.getMaxSize() > 0) {
+			super.setMaxSize(subscriptionData.getMaxSize());
+		}
+		if (subscriptionData.getMaxDepth() > 0) {
+			super.setMaxDepth(subscriptionData.getMaxDepth());
+		}
+	}
+
+	private void init() {
+		// set default data
+		super.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
+		super.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 	}
 
 	@Override

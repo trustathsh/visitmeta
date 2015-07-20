@@ -47,7 +47,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		super.setMaxPollResultSize(connectionData.getMaxPollResultSize());
 		super.setConnected(connectionData.isConnected());
 		super.setStartupConnect(connectionData.doesConnectOnStartup());
-		super.setAuthenticationBasic(connectionData.isAuthenticationBasic());
+		super.setAuthenticationBasic(true); // default is true
 
 		for (Data subscriptonData : connectionData.getSubscriptions()) {
 			if (!(subscriptonData instanceof RestSubscriptionImpl) && subscriptonData instanceof SubscriptionData) {

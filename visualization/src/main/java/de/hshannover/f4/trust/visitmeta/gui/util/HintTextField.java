@@ -42,22 +42,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.text.Format;
 
-import javax.swing.JTextField;
+import javax.swing.JFormattedTextField;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 import javax.swing.text.JTextComponent;
 
-public class HintTextField extends JTextField {
+public class HintTextField extends JFormattedTextField {
 
 	private static final long serialVersionUID = -3261867067230514829L;
 
 	private String mHint;
 
-	public HintTextField() {
-		this("");
-	}
-
-	public HintTextField(final String hint) {
+	public HintTextField(String hint, Format format) {
+		super(format);
 		mHint = hint;
 		setHint(mHint);
 	}
@@ -143,15 +141,17 @@ class HintTextFieldUI extends BasicTextFieldUI implements FocusListener {
 
 	@Override
 	public void focusGained(FocusEvent e) {
-		if (mHideOnFocus)
+		if (mHideOnFocus) {
 			repaint();
+		}
 
 	}
 
 	@Override
 	public void focusLost(FocusEvent e) {
-		if (mHideOnFocus)
+		if (mHideOnFocus) {
 			repaint();
+		}
 	}
 
 	@Override

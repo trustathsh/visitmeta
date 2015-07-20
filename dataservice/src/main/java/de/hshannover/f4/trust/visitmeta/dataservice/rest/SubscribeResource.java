@@ -71,8 +71,8 @@ import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 /**
  * For each request a new object of this class will be created. The resource is
  * accessible under the path <tt>{connectionName}/subscribe</tt>. About this
- * interface can be update and delete subscriptions. Untder the path
- * {connectionName}/subscribe/active return a list for all active subscriptions.
+ * interface can be update and delete subscriptions. Under the path
+ * {connectionName}/subscribe return a list for all saved subscriptions.
  *
  * @author Marcel Reichenbach
  *
@@ -98,21 +98,22 @@ public class SubscribeResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getSubscriptions(@PathParam("connectionName") String name) {
+	public Object getSubscriptions(@PathParam("connectionName") String connectionName) {
+		ConnectionManager manager = Application.getConnectionManager();
 		JSONArray jaSubscriptions;
 		if (!mOnlyActive) {
 			try {
-				jaSubscriptions = new JSONArray(Application.getConnectionManager().getSubscriptions(name));
+				jaSubscriptions = new JSONArray(manager.getSubscriptions(connectionName));
 			} catch (ConnectionException e) {
-				return responseError("GET subscriptions from " + name, e.toString());
+				return responseError("GET subscriptions from " + connectionName, e.toString());
 			}
 
 		} else {
 
 			try {
-				jaSubscriptions = new JSONArray(Application.getConnectionManager().getActiveSubscriptions(name));
+				jaSubscriptions = new JSONArray(manager.getActiveSubscriptions(connectionName));
 			} catch (ConnectionException e) {
-				return responseError("GET active subscriptions from " + name, e.toString());
+				return responseError("GET active subscriptions from connection('" + connectionName + ")'", e.toString());
 			}
 
 		}
@@ -121,7 +122,7 @@ public class SubscribeResource {
 	}
 
 	/**
-	 * Send a subscribeUpdate to the MAP-Server with a JSONObject. Max-Depth and
+	 * Send a subscribe-update to the MAP-Server with a JSONObject. Max-Depth and
 	 * Max-Size have the defaultValue 1000 and 1000000000. To change this values
 	 * set "maxDepth" and "maxSize" in the JSONObject.
 	 *
@@ -183,6 +184,48 @@ public class SubscribeResource {
 		return Response.ok().entity("INFO: subscribe successfully").build();
 	}
 
+	/**
+	 * Save a subscribe-update. Max-Depth and Max-Size have the defaultValue 1000 and 1000000000.
+	 * To change this values set "maxDepth" and "maxSize" in the JSONObject. <br>
+	 * <br>
+	 * On identifier type: ip-address: "[type],[value]" e.g. "IPv4,10.1.1.1"
+	 * device: "[name]" access-request: "[name]" mac-address: "[value]" <br>
+	 * <br>
+	 * Use the valid JSON-Keys for subscriptions: START IDENTIFIER = "startIdentifier" IDENTIFIER-TYPE =
+	 * "identifierType" MAX-DEPTH = "maxDepth" MAX-SIZE = "maxSize" MATCH-LINKS-FILTER
+	 * = "matchLinksFilter" RESULT-FILTER = "resultFilter" TERMINAL-IDENTIFIER-TYPES
+	 * = "terminalIdentifierTypes" see also {@link JSONDataKey}. <br>
+	 * <br>
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe</tt> <br>
+	 * <br>
+	 * Example-JSONObject:
+	 * {
+	 * "subExample":
+	 * {
+	 * "startIdentifier": "freeradius-pdp",
+	 * "identifierType": "device"
+	 * }
+	 * } <br>
+	 * <br>
+	 * <b>required values:</b>
+	 * <ul>
+	 * <li>startIdentifier</li>
+	 * <li>identifierType</li>
+	 * </ul>
+	 * <br>
+	 * <b>optional values:</b><br>
+	 * <ul>
+	 * <li>matchLinksFilter</li>
+	 * <li>resultFilter</li>
+	 * <li>terminalIdentifierTypes</li>
+	 * <li>maxDepth</li>
+	 * <li>maxSize</li>
+	 * </ul>
+	 * 
+	 * @param connectionName
+	 * @param jsonData
+	 * @return
+	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putSubscription(@PathParam("connectionName") String connectionName, JSONObject jsonData) {
@@ -228,40 +271,46 @@ public class SubscribeResource {
 	/**
 	 * Send subscribe update request
 	 * 
-	 * @param connectName saved connection
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/start/{subscriptionName}</tt>
+	 * 
+	 * @param connectionName saved connection
 	 * @param subscriptionName saved subscription
 	 * @return
 	 */
 	@PUT
 	@Path("start/{subscriptionName}")
-	public Response start(@PathParam("connectionName") String connectName,
+	public Response start(@PathParam("connectionName") String connectionName,
 			@PathParam("subscriptionName") String subscriptionName) {
 		try {
-			Application.getConnectionManager().startSubscription(connectName, subscriptionName);
+			Application.getConnectionManager().startSubscription(connectionName, subscriptionName);
 		} catch (ConnectionException e) {
-			return responseError("start " + subscriptionName + " from " + connectName, e.toString());
+			return responseError("start " + subscriptionName + " from connection('" + connectionName + ")'",
+					e.toString());
 		}
-		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") enabled").build();
+		return Response.ok().entity("INFO: subscription('" + subscriptionName + "') enabled").build();
 	}
 
 	/**
 	 * Send subscribe delete request
 	 * 
-	 * @param connectName saved connection
+	 * Example-URL: <tt>http://example.com:8000/default/subscribe/stop/{subscriptionName}</tt>
+	 * 
+	 * @param connectionName saved connection
 	 * @param subscriptionName saved subscription
 	 * @return
 	 */
 	@PUT
 	@Path("stop/{subscriptionName}")
-	public Response stop(@PathParam("connectionName") String connectName,
+	public Response stop(@PathParam("connectionName") String connectionName,
 			@PathParam("subscriptionName") String subscriptionName) {
 		try {
-			Application.getConnectionManager().stopSubscription(connectName, subscriptionName);
+			Application.getConnectionManager().stopSubscription(connectionName, subscriptionName);
 		} catch (ConnectionException e) {
-			return responseError("stop " + subscriptionName + " from " + connectName, e.toString());
+			return responseError("stop " + subscriptionName + " from connection('" + connectionName + ")'",
+					e.toString());
 		}
 
-		return Response.ok().entity("INFO: subscription(" + subscriptionName + ") disabled").build();
+		return Response.ok().entity("INFO: subscription('" + subscriptionName + "') disabled").build();
 	}
 
 	/**
@@ -279,14 +328,15 @@ public class SubscribeResource {
 			try {
 				Application.getConnectionManager().deleteAllSubscriptions(connectionName);
 			} catch (ConnectionException e) {
-				return responseError("delete all subscriptions from " + connectionName, e.toString());
+				return responseError("delete all subscriptions from connection('" + connectionName + ")'", e.toString());
 			}
 
 			// persist
 			try {
 				Application.getConnections().persistConnections();
 			} catch (PropertyException e) {
-				return responseError("connection persist", e.toString());
+				return responseError("[persist] delete all subscriptions from connection('" + connectionName + ")'",
+						e.toString());
 			}
 
 			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
@@ -312,14 +362,16 @@ public class SubscribeResource {
 		try {
 			Application.getConnectionManager().deleteSubscription(connectionName, subscriptionName);
 		} catch (ConnectionException e) {
-			return responseError("delete subscription(" + subscriptionName + ") from " + connectionName, e.toString());
+			return responseError("delete subscription('" + subscriptionName + "') from connection('" + connectionName
+					+ ")'", e.toString());
 		}
 
 		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			return responseError("connection persist", e.toString());
+			return responseError("[persist] delete subscription('" + subscriptionName + "') from connection('"
+					+ connectionName + "')", e.toString());
 		}
 
 		return Response.ok().entity("INFO: delete subscription(" + subscriptionName + ") successfully").build();

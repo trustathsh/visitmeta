@@ -149,7 +149,6 @@ public class SubscribeResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("connectionName") String name, JSONObject jsonData) {
 		ConnectionManager manager = Application.getConnectionManager();
-
 		SubscriptionData subscriptionData;
 
 		// transform
@@ -187,47 +186,40 @@ public class SubscribeResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putSubscription(@PathParam("connectionName") String connectionName, JSONObject jsonData) {
-
+		ConnectionManager manager = Application.getConnectionManager();
 		SubscriptionData subscriptionData;
+		List<Data> subscriptionList;
+		
+		// transform
 		try {
-
 			subscriptionData = (SubscriptionData) DataManager.transformJSONObject(jsonData, SubscriptionData.class);
-
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
 				| JSONException e) {
-			String msg = "error while transform JSONObject";
-			log.error(msg + " | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg + " | Exception: " + e.toString())
-					.build();
+			return responseError("JSONObject transform", e.toString());
 		}
 
-		List<Data> subscriptionList;
 		try {
-			subscriptionList = Application.getConnectionManager().getSubscriptions(connectionName);
+			subscriptionList = manager.getSubscriptions(connectionName);
 		} catch (ConnectionException e) {
-			log.error("error while subscription PUT | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while connection PUT -> " + e.toString()).build();
+			return responseError("get subscriptions", e.toString());
 		}
 
+		// update || save subscription
 		if (subscriptionList.contains(subscriptionData)) {
 			Application.getConnectionManager().updateSubscription(connectionName, subscriptionData);
 		} else {
 			try {
 				Application.getConnectionManager().storeSubscription(connectionName, subscriptionData);
 			} catch (IOException | PropertyException e) {
-				log.error("error while subscription PUT | " + e.toString());
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity("error while connection PUT -> " + e.toString()).build();
+				return responseError("subscription store", e.toString());
 			}
 		}
 
+		// persist
 		try {
 			Application.getConnections().persistConnections();
 		} catch (PropertyException e) {
-			log.error("error while connection persist | " + e.toString());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("error while connection persist -> " + e.toString()).build();
+			return responseError("connection persist", e.toString());
 		}
 
 		return Response.ok().entity("INFO: subscribe put successfully").build();

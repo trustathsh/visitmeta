@@ -196,7 +196,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	@Override
 	public void updateSubscription(SubscriptionData newData) {
-		for (Data subData : mSubscriptionDataList) {
+		for (Data subData : getSubscriptions()) {
 			if (subData.getName().equals(newData.getName())) {
 				((SubscriptionData) subData).changeData(newData);
 				break;

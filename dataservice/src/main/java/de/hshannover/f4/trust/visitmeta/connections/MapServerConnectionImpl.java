@@ -18,6 +18,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseExceptio
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.IfmapConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedSubscriptionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionHelper;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionImpl;
@@ -188,21 +189,33 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 	@Override
 	public void startSubscription(String subscriptionName) throws ConnectionException {
+		boolean contains = false;
 		for (Data subscription : getSubscriptions()) {
 			if (subscription.getName().equals(subscriptionName)) {
+				contains = true;
 				((Subscription) subscription).startSubscription();
 				break;
 			}
+		}
+
+		if (!contains) {
+			throw new NoSavedSubscriptionException();
 		}
 	}
 
 	@Override
 	public void stopSubscription(String subscriptionName) throws ConnectionException {
+		boolean contains = false;
 		for (Data subscription : getSubscriptions()) {
 			if (subscription.getName().equals(subscriptionName)) {
+				contains = true;
 				((Subscription) subscription).stopSubscription();
 				break;
 			}
+		}
+
+		if (!contains) {
+			throw new NoSavedSubscriptionException();
 		}
 	}
 

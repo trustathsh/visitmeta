@@ -312,8 +312,7 @@ public class SubscribeResource {
 		try {
 			Application.getConnectionManager().deleteSubscription(connectionName, subscriptionName);
 		} catch (ConnectionException e) {
-			return responseError("delete all subscription(" + subscriptionName + ") from " + connectionName,
-					e.toString());
+			return responseError("delete subscription(" + subscriptionName + ") from " + connectionName, e.toString());
 		}
 
 		// persist

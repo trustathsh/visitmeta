@@ -46,7 +46,6 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 		setName(newData.getName());
 		setUrl(newData.getUrl());
 		setRawXml(newData.isRawXml());
-		setConnected(newData.isConnected());
 	}
 
 	@Override

@@ -104,7 +104,6 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 		setStartupSubscribe(newData.isStartupSubscribe());
 		setMaxDepth(newData.getMaxDepth());
 		setMaxSize(newData.getMaxSize());
-		setActive(newData.isActive());
 	}
 
 	@Override

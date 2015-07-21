@@ -5,9 +5,9 @@ import java.awt.event.WindowListener;
 
 public class ConnectionDialogWindowListener implements WindowListener {
 
-	private NewConnectionDialog mDialog;
+	private ConnectionDialog mDialog;
 
-	public ConnectionDialogWindowListener(NewConnectionDialog dialog) {
+	public ConnectionDialogWindowListener(ConnectionDialog dialog) {
 		mDialog = dialog;
 	}
 

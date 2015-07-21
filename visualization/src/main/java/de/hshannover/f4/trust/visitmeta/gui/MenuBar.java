@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
-import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 
 /**
  *
@@ -105,7 +105,7 @@ public class MenuBar extends JMenuBar {
 		mntmAddConnection.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				NewConnectionDialog cD = new NewConnectionDialog();
+				ConnectionDialog cD = new ConnectionDialog();
 				cD.setVisible(true);
 			}
 		});

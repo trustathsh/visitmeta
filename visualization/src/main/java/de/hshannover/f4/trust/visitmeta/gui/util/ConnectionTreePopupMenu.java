@@ -28,7 +28,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
-import de.hshannover.f4.trust.visitmeta.gui.dialog.NewConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -63,7 +63,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private MainWindow mMainWindow;
 
-	private NewConnectionDialog mConnectionDialog;
+	private ConnectionDialog mConnectionDialog;
 
 	private RESTConnectionTree mConnectionTree;
 
@@ -74,7 +74,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		mConnectionTree = connectionTree;
 	}
 
-	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, NewConnectionDialog connectionDialog,
+	public ConnectionTreePopupMenu(RESTConnectionTree connectionTree, ConnectionDialog connectionDialog,
 			Data selectedData) {
 		this(connectionTree, selectedData);
 		mConnectionDialog = connectionDialog;

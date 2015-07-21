@@ -44,11 +44,11 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
-public class NewConnectionDialog extends JDialog {
+public class ConnectionDialog extends JDialog {
 
 	private static final long serialVersionUID = -8052562697583611679L;
 
-	private static final Logger LOGGER = Logger.getLogger(NewConnectionDialog.class);
+	private static final Logger LOGGER = Logger.getLogger(ConnectionDialog.class);
 
 	private static Properties mConfig;
 
@@ -86,16 +86,7 @@ public class NewConnectionDialog extends JDialog {
 		LOGGER.addAppender(new JTextAreaAppander());
 	}
 
-	public static void main(String[] args) {
-		Main.initComponents();
-		mConfig = Main.getConfig();
-		mDataservicePersister = Main.getDataservicePersister();
-
-		NewConnectionDialog temp = new NewConnectionDialog();
-		temp.setVisible(true);
-	}
-
-	public NewConnectionDialog() {
+	public ConnectionDialog() {
 		mDataservicePersister = Main.getDataservicePersister();
 
 		createDialog();

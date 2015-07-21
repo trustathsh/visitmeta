@@ -5,9 +5,9 @@ import java.awt.event.MouseListener;
 
 public class ConnectionTreeDialogListener implements MouseListener {
 
-	private NewConnectionDialog mConnectionDialog;
+	private ConnectionDialog mConnectionDialog;
 
-	public ConnectionTreeDialogListener(NewConnectionDialog connectionDialog) {
+	public ConnectionTreeDialogListener(ConnectionDialog connectionDialog) {
 		mConnectionDialog = connectionDialog;
 	}
 

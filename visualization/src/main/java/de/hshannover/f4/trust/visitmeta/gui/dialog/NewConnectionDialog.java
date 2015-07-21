@@ -128,6 +128,47 @@ public class NewConnectionDialog extends JDialog {
 		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.mLblInsets);
 	}
 
+	private int confirmCloseRequest() {
+		return JOptionPane.showConfirmDialog(this, "Do you really want to close without saving?",
+				"Confirm close window!", JOptionPane.YES_NO_OPTION);
+	}
+
+	private boolean existNotPersistedData() {
+		Object root = mJtConnections.getModel().getRoot();
+		if (root instanceof Dataservices) {
+			Dataservices dataservices = (Dataservices) root;
+			for (Data dataserviceConnectionData : dataservices.getSubData()) {
+				if (dataserviceConnectionData instanceof DataserviceRestConnectionImpl) {
+					DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) dataserviceConnectionData;
+
+					if (dataserviceConnection.isNotPersised()) {
+						return true;
+					}
+
+					for (Data mapServerConnectionData : dataserviceConnection.getSubData()) {
+						if (mapServerConnectionData instanceof MapServerRestConnectionImpl) {
+							MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) mapServerConnectionData;
+
+							if (mapServerConnection.isNotPersised()) {
+								return true;
+							}
+
+							for (Data subscriptionData : mapServerConnection.getSubData()) {
+								if (subscriptionData instanceof RestSubscriptionImpl) {
+									RestSubscriptionImpl subscription = (RestSubscriptionImpl) subscriptionData;
+									if (subscription.isNotPersised()) {
+										return true;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	private void initSouthPanel() {
 		mJpSouth = new JPanel();
 		mJpSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -136,6 +177,12 @@ public class NewConnectionDialog extends JDialog {
 		mJbClose.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (existNotPersistedData()) {
+					int requestResult = confirmCloseRequest();
+					if (requestResult != JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
 				setVisible(false);
 			}
 		});

@@ -465,18 +465,14 @@ public class SimpleGraphService implements GraphService {
 			for(InternalIdentifier id : result.getAllIdentifier()) {
 				ArrayList<InternalMetadata> toRemove = new ArrayList<>();
 				for(InternalMetadata meta : id.getMetadata()) {
-					if(!filter.matchMeta(internalMetadaToDocument(meta))) {
-						toRemove.add(meta);
+					if(filter.matchMeta(internalMetadaToDocument(meta))) {
 						id.removeMetadata(meta);
 					}
-				}
-				for (InternalMetadata meta : toRemove) {
-					id.removeMetadata(meta);
 				}
 				toRemove.clear();
 				for(InternalLink link : id.getLinks()) {
 					for (InternalMetadata linkMeta : link.getMetadata()) {
-						if(!filter.matchMeta(internalMetadaToDocument(linkMeta))) {
+						if(filter.matchMeta(internalMetadaToDocument(linkMeta))) {
 							toRemove.add(linkMeta);
 						}
 					}

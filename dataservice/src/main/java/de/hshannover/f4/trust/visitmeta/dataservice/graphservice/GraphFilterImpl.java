@@ -8,6 +8,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import de.hshannover.f4.trust.visitmeta.dataservice.util.SimpleNamespaceContext;
@@ -27,14 +28,18 @@ public class GraphFilterImpl implements GraphFilter {
 
 	private static XPathFactory xpathFactory;
 
+	private static final Logger log = Logger.getLogger(GraphFilterImpl.class);
+
 	public GraphFilterImpl(Identifier startIdentifier, String resultFilter,
 			String matchLinks, int maxDepth, Map<String, String> prefixMap) {
 		mStartIdentifier = startIdentifier;
 		mMaxDepth = maxDepth;
-		mMatchMetaNothing = resultFilter != null && resultFilter.length() == 0;
+		mMatchMetaNothing = resultFilter != null
+				&& resultFilter.length() == 0;
 		mMatchMetaEverything = resultFilter == null;
 
-		mMatchLinkEverything = matchLinks != null && matchLinks.length() == 0;
+		mMatchLinkEverything = matchLinks != null
+				&& matchLinks.length() == 0;
 		mMatchLinkNothing = matchLinks == null;
 
 		xpathFactory = XPathFactory.newInstance();
@@ -43,19 +48,23 @@ public class GraphFilterImpl implements GraphFilter {
 		xpath.setNamespaceContext(new SimpleNamespaceContext(prefixMap));
 
 		try {
-			if (resultFilter != null && resultFilter.length() > 0) {
+			if (resultFilter != null
+					&& resultFilter.length() > 0) {
 				mResultFilter = xpath.compile(adaptFilterString(resultFilter));
 			}
 		} catch (XPathExpressionException e1) {
-			// todo log failed filterstring stuff
+			log.error("Error at compiling result filter: "
+					+ e1.getLocalizedMessage());
 		}
 
 		try {
-			if (matchLinks != null && matchLinks.length() > 0) {
+			if (matchLinks != null
+					&& matchLinks.length() > 0) {
 				mMatchLinks = xpath.compile(adaptFilterString(matchLinks));
 			}
 		} catch (XPathExpressionException e1) {
-			// todo log failed filterstring stuff
+			log.error("Error at compiling match-links filter: "
+					+ e1.getLocalizedMessage());
 		}
 	}
 
@@ -101,7 +110,7 @@ public class GraphFilterImpl implements GraphFilter {
 		if (mMatchLinks == null) {
 			return false;
 		}
-		
+
 		Object ret = null;
 		try {
 			ret = mMatchLinks.evaluate(meta, XPathConstants.BOOLEAN);

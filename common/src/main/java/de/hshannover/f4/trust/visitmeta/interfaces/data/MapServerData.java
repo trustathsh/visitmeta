@@ -31,11 +31,11 @@ public interface MapServerData extends Data {
 	public void setTruststorePassword(String truststorePass);
 
 	/**
-	 * Adds a subscription to the internal list of subscriptions for this {@link MapServerData}.
+	 * Adds a {@link SubscriptionData} to the internal list of subscriptions-datas for this {@link MapServerData}.
 	 *
-	 * @param subscription a subscription
+	 * @param subscriptionData
 	 */
-	public void addSubscription(Subscription connection);
+	public void addSubscription(SubscriptionData subscriptionData);
 
 	/**
 	 * Delete a subscription.

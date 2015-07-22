@@ -189,8 +189,8 @@ public class MapServerDataImpl extends DataImpl implements MapServerData {
 	}
 
 	@Override
-	public void addSubscription(Subscription subscription) {
-		mSubscriptionDataList.add(subscription);
+	public void addSubscription(SubscriptionData subscriptionData) {
+		mSubscriptionDataList.add(subscriptionData);
 	}
 
 	@Override

@@ -1,11 +1,11 @@
-package de.hshannover.f4.trust.visitmeta.data;
+package de.hshannover.f4.trust.visitmeta.data.handler;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.JSONHandler;
 
 public class JSONHandlerManager {
 
-	private static final String POST_CLASS_PATH = "de.hshannover.f4.trust.visitmeta.data.handler.";
+	private static final String POST_CLASS_PATH = JSONHandlerManager.class.getPackage().getName() + ".";
 	
 	public static JSONHandler<?> getHandlerFor(Class<?> dataTypeClazz) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException {
@@ -16,7 +16,7 @@ public class JSONHandlerManager {
 
 		return eventHandler;
 	}
-	
+
 	public static JSONHandler<?> getHandlerFor(Data data) throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException {
 

@@ -3,6 +3,7 @@ package de.hshannover.f4.trust.visitmeta.data;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.visitmeta.data.handler.JSONHandlerManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.JSONHandler;

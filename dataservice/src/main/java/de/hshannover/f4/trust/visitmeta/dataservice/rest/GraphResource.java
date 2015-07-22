@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
-
-
 
 import java.util.Iterator;
 import java.util.List;
@@ -92,17 +90,17 @@ public class GraphResource {
 	@QueryParam("rawData")
 	@DefaultValue("false")
 	private boolean mIncludeRawXML;
-	
+
 	@QueryParam("onlyNotifies")
 	@DefaultValue("false")
 	private boolean mGetNotify;
-
 
 	@GET
 	@Path("index")
 	@Produces("text/html")
 	public String index() {
 		try {
+			@SuppressWarnings("resource")
 			String site = new Scanner(getClass().getResourceAsStream("/index.html")).useDelimiter("\\A").next();
 			return site;
 		} catch (Exception e) {
@@ -121,7 +119,7 @@ public class GraphResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getChangesMap(@PathParam("connectionName") String name) {
 		SortedMap<Long, Long> changes;
-		try{
+		try {
 			changes = Application.getConnectionManager().getGraphService(name).getChangesMap();
 		} catch (ConnectionException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.toString()).build();
@@ -139,7 +137,7 @@ public class GraphResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getInitialGraph(@PathParam("connectionName") String name) {
 		List<IdentifierGraph> graphs;
-		try{
+		try {
 
 			graphs = Application.getConnectionManager().getGraphService(name).getInitialGraph();
 
@@ -149,8 +147,8 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
-	
-	@GET
+
+	@POST
 	@Path("initial")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -169,7 +167,7 @@ public class GraphResource {
 	/**
 	 * Returns the graph at the given timestamp. If the given timestamp
 	 * is not a exact change-timestamp the next smaller timestamp to the
-	 * given timestamp will be chosen. If query parameter onlyNotifes is 
+	 * given timestamp will be chosen. If query parameter onlyNotifes is
 	 * given only notify metadata matching the given timestamp is returned.
 	 * Example-URL: <tt>http://example.com:8000/graph/314159265[?onlyNotifes=true]</tt>
 	 */
@@ -178,8 +176,8 @@ public class GraphResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp) {
 		List<IdentifierGraph> graphs;
-		try{
-			if(!mGetNotify) {
+		try {
+			if (!mGetNotify) {
 				graphs = Application.getConnectionManager().getGraphService(name).getGraphAt(timestamp);
 			} else {
 				graphs = Application.getConnectionManager().getGraphService(name).getNotifiesAt(timestamp);
@@ -190,12 +188,13 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
-	
-	@GET
+
+	@POST
 	@Path("{at}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Object getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp, JSONObject jobj) {
+	public Object
+			getGraphAt(@PathParam("connectionName") String name, @PathParam("at") long timestamp, JSONObject jobj) {
 		List<IdentifierGraph> graph;
 		GraphFilter filter;
 		try {
@@ -219,7 +218,7 @@ public class GraphResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object getCurrentGraph(@PathParam("connectionName") String name) {
 		List<IdentifierGraph> graphs;
-		try{
+		try {
 
 			graphs = Application.getConnectionManager().getGraphService(name).getCurrentGraph();
 
@@ -229,13 +228,12 @@ public class GraphResource {
 
 		return jsonMarshaller().toJson(graphs);
 	}
-	
-	
+
 	@POST
 	@Path("current")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Object getCurentGraph(@PathParam("connectionName") String name, JSONObject jobj) {
+	public Object getCurrentGraph(@PathParam("connectionName") String name, JSONObject jobj) {
 		List<IdentifierGraph> graph;
 		GraphFilter filter;
 		try {
@@ -247,22 +245,24 @@ public class GraphResource {
 		return jsonMarshaller().toJson(graph);
 	}
 
-
 	/**
 	 * Returns the delta object from the given timestamp <tt>from</tt> to the second
 	 * timestamp <tt>to</tt>.
 	 * Example-URL: <tt>http://example.com:8000/graph/42/43</tt>
 	 *
-	 * @param t1 the timestamp to start with the delta calculation
-	 * @param t2 the timestamp to end with the delta calculation
+	 * @param t1
+	 *            the timestamp to start with the delta calculation
+	 * @param t2
+	 *            the timestamp to end with the delta calculation
 	 * @return a {@link JSONObject} containing the updates and deletes
 	 */
 	@GET
 	@Path("{from}/{to}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getDelta(@PathParam("connectionName") String name, @PathParam("from") long t1, @PathParam("to") long t2) {
+	public Object getDelta(@PathParam("connectionName") String name, @PathParam("from") long t1,
+			@PathParam("to") long t2) {
 		Delta delta;
-		try{
+		try {
 
 			delta = Application.getConnectionManager().getGraphService(name).getDelta(t1, t2);
 
@@ -275,6 +275,7 @@ public class GraphResource {
 
 	/**
 	 * Returns the appropriate {@link JsonMarshaller} for the current request.
+	 *
 	 * @return a {@link JsonMarshaller}
 	 */
 	protected JsonMarshaller jsonMarshaller() {
@@ -284,24 +285,35 @@ public class GraphResource {
 			return new JsonMarshaller();
 		}
 	}
-	
+
 	private GraphFilter parseFilterFromJson(JSONObject jobj, String connection) throws JSONException {
+		log.trace("Trying to parse JSON to filter: "
+				+ jobj);
 		String resultFilter = jobj.getString("resultFilter");
 		resultFilter = resultFilter.equalsIgnoreCase("null") ? null : resultFilter;
 		String matchLinks = jobj.getString("matchLinks");
 		int maxDepth = jobj.getInt("maxDepth");
 		IdentifierImpl startId = null;
-		
+
 		JSONObject id = jobj.getJSONObject("startId");
-		startId = new IdentifierImpl(id.getString("type"));
+
+		String type = id.getString("type");
+		startId = new IdentifierImpl(type);
 		id.remove("type");
-		Iterator i = id.keys();
-		
-		while(i.hasNext()) {
+		Iterator<?> i = id.keys();
+
+		while (i.hasNext()) {
 			String tmpKey = (String) i.next();
-			startId.addProperty(tmpKey, id.getString(tmpKey));
+			if (tmpKey.contains("@")) {
+				startId.addProperty("/"
+						+ type + "[" + tmpKey + "]", id.getString(tmpKey));
+			} else {
+				startId.addProperty("/"
+						+ type + "/" + tmpKey, id.getString(tmpKey));
+			}
 		}
-		
-		return new GraphFilterImpl(startId, resultFilter, matchLinks, maxDepth, NamespaceHolder.getPrefixMap(connection));
+
+		return new GraphFilterImpl(startId, resultFilter, matchLinks, maxDepth,
+				NamespaceHolder.getPrefixMap(connection));
 	}
 }

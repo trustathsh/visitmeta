@@ -46,7 +46,7 @@ import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeUpdate;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class SubscriptionHelper {
 

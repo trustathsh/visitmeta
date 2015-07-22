@@ -41,8 +41,8 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 

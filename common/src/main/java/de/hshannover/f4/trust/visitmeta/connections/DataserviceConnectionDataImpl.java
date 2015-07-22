@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 
 public class DataserviceConnectionDataImpl extends DataImpl implements DataserviceData {
 

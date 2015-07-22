@@ -53,9 +53,9 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionExcept
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 /**
  * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.

@@ -36,12 +36,12 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class ConnectionDialog extends JDialog {

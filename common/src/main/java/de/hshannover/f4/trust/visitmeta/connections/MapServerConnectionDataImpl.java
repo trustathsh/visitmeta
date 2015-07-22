@@ -5,9 +5,9 @@ import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class MapServerConnectionDataImpl extends DataImpl implements MapServerData {
 

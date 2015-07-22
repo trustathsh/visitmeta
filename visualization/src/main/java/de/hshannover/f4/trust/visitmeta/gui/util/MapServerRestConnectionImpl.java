@@ -12,11 +12,11 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.network.ProxyGraphService;
 
 public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl implements MapServerConnection {

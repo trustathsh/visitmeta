@@ -39,6 +39,7 @@
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public interface Subscription extends SubscriptionData {
 

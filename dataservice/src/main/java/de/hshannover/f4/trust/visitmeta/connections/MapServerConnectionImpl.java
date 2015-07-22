@@ -25,10 +25,10 @@ import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.ifmap.UpdateService;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 

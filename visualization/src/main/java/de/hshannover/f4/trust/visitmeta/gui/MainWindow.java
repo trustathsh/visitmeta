@@ -92,10 +92,10 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;

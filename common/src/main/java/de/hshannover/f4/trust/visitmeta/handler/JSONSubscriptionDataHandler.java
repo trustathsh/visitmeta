@@ -16,7 +16,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionDataImpl;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.handler.SubscriptionDataHandler;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 

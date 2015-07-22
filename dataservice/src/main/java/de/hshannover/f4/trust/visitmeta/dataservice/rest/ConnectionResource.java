@@ -63,7 +63,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 
 /**
  * For each request a new object of this class will be created. The resource is

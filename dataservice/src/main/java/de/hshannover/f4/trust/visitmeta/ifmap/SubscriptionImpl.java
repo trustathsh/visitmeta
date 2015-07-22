@@ -40,8 +40,8 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
 public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {

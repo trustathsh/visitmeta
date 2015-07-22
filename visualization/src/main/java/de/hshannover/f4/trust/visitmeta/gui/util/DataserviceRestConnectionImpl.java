@@ -9,9 +9,9 @@ import de.hshannover.f4.trust.visitmeta.connections.DataserviceConnectionDataImp
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 
 public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl implements DataserviceConnection {
 

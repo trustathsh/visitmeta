@@ -21,9 +21,9 @@ import org.codehaus.jettison.json.JSONObject;
 import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.handler.MapServerDataHandler;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 

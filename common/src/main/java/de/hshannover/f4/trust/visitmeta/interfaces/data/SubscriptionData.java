@@ -36,9 +36,8 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.interfaces;
+package de.hshannover.f4.trust.visitmeta.interfaces.data;
 
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public interface SubscriptionData extends Data {
 

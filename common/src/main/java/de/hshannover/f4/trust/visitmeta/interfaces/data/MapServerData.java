@@ -1,10 +1,8 @@
-package de.hshannover.f4.trust.visitmeta.interfaces.connections;
+package de.hshannover.f4.trust.visitmeta.interfaces.data;
 
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public interface MapServerData extends Data {
 

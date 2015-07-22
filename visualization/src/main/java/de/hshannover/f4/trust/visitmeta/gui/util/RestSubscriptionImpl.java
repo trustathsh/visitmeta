@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
-import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 

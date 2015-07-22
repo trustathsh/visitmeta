@@ -10,8 +10,8 @@ import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 
 public class DataServiceParameterPanel extends ParameterPanel {
 

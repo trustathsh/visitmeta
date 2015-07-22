@@ -6,6 +6,7 @@ import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 
 /**
  * A interface for Connections within the dataservice.

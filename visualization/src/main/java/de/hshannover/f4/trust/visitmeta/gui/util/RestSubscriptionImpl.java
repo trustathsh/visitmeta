@@ -2,8 +2,8 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.data.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
-import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 

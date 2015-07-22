@@ -36,11 +36,10 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.ifmap;
+package de.hshannover.f4.trust.visitmeta.data;
 
 import java.util.List;
 
-import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 

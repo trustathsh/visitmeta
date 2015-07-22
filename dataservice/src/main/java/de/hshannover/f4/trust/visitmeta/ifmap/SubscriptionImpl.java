@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+import de.hshannover.f4.trust.visitmeta.data.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;

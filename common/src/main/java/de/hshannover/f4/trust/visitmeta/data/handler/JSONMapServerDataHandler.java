@@ -18,8 +18,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
+import de.hshannover.f4.trust.visitmeta.data.MapServerDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
@@ -81,7 +81,7 @@ public class JSONMapServerDataHandler implements MapServerDataHandler<MapServerD
 			throw new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
 		}
 
-		MapServerData connectionData = new MapServerConnectionDataImpl(connectionName);
+		MapServerData connectionData = new MapServerDataImpl(connectionName);
 		JSONArray jsonKeys = jsonConnectionData.names();
 		if (jsonKeys != null) {
 

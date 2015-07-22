@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
-import de.hshannover.f4.trust.visitmeta.connections.DataserviceConnectionDataImpl;
+import de.hshannover.f4.trust.visitmeta.data.DataserviceDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -13,7 +13,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 
-public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl implements DataserviceConnection {
+public class DataserviceRestConnectionImpl extends DataserviceDataImpl implements DataserviceConnection {
 
 	private static final Logger LOGGER = Logger.getLogger(DataserviceRestConnectionImpl.class);
 

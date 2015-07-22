@@ -1,14 +1,13 @@
-package de.hshannover.f4.trust.visitmeta.connections;
+package de.hshannover.f4.trust.visitmeta.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 
-public class DataserviceConnectionDataImpl extends DataImpl implements DataserviceData {
+public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 
 	private String mUrl;
 
@@ -18,11 +17,11 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 
 	private List<Data> mSubDataList;
 
-	private DataserviceConnectionDataImpl() {
+	private DataserviceDataImpl() {
 		mSubDataList = new ArrayList<Data>();
 	}
 
-	public DataserviceConnectionDataImpl(String name, String url, boolean rawXml) {
+	public DataserviceDataImpl(String name, String url, boolean rawXml) {
 		this();
 		setName(name);
 		setUrl(url);
@@ -31,7 +30,7 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 
 	@Override
 	public DataserviceData copy() {
-		DataserviceData tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
+		DataserviceData tmpCopy = new DataserviceDataImpl(getName(), getUrl(), isRawXml());
 		tmpCopy.setMapServerData(getMapServerData());
 		return tmpCopy;
 	}

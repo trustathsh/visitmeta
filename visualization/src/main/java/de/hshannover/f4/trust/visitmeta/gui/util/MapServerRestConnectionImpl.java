@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.sun.jersey.api.client.WebResource;
 
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
-import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
+import de.hshannover.f4.trust.visitmeta.data.MapServerDataImpl;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
@@ -19,7 +19,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.network.ProxyGraphService;
 
-public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl implements MapServerConnection {
+public class MapServerRestConnectionImpl extends MapServerDataImpl implements MapServerConnection {
 
 	private static final Logger LOGGER = Logger.getLogger(MapServerRestConnectionImpl.class);
 

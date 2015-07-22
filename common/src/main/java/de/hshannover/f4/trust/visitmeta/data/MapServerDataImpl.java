@@ -1,15 +1,14 @@
-package de.hshannover.f4.trust.visitmeta.connections;
+package de.hshannover.f4.trust.visitmeta.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
-public class MapServerConnectionDataImpl extends DataImpl implements MapServerData {
+public class MapServerDataImpl extends DataImpl implements MapServerData {
 
 	private String mUrl;
 
@@ -31,16 +30,16 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerDa
 
 	private boolean mAuthenticationBasic;
 
-	private MapServerConnectionDataImpl() {
+	private MapServerDataImpl() {
 		mSubscriptionDataList = new ArrayList<SubscriptionData>();
 	}
 
-	public MapServerConnectionDataImpl(String name) {
+	public MapServerDataImpl(String name) {
 		this();
 		setName(name);
 	}
 
-	public MapServerConnectionDataImpl(String name, String url, String userName, String userPassword) {
+	public MapServerDataImpl(String name, String url, String userName, String userPassword) {
 		this();
 		setName(name);
 		setUrl(url);
@@ -50,7 +49,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerDa
 
 	@Override
 	public MapServerData copy() {
-		MapServerData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
+		MapServerData data = new MapServerDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
 		data.setSubscriptionData(getSubscriptions());

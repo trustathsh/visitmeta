@@ -12,6 +12,7 @@ import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
 import de.hshannover.f4.trust.ifmapj.exception.InitializationException;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
+import de.hshannover.f4.trust.visitmeta.data.MapServerDataImpl;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InMemoryMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
@@ -45,7 +46,7 @@ import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
  *
  * @author Marcel Reichenbach
  */
-public class MapServerConnectionImpl extends MapServerConnectionDataImpl implements MapServerConnection {
+public class MapServerConnectionImpl extends MapServerDataImpl implements MapServerConnection {
 
 	private static final Logger LOGGER = Logger.getLogger(MapServerConnectionImpl.class);
 

@@ -142,9 +142,9 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 		when(mDbConnection.getTimestampManager()).thenReturn(mTimestampManager);
 
 		mNeo4jRepo = new Neo4JRepository(mDbConnection, MessageDigest.getInstance("MD5"));
-		mNeo4jDb = new Neo4JReader(mNeo4jRepo, mDbConnection);
+		mNeo4jDb = new Neo4JReader(mNeo4jRepo, mDbConnection, "testDB");
 		mExecutor = new Neo4JExecutor(mDbConnection);
-		mWriter = new Neo4JWriter(mNeo4jRepo, mDbConnection);
+		mWriter = new Neo4JWriter(mNeo4jRepo, mDbConnection, "testDB");
 
 		mService = new SimpleGraphService(mNeo4jDb, mExecutor, new DummyGraphCache());
 		mJsonMarshaller = new JsonMarshaller();

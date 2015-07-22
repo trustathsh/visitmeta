@@ -43,6 +43,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.graphservice.NamespaceHolder;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
@@ -50,8 +51,11 @@ import de.hshannover.f4.trust.visitmeta.ifmap.PollResult;
 import de.hshannover.f4.trust.visitmeta.ifmap.ResultItem;
 
 public abstract class AbstractWriter implements Writer {
+
 	protected Repository mRepo;
 	protected Long mLastTimestamp;
+	protected String mConnectionName;
+
 	private static final Logger log = Logger.getLogger(AbstractWriter.class);
 
 	public abstract void finishTransaction();
@@ -62,11 +66,25 @@ public abstract class AbstractWriter implements Writer {
 
 	protected abstract void submitDelete(int n);
 
+	protected void savePrexif(InternalMetadata m) {
+		String prefix = null, value = null;
+		for (String key : m.getProperties()) {
+			if (key.contains("@xmlns")) {
+				prefix = key.substring(key.indexOf("@xmlns") + 7,
+						key.length() - 1);
+				value = m.valueFor(key);
+			}
+		}
+		if (prefix != null && value != null) {
+			NamespaceHolder.addPrefix(mConnectionName, prefix, value);
+		}
+	}
+
 	@Override
 	public void submitPollResult(PollResult pr) {
 		beginTransaction();
 		for (ResultItem resultItem : pr.getResults()) {
-			switch(resultItem.getType()) {
+			switch (resultItem.getType()) {
 			case UPDATE:
 			case SEARCH:
 			case NOTIFY:
@@ -75,7 +93,8 @@ public abstract class AbstractWriter implements Writer {
 				} else if (resultItem.getId2() == null) {
 					submitUpdate(resultItem.getId1(), resultItem.getMetadata());
 				} else {
-					submitUpdate(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
+					submitUpdate(resultItem.getId1(), resultItem.getId2(),
+							resultItem.getMetadata());
 				}
 				break;
 			case DELETE:
@@ -84,7 +103,8 @@ public abstract class AbstractWriter implements Writer {
 				} else if (resultItem.getId2() == null) {
 					submitDelete(resultItem.getId1(), resultItem.getMetadata());
 				} else {
-					submitDelete(resultItem.getId1(), resultItem.getId2(), resultItem.getMetadata());
+					submitDelete(resultItem.getId1(), resultItem.getId2(),
+							resultItem.getMetadata());
 				}
 				break;
 			default:
@@ -95,7 +115,8 @@ public abstract class AbstractWriter implements Writer {
 		finishTransaction();
 	}
 
-	protected void submitUpdate(InternalIdentifier id, List<InternalMetadata> meta) {
+	protected void submitUpdate(InternalIdentifier id,
+			List<InternalMetadata> meta) {
 		log.debug("Got update for a single identifier");
 		InternalIdentifier in = mRepo.findIdentifier(id);
 		List<InternalMetadata> unique = new ArrayList<InternalMetadata>();
@@ -130,7 +151,8 @@ public abstract class AbstractWriter implements Writer {
 		log.trace("Added update for a single identifier");
 	}
 
-	protected void submitUpdate(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
+	protected void submitUpdate(InternalIdentifier id1, InternalIdentifier id2,
+			List<InternalMetadata> meta) {
 		log.debug("Persistance got update for two identifiers");
 		InternalIdentifier idGraph1 = mRepo.findIdentifier(id1);
 		InternalIdentifier idGraph2 = mRepo.findIdentifier(id2);
@@ -198,7 +220,8 @@ public abstract class AbstractWriter implements Writer {
 		log.trace("Added update for two identifiers");
 	}
 
-	protected void submitDelete(InternalIdentifier id1, InternalIdentifier id2, List<InternalMetadata> meta) {
+	protected void submitDelete(InternalIdentifier id1, InternalIdentifier id2,
+			List<InternalMetadata> meta) {
 		log.debug("Persistance got delete for two identifiers");
 		InternalIdentifier idGraph1 = mRepo.findIdentifier(id1);
 		InternalIdentifier idGraph2 = null;
@@ -206,10 +229,12 @@ public abstract class AbstractWriter implements Writer {
 		SubmitStatus status = new SubmitStatus(meta.size());
 		int n = 0;
 		if (idGraph1 == null) {
-			throw new RuntimeException("Someone is trying to delete from an non initiated identifier.");
+			throw new RuntimeException(
+					"Someone is trying to delete from an non initiated identifier.");
 		}
 		for (InternalLink l : idGraph1.getLinks()) {
-			if (l.getIdentifiers().getFirst().equals(id2) || l.getIdentifiers().getSecond().equals(id2)) {
+			if (l.getIdentifiers().getFirst().equals(id2)
+					|| l.getIdentifiers().getSecond().equals(id2)) {
 				linkToEdit = l;
 				break;
 			}
@@ -238,7 +263,8 @@ public abstract class AbstractWriter implements Writer {
 		log.trace("Performed delete for two identifiers");
 	}
 
-	protected void submitDelete(InternalIdentifier id, List<InternalMetadata> meta) {
+	protected void submitDelete(InternalIdentifier id,
+			List<InternalMetadata> meta) {
 		log.debug("Got delete for single identifier");
 		InternalIdentifier idGraph = mRepo.findIdentifier(id);
 		SubmitStatus status = new SubmitStatus(meta.size());

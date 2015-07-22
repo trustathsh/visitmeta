@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
-
-
 
 import java.util.HashSet;
 import java.util.List;
@@ -101,6 +99,17 @@ public class JsonMarshaller {
 				JSONObject identifierWithMetadata = toJson(i, i.getMetadata());
 				jsonLinks.put(identifierWithMetadata);
 			}
+
+			/**
+			 * When using a filter with a maxDepth of 0, only the start identifier is in the result.
+			 * This special case handles identifiers with no metadata attached to them.
+			 * In normal cases, we don't want single identifier in a result, only when it is the only item in a graph.
+			 */
+			if (i.getMetadata().size() == 0
+					&& graph.getIdentifiers().size() == 1) {
+				JSONObject identifierWithoutMetadataAndLinks = toJson(i, null);
+				jsonLinks.put(identifierWithoutMetadataAndLinks);
+			}
 		}
 		try {
 			jsonGraph.put(KEY_LINKS, jsonLinks);
@@ -117,9 +126,11 @@ public class JsonMarshaller {
 		try {
 			identifierWithMetadata.put(KEY_IDENTIFIERS, jsonIdentifier);
 
-			for (Metadata m : metadata) {
-				JSONObject jsonMetadata = toJson(m);
-				identifierWithMetadata.accumulate(KEY_METADATA, jsonMetadata);
+			if (metadata != null) {
+				for (Metadata m : metadata) {
+					JSONObject jsonMetadata = toJson(m);
+					identifierWithMetadata.accumulate(KEY_METADATA, jsonMetadata);
+				}
 			}
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
@@ -181,7 +192,7 @@ public class JsonMarshaller {
 
 	public JSONObject toJson(Map<Long, Long> changes) {
 		JSONObject newJSONObject = new JSONObject();
-		for (Entry<Long,Long> entry: changes.entrySet()) {
+		for (Entry<Long, Long> entry : changes.entrySet()) {
 			try {
 				newJSONObject.put(entry.getKey().toString(), entry.getValue());
 			} catch (JSONException e) {

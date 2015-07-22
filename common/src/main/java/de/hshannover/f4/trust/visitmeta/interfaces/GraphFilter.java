@@ -38,42 +38,43 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
-
-
-
-
-import java.util.List;
+import org.w3c.dom.Document;
 
 public interface GraphFilter {
 
 	/**
-	 * @return
-	 * The starting place of the search.
+	 * @return The starting place of the search.
 	 */
 	public Identifier getStartIdentifier();
-	
+
 	/**
-	 * @return
-	 * The maximum distance of any included identifiers. 
-	 * Distance is measured by number of links away from the starting identifier.
+	 * @return The maximum distance of any included identifiers. Distance is
+	 *         measured by number of links away from the starting identifier.
 	 */
 	public int getMaxDepth();
-	
+
 	/**
-	 * @return
-	 * A list of link-types which to include in the filter step. 
-	 * Here, it will be represented by a list of strings denoting the typenames.
-	 * E.g. meta:access-request-ip
+	 * @param metadata
+	 *            to check if it matches the filter.
+	 * @return true if the metadata matches the filter, otherwise false.
 	 */
-	public List<String> getMatchLinks();
-	
+	public boolean matchMeta(Document metadata);
+
 	/**
-	 * @return
-	 * A list of metadata-types which to include in the filter step. 
-	 * Here, it will be represented by a list if strings denoting the typenames.
-	 * E.g. meta:roles
-	 * <i>Note: The result filter being null means, that no metadata will be filtered, while an 
-	 * empty list will result in all metadata being filtered and only the identifiers returned.</i>
+	 * 
+	 * @param linkMeta
+	 *            to check if it machtes the filter
+	 * @return true if the metadata matches the matchlinks, otherwise false.
 	 */
-	public List<String> getResultFilter();
+	public boolean matchLink(Document linkMeta);
+
+	/**
+	 * @return whether the filter matches every Metadata or not.
+	 */
+	public boolean matchEverything();
+
+	/**
+	 * @return whether the filter matches not any Metadata or not.
+	 */
+	public boolean matchNothing();
 }

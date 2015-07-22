@@ -124,7 +124,7 @@ public abstract class AbstractTestCase {
 
 		Neo4JRepository repo = new Neo4JRepository(mDbConnection,
 				MessageDigest.getInstance("MD5"));
-		mReader = new Neo4JReader(repo, mDbConnection);
+		mReader = new Neo4JReader(repo, mDbConnection, "testDB");
 		mExecutor = new Neo4JExecutor(mDbConnection);
 
 		mService = new SimpleGraphService(mReader, mExecutor,

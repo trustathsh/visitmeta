@@ -1,4 +1,4 @@
-/*
+﻿/*
  * #%L
  * =====================================================
  *   _____                _     ____  _   _       _   _
@@ -42,12 +42,11 @@ import java.util.Collections;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
  * Internal representation of one IF-MAP metadata.
  */
-public abstract class InternalMetadata implements Propable {
+public abstract class InternalMetadata implements Metadata {
 	public static final long METADATA_NOT_DELETED_TIMESTAMP = -1;
 	private boolean mIsNotify;
 

@@ -148,3 +148,39 @@ http://example.com:8000/default/
 \textbf{Response:}
 See \ref{initial}
 \end{minipage}
+
+\subsection{Graph Filter}
+Initial, Current and GraphAt responses may be filtered. Only necessary changes are HTTP:POST instead of HTTP:GET and a Content-Type: application/json containing the filter information.
+
+\paragraph{startId}
+Identifier where the filter begins the search (represented as JSON).
+\paragraph{maxDepth}
+Integer value determining the maximal amount of links traveled from the first Identifier.
+\paragraph{resultFilter}
+Filterstring that filters Metadata. If the resultFilter is empty, no Metadata will be filtered. If the resultFilter is null, all Metadata will be filtered, resulting in a set only containing Identifiers. The filterstring should follow the filter-syntax specified by ifmap.
+\paragraph{matchLinks}
+Filterstring that determines what Link-types are allowed in the filtered graph. If matchLinks is empty, all Link-types are allowed. If matchLinks is null, no Link-types are allowed resulting in a Graph just containing the start Identifier.
+
+\begin{minipage}{\linewidth}
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:POST
+Content-Type: application/json
+http://example.com:8000/default/graph/initial
+{
+startId:
+  {
+    type: device,
+    name: freeradius-pdp
+  },
+  maxDepth: 3,
+  resultFilter: "meta:event/name=\"event1\"",
+  matchLinks: "meta:device-ip"
+}
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\textbf{Response:}
+See \ref{initial}
+\end{minipage}

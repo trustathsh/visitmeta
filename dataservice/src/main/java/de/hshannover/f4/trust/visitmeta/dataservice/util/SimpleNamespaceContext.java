@@ -36,36 +36,39 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.persistence.neo4j;
+package de.hshannover.f4.trust.visitmeta.dataservice.util;
 
+import java.util.Iterator;
+import java.util.Map;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 
-import java.util.SortedMap;
-
-import org.apache.log4j.Logger;
-
-import de.hshannover.f4.trust.visitmeta.persistence.AbstractReader;
-public class Neo4JReader extends AbstractReader {
-
-	private Logger log = Logger.getLogger(Neo4JReader.class);
-
-	private Neo4JConnection mConnection;
-
-	public Neo4JReader(Neo4JRepository repo, Neo4JConnection connection, String connectionName) {
-		log.trace("new Neo4JReader()");
-		mRepo = repo;
-		mConnection = connection;
-		mConnectionName = connectionName;
+public class SimpleNamespaceContext implements NamespaceContext {
+	
+	private final Map<String, String> mNamespaceMap;
+	
+	public SimpleNamespaceContext(Map<String, String> nsMap) {
+		mNamespaceMap = nsMap;
 	}
 
 	@Override
-	public long getTimeOfLastUpdate() {
-		return getChangesMap().lastKey();
+	public String getNamespaceURI(String prefix) {
+		if (mNamespaceMap.containsKey(prefix)) {
+			return mNamespaceMap.get(prefix);
+		}
+		return XMLConstants.NULL_NS_URI;
 	}
 
 	@Override
-	public SortedMap<Long, Long> getChangesMap() {
-		return mConnection.getTimestampManager().getChangesMap();
+	public String getPrefix(String namespaceURI) {
+		throw new RuntimeException("Not implemented!");
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Iterator getPrefixes(String namespaceURI) {
+		throw new RuntimeException("Not implemented!");
 	}
 
 }

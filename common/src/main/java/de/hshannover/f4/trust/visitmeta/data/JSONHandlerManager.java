@@ -1,7 +1,7 @@
 package de.hshannover.f4.trust.visitmeta.data;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
-import de.hshannover.f4.trust.visitmeta.interfaces.handler.JSONHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.JSONHandler;
 
 public class JSONHandlerManager {
 

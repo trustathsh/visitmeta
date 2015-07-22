@@ -5,7 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
-import de.hshannover.f4.trust.visitmeta.interfaces.handler.JSONHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.JSONHandler;
 
 public class DataManager {
 

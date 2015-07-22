@@ -24,7 +24,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.handler.MapServerDataHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.MapServerDataHandler;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
 public class JSONMapServerDataHandler implements MapServerDataHandler<MapServerData> {

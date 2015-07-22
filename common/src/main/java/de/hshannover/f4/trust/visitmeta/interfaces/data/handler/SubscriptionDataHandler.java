@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.interfaces.handler;
+package de.hshannover.f4.trust.visitmeta.interfaces.data.handler;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 

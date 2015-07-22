@@ -20,9 +20,9 @@ public interface DataserviceData extends Data {
 
 	public void addMapServerData(MapServerData connection);
 
-	public void setMapServerData(List<Data> connection);
+	public void setMapServerData(List<MapServerData> connection);
 
-	public List<Data> getMapServerData();
+	public List<MapServerData> getMapServerData();
 
 	public void removeMapServerData(MapServerData connection);
 

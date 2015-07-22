@@ -26,7 +26,6 @@ import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
@@ -34,30 +33,25 @@ public class RestHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(RestHelper.class);
 
-	public static List<Data> loadMapServerConnections(DataserviceConnection dataserviceConnection)
+	public static List<MapServerData> loadMapServerConnections(DataserviceConnection dataserviceConnection)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONHandlerException,
 			JSONException, ConnectionException {
-		List<Data> dataList = loadMapServerConnectionsData(dataserviceConnection);
+		List<MapServerData> dataList = loadMapServerConnectionsData(dataserviceConnection);
 
-		List<Data> connectionsList = new ArrayList<Data>();
+		List<MapServerData> connectionsList = new ArrayList<MapServerData>();
 
-		for(Data data: dataList){
-			if (data instanceof MapServerData) {
-				MapServerData connectionData = (MapServerData) data;
-				MapServerConnection connection = new MapServerRestConnectionImpl(dataserviceConnection, connectionData);
+		for (MapServerData data : dataList) {
+			MapServerConnection connection = new MapServerRestConnectionImpl(dataserviceConnection, data);
 				connectionsList.add(connection);
-			} else {
-				LOGGER.fatal("Loaded connection data ist not a MapServerConnectionData");
-			}
 		}
 
 		return connectionsList;
 	}
 
-	public static List<Data> loadMapServerConnectionsData(DataserviceConnection dataserviceConnection)
+	public static List<MapServerData> loadMapServerConnectionsData(DataserviceConnection dataserviceConnection)
 			throws JSONException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			JSONHandlerException, ConnectionException {
-		List<Data> connections = new ArrayList<Data>();
+		List<MapServerData> connections = new ArrayList<MapServerData>();
 
 		JSONArray jsonResponse = null;
 		try {
@@ -71,7 +65,8 @@ public class RestHelper {
 		for (int i = 0; i < jsonResponse.length(); i++) {
 			JSONObject jsonConnectionData = jsonResponse.getJSONObject(i);
 
-			Data connectionData = DataManager.transformJSONObject(jsonConnectionData, MapServerData.class);
+			MapServerData connectionData = (MapServerData) DataManager.transformJSONObject(jsonConnectionData,
+					MapServerData.class);
 
 			connections.add(connectionData);
 		}

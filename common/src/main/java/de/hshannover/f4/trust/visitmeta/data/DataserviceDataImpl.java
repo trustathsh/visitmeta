@@ -15,10 +15,10 @@ public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 
 	private boolean mConnected;
 
-	private List<Data> mSubDataList;
+	private List<MapServerData> mSubDataList;
 
 	private DataserviceDataImpl() {
-		mSubDataList = new ArrayList<Data>();
+		mSubDataList = new ArrayList<MapServerData>();
 	}
 
 	public DataserviceDataImpl(String name, String url, boolean rawXml) {
@@ -47,9 +47,10 @@ public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 		setRawXml(newData.isRawXml());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Data> getSubData() {
-		return getMapServerData();
+		return (List<Data>) (List<?>) getMapServerData();
 	}
 
 	@Override
@@ -78,13 +79,13 @@ public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 	}
 
 	@Override
-	public void setMapServerData(List<Data> connection) {
+	public void setMapServerData(List<MapServerData> connection) {
 		mSubDataList = connection;
 	}
 
 	@Override
-	public List<Data> getMapServerData() {
-		return new ArrayList<Data>(mSubDataList);
+	public List<MapServerData> getMapServerData() {
+		return new ArrayList<MapServerData>(mSubDataList);
 	}
 
 	@Override

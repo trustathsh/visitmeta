@@ -12,6 +12,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnec
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 
 public class DataserviceRestConnectionImpl extends DataserviceDataImpl implements DataserviceConnection {
 
@@ -67,7 +68,7 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 		}
 	}
 
-	public List<Data> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
+	public List<MapServerData> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, JSONHandlerException, JSONException, ConnectionException {
 
 		return RestHelper.loadMapServerConnections(this);
@@ -94,7 +95,7 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 	}
 
 	public void update() throws ConnectionException {
-		List<Data> updateList = null;
+		List<MapServerData> updateList = null;
 		try {
 			updateList = loadMapServerConnections();
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException

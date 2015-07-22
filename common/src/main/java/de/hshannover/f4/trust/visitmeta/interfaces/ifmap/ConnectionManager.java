@@ -56,7 +56,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 /**
  * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.
@@ -141,19 +140,19 @@ public interface ConnectionManager {
 	 * Returns all active subscriptions for a given {@link Connection}.
 	 *
 	 * @param connectionName name of the {@link Connection}
-	 * @return a List<String> with the active subscriptions.
+	 * @return a List<SubscriptionData> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public List<Data> getActiveSubscriptions(String connectionName) throws ConnectionException;
+	public List<SubscriptionData> getActiveSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
 	 * Returns all subscriptions for a given {@link Connection}.
 	 *
 	 * @param connectionName name of the {@link Connection}
-	 * @return a List<Data> with the active subscriptions.
+	 * @return a List<SubscriptionData> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public List<Data> getSubscriptions(String connectionName) throws ConnectionException;
+	public List<SubscriptionData> getSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
 	 * Returns all saved connections as a String {@link Map}.

@@ -138,10 +138,11 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 		return connectionData;
 	}
 
-	private List<Data> buildSubscriptionsDataList(JSONArray subscrptionsArray) throws ClassNotFoundException,
-			InstantiationException, IllegalAccessException, JSONException, JSONHandlerException {
+	private List<SubscriptionData> buildSubscriptionsDataList(JSONArray subscrptionsArray)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException,
+			JSONHandlerException {
 
-		List<Data> subscriptionsList = new ArrayList<Data>();
+		List<SubscriptionData> subscriptionsList = new ArrayList<SubscriptionData>();
 
 		for (int i = 0; i < subscrptionsArray.length(); i++) {
 			JSONObject jsonSubscriptionData = subscrptionsArray.getJSONObject(i);

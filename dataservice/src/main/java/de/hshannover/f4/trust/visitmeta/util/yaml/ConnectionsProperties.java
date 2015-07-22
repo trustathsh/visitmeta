@@ -50,8 +50,8 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.SubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 import de.hshannover.f4.trust.visitmeta.util.SubscriptionKey;
@@ -237,9 +237,9 @@ public class ConnectionsProperties extends Properties {
 		String connectionName = connection.getConnectionName();
 
 		// read Subscriptions from Connection
-		List<Data> subscribeList = connection.getSubscriptions();
+		List<SubscriptionData> subscribeList = connection.getSubscriptions();
 
-		for (Data subscriptionData : subscribeList) {
+		for (SubscriptionData subscriptionData : subscribeList) {
 			Subscription subscribtion = (Subscription) subscriptionData;
 			// read values from Subscription
 			String subscriptionName = subscribtion.getName();

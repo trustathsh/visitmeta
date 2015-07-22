@@ -169,12 +169,12 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public List<Data> getActiveSubscriptions(String connectionName) throws ConnectionException {
+	public List<SubscriptionData> getActiveSubscriptions(String connectionName) throws ConnectionException {
 		return getConnection(connectionName).getActiveSubscriptions();
 	}
 
 	@Override
-	public List<Data> getSubscriptions(String connectionName) throws ConnectionException {
+	public List<SubscriptionData> getSubscriptions(String connectionName) throws ConnectionException {
 		return getConnection(connectionName).getSubscriptions();
 	}
 

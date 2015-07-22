@@ -56,7 +56,7 @@ public interface MapServerConnectionData extends Data {
 	 *
 	 * @return a {@link List} with all active subscriptions.
 	 */
-	public List<Data> getActiveSubscriptions();
+	public List<SubscriptionData> getActiveSubscriptions();
 
 	/**
 	 * Returns a {@link List} of {@link Subscription} representing all subscriptions for this
@@ -64,9 +64,9 @@ public interface MapServerConnectionData extends Data {
 	 *
 	 * @return all subscriptions as a {@link List} of {@link Subscription}.
 	 */
-	public List<Data> getSubscriptions();
+	public List<SubscriptionData> getSubscriptions();
 
-	public void setSubscriptionData(List<Data> connection);
+	public void setSubscriptionData(List<SubscriptionData> connection);
 
 	public int getMaxPollResultSize();
 

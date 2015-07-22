@@ -64,7 +64,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
@@ -231,7 +230,7 @@ public class SubscribeResource {
 	public Response putSubscription(@PathParam("connectionName") String connectionName, JSONObject jsonData) {
 		ConnectionManager manager = Application.getConnectionManager();
 		SubscriptionData subscriptionData;
-		List<Data> subscriptionList;
+		List<SubscriptionData> subscriptionList;
 		
 		// transform
 		try {

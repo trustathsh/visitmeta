@@ -21,7 +21,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	private String mTruststorePassword;
 
-	private List<Data> mSubscriptionDataList;
+	private List<SubscriptionData> mSubscriptionDataList;
 
 	private int mMaxPollResultSize;
 
@@ -32,7 +32,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	private boolean mAuthenticationBasic;
 
 	private MapServerConnectionDataImpl() {
-		mSubscriptionDataList = new ArrayList<Data>();
+		mSubscriptionDataList = new ArrayList<SubscriptionData>();
 	}
 
 	public MapServerConnectionDataImpl(String name) {
@@ -88,9 +88,10 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 		super.setName(connectionName);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Data> getSubData() {
-		return getSubscriptions();
+		return (List<Data>) (List<?>) getSubscriptions();
 	}
 
 	@Override
@@ -144,7 +145,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public void setSubscriptionData(List<Data> connection) {
+	public void setSubscriptionData(List<SubscriptionData> connection) {
 		mSubscriptionDataList = connection;
 	}
 
@@ -219,9 +220,9 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public List<Data> getActiveSubscriptions() {
-		List<Data> newActiveList = new ArrayList<Data>();
-		for (Data subData : getSubscriptions()) {
+	public List<SubscriptionData> getActiveSubscriptions() {
+		List<SubscriptionData> newActiveList = new ArrayList<SubscriptionData>();
+		for (SubscriptionData subData : getSubscriptions()) {
 			if (((Subscription) subData).isActive()) {
 				newActiveList.add(subData);
 			}
@@ -231,8 +232,8 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public List<Data> getSubscriptions() {
-		return new ArrayList<Data>(mSubscriptionDataList);
+	public List<SubscriptionData> getSubscriptions() {
+		return new ArrayList<SubscriptionData>(mSubscriptionDataList);
 	}
 
 	@Override

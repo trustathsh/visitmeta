@@ -38,4 +38,11 @@ public interface Connection {
 	 */
 	public boolean isConnected();
 
+	/**
+	 * Set the connection-status of this {@link Connection}.
+	 * 
+	 * @param connected
+	 */
+	public void setConnected(boolean connected);
+
 }

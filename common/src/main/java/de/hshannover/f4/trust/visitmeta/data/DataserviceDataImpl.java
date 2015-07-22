@@ -13,8 +13,6 @@ public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 
 	private boolean mRawXml;
 
-	private boolean mConnected;
-
 	private List<MapServerData> mSubDataList;
 
 	private DataserviceDataImpl() {
@@ -96,16 +94,6 @@ public class DataserviceDataImpl extends DataImpl implements DataserviceData {
 	@Override
 	public void removeMapServerData(int index) {
 		mSubDataList.remove(index);
-	}
-
-	@Override
-	public void setConnected(boolean connected) {
-		mConnected = connected;
-	}
-
-	@Override
-	public boolean isConnected() {
-		return mConnected;
 	}
 
 	@Override

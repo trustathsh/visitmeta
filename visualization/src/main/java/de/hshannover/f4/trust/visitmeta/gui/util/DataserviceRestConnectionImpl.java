@@ -20,6 +20,8 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 
 	private boolean mNotPersised;
 
+	private boolean mConnected;
+
 	private DataserviceData mOldData;
 
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
@@ -28,7 +30,6 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 
 	public DataserviceRestConnectionImpl(DataserviceData connectionData) {
 		super(connectionData.getName(), connectionData.getUrl(), connectionData.isRawXml());
-		super.setConnected(connectionData.isConnected());
 	}
 
 	@Override
@@ -47,13 +48,13 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 	@Override
 	public void connect() throws ConnectionException {
 		update();
-		super.setConnected(true);
+		setConnected(true);
 	}
 
 	@Override
 	public void disconnect() throws ConnectionException {
 		update(); // TODO muss das sein?
-		super.setConnected(false);
+		setConnected(false);
 	}
 
 	@Override
@@ -103,6 +104,16 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 			LOGGER.error(e.toString());
 		}
 		super.setMapServerData(updateList);
+	}
+
+	@Override
+	public void setConnected(boolean connected) {
+		mConnected = connected;
+	}
+
+	@Override
+	public boolean isConnected() {
+		return mConnected;
 	}
 
 	public boolean isNotPersised() {

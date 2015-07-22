@@ -28,10 +28,6 @@ public interface DataserviceData extends Data {
 
 	public void removeMapServerData(int index);
 
-	public void setConnected(boolean connected);
-
-	public boolean isConnected();
-	
 	/**
 	 * Only the connection properties. For MapServerConnections use MapServerConnectionData.changeData().
 	 * 

@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.handler;
+package de.hshannover.f4.trust.visitmeta.data.handler;
 
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.IDENTIFIER_TYPE;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.IS_ACTIVE;

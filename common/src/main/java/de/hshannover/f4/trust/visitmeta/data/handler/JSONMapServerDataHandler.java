@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.handler;
+package de.hshannover.f4.trust.visitmeta.data.handler;
 
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.AUTHENTICATION_BASIC;
 import static de.hshannover.f4.trust.visitmeta.util.JSONDataKey.IFMAP_SERVER_URL;

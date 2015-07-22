@@ -5,7 +5,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.handler.JSONHandler;
 
 public class JSONHandlerManager {
 
-	private static final String POST_CLASS_PATH = "de.hshannover.f4.trust.visitmeta.handler.";
+	private static final String POST_CLASS_PATH = "de.hshannover.f4.trust.visitmeta.data.handler.";
 	
 	public static JSONHandler<?> getHandlerFor(Class<?> dataTypeClazz) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException {

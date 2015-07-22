@@ -168,10 +168,14 @@ HTTP:POST
 Content-Type: application/json
 http://example.com:8000/default/graph/initial
 {
-startId:{type:device, name:"freeradius-pdp"},
-maxDepth: 10,
-resultFilter:"meta:role",
-matchLinks:"" 
+startId:
+  {
+    type: device,
+    name: freeradius-pdp
+  },
+  maxDepth: 3,
+  resultFilter: "meta:event/name=\"event1\"",
+  matchLinks: "meta:device-ip"
 }
 \end{lstlisting}
 \end{minipage}

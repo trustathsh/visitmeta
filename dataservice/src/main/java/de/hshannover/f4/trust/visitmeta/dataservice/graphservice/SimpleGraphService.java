@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
-
-
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -83,9 +81,9 @@ public class SimpleGraphService implements GraphService {
 	private GraphCache mCache;
 
 	private Executor mExecutor;
-	
+
 	private DocumentBuilder mBuilder;
-	
+
 	private DocumentBuilderFactory mBuilderFactory;
 
 	private SimpleGraphService() {
@@ -111,10 +109,14 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getInitialGraph(GraphFilter filter) {
-		log.trace("Method getInitialGraph(" + filter + ") called.");
+		log.trace("Method getInitialGraph("
+				+ filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
-			graph.add(filterGraph(getInternalGraphAt(getChangesMap().firstKey()), filter));
+			IdentifierGraph filterResult = filterGraph(getInternalGraphAt(getChangesMap().firstKey()), filter);
+			if (filterResult != null) {
+				graph.add(filterResult);
+			}
 		}
 		return graph;
 	}
@@ -131,13 +133,17 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getCurrentGraph(GraphFilter filter) {
-		log.trace("Method getCurrentGraph(" + filter + ") called.");
+		log.trace("Method getCurrentGraph("
+				+ filter + ") called.");
 		if (getChangesMap().isEmpty()) {
 			return new ArrayList<>();
 		}
 		List<InternalIdentifierGraph> binky = getInternalGraphAt(getChangesMap().lastKey());
 		List<IdentifierGraph> minky = new ArrayList<>();
-		minky.add(filterGraph(binky, filter));
+		IdentifierGraph filterResult = filterGraph(binky, filter);
+		if (filterResult != null) {
+			minky.add(filterResult);
+		}
 		return minky;
 	}
 
@@ -170,10 +176,11 @@ public class SimpleGraphService implements GraphService {
 		return new ArrayList<InternalIdentifierGraph>();
 
 	}
-	
+
 	@Override
 	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
-		log.trace("Method getNotifiesAt(" + timestamp + ") called.");
+		log.trace("Method getNotifiesAt("
+				+ timestamp + ") called.");
 		SortedMap<Long, Long> changes = getChangesMap();
 		long closestTimestamp = 0l;
 		if (!changes.isEmpty()) {
@@ -189,7 +196,7 @@ public class SimpleGraphService implements GraphService {
 				}
 			}
 			List<IdentifierGraph> graph = new ArrayList<>();
-			for(InternalIdentifierGraph internalGraph : mReader.getNotifiesAt(closestTimestamp)) {
+			for (InternalIdentifierGraph internalGraph : mReader.getNotifiesAt(closestTimestamp)) {
 				graph.add(GraphHelper.internalToExternalGraph(internalGraph));
 			}
 			return graph;
@@ -200,7 +207,8 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getGraphAt(long timestamp) {
-		log.trace("Method getGraphAt(" + timestamp + ") called.");
+		log.trace("Method getGraphAt("
+				+ timestamp + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		for (InternalIdentifierGraph internalGraph : getInternalGraphAt(timestamp)) {
 			if (internalGraph.getStartIdentifier() != null) {
@@ -212,18 +220,22 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getGraphAt(long timestamp, GraphFilter filter) {
-		log.trace("Method getGraphAt(" + timestamp + ", " + filter + ") called.");
+		log.trace("Method getGraphAt("
+				+ timestamp + ", " + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
-			// FIXME check if graph at timestamp is empty
-			graph.add(filterGraph(getInternalGraphAt(timestamp), filter));
+			IdentifierGraph filterResult = filterGraph(getInternalGraphAt(timestamp), filter);
+			if (filterResult != null) {
+				graph.add(filterResult);
+			}
 		}
 		return graph;
 	}
 
 	@Override
 	public Delta getDelta(long t1, long t2) {
-		log.trace("Method getDelta(" + t1 + "," + t2 + ") called.");
+		log.trace("Method getDelta("
+				+ t1 + "," + t2 + ") called.");
 		if (t1 > t2) {
 			return getDelta(t2, t1);
 		}
@@ -326,21 +338,21 @@ public class SimpleGraphService implements GraphService {
 			for (InternalLink l : id.getLinks()) {
 				InternalIdentifier other = l.getIdentifiers().getFirst().equals(id)
 						? l.getIdentifiers().getSecond() : l.getIdentifiers().getFirst();
-						if (!seen.contains(other)) {
-							InternalIdentifier insertedOther = subgraph.findIdentifier(other);
-							if (insertedOther == null) {
-								insertedOther = subgraph.insert(other);
+				if (!seen.contains(other)) {
+					InternalIdentifier insertedOther = subgraph.findIdentifier(other);
+					if (insertedOther == null) {
+						insertedOther = subgraph.insert(other);
 
-								for (InternalMetadata m : other.getMetadata()) {
-									subgraph.connectMeta(insertedOther, subgraph.insert(m));
-								}
-							}
-							InternalLink insertedLink = subgraph.connect(insertedId, insertedOther);
-							for (InternalMetadata m : l.getMetadata()) {
-								subgraph.connectMeta(insertedLink, subgraph.insert(m));
-							}
-							idsToVisit.add(other);
+						for (InternalMetadata m : other.getMetadata()) {
+							subgraph.connectMeta(insertedOther, subgraph.insert(m));
 						}
+					}
+					InternalLink insertedLink = subgraph.connect(insertedId, insertedOther);
+					for (InternalMetadata m : l.getMetadata()) {
+						subgraph.connectMeta(insertedLink, subgraph.insert(m));
+					}
+					idsToVisit.add(other);
+				}
 			}
 			idsToVisit.remove(id);
 			expandNode(idsToVisit, seen, subgraph);
@@ -351,12 +363,14 @@ public class SimpleGraphService implements GraphService {
 			List<InternalIdentifier> identifierToRemove,
 			InternalIdentifierGraph graph) {
 		for (InternalIdentifier graphIdentifier : graph.getIdentifiers()) {
-			log.trace("looking for '" + graphIdentifier
+			log.trace("looking for '"
+					+ graphIdentifier
 					+ "' in identifiersToRemove");
 			int indexOfOldEquivalent = identifierToRemove
 					.indexOf(graphIdentifier);
 			if (indexOfOldEquivalent != -1) {
-				log.trace("found '" + graphIdentifier + "'");
+				log.trace("found '"
+						+ graphIdentifier + "'");
 				InternalIdentifier oldEquivalent = identifierToRemove
 						.get(indexOfOldEquivalent);
 				stripMetadataFromIdentifier(graphIdentifier,
@@ -366,7 +380,8 @@ public class SimpleGraphService implements GraphService {
 
 				if (graphIdentifier.getMetadata().isEmpty()
 						&& graphIdentifier.getLinks().isEmpty()) {
-					log.trace("removing '" + graphIdentifier + "' from graph");
+					log.trace("removing '"
+							+ graphIdentifier + "' from graph");
 					graph.removeIdentifier(graphIdentifier);
 				}
 			}
@@ -395,19 +410,19 @@ public class SimpleGraphService implements GraphService {
 			InternalIdentifierPair pair = l.getIdentifiers();
 			InternalIdentifier opposite = (pair.getFirst().equals(id)) ? pair
 					.getSecond() : pair.getFirst();
-					for (InternalLink deleteCandidate : id.getLinks()) {
-						InternalIdentifierPair candidatePair = deleteCandidate
-								.getIdentifiers();
-						if ((candidatePair.getFirst().equals(opposite) && candidatePair
-								.getSecond().equals(id))
-								|| (candidatePair.getFirst().equals(id) && candidatePair
-										.getSecond().equals(opposite))) {
-							stripMetadataFromLink(deleteCandidate, l.getMetadata());
-							if (deleteCandidate.getMetadata().isEmpty()) {
-								linksToDelete.add(l);
-							}
-						}
+			for (InternalLink deleteCandidate : id.getLinks()) {
+				InternalIdentifierPair candidatePair = deleteCandidate
+						.getIdentifiers();
+				if ((candidatePair.getFirst().equals(opposite) && candidatePair
+						.getSecond().equals(id))
+						|| (candidatePair.getFirst().equals(id) && candidatePair
+								.getSecond().equals(opposite))) {
+					stripMetadataFromLink(deleteCandidate, l.getMetadata());
+					if (deleteCandidate.getMetadata().isEmpty()) {
+						linksToDelete.add(l);
 					}
+				}
+			}
 		}
 		for (InternalLink l : linksToDelete) {
 			id.removeLink(l);
@@ -423,27 +438,31 @@ public class SimpleGraphService implements GraphService {
 		return ids;
 	}
 
-
 	@Override
 	public SortedMap<Long, Long> getChangesMap() {
 		log.trace("Method getChangesMap() called.");
 		return mReader.getChangesMap();
 	}
 
-
 	public IdentifierGraph filterGraph(List<InternalIdentifierGraph> graphList, GraphFilter filter) {
 		Identifier startId = filter.getStartIdentifier();
+		log.debug("Start identifier (from filter): "
+				+ startId);
 		InternalIdentifier internalStartId = null;
 		InternalIdentifierGraph graph = null;
-		for(InternalIdentifierGraph g : graphList) {
+		for (InternalIdentifierGraph g : graphList) {
 			for (InternalIdentifier id : g.getIdentifiers()) {
+				log.debug("Identifier from graph:"
+						+ id);
 				if (id.sameAs(startId)) {
 					graph = g;
 					internalStartId = id;
+					log.debug("Start identifier found");
 				}
 			}
 		}
-		if(graph == null) {
+		if (graph == null) {
+			log.debug("No start identifier found");
 			return null;
 		}
 		int maxDepth = filter.getMaxDepth();
@@ -454,7 +473,7 @@ public class SimpleGraphService implements GraphService {
 	}
 
 	private void filterResult(InMemoryIdentifierGraph result, GraphFilter filter) {
-		if(filter.matchEverything()) {
+		if (filter.matchEverything()) {
 			for (InternalIdentifier id : result.getAllIdentifier()) {
 				id.clearMetadata();
 				for (InternalLink l : id.getLinks()) {
@@ -462,17 +481,17 @@ public class SimpleGraphService implements GraphService {
 				}
 			}
 		} else {
-			for(InternalIdentifier id : result.getAllIdentifier()) {
+			for (InternalIdentifier id : result.getAllIdentifier()) {
 				ArrayList<InternalMetadata> toRemove = new ArrayList<>();
-				for(InternalMetadata meta : id.getMetadata()) {
-					if(filter.matchMeta(internalMetadaToDocument(meta))) {
+				for (InternalMetadata meta : id.getMetadata()) {
+					if (filter.matchMeta(internalMetadaToDocument(meta))) {
 						id.removeMetadata(meta);
 					}
 				}
 				toRemove.clear();
-				for(InternalLink link : id.getLinks()) {
+				for (InternalLink link : id.getLinks()) {
 					for (InternalMetadata linkMeta : link.getMetadata()) {
-						if(filter.matchMeta(internalMetadaToDocument(linkMeta))) {
+						if (filter.matchMeta(internalMetadaToDocument(linkMeta))) {
 							toRemove.add(linkMeta);
 						}
 					}
@@ -484,10 +503,11 @@ public class SimpleGraphService implements GraphService {
 		}
 	}
 
-	private void searchRoutine(InternalIdentifierGraph graph, InternalIdentifier currentId, InMemoryIdentifierGraph result, int currentDepth, int maxDepth, GraphFilter filter) {
+	private void searchRoutine(InternalIdentifierGraph graph, InternalIdentifier currentId,
+			InMemoryIdentifierGraph result, int currentDepth, int maxDepth, GraphFilter filter) {
 		if (currentDepth <= maxDepth) {
 			InternalIdentifier insertedId;
-			if(!result.getIdentifiers().contains(currentId)) {
+			if (!result.getIdentifiers().contains(currentId)) {
 				insertedId = result.insert(currentId);
 				for (InternalMetadata currentMeta : currentId.getMetadata()) {
 					result.insert(currentMeta);
@@ -496,44 +516,47 @@ public class SimpleGraphService implements GraphService {
 			} else {
 				return;
 			}
-			for (InternalLink currentLink : currentId.getLinks()) {
-				if(checkMatchesLink(currentLink, filter)) {
-					for (InternalMetadata currentLinkMeta : currentLink.getMetadata()) {
-						result.insert(currentLinkMeta);
-						InternalIdentifierPair ip = currentLink.getIdentifiers();
-						InternalIdentifier other = (ip.getFirst().equals(currentId) ? ip.getSecond() : ip.getFirst());
-						if (!result.getIdentifiers().contains(other)) {
-							searchRoutine(graph, other, result, currentDepth + 1, maxDepth, filter);
-						} else {
-							for (InternalIdentifier tmp : result.getIdentifiers())  {
-								if(tmp.equals(other)) {
-									other = tmp;
+			if (maxDepth != 0) {
+				for (InternalLink currentLink : currentId.getLinks()) {
+					if (checkMatchesLink(currentLink, filter)) {
+						for (InternalMetadata currentLinkMeta : currentLink.getMetadata()) {
+							result.insert(currentLinkMeta);
+							InternalIdentifierPair ip = currentLink.getIdentifiers();
+							InternalIdentifier other =
+									(ip.getFirst().equals(currentId) ? ip.getSecond() : ip.getFirst());
+							if (!result.getIdentifiers().contains(other)) {
+								searchRoutine(graph, other, result, currentDepth + 1, maxDepth, filter);
+							} else {
+								for (InternalIdentifier tmp : result.getIdentifiers()) {
+									if (tmp.equals(other)) {
+										other = tmp;
+									}
 								}
 							}
+							InternalLink insertedLink = result.connect(insertedId, other);
+							result.connectMeta(insertedLink, currentLinkMeta);
 						}
-						InternalLink insertedLink = result.connect(insertedId, other);
-						result.connectMeta(insertedLink, currentLinkMeta);
 					}
 				}
 			}
 		}
 	}
-	
+
 	private boolean checkMatchesLink(InternalLink link, GraphFilter filter) {
-		for(InternalMetadata meta : link.getMetadata()) {
-			if(filter.matchLink(internalMetadaToDocument(meta))) {
+		for (InternalMetadata meta : link.getMetadata()) {
+			if (filter.matchLink(internalMetadaToDocument(meta))) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private Document internalMetadaToDocument(InternalMetadata meta) {
-		if(mBuilderFactory == null) {
+		if (mBuilderFactory == null) {
 			mBuilderFactory = DocumentBuilderFactory.newInstance();
 			mBuilderFactory.setNamespaceAware(true);
 		}
-		if(mBuilder == null) {
+		if (mBuilder == null) {
 			try {
 				mBuilder = mBuilderFactory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
@@ -547,10 +570,10 @@ public class SimpleGraphService implements GraphService {
 			log.error("could not convert InternalMetada to Document!");
 			e.printStackTrace();
 		}
-		
+
 		return doc;
 	}
-	
+
 	@Override
 	public long count(GraphType type) {
 		return mExecutor.count(type);

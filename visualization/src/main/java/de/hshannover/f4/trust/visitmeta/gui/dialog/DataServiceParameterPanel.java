@@ -10,7 +10,7 @@ import javax.swing.JTextField;
 
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class DataServiceParameterPanel extends ParameterPanel {
@@ -26,7 +26,7 @@ public class DataServiceParameterPanel extends ParameterPanel {
 
 	private JCheckBox mJcbRawXML;
 
-	private DataserviceConnectionData mConnectionData;
+	private DataserviceData mConnectionData;
 
 	private DocumentChangedListener mDocumentChangedListener;
 
@@ -36,7 +36,7 @@ public class DataServiceParameterPanel extends ParameterPanel {
 		createPanels();
 	}
 
-	public DataServiceParameterPanel(DataserviceConnectionData connectionData) {
+	public DataServiceParameterPanel(DataserviceData connectionData) {
 		mConnectionData = connectionData;
 
 		createPanels();

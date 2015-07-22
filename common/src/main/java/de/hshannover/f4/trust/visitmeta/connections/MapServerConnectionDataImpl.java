@@ -6,10 +6,10 @@ import java.util.List;
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class MapServerConnectionDataImpl extends DataImpl implements MapServerConnectionData {
+public class MapServerConnectionDataImpl extends DataImpl implements MapServerData {
 
 	private String mUrl;
 
@@ -49,8 +49,8 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public MapServerConnectionData copy() {
-		MapServerConnectionData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
+	public MapServerData copy() {
+		MapServerData data = new MapServerConnectionDataImpl(getName(), getUrl(), getUserName(), getUserPassword());
 		data.setTruststorePath(getTruststorePath());
 		data.setTruststorePassword(getTruststorePassword());
 		data.setSubscriptionData(getSubscriptions());
@@ -61,12 +61,12 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 	}
 
 	@Override
-	public MapServerConnectionData clone() {
-		return (MapServerConnectionData) super.clone();
+	public MapServerData clone() {
+		return (MapServerData) super.clone();
 	}
 
 	@Override
-	public void changeData(MapServerConnectionData newData) {
+	public void changeData(MapServerData newData) {
 		setName(newData.getName());
 		setUrl(newData.getUrl());
 		setUserName(newData.getUserName());
@@ -238,7 +238,7 @@ public class MapServerConnectionDataImpl extends DataImpl implements MapServerCo
 
 	@Override
 	public Class<?> getDataTypeClass() {
-		return MapServerConnectionData.class;
+		return MapServerData.class;
 	}
 
 }

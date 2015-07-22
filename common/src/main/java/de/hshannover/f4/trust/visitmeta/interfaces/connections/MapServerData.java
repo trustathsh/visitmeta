@@ -6,7 +6,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public interface MapServerConnectionData extends Data {
+public interface MapServerData extends Data {
 
 	public String getConnectionName();
 
@@ -33,7 +33,7 @@ public interface MapServerConnectionData extends Data {
 	public void setTruststorePassword(String truststorePass);
 
 	/**
-	 * Adds a subscription to the internal list of subscriptions for this {@link MapServerConnectionData}.
+	 * Adds a subscription to the internal list of subscriptions for this {@link MapServerData}.
 	 *
 	 * @param subscription a subscription
 	 */
@@ -60,7 +60,7 @@ public interface MapServerConnectionData extends Data {
 
 	/**
 	 * Returns a {@link List} of {@link Subscription} representing all subscriptions for this
-	 * {@link MapServerConnectionData}.
+	 * {@link MapServerData}.
 	 *
 	 * @return all subscriptions as a {@link List} of {@link Subscription}.
 	 */
@@ -77,16 +77,16 @@ public interface MapServerConnectionData extends Data {
 	public boolean isConnected();
 
 	/**
-	 * Set the flag for connecting on startup for this {@link MapServerConnectionData}.
+	 * Set the flag for connecting on startup for this {@link MapServerData}.
 	 *
 	 * @param startupConnect connect on startup boolean
 	 */
 	public void setStartupConnect(boolean startupConnect);
 
 	/**
-	 * Returns if the flag for connecting on startup is set for this {@link MapServerConnectionData}.
+	 * Returns if the flag for connecting on startup is set for this {@link MapServerData}.
 	 *
-	 * @return true, if this {@link MapServerConnectionData} shall connect on startup
+	 * @return true, if this {@link MapServerData} shall connect on startup
 	 */
 	public boolean doesConnectOnStartup();
 
@@ -99,13 +99,13 @@ public interface MapServerConnectionData extends Data {
 	 * 
 	 * @param newData
 	 */
-	public void changeData(MapServerConnectionData newData);
+	public void changeData(MapServerData newData);
 
 	public void updateSubscription(SubscriptionData newData);
 
 	@Override
-	public MapServerConnectionData copy();
+	public MapServerData copy();
 
 	@Override
-	public MapServerConnectionData clone();
+	public MapServerData clone();
 }

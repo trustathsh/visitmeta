@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.data.DataImpl;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public class DataserviceConnectionDataImpl extends DataImpl implements DataserviceConnectionData {
+public class DataserviceConnectionDataImpl extends DataImpl implements DataserviceData {
 
 	private String mUrl;
 
@@ -30,19 +30,19 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 	}
 
 	@Override
-	public DataserviceConnectionData copy() {
-		DataserviceConnectionData tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
+	public DataserviceData copy() {
+		DataserviceData tmpCopy = new DataserviceConnectionDataImpl(getName(), getUrl(), isRawXml());
 		tmpCopy.setMapServerData(getMapServerData());
 		return tmpCopy;
 	}
 
 	@Override
-	public DataserviceConnectionData clone() {
-		return (DataserviceConnectionData) super.clone();
+	public DataserviceData clone() {
+		return (DataserviceData) super.clone();
 	}
 
 	@Override
-	public void changeData(DataserviceConnectionData newData) {
+	public void changeData(DataserviceData newData) {
 		setName(newData.getName());
 		setUrl(newData.getUrl());
 		setRawXml(newData.isRawXml());
@@ -74,7 +74,7 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 	}
 
 	@Override
-	public void addMapServerData(MapServerConnectionData connection) {
+	public void addMapServerData(MapServerData connection) {
 		mSubDataList.add(connection);
 	}
 
@@ -89,7 +89,7 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 	}
 
 	@Override
-	public void removeMapServerData(MapServerConnectionData connection) {
+	public void removeMapServerData(MapServerData connection) {
 		mSubDataList.remove(connection);
 	}
 
@@ -110,7 +110,7 @@ public class DataserviceConnectionDataImpl extends DataImpl implements Dataservi
 
 	@Override
 	public Class<?> getDataTypeClass() {
-		return DataserviceConnectionData.class;
+		return DataserviceData.class;
 	}
 
 }

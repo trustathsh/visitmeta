@@ -93,8 +93,8 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MainWindow extends JFrame {
@@ -229,11 +229,11 @@ public class MainWindow extends JFrame {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
-			mJpParameterValues = new DataServiceParameterPanel(((DataserviceConnectionData) selectedComponent).copy());
+			mJpParameterValues = new DataServiceParameterPanel(((DataserviceData) selectedComponent).copy());
 			mJbParameterSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
 			mJbParameterReset.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
-			mJpParameterValues = new MapServerParameterPanel(((MapServerConnectionData) selectedComponent).copy());
+			mJpParameterValues = new MapServerParameterPanel(((MapServerData) selectedComponent).copy());
 			mJbParameterSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
 			mJbParameterReset.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -477,17 +477,17 @@ public class MainWindow extends JFrame {
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			if(!dataserviceConnection.isNotPersised()){
-				dataserviceConnection.setOldData(((DataserviceConnectionData)dataserviceConnection).copy());
+				dataserviceConnection.setOldData(((DataserviceData)dataserviceConnection).copy());
 			}
-			dataserviceConnection.changeData((DataserviceConnectionData) changedData);
+			dataserviceConnection.changeData((DataserviceData) changedData);
 			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			if(!mapServerConnection.isNotPersised()){
-				mapServerConnection.setOldData(((MapServerConnectionData)mapServerConnection).copy());
+				mapServerConnection.setOldData(((MapServerData)mapServerConnection).copy());
 			}
-			mapServerConnection.changeData((MapServerConnectionData) changedData);
+			mapServerConnection.changeData((MapServerData) changedData);
 			mapServerConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {

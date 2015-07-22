@@ -13,7 +13,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
  * @author Bastian Hellmann
  * @author Marcel Reichenbach
  */
-public interface MapServerConnection extends Connection, MapServerConnectionData {
+public interface MapServerConnection extends Connection, MapServerData {
 
 	/**
 	 * Start a subscription.

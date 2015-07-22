@@ -63,7 +63,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 
 /**
  * For each request a new object of this class will be created. The resource is
@@ -151,10 +151,10 @@ public class ConnectionResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putConnection(JSONObject jsonConnectionData) {
 		// transform
-		MapServerConnectionData newConnectionData = null;
+		MapServerData newConnectionData = null;
 		try {
-			newConnectionData = (MapServerConnectionData) DataManager.transformJSONObject(jsonConnectionData,
-					MapServerConnectionData.class);
+			newConnectionData = (MapServerData) DataManager.transformJSONObject(jsonConnectionData,
+					MapServerData.class);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
 				| JSONException e) {
 			return responseError("JSONObject transform", e.toString());

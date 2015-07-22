@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.gui.util;
+﻿package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import de.hshannover.f4.trust.visitmeta.connections.DataserviceConnectionDataImp
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
@@ -19,20 +19,20 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 
 	private boolean mNotPersised;
 
-	private DataserviceConnectionData mOldData;
+	private DataserviceData mOldData;
 
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
 	}
 
-	public DataserviceRestConnectionImpl(DataserviceConnectionData connectionData) {
+	public DataserviceRestConnectionImpl(DataserviceData connectionData) {
 		super(connectionData.getName(), connectionData.getUrl(), connectionData.isRawXml());
 		super.setConnected(connectionData.isConnected());
 	}
 
 	@Override
 	public DataserviceRestConnectionImpl copy() {
-		DataserviceConnectionData dataCopy = super.copy();
+		DataserviceData dataCopy = super.copy();
 		DataserviceRestConnectionImpl tmpCopy = new DataserviceRestConnectionImpl(dataCopy);
 		tmpCopy.setNotPersised(true);
 		return tmpCopy;
@@ -112,11 +112,11 @@ public class DataserviceRestConnectionImpl extends DataserviceConnectionDataImpl
 		mNotPersised = b;
 	}
 
-	public void setOldData(DataserviceConnectionData oldData) {
+	public void setOldData(DataserviceData oldData) {
 		mOldData = oldData;
 	}
 
-	public DataserviceConnectionData getOldData() {
+	public DataserviceData getOldData() {
 		return mOldData;
 	}
 }

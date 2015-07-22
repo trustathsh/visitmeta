@@ -1,7 +1,7 @@
 package de.hshannover.f4.trust.visitmeta.interfaces.connections;
 
 
-public interface DataserviceConnection extends Connection, DataserviceConnectionData {
+public interface DataserviceConnection extends Connection, DataserviceData {
 
 	@Override
 	public DataserviceConnection copy();

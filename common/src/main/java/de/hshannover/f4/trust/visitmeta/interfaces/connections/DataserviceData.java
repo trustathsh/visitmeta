@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
-public interface DataserviceConnectionData extends Data {
+public interface DataserviceData extends Data {
 
 	@Override
 	public String getName();
@@ -20,13 +20,13 @@ public interface DataserviceConnectionData extends Data {
 
 	public void setRawXml(boolean rawXml);
 
-	public void addMapServerData(MapServerConnectionData connection);
+	public void addMapServerData(MapServerData connection);
 
 	public void setMapServerData(List<Data> connection);
 
 	public List<Data> getMapServerData();
 
-	public void removeMapServerData(MapServerConnectionData connection);
+	public void removeMapServerData(MapServerData connection);
 
 	public void removeMapServerData(int index);
 
@@ -39,11 +39,11 @@ public interface DataserviceConnectionData extends Data {
 	 * 
 	 * @param newData
 	 */
-	public void changeData(DataserviceConnectionData newData);
+	public void changeData(DataserviceData newData);
 
 	@Override
-	public DataserviceConnectionData copy();
+	public DataserviceData copy();
 
 	@Override
-	public DataserviceConnectionData clone();
+	public DataserviceData clone();
 }

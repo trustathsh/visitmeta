@@ -55,7 +55,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 
 /**
  * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.
@@ -79,7 +79,7 @@ public interface ConnectionManager {
 	 * @param newData
 	 * @throws NoSavedConnectionException
 	 */
-	public void updateConnection(MapServerConnectionData newData) throws NoSavedConnectionException;
+	public void updateConnection(MapServerData newData) throws NoSavedConnectionException;
 
 	/**
 	 * Connect to a MAP-Server.

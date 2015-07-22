@@ -15,7 +15,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.network.ProxyGraphService;
 
@@ -33,10 +33,10 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	private boolean mNotPersised;
 
-	private MapServerConnectionData mOldData;
+	private MapServerData mOldData;
 
 	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection,
-			MapServerConnectionData connectionData) {
+			MapServerData connectionData) {
 		super(connectionData.getConnectionName());
 
 		super.setUrl(connectionData.getUrl());
@@ -73,7 +73,7 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 
 	@Override
 	public MapServerRestConnectionImpl copy() {
-		MapServerConnectionData dataCopy = super.copy();
+		MapServerData dataCopy = super.copy();
 		MapServerRestConnectionImpl tmpCopy = new MapServerRestConnectionImpl(mDataserviceConnection, dataCopy);
 		tmpCopy.setNotPersised(true);
 		return tmpCopy;
@@ -219,11 +219,11 @@ public class MapServerRestConnectionImpl extends MapServerConnectionDataImpl imp
 		mNotPersised = b;
 	}
 
-	public void setOldData(MapServerConnectionData oldData) {
+	public void setOldData(MapServerData oldData) {
 		mOldData = oldData;
 	}
 
-	public MapServerConnectionData getOldData() {
+	public MapServerData getOldData() {
 		return mOldData;
 	}
 }

@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.DocumentChangedListener;
 import de.hshannover.f4.trust.visitmeta.gui.util.HintTextField;
 import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class MapServerParameterPanel extends ParameterPanel {
@@ -41,7 +41,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 	private JCheckBox mJcbBasicAuthentication;
 	private JCheckBox mJcbConnectingAtStartUp;
 
-	private MapServerConnectionData mConnectionData;
+	private MapServerData mConnectionData;
 
 	private DocumentChangedListener mDocumentChangedListener;
 
@@ -51,7 +51,7 @@ public class MapServerParameterPanel extends ParameterPanel {
 		createPanels();
 	}
 
-	public MapServerParameterPanel(MapServerConnectionData connectionData) {
+	public MapServerParameterPanel(MapServerData connectionData) {
 		mConnectionData = connectionData;
 
 		createPanels();

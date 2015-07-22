@@ -27,7 +27,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.persistence.neo4j.Neo4JDatabase;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
@@ -70,7 +70,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 		init();
 	}
 
-	public MapServerConnectionImpl(MapServerConnectionData connectionData) {
+	public MapServerConnectionImpl(MapServerData connectionData) {
 		super(connectionData.getConnectionName(), connectionData.getUrl(), connectionData.getUserName(), connectionData
 				.getUserPassword());
 
@@ -111,7 +111,7 @@ public class MapServerConnectionImpl extends MapServerConnectionDataImpl impleme
 
 	@Override
 	public MapServerConnectionImpl copy() {
-		MapServerConnectionData dataCopy = super.copy();
+		MapServerData dataCopy = super.copy();
 		MapServerConnectionImpl tmpCopy = new MapServerConnectionImpl(dataCopy);
 		return tmpCopy;
 	}

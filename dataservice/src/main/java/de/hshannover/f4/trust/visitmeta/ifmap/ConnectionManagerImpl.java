@@ -54,7 +54,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 
@@ -82,7 +82,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 	}
 
 	@Override
-	public void updateConnection(MapServerConnectionData newData) throws NoSavedConnectionException {
+	public void updateConnection(MapServerData newData) throws NoSavedConnectionException {
 		MapServerConnection savedConnection = getConnection(newData.getConnectionName());
 		savedConnection.changeData(newData);
 	}

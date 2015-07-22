@@ -38,9 +38,9 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
@@ -343,17 +343,17 @@ public class ConnectionDialog extends JDialog {
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			if(!dataserviceConnection.isNotPersised()){
-				dataserviceConnection.setOldData(((DataserviceConnectionData)dataserviceConnection).copy());
+				dataserviceConnection.setOldData(((DataserviceData)dataserviceConnection).copy());
 			}
-			dataserviceConnection.changeData((DataserviceConnectionData) changedData);
+			dataserviceConnection.changeData((DataserviceData) changedData);
 			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			if(!mapServerConnection.isNotPersised()){
-				mapServerConnection.setOldData(((MapServerConnectionData)mapServerConnection).copy());
+				mapServerConnection.setOldData(((MapServerData)mapServerConnection).copy());
 			}
-			mapServerConnection.changeData((MapServerConnectionData) changedData);
+			mapServerConnection.changeData((MapServerData) changedData);
 			mapServerConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -480,7 +480,7 @@ public class ConnectionDialog extends JDialog {
 
 		} else if (lastPathComponent instanceof DataserviceConnection) {
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) lastPathComponent;
-			dataserviceConnection.addMapServerData((MapServerConnectionData) newData);
+			dataserviceConnection.addMapServerData((MapServerData) newData);
 
 			mJtConnections.updateModel();
 			selectPath(newPath);

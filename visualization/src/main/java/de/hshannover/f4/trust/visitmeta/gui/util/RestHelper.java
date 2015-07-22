@@ -27,7 +27,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class RestHelper {
@@ -42,8 +42,8 @@ public class RestHelper {
 		List<Data> connectionsList = new ArrayList<Data>();
 
 		for(Data data: dataList){
-			if (data instanceof MapServerConnectionData) {
-				MapServerConnectionData connectionData = (MapServerConnectionData) data;
+			if (data instanceof MapServerData) {
+				MapServerData connectionData = (MapServerData) data;
 				MapServerConnection connection = new MapServerRestConnectionImpl(dataserviceConnection, connectionData);
 				connectionsList.add(connection);
 			} else {
@@ -71,7 +71,7 @@ public class RestHelper {
 		for (int i = 0; i < jsonResponse.length(); i++) {
 			JSONObject jsonConnectionData = jsonResponse.getJSONObject(i);
 
-			Data connectionData = DataManager.transformJSONObject(jsonConnectionData, MapServerConnectionData.class);
+			Data connectionData = DataManager.transformJSONObject(jsonConnectionData, MapServerData.class);
 
 			connections.add(connectionData);
 		}
@@ -80,7 +80,7 @@ public class RestHelper {
 	}
 
 	public static void saveMapServerConnection(DataserviceConnection dataserviceConnection,
-			MapServerConnectionData connectionData) throws ClassNotFoundException, InstantiationException,
+			MapServerData connectionData) throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, JSONException {
 
 		JSONObject jsonMapServerConnectionData = DataManager.transformData(connectionData);

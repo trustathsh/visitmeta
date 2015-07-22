@@ -22,15 +22,15 @@ import de.hshannover.f4.trust.visitmeta.connections.MapServerConnectionDataImpl;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.interfaces.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnectionData;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
-import de.hshannover.f4.trust.visitmeta.interfaces.handler.MapServerConnectionDataHandler;
+import de.hshannover.f4.trust.visitmeta.interfaces.handler.MapServerDataHandler;
 import de.hshannover.f4.trust.visitmeta.util.JSONDataKey;
 
-public class JSONMapServerConnectionDataHandler implements MapServerConnectionDataHandler<MapServerConnectionData> {
+public class JSONMapServerDataHandler implements MapServerDataHandler<MapServerData> {
 
 	@Override
-	public JSONObject toJSONObject(MapServerConnectionData data) throws JSONException, ClassNotFoundException,
+	public JSONObject toJSONObject(MapServerData data) throws JSONException, ClassNotFoundException,
 			InstantiationException, IllegalAccessException {
 		JSONObject jsonConnectionData = new JSONObject();
 		JSONObject jsonData = new JSONObject();
@@ -51,7 +51,7 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 		return jsonData;
 	}
 
-	private JSONArray buildSubscriptionsJSONArray(MapServerConnectionData data) throws ClassNotFoundException,
+	private JSONArray buildSubscriptionsJSONArray(MapServerData data) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException, JSONException {
 		JSONArray jsonSubscriptions = new JSONArray();
 
@@ -67,7 +67,7 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 	}
 
 	@Override
-	public MapServerConnectionData toData(JSONObject jsonData) throws JSONHandlerException, JSONException,
+	public MapServerData toData(JSONObject jsonData) throws JSONHandlerException, JSONException,
 			ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		String connectionName = null;
@@ -81,7 +81,7 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 			throw new JSONHandlerException(JSONHandlerException.ERROR_MSG_JSON_Object_INVALID_FORMAT);
 		}
 
-		MapServerConnectionData connectionData = new MapServerConnectionDataImpl(connectionName);
+		MapServerData connectionData = new MapServerConnectionDataImpl(connectionName);
 		JSONArray jsonKeys = jsonConnectionData.names();
 		if (jsonKeys != null) {
 
@@ -156,8 +156,8 @@ public class JSONMapServerConnectionDataHandler implements MapServerConnectionDa
 	}
 
 	@Override
-	public Class<MapServerConnectionData> handle() {
-		return MapServerConnectionData.class;
+	public Class<MapServerData> handle() {
+		return MapServerData.class;
 	}
 
 }

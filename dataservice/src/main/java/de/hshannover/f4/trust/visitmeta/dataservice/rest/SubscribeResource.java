@@ -338,7 +338,7 @@ public class SubscribeResource {
 						e.toString());
 			}
 
-			return Response.ok().entity("INFO: delete all active subscriptions successfully").build();
+			return Response.ok().entity("INFO: delete all subscriptions successfully").build();
 		} else {
 			return Response.status(Response.Status.NOT_MODIFIED)
 					.entity("INFO: deleteAll value is not true, nothing were deleted").build();

@@ -10,6 +10,11 @@ import java.util.List;
 import de.hshannover.f4.trust.ifmapj.messages.PollResult;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 
+/**
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class PollResultMock implements IfmapMock<PollResult> {
 
 	private PollResult mPollResult_mock;

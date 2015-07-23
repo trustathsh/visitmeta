@@ -9,6 +9,11 @@ import java.util.List;
 import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 import de.hshannover.f4.trust.ifmapj.messages.SearchResult;
 
+/**
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class SearchResultMock implements IfmapMock<SearchResult> {
 
 	private String mSerachResultName;

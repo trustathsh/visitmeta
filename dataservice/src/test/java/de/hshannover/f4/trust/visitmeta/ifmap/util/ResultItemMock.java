@@ -11,6 +11,11 @@ import org.w3c.dom.Document;
 import de.hshannover.f4.trust.ifmapj.identifier.Identifier;
 import de.hshannover.f4.trust.ifmapj.messages.ResultItem;
 
+/**
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class ResultItemMock implements IfmapMock<ResultItem> {
 
 	private ResultItem mResultItem_mock;

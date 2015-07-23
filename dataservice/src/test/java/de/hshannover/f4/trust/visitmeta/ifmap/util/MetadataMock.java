@@ -18,6 +18,11 @@ import de.hshannover.f4.trust.ifmapj.metadata.Significance;
 import de.hshannover.f4.trust.ifmapj.metadata.StandardIfmapMetadataFactory;
 import de.hshannover.f4.trust.ifmapj.metadata.WlanSecurityType;
 
+/**
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class MetadataMock {
 
 	public static final String XMLNS_PREFIX = "xmlns:";
@@ -152,8 +157,7 @@ public class MetadataMock {
 	}
 
 	public static Document createDevChar(String manufacturer, String model, String os, String osVersion,
-			String deviceType, String discoveredTime, String discovererId, String discoveryMethod,
-			Date timestamp) {
+			String deviceType, String discoveredTime, String discovererId, String discoveryMethod, Date timestamp) {
 		Document doc = IFMAP_METADATA_FACTORY.createDevChar(manufacturer, model, os, osVersion, deviceType, discoveredTime, discovererId, discoveryMethod);
 		setDocumentXmlAttributes(doc, timestamp);
 		return doc;
@@ -167,10 +171,10 @@ public class MetadataMock {
 	}
 
 	public static Document createEvent(String name, String discoveredTime, String discovererId, Integer magnitude,
-			Integer confidence, Significance significance, EventType type,
-			String otherTypeDefinition, String information, String vulnerabilityUri, Date timestamp) {
-		Document doc = IFMAP_METADATA_FACTORY.createEvent(name, discoveredTime, discovererId, magnitude, confidence, significance, type, otherTypeDefinition, information,
-				vulnerabilityUri);
+			Integer confidence, Significance significance, EventType type, String otherTypeDefinition,
+			String information, String vulnerabilityUri, Date timestamp) {
+		Document doc = IFMAP_METADATA_FACTORY.createEvent(name, discoveredTime, discovererId, magnitude, confidence,
+				significance, type, otherTypeDefinition, information, vulnerabilityUri);
 		setDocumentXmlAttributes(doc, timestamp);
 		return doc;
 	}

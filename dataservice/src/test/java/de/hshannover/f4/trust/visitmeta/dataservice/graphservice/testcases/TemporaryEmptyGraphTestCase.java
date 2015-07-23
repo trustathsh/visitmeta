@@ -69,11 +69,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(initialGraph);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
-			JSONObject subGraph = createJSON(0l, idPair1);
-			expected.put(subGraph);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+		JSONObject subGraph = createJSON(0l, idPair1);
+		expected.put(subGraph);
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -91,11 +91,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(graphAt);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
-			JSONObject subGraph = createJSON(0l, idPair1);
-			expected.put(subGraph);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+		JSONObject subGraph = createJSON(0l, idPair1);
+		expected.put(subGraph);
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -116,11 +116,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(graphAt);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
-			JSONObject subGraph1 = createJSON(2l, idPair);
-			expected.put(subGraph1);
-		}
+
+		JSONObject idPair = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
+		JSONObject subGraph1 = createJSON(2l, idPair);
+		expected.put(subGraph1);
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -131,11 +131,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(currentGraph);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
-			JSONObject subGraph1 = createJSON(2l, idPair1);
-			expected.put(subGraph1);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip2");
+		JSONObject subGraph1 = createJSON(2l, idPair1);
+		expected.put(subGraph1);
+
 		assertTrue(jsonsEqual(actual, expected));
 	}
 
@@ -162,11 +162,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualDeletes = toJson(deletes);
 		JSONArray expectedDeletes = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
-			JSONObject subGraph1 = createJSON(1l, idPair1);
-			expectedDeletes.put(subGraph1);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+		JSONObject subGraph1 = createJSON(1l, idPair1);
+		expectedDeletes.put(subGraph1);
+
 		assertTrue(jsonsEqual(actualDeletes, expectedDeletes));
 	}
 
@@ -182,11 +182,11 @@ public class TemporaryEmptyGraphTestCase extends AbstractTestCase {
 
 		JSONArray actualUpdates = toJson(updates);
 		JSONArray expectedUpdates = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
-			JSONObject subGraph1 = createJSON(2l, idPair1);
-			expectedUpdates.put(subGraph1);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "ip-address1", "device-ip1");
+		JSONObject subGraph1 = createJSON(2l, idPair1);
+		expectedUpdates.put(subGraph1);
+
 		assertTrue(jsonsEqual(actualUpdates, expectedUpdates));
 
 		JSONArray actualDeletes = toJson(deletes);

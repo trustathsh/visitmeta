@@ -18,6 +18,11 @@ import de.hshannover.f4.trust.ifmapj.metadata.LocationInformation;
 import de.hshannover.f4.trust.ifmapj.metadata.Significance;
 import de.hshannover.f4.trust.ifmapj.metadata.WlanSecurityType;
 
+/**
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class IfmapjMock {
 
 	private static final String mDefaultSubscriptionName = "DefaultSubscriptionName";
@@ -108,8 +113,7 @@ public class IfmapjMock {
 	}
 
 	public static Document CreateDevChar(String manufacturer, String model, String os, String osVersion,
-			String deviceType, String discoveredTime, String discovererId, String discoveryMethod,
-			Date timestamp) {
+			String deviceType, String discoveredTime, String discovererId, String discoveryMethod, Date timestamp) {
 		return MetadataMock.createDevChar(manufacturer, model, os, osVersion, deviceType, discoveredTime, discovererId,
 				discoveryMethod, timestamp);
 	}
@@ -121,8 +125,8 @@ public class IfmapjMock {
 	}
 
 	public static Document CreateEvent(String name, String discoveredTime, String discovererId, Integer magnitude,
-			Integer confidence, Significance significance, EventType type,
-			String otherTypeDefinition, String information, String vulnerabilityUri, Date timestamp) {
+			Integer confidence, Significance significance, EventType type, String otherTypeDefinition,
+			String information, String vulnerabilityUri, Date timestamp) {
 		return MetadataMock.createEvent(name, discoveredTime, discovererId, magnitude, confidence, significance, type,
 				otherTypeDefinition, information, vulnerabilityUri, timestamp);
 	}
@@ -157,8 +161,7 @@ public class IfmapjMock {
 	}
 
 	public static Document CreateWlanInformation(String ssid, List<WlanSecurityType> ssidUnicastSecurity,
-			WlanSecurityType ssidGroupSecurity, List<WlanSecurityType> ssidManagementSecurity,
-			Date timestamp) {
+			WlanSecurityType ssidGroupSecurity, List<WlanSecurityType> ssidManagementSecurity, Date timestamp) {
 		return MetadataMock.createWlanInformation(ssid, ssidUnicastSecurity, ssidGroupSecurity, ssidManagementSecurity,
 				timestamp);
 	}

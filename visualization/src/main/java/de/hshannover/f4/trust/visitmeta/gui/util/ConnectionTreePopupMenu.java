@@ -313,16 +313,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 				mConnectionTree.expandAllNodes();
 
-				if (mMainWindow != null) {
-					for (Component c : mMainWindow.getTabbedConnectionPane().getComponents()) {
-						if (c instanceof ConnectionTab) {
-							ConnectionTab connectionTab = (ConnectionTab) c;
-							mMainWindow.closeConnectionTab(connectionTab);
-						}
-					}
-				
-					mMainWindow.openConnectedMapServerConnections();
-				}
+				reopenConnectionTabs();
 			}
 		});
 
@@ -344,5 +335,18 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		});
 
 		super.add(mDelete);
+	}
+
+	private void reopenConnectionTabs() {
+		if (mMainWindow != null) {
+			for (Component c : mMainWindow.getTabbedConnectionPane().getComponents()) {
+				if (c instanceof ConnectionTab) {
+					ConnectionTab connectionTab = (ConnectionTab) c;
+					mMainWindow.closeConnectionTab(connectionTab);
+				}
+			}
+
+			mMainWindow.openConnectedMapServerConnections();
+		}
 	}
 }

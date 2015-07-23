@@ -67,7 +67,7 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 		}
 	}
 
-	public List<MapServerData> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
+	public List<MapServerConnection> loadMapServerConnections() throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, JSONHandlerException, JSONException, ConnectionException {
 
 		return RestHelper.loadMapServerConnections(this);
@@ -93,10 +93,11 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void update() throws ConnectionException {
 		List<MapServerData> updateList = null;
 		try {
-			updateList = loadMapServerConnections();
+			updateList = (List<MapServerData>) (List<?>) loadMapServerConnections();
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONHandlerException
 				| JSONException e) {
 			LOGGER.error(e.toString());

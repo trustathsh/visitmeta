@@ -33,12 +33,12 @@ public class RestHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(RestHelper.class);
 
-	public static List<MapServerData> loadMapServerConnections(DataserviceConnection dataserviceConnection)
+	public static List<MapServerConnection> loadMapServerConnections(DataserviceConnection dataserviceConnection)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONHandlerException,
 			JSONException, ConnectionException {
 		List<MapServerData> dataList = loadMapServerConnectionsData(dataserviceConnection);
 
-		List<MapServerData> connectionsList = new ArrayList<MapServerData>();
+		List<MapServerConnection> connectionsList = new ArrayList<MapServerConnection>();
 
 		for (MapServerData data : dataList) {
 			MapServerConnection connection = new MapServerRestConnectionImpl(dataserviceConnection, data);

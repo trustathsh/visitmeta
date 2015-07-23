@@ -149,6 +149,9 @@ public class RetryConnectionDialog extends JDialog {
 			appendMassage("Try to connect(" + (i + 1) + "/" + retry + ")...", Color.BLACK, 0,
 					mJpMessage.getComponentCount());
 			try {
+				if (connection instanceof DataserviceRestConnectionImpl) {
+					((DataserviceRestConnectionImpl) connection).update();
+				}
 				connection.connect();
 				appendMassage("Connected!", new Color(59, 186, 63), 1, mJpMessage.getComponentCount() - 1);
 				mJbClose.setEnabled(true);

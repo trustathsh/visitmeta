@@ -47,13 +47,11 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 
 	@Override
 	public void connect() throws ConnectionException {
-		update();
 		setConnected(true);
 	}
 
 	@Override
 	public void disconnect() throws ConnectionException {
-		update(); // TODO muss das sein?
 		setConnected(false);
 	}
 

@@ -108,11 +108,11 @@ public class DataservicePersister extends Properties {
 		}
 
 		for (Data data : dataserviceConnectionList) {
-			if (data instanceof DataserviceConnection) {
-				DataserviceConnection connection = (DataserviceConnection) data;
+			if (data instanceof DataserviceRestConnectionImpl) {
+				DataserviceRestConnectionImpl connection = (DataserviceRestConnectionImpl) data;
 				if (connection.isConnected()) {
 					try {
-						connection.connect(); // To update all sub connections
+						connection.update(); // To update all sub connections
 					} catch (ConnectionException e) {
 						connection.setConnected(false);
 						LOGGER.warn(e.toString());

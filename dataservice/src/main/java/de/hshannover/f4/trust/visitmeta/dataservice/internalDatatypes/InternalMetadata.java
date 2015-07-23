@@ -1,4 +1,4 @@
-﻿/*
+/*
  * #%L
  * =====================================================
  *   _____                _     ____  _   _       _   _
@@ -190,12 +190,14 @@ public abstract class InternalMetadata implements Metadata {
 	 * @return
 	 *         True if corresponding IF-MAP metadata is single value, false otherwise.
 	 */
+	@Override
 	public abstract boolean isSingleValue();
 
 	/**
 	 * @return
 	 *         The (IF-MAP) publish timestamp
 	 */
+	@Override
 	public abstract long getPublishTimestamp();
 
 	/**

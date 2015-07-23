@@ -1,4 +1,4 @@
-﻿/*
+/*
  * #%L
  * =====================================================
  *   _____                _     ____  _   _       _   _
@@ -183,7 +183,6 @@ public class MainWindow extends JFrame {
 
 		mConnectionTree.expandAllNodes();
 		mConnectionTree.addMouseListener(new ConnectionTreeMainWindowListener(this));
-
 
 		mTreeRenderer = new ConnectionTreeCellRenderer();
 		mConnectionTree.setCellRenderer(mTreeRenderer);
@@ -476,24 +475,24 @@ public class MainWindow extends JFrame {
 		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
-			if(!dataserviceConnection.isNotPersised()){
-				dataserviceConnection.setOldData(((DataserviceData)dataserviceConnection).copy());
+			if (!dataserviceConnection.isNotPersised()) {
+				dataserviceConnection.setOldData(((DataserviceData) dataserviceConnection).copy());
 			}
 			dataserviceConnection.changeData((DataserviceData) changedData);
 			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
-			if(!mapServerConnection.isNotPersised()){
-				mapServerConnection.setOldData(((MapServerData)mapServerConnection).copy());
+			if (!mapServerConnection.isNotPersised()) {
+				mapServerConnection.setOldData(((MapServerData) mapServerConnection).copy());
 			}
 			mapServerConnection.changeData((MapServerData) changedData);
 			mapServerConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
 			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
-			if(!subscription.isNotPersised()){
-				subscription.setOldData(((SubscriptionData)subscription).copy());
+			if (!subscription.isNotPersised()) {
+				subscription.setOldData(((SubscriptionData) subscription).copy());
 			}
 			subscription.changeData((SubscriptionData) changedData);
 			subscription.setNotPersised(true);

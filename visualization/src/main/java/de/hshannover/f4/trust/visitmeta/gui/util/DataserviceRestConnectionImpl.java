@@ -1,4 +1,4 @@
-﻿package de.hshannover.f4.trust.visitmeta.gui.util;
+package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.util.List;
 
@@ -60,8 +60,8 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 		return super.getName();
 	}
 
-	public void resetData(){
-		if(mOldData != null){
+	public void resetData() {
+		if (mOldData != null) {
 			super.changeData(mOldData);
 			mOldData = null;
 		}

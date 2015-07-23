@@ -1,4 +1,4 @@
-﻿package de.hshannover.f4.trust.visitmeta.gui.dialog;
+package de.hshannover.f4.trust.visitmeta.gui.dialog;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -198,7 +198,6 @@ public class ConnectionDialog extends JDialog {
 			}
 		});
 
-
 		mJpSouth.add(mJbClose);
 		mJpSouth.add(mJbReset);
 		mJpSouth.add(mJbSave);
@@ -216,7 +215,6 @@ public class ConnectionDialog extends JDialog {
 		mJspMain.setRightComponent(mJpRight);
 
 	}
-
 
 	/**
 	 * Initializes the left hand side of the JSplitPane
@@ -342,24 +340,24 @@ public class ConnectionDialog extends JDialog {
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();
 		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
-			if(!dataserviceConnection.isNotPersised()){
-				dataserviceConnection.setOldData(((DataserviceData)dataserviceConnection).copy());
+			if (!dataserviceConnection.isNotPersised()) {
+				dataserviceConnection.setOldData(((DataserviceData) dataserviceConnection).copy());
 			}
 			dataserviceConnection.changeData((DataserviceData) changedData);
 			dataserviceConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
-			if(!mapServerConnection.isNotPersised()){
-				mapServerConnection.setOldData(((MapServerData)mapServerConnection).copy());
+			if (!mapServerConnection.isNotPersised()) {
+				mapServerConnection.setOldData(((MapServerData) mapServerConnection).copy());
 			}
 			mapServerConnection.changeData((MapServerData) changedData);
 			mapServerConnection.setNotPersised(true);
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
 			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
-			if(!subscription.isNotPersised()){
-				subscription.setOldData(((SubscriptionData)subscription).copy());
+			if (!subscription.isNotPersised()) {
+				subscription.setOldData(((SubscriptionData) subscription).copy());
 			}
 			subscription.changeData((SubscriptionData) changedData);
 			subscription.setNotPersised(true);
@@ -401,7 +399,7 @@ public class ConnectionDialog extends JDialog {
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) parentData;
 
 			if (!mapServerConnection.isNotPersised()) {
-			RestHelper.deleteMapServerConnection(dataserviceConnection, mapServerConnection.getConnectionName());
+				RestHelper.deleteMapServerConnection(dataserviceConnection, mapServerConnection.getConnectionName());
 			}
 
 			dataserviceConnection.removeMapServerData(mapServerConnection);
@@ -414,8 +412,8 @@ public class ConnectionDialog extends JDialog {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) parentData;
 
 			if (!subscription.isNotPersised()) {
-			RestHelper.deleteSubscription(mapServerConnection.getDataserviceConnection(),
-					mapServerConnection.getConnectionName(), subscription.getName());
+				RestHelper.deleteSubscription(mapServerConnection.getDataserviceConnection(),
+						mapServerConnection.getConnectionName(), subscription.getName());
 			}
 
 			mapServerConnection.deleteSubscription(subscription.getName());
@@ -517,7 +515,6 @@ public class ConnectionDialog extends JDialog {
 		}
 		changeParameterPanel();
 	}
-
 
 	public void savePropertyChanges() {
 		Object selectedComponent = mJtConnections.getLastSelectedPathComponent();

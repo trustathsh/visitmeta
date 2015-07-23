@@ -46,6 +46,7 @@ import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
  * A class that implements {@link IdentifierInformationStrategy} and returns a
@@ -108,12 +109,18 @@ public class IdentifierInformationCompact extends IdentifierInformationStrategy 
 		String name = wrapper.getValueForXpathExpressionOrElse("@"
 				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
 		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
-				"@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
+				"@"
+						+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
 				"other-type-definition"); // other-type-definition
 
 		StringBuilder sb = new StringBuilder();
 		if (type.equals("other")) {
-			sb.append("extended-identifier: ");
+			boolean showExtendedIdentifierPrefix =
+					mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
+							VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
+			if (showExtendedIdentifierPrefix) {
+				sb.append("extended-identifier: ");
+			}
 			int idxFirstSemicolon = name.indexOf(";");
 			if (idxFirstSemicolon != -1) {
 				sb.append(name.substring(name.indexOf(";") + 1,

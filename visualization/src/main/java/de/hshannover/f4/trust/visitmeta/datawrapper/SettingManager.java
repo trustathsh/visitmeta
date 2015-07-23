@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
  * Manage the settings of the application.
@@ -65,16 +66,20 @@ public class SettingManager extends Observable {
 		LOGGER.debug("Load settings.");
 		mConnection = connection;
 		mConnection.getName();
-		mNetworkInterval = mConfig.getInt("visualization.network.interval",
-				10000);
+		mNetworkInterval = mConfig.getInt(VisualizationConfig.KEY_NETWORK_INTERVAL,
+				VisualizationConfig.DEFAULT_VALUE_NETWORK_INTERVAL);
 		mCalculationInterval = mConfig.getInt(
-				"visualization.calculation.interval", 3000);
-		mCalculationIterations = mConfig.getInt(
-				"visualization.calculation.iterations", 100);
-		mHighlightsTimeout = mConfig.getInt("visualization.highlights.timeout",
-				5000);
-		mNodeTranslationDuration = mConfig.getInt(
-				"visualization.node.translation.duration", 1000);
+				VisualizationConfig.KEY_CALCULATION_INTERVAL, VisualizationConfig.DEFAULT_VALUE_CALCULATION_INTERVAL);
+		mCalculationIterations =
+				mConfig.getInt(
+						VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
+						VisualizationConfig.DEFAULT_VALUE_CALCUCATION_ITERATIONS);
+		mHighlightsTimeout = mConfig.getInt(VisualizationConfig.KEY_HIGHTLIGHT_TIMEOUT,
+				VisualizationConfig.DEFAULT_VALUE_HIGHTLIGHT_TIMEOUT);
+		mNodeTranslationDuration =
+				mConfig.getInt(
+						VisualizationConfig.KEY_NODE_TRANSLATION_DURATION,
+						VisualizationConfig.DEFAULT_VALUE_NODE_TRANSLATION_DURATION);
 	}
 
 	@Override
@@ -82,12 +87,12 @@ public class SettingManager extends Observable {
 		super.finalize();
 
 		LOGGER.debug("Save settings.");
-		mConfig.set("visualization.network.interval", mNetworkInterval);
-		mConfig.set("visualization.calculation.interval", mCalculationInterval);
-		mConfig.set("visualization.calculation.iterations",
+		mConfig.set(VisualizationConfig.KEY_NETWORK_INTERVAL, mNetworkInterval);
+		mConfig.set(VisualizationConfig.KEY_CALCULATION_INTERVAL, mCalculationInterval);
+		mConfig.set(VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
 				mCalculationIterations);
-		mConfig.set("visualization.highlights.timeout", mHighlightsTimeout);
-		mConfig.set("visualization.node.translation.duration",
+		mConfig.set(VisualizationConfig.KEY_HIGHTLIGHT_TIMEOUT, mHighlightsTimeout);
+		mConfig.set(VisualizationConfig.KEY_NODE_TRANSLATION_DURATION,
 				mNodeTranslationDuration);
 	}
 
@@ -117,14 +122,16 @@ public class SettingManager extends Observable {
 	}
 
 	public synchronized void setNetworkInterval(int pNetworkInterval) {
-		LOGGER.trace("Method setNetworkInterval(" + pNetworkInterval
+		LOGGER.trace("Method setNetworkInterval("
+				+ pNetworkInterval
 				+ ") called.");
 		mNetworkInterval = pNetworkInterval;
 		setChanged();
 	}
 
 	public synchronized void setCalculationInterval(int pCalculationInterval) {
-		LOGGER.trace("Method setCalculationInterval(" + pCalculationInterval
+		LOGGER.trace("Method setCalculationInterval("
+				+ pCalculationInterval
 				+ ") called.");
 		mCalculationInterval = pCalculationInterval;
 		setChanged();
@@ -138,7 +145,8 @@ public class SettingManager extends Observable {
 	}
 
 	public synchronized void setHighlightsTimeout(int pHighlightsTimeout) {
-		LOGGER.trace("Method setHighlightsTimeout(" + pHighlightsTimeout
+		LOGGER.trace("Method setHighlightsTimeout("
+				+ pHighlightsTimeout
 				+ ") called.");
 		mHighlightsTimeout = pHighlightsTimeout;
 		setChanged();

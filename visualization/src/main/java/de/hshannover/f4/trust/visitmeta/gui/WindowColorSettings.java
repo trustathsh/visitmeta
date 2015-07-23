@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,6 +63,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
 
@@ -123,31 +124,36 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 						 * access-requests
 						 */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + IfmapStrings.ACCESS_REQUEST_EL_NAME
 								+ "." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 1) {
 						/* Second item is the identifier color for devices */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + IfmapStrings.DEVICE_EL_NAME + "."
 								+ vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 2) {
 						/* Third item is the identifier color for identities */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + IfmapStrings.IDENTITY_EL_NAME + "."
 								+ vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 3) {
 						/* Fourth item is the identifier color for ip-addresses */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + IfmapStrings.IP_ADDRESS_EL_NAME + "."
 								+ vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 4) {
 						/* Fifth item is the identifier color for mac-addresses */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + IfmapStrings.MAC_ADDRESS_EL_NAME + "."
 								+ vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 5) {
@@ -156,18 +162,21 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 						 * extended-identifiers
 						 */
 						vType = NodeType.IDENTIFIER;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ ".extended." + vParam;
 					} else if (mSelectPublisher.getSelectedIndex() == 6) {
 						/* Seventh item is the default metadata color */
 						vType = NodeType.METADATA;
-						vProperty = "color." + vType.toString().toLowerCase()
+						vProperty = "color."
+								+ vType.toString().toLowerCase()
 								+ "." + vParam;
 					} else {
 						vType = NodeType.METADATA;
 						vPublisher = cleanUpPublisherString((String) mSelectPublisher
 								.getSelectedItem());
-						vProperty = "color." + vPublisher + "." + vParam;
+						vProperty = "color."
+								+ vPublisher + "." + vParam;
 					}
 					String vColor = "0x"
 							+ Integer.toHexString(
@@ -285,7 +294,8 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 		mSelectPublisher.addItem("Identifier: extended");
 		mSelectPublisher.addItem("Default Metadata");
 		for (String s : mPublisher) {
-			mSelectPublisher.addItem("Publisher-ID: " + s);
+			mSelectPublisher.addItem("Publisher-ID: "
+					+ s);
 		}
 	}
 
@@ -300,9 +310,11 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 				.getSelectedItem());
 		String actionCommand = vButton.getActionCommand();
 
-		String vKey = "color." + selectedItem + "." + actionCommand;
-		String vDefault = mConfig.getString("color.metadata." + actionCommand,
-				"0xFFFFFF");
+		String vKey = "color."
+				+ selectedItem + "." + actionCommand;
+		String vDefault = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_PREFIX
+				+ actionCommand,
+				VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA);
 		Color vColor = Color.decode(mConfig.getString(vKey, vDefault));
 		mColorChooser.setColor(vColor);
 		mDelay.stop();

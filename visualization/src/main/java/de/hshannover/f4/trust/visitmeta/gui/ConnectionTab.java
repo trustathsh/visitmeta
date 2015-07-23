@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,6 +65,7 @@ import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionInformationPane;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.ReflectionUtils;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class ConnectionTab extends JPanel {
 	private static final Properties mConfig = Main.getConfig();
@@ -114,8 +115,8 @@ public class ConnectionTab extends JPanel {
 		mGraphPanel = mGraphConnection.getGraphPanel();
 
 		String historyNavigationType = mConfig.getString(
-				"visualization.history.navigation.style",
-				HistoryNavigationStrategyType.TAB_BASED_NAVIGATION.name());
+				VisualizationConfig.KEY_HISTORY_NAVIGATION_STYLE,
+				VisualizationConfig.DEFAULT_VALUE_HISTORY_NAVIGATION_STYLE);
 		mHistoryNavigationStrategy = HistoryNavigationStrategyFactory.create(
 				HistoryNavigationStrategyType.valueOf(historyNavigationType),
 				mConnection);
@@ -124,9 +125,8 @@ public class ConnectionTab extends JPanel {
 				Searchable.class)) {
 			Searchable searchable = (Searchable) mGraphPanel;
 			String searchAndFilterStrategyType = mConfig.getString(
-					"visualization.searchandfilter.style",
-					SearchAndFilterStrategyType.SIMPLE_SEARCH_AND_NO_FILTER
-							.name());
+					VisualizationConfig.KEY_SEARCH_AND_FILTER_STYLE,
+					VisualizationConfig.DEFAULT_VALUE_SEARCH_AND_FILTER_STYLE);
 			mSearchAndFilterStrategy = SearchAndFilterStrategyFactory.create(
 					SearchAndFilterStrategyType
 							.valueOf(searchAndFilterStrategyType), searchable);
@@ -237,7 +237,8 @@ public class ConnectionTab extends JPanel {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null || !(o instanceof ConnectionTab)) {
+		if (o == null
+				|| !(o instanceof ConnectionTab)) {
 			return false;
 		}
 		ConnectionTab other = (ConnectionTab) o;
@@ -261,8 +262,7 @@ public class ConnectionTab extends JPanel {
 	}
 
 	/**
-	 * Shows the information of the given {@link Propable} object by filling the
-	 * {@link PanelXmlTree}.
+	 * Shows the information of the given {@link Propable} object by filling the {@link PanelXmlTree}.
 	 *
 	 * @param propable
 	 *            the {@link Propable} objects, whose information shall be shown

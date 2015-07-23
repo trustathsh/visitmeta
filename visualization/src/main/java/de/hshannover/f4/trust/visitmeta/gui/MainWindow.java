@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,8 +84,10 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class MainWindow extends JFrame {
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
 
@@ -113,7 +115,8 @@ public class MainWindow extends JFrame {
 	 * @param guiController
 	 */
 	public MainWindow(MotionControllerHandler motionControllerHandler) {
-		super("VisITMeta GUI v" + Main.VISUALIZATION_VERSION);
+		super("VisITMeta GUI v"
+				+ Main.VISUALIZATION_VERSION);
 
 		mMotionControllerHandler = motionControllerHandler;
 
@@ -371,7 +374,8 @@ public class MainWindow extends JFrame {
 					mMotionControllerHandler
 							.setCurrentConnectionTab(currentTab);
 					;
-					LOGGER.debug("Tab changed to " + currentTab.getConnName());
+					LOGGER.debug("Tab changed to "
+							+ currentTab.getConnName());
 				}
 			}
 		});
@@ -385,12 +389,15 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setLocation(mConfig.getInt("window.position.x", 0),
-				mConfig.getInt("window.position.y", 0));
-		setPreferredSize(new Dimension(mConfig.getInt("window.width", 1280),
-				mConfig.getInt("window.height", 720)));
-		mMainSplitPane.setDividerLocation(mConfig.getInt("window.resizeweight",
-				-1));
+		setLocation(mConfig.getInt(VisualizationConfig.KEY_WINDOW_POSITION_X,
+				VisualizationConfig.DEFAULT_VALUE_WINDOW_POSITION_X),
+				mConfig.getInt(VisualizationConfig.KEY_WINDOW_POSITION_Y,
+						VisualizationConfig.DEFAULT_VALUE_WINDOW_POSITION_Y));
+		setPreferredSize(new Dimension(mConfig.getInt(VisualizationConfig.KEY_WINDOW_WIDTH,
+				VisualizationConfig.DEFAULT_VALUE_WINDOW_WIDTH),
+				mConfig.getInt(VisualizationConfig.KEY_WINDOW_HEIGHT, VisualizationConfig.DEFAULT_VALUE_WINDOW_HEIGHT)));
+		mMainSplitPane.setDividerLocation(mConfig.getInt(VisualizationConfig.KEY_WINDOW_DIVIDER,
+				VisualizationConfig.DEFAULT_VALUE_WINDOW_DIVIDER));
 	}
 
 	/**
@@ -403,13 +410,13 @@ public class MainWindow extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent we) {
 				try {
-					mConfig.set("window.position.x",
+					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_X,
 							(int) getLocationOnScreen().getX());
-					mConfig.set("window.position.y",
+					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_Y,
 							(int) getLocationOnScreen().getY());
-					mConfig.set("window.width", getWidth());
-					mConfig.set("window.height", getHeight());
-					mConfig.set("window.divider",
+					mConfig.set(VisualizationConfig.KEY_WINDOW_WIDTH, getWidth());
+					mConfig.set(VisualizationConfig.KEY_WINDOW_HEIGHT, getHeight());
+					mConfig.set(VisualizationConfig.KEY_WINDOW_DIVIDER,
 							mMainSplitPane.getDividerLocation());
 				} catch (PropertyException e) {
 					LOGGER.fatal(e.toString(), e);

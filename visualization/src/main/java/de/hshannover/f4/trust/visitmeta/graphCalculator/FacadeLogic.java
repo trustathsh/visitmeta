@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,6 +50,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeManagerDeletion;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
  * Calculates the layout and provides a graph structure to the gui.
@@ -99,7 +100,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Set the new position for a Position-Object.
-	 * 
+	 *
 	 * @param pNode
 	 *            the Object.
 	 * @param pNewX
@@ -110,7 +111,8 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	 *            the new z coordinate.
 	 */
 	public synchronized void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
-		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
+		LOGGER.trace("Method updateNode("
+				+ pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
 		mCalculator.updateNode(pNode, pNewX, pNewY, pNewZ, pinNode);
 	}
 
@@ -132,7 +134,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Return if the thread is calculation positions.
-	 * 
+	 *
 	 * @return False = Motion of graph is Off. True = Motion of graph is On.
 	 */
 	public boolean isCalculationRunning() {
@@ -150,7 +152,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Loads the current graph
-	 * 
+	 *
 	 * @see FacadeNetwork#loadCurrentGraph()
 	 */
 	public synchronized void loadCurrentGraph() {
@@ -161,7 +163,7 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	/**
 	 * Load the delta to the timestamps in TimeSelector. This methode notify the
 	 * observers.
-	 * 
+	 *
 	 * @see FacadeNetwork#loadDelta()
 	 */
 	public synchronized void loadDelta() {
@@ -180,12 +182,13 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 
 	/**
 	 * Remove a node from the graph.
-	 * 
+	 *
 	 * @param pNode
 	 *            the node.
 	 */
 	public synchronized void deleteNode(Position pNode) {
-		LOGGER.trace("Method deleteNode(" + pNode + ") called.");
+		LOGGER.trace("Method deleteNode("
+				+ pNode + ") called.");
 		mCalculator.deleteNode(pNode);
 	}
 
@@ -208,12 +211,14 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	 */
 	public synchronized void recalculateGraph() {
 		LOGGER.trace("Method recalculateGraph() called.");
-		mCalculator.adjustGraphAnew(Main.getConfig().getInt("visualization.calculation.iterations", 100));
+		mCalculator.adjustGraphAnew(Main.getConfig().getInt(VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
+				VisualizationConfig.DEFAULT_VALUE_CALCUCATION_ITERATIONS));
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		LOGGER.trace("Method update(" + o + ", " + arg + ") called.");
+		LOGGER.trace("Method update("
+				+ o + ", " + arg + ") called.");
 		if (o instanceof FacadeNetwork) {
 			synchronized (this) {
 				/* Add nodes to calculator. */

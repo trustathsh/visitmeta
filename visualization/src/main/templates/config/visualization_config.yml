@@ -37,6 +37,9 @@ visualization:
       #              additional lines when necessary and useful (for example
       #              for Extended Identifiers)
       style: COMPACT
+      # If true, the prefix 'extended identifier: ' is shown before the actual name of an extended identifier.
+      # This is not supported by all styles. 
+      showextendedidentifierprefix: true
   metadata:
     text:
       # Sets the text style for metadata nodes; possible values are:

@@ -232,7 +232,6 @@ public class ConnectionResource {
 	 * <br>
 	 * Example-URL: <tt>http://example.com:8000/</tt> <br>
 	 * <br>
-	 * You can set the onlyActive value of true. Example-URL: <tt>http://example.com:8000/?onlyActive=true</tt>
 	 * 
 	 **/
 	@GET

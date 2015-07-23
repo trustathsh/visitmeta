@@ -60,8 +60,7 @@ public class ConnectionsProperties extends Properties {
 
 	private static final Properties mCONFIG = Application.getConfig();
 
-	// TODO the dataservice supports only basic authentication this value is not
-	// in use
+	// TODO the dataservice supports only basic authentication. This value is not used to make decisions.
 	public static final boolean DEFAULT_AUTHENTICATION_BASIC = true;
 
 	public static final boolean DEFAULT_STARTUP_CONNECT = mCONFIG.getBoolean(

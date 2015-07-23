@@ -7,6 +7,12 @@ import de.hshannover.f4.trust.visitmeta.data.DataImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
+/**
+ * Helper class for the {@link RESTConnectionModel}. It combines {@link DataserviceConnection}s.
+ * 
+ * @author Marcel Reichenbach
+ *
+ */
 public class Dataservices extends DataImpl {
 
 	List<Data> mList;
@@ -34,8 +40,7 @@ public class Dataservices extends DataImpl {
 
 	@Override
 	public Class<?> getDataTypeClass() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public void addDataserviceConnection(DataserviceConnection newDataserviceConnection) {

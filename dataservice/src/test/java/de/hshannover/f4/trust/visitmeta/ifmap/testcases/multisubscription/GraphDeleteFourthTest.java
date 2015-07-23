@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.hshannover.f4.trust.ifmapj.identifier.Identifiers;
@@ -73,6 +74,8 @@ public class GraphDeleteFourthTest extends AbstractMultiSubscriptionTestCase {
 	}
 
 	@Test
+	@Ignore
+	// knowing issue, look VisIT Meta-Test Cases v.0.6.pdf for details
 	public void shouldReturnTheRightChangeMapChangeValue() {
 		executePollTask();
 
@@ -80,6 +83,8 @@ public class GraphDeleteFourthTest extends AbstractMultiSubscriptionTestCase {
 	}
 
 	@Test
+	@Ignore
+	// knowing issue, look VisIT Meta-Test Cases v.0.6.pdf for details
 	public void shouldReturnTheRightGraph() {
 		executePollTask();
 

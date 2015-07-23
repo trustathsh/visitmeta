@@ -38,9 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
-
 public class ConnectionCloseException extends ConnectionException {
-
 
 	private static final long serialVersionUID = 2556943970847694697L;
 

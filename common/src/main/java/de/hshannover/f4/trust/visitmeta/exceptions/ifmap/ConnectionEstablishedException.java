@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
 public class ConnectionEstablishedException extends ConnectionException {
 
-
 	private static final long serialVersionUID = 508775594043936595L;
 
 }

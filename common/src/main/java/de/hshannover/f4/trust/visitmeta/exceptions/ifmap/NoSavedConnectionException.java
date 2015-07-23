@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
 public class NoSavedConnectionException extends ConnectionException {
 
-
 	private static final long serialVersionUID = -4720511483677862815L;
 
 }

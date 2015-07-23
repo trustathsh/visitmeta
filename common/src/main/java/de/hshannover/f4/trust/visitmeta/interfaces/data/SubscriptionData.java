@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces.data;
 
-
 public interface SubscriptionData extends Data {
 
 	@Override

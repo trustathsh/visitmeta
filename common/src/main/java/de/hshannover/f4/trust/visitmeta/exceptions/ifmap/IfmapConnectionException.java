@@ -38,13 +38,10 @@
  */
 package de.hshannover.f4.trust.visitmeta.exceptions.ifmap;
 
-
-
 import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
 
 public class IfmapConnectionException extends ConnectionException {
-
 
 	private static final long serialVersionUID = -1557730289942824556L;
 
@@ -62,9 +59,11 @@ public class IfmapConnectionException extends ConnectionException {
 	@Override
 	public String toString() {
 		if(mIfmapException != null){
-			return super.toString() + " IfmapException[Description: " + mIfmapException.getDescription() + " || Message: " + mIfmapException.getMessage() + "]";
+			return super.toString() + " IfmapException[Description: " + mIfmapException.getDescription()
+					+ " || Message: " + mIfmapException.getMessage() + "]";
 		}else if(mErrorResult != null){
-			return super.toString() + " IfmapErrorResult[ErrorString: " + mErrorResult.getErrorString() + " || Message: " + mErrorResult.getMessage() + "]";
+			return super.toString() + " IfmapErrorResult[ErrorString: " + mErrorResult.getErrorString()
+					+ " || Message: " + mErrorResult.getMessage() + "]";
 		}else{
 			return super.toString();
 		}

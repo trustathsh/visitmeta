@@ -8,7 +8,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 /**
  * A simple helper Class
  * 
- * @author Marcel
+ * @author Marcel Reichenbach
  */
 public class Check {
 

@@ -86,7 +86,6 @@ public class ConnectionTab extends JPanel {
 	private WindowColorSettings mWindowColorSettings;
 	private WindowSettings mWindowSettings;
 
-	// private DataserviceConnection mDataserviceConnection;
 	private MotionInformationPane mMotionInformationPane;
 	private GraphPanel mGraphPanel;
 	private PanelXmlTree mPanelXmlTree;
@@ -94,20 +93,17 @@ public class ConnectionTab extends JPanel {
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
 	 *
-	 * @param name
-	 *            Name of the Connection
-	 * @param connection
-	 *            Panel Object that represents the Connection
+	 * @param name Name of the Connection
+	 * @param connection Panel Object that represents the Connection
 	 */
 	public ConnectionTab(GraphContainer connection, JFrame window) {
 		super();
-		LOGGER.trace("Init ConnectionTab for the Connection "
-				+ connection.getName());
+		LOGGER.trace("Init ConnectionTab for the Connection " + connection.getName());
 
 		mName = connection.getName();
 		mConnected = true;
 		mConnection = connection;
-		// mDataserviceConnection = mConnection.getDataserviceConnection();
+
 		mGraphConnection = mConnection.getGraphConnection();
 		mGraphConnection.setParentTab(this);
 		mGraphPanel = mGraphConnection.getGraphPanel();
@@ -156,16 +152,13 @@ public class ConnectionTab extends JPanel {
 		mUpperPanel.setLayout(new GridLayout());
 		mLowerPanel.setLayout(new BoxLayout(mLowerPanel, BoxLayout.Y_AXIS));
 
-		mMotionInformationPane = new MotionInformationPane(
-				mGraphPanel.getPanel());
+		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
 
 		JPanel searchAndFilterPanel = mSearchAndFilterStrategy.getJPanel();
 		searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy
-				.getJPanel();
-		historyNavigationStrategyPanel
-				.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy.getJPanel();
+		historyNavigationStrategyPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mPanelXmlTree = new PanelXmlTree();
 		mPanelXmlTree.setPreferredSize(new Dimension(800, 200));
@@ -209,12 +202,10 @@ public class ConnectionTab extends JPanel {
 	}
 
 	public void connect() {
-		// mDataserviceConnection.connect(mConnection.getRestConnectionName());
 		setConnectionStatus(true);
 	}
 
 	public void disconnect() {
-		// mDataserviceConnection.disconnect(mConnection.getRestConnectionName());
 		setConnectionStatus(false);
 	}
 

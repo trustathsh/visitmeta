@@ -78,8 +78,7 @@ public class GraphConnection implements Observer {
 	private boolean mIsPropablePicked = false;
 
 	/**
-	 * @param container
-	 *            Contains information about the Connection.
+	 * @param container Contains information about the Connection.
 	 */
 	public GraphConnection(GraphContainer container) {
 		mConnetion = container;
@@ -121,8 +120,7 @@ public class GraphConnection implements Observer {
 	/**
 	 * Add the identifier in the list to the graph.
 	 *
-	 * @param pIdentifier
-	 *            the list with identifier.
+	 * @param pIdentifier the list with identifier.
 	 */
 	private synchronized void addIdentifier(List<NodeIdentifier> pIdentifier) {
 		LOGGER.trace("Method addIdentifier(" + pIdentifier + ") called.");
@@ -138,13 +136,10 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Add the metadata of the list and create the edges to the identifier in
-	 * the graph.
+	 * Add the metadata of the list and create the edges to the identifier in the graph.
 	 *
-	 * @param pIdentifier
-	 *            the identifier.
-	 * @param pMetadata
-	 *            the list with metadata.
+	 * @param pIdentifier the identifier.
+	 * @param pMetadata the list with metadata.
 	 */
 	private synchronized void addMetadata(NodeIdentifier pIdentifier, List<NodeMetadata> pMetadata) {
 		LOGGER.trace("Method addMetadata(" + pIdentifier + ", " + pMetadata + ") called.");
@@ -160,13 +155,10 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Add the metadata of the list and create the edges of the link in the
-	 * graph.
+	 * Add the metadata of the list and create the edges of the link in the graph.
 	 *
-	 * @param pLink
-	 *            the link.
-	 * @param pMetadata
-	 *            the list with metadata.
+	 * @param pLink the link.
+	 * @param pMetadata the list with metadata.
 	 */
 	private synchronized void addMetadata(ExpandedLink pLink, List<NodeMetadata> pMetadata) {
 		LOGGER.trace("Method addMetadata(" + pLink + ", " + pMetadata + ") called.");
@@ -184,8 +176,7 @@ public class GraphConnection implements Observer {
 	/**
 	 * Remove the IdentifierNode.
 	 *
-	 * @param pIdentifier
-	 *            the NodeIdentifier to identify the node in the graph.
+	 * @param pIdentifier the NodeIdentifier to identify the node in the graph.
 	 */
 	private synchronized void deleteIdentifier(List<NodeIdentifier> pIdentifier) {
 		LOGGER.trace("Method deleteIdentifier(" + pIdentifier + ") called.");
@@ -200,8 +191,7 @@ public class GraphConnection implements Observer {
 	/**
 	 * Delete the MetadataNode and the edges to the node from the graph.
 	 *
-	 * @param pMetadata
-	 *            the NodeMetadata to identify the node and edges in the graph.
+	 * @param pMetadata the NodeMetadata to identify the node and edges in the graph.
 	 */
 	private synchronized void deleteMetadata(List<NodeMetadata> pMetadata) {
 		LOGGER.trace("Method deleteMetadata(" + pMetadata + ") called.");
@@ -236,16 +226,11 @@ public class GraphConnection implements Observer {
 	/**
 	 * Set the new position for a Position-Object.
 	 *
-	 * @param pNode
-	 *            the Object.
-	 * @param pNewX
-	 *            the new x coordinate.
-	 * @param pNewY
-	 *            the new y coordinate.
-	 * @param pNewZ
-	 *            the new z coordinate.
-	 * @param pinNode
-	 *            TODO
+	 * @param pNode the Object.
+	 * @param pNewX the new x coordinate.
+	 * @param pNewY the new y coordinate.
+	 * @param pNewZ the new z coordinate.
+	 * @param pinNode TODO
 	 */
 	public void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
 		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
@@ -265,11 +250,8 @@ public class GraphConnection implements Observer {
 	/**
 	 * Repaint nodes of a specific type and publisher.
 	 *
-	 * @param pPublisher
-	 *            the id of the current publisher, empty if the default color is
-	 *            changed.
-	 * @param pType
-	 *            the type of the node,
+	 * @param pPublisher the id of the current publisher, empty if the default color is changed.
+	 * @param pType the type of the node,
 	 */
 	public void repaintNodes(NodeType pType) {
 		LOGGER.trace("Method repaintMetadata() called.");
@@ -452,8 +434,7 @@ public class GraphConnection implements Observer {
 	 * Just shows the properties of the given {@link Propable} object, without
 	 * marking it as selected or storing whether it was picked.
 	 *
-	 * @param propable
-	 *            the {@link Propable} object to show
+	 * @param propable the {@link Propable} object to show
 	 */
 	public void showProperty(Propable propable) {
 		LOGGER.trace("Method showProperties(" + propable + ") called.");
@@ -472,11 +453,9 @@ public class GraphConnection implements Observer {
 	}
 
 	/**
-	 * Returns if the current shown {@link Propable} object was marked as picked
-	 * or not.
+	 * Returns if the current shown {@link Propable} object was marked as picked or not.
 	 *
-	 * @return true if current shown {@link Propable} object was marked as
-	 *         picked, false if not
+	 * @return true if current shown {@link Propable} object was marked as picked, false if not
 	 */
 	public boolean isPropablePicked() {
 		LOGGER.trace("Method isPropablePicked() called.");

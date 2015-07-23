@@ -35,8 +35,7 @@ public class MapServerRestConnectionImpl extends MapServerDataImpl implements Ma
 
 	private MapServerData mOldData;
 
-	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection,
-			MapServerData connectionData) {
+	public MapServerRestConnectionImpl(DataserviceConnection dataserviceConnection, MapServerData connectionData) {
 		super(connectionData.getConnectionName());
 
 		super.setUrl(connectionData.getUrl());

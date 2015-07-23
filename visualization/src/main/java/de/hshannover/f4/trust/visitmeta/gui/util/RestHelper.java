@@ -56,7 +56,7 @@ public class RestHelper {
 		JSONArray jsonResponse = null;
 		try {
 			jsonResponse = buildWebResource(dataserviceConnection).path("/").accept(MediaType.APPLICATION_JSON)
-				.get(JSONArray.class);
+					.get(JSONArray.class);
 		} catch (ClientHandlerException e) {
 			// if not available
 			throw new ConnectionException(e.getMessage());

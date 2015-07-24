@@ -358,8 +358,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 							component));
 				} catch (PropertyException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, e.toString(), e.getClass().getSimpleName(),
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 
 				mConnectionTree.expandAllNodes();
@@ -382,8 +382,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					mConnectionDialog.eventDeleteData();
 				} catch (PropertyException | RESTException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, e.toString(), e.getClass().getSimpleName(),
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

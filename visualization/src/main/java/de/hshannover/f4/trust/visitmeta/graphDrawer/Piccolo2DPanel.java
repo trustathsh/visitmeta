@@ -1134,16 +1134,15 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		if ((propable != null)
 				&& (mSelectedNode != propable)) {
 			mSelectedNode = propable;
-			triggerRepaint(propable);
+			triggerRepaint();
 		}
 	}
 
 	@Override
 	public void unselectNode() {
 		LOGGER.trace("Method unselectNode() called.");
-		Propable unselectedNode = mSelectedNode;
 		mSelectedNode = null;
-		triggerRepaint(unselectedNode);
+		triggerRepaint();
 	}
 
 	/**
@@ -1152,15 +1151,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	 * @param propable
 	 *            a {@link Propable} instance
 	 */
-	private void triggerRepaint(Propable propable) {
-		LOGGER.trace("Method triggerRepaint("
-				+ propable + ") called.");
-
-		if (propable instanceof Identifier) {
-			repaintNodes(NodeType.IDENTIFIER);
-		} else if (propable instanceof Metadata) {
-			repaintNodes(NodeType.METADATA);
-		}
+	private void triggerRepaint() {
+		LOGGER.trace("Method triggerRepaint() called.");
+		repaintNodes(NodeType.IDENTIFIER);
+		repaintNodes(NodeType.METADATA);
 	}
 
 	/**

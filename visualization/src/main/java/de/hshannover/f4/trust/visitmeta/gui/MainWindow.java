@@ -58,6 +58,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -92,11 +93,12 @@ import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
-import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.util.StringHelper;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class MainWindow extends JFrame {
 
@@ -182,6 +184,8 @@ public class MainWindow extends JFrame {
 			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
 		} catch (PropertyException e) {
 			LOGGER.error(e.toString(), e);
+			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 		}
 
 		mConnectionTree.expandAllNodes();
@@ -269,7 +273,8 @@ public class MainWindow extends JFrame {
 	/**
 	 * Adds a component to a JTabbedPane with a little "close tab" button on the right side of the tab.
 	 *
-	 * @param cTab the ConnectionTab that should be added
+	 * @param cTab
+	 *            the ConnectionTab that should be added
 	 */
 	private void addClosableTab(final ConnectionTab cTab) {
 		if (mCancelIcon == null) {
@@ -332,7 +337,8 @@ public class MainWindow extends JFrame {
 				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
 				if (currentTab != null) {
 					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
-					LOGGER.debug("Tab changed to " + currentTab.getConnName());
+					LOGGER.debug("Tab changed to "
+							+ currentTab.getConnName());
 				}
 			}
 		});
@@ -443,6 +449,8 @@ public class MainWindow extends JFrame {
 				}
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
+				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				continue;
 			}
 		}
@@ -455,6 +463,8 @@ public class MainWindow extends JFrame {
 					lAf.menuItem.setSelected(true);
 				} catch (UnsupportedLookAndFeelException e) {
 					LOGGER.error(e.getMessage(), e);
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -546,6 +556,8 @@ public class MainWindow extends JFrame {
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
 				LOGGER.error(e.toString());
+				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -556,6 +568,8 @@ public class MainWindow extends JFrame {
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 				LOGGER.error(e.toString());
+				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -570,6 +584,8 @@ public class MainWindow extends JFrame {
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
 						| ConnectionException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,7 +58,6 @@ import javax.swing.tree.TreePath;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
-import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
@@ -80,6 +79,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class ConnectionDialog extends JDialog {
@@ -87,8 +87,6 @@ public class ConnectionDialog extends JDialog {
 	private static final long serialVersionUID = -8052562697583611679L;
 
 	private static final Logger LOGGER = Logger.getLogger(ConnectionDialog.class);
-
-	private static Properties mConfig;
 
 	private static DataservicePersister mDataservicePersister;
 
@@ -139,8 +137,10 @@ public class ConnectionDialog extends JDialog {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		addWindowListener(new ConnectionDialogWindowListener(this));
 		setMinimumSize(new Dimension(600, 500));
-		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2, (Toolkit
-				.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2);
+		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)
+				/ 2 - getWidth() / 2, (Toolkit
+				.getDefaultToolkit().getScreenSize().height)
+				/ 2 - getHeight() / 2);
 	}
 
 	private void createPanels() {
@@ -168,7 +168,8 @@ public class ConnectionDialog extends JDialog {
 			Dataservices dataservices = (Dataservices) root;
 			for (Data dataserviceConnectionData : dataservices.getSubData()) {
 				if (dataserviceConnectionData instanceof DataserviceRestConnectionImpl) {
-					DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) dataserviceConnectionData;
+					DataserviceRestConnectionImpl dataserviceConnection =
+							(DataserviceRestConnectionImpl) dataserviceConnectionData;
 
 					if (dataserviceConnection.isNotPersised()) {
 						return true;
@@ -176,7 +177,8 @@ public class ConnectionDialog extends JDialog {
 
 					for (Data mapServerConnectionData : dataserviceConnection.getSubData()) {
 						if (mapServerConnectionData instanceof MapServerRestConnectionImpl) {
-							MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) mapServerConnectionData;
+							MapServerRestConnectionImpl mapServerConnection =
+									(MapServerRestConnectionImpl) mapServerConnectionData;
 
 							if (mapServerConnection.isNotPersised()) {
 								return true;
@@ -412,7 +414,8 @@ public class ConnectionDialog extends JDialog {
 	public void eventDeleteData() throws PropertyException, RESTException {
 		int requestResult = confirmDeleteRequest();
 
-		if (requestResult == JOptionPane.NO_OPTION || requestResult == JOptionPane.CLOSED_OPTION) {
+		if (requestResult == JOptionPane.NO_OPTION
+				|| requestResult == JOptionPane.CLOSED_OPTION) {
 			return;
 		}
 
@@ -420,7 +423,8 @@ public class ConnectionDialog extends JDialog {
 		TreePath parentPath = mJtConnections.getSelectionPath().getParentPath();
 		Object parentData = parentPath.getLastPathComponent();
 
-		if (selectedComponent instanceof DataserviceRestConnectionImpl && parentData instanceof Dataservices) {
+		if (selectedComponent instanceof DataserviceRestConnectionImpl
+				&& parentData instanceof Dataservices) {
 			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
 			Dataservices dataservices = (Dataservices) parentData;
 
@@ -479,7 +483,8 @@ public class ConnectionDialog extends JDialog {
 		if (selectedComponent instanceof Dataservices) {
 			Dataservices dataservices = (Dataservices) selectedComponent;
 			DataserviceRestConnectionImpl newDataserviceConnection = new DataserviceRestConnectionImpl(
-					"New Dataservice-Connection " + (dataservices.getSubDataCount() + 1), "", false);
+					"New Dataservice-Connection "
+							+ (dataservices.getSubDataCount() + 1), "", false);
 			newDataserviceConnection.setNotPersised(true);
 
 			addNewData(selectionPath, newDataserviceConnection);
@@ -487,7 +492,8 @@ public class ConnectionDialog extends JDialog {
 		} else if (selectedComponent instanceof DataserviceConnection) {
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
 			MapServerRestConnectionImpl newMapServerConnection = new MapServerRestConnectionImpl(
-					dataserviceConnection, "New Map-Server-Connection " + (dataserviceConnection.getSubDataCount() + 1));
+					dataserviceConnection, "New Map-Server-Connection "
+							+ (dataserviceConnection.getSubDataCount() + 1));
 			newMapServerConnection.setNotPersised(true);
 
 			addNewData(selectionPath, newMapServerConnection);
@@ -495,7 +501,8 @@ public class ConnectionDialog extends JDialog {
 		} else if (selectedComponent instanceof MapServerConnection) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
 			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(
-					"New Subscription " + (mapServerConnection.getSubDataCount() + 1), mapServerConnection);
+					"New Subscription "
+							+ (mapServerConnection.getSubDataCount() + 1), mapServerConnection);
 			newSubscription.setNotPersised(true);
 
 			addNewData(selectionPath, newSubscription);
@@ -564,6 +571,8 @@ public class ConnectionDialog extends JDialog {
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
 				LOGGER.error(e.toString());
+				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -574,6 +583,8 @@ public class ConnectionDialog extends JDialog {
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 				LOGGER.error(e.toString());
+				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -588,6 +599,8 @@ public class ConnectionDialog extends JDialog {
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
 						| ConnectionException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}

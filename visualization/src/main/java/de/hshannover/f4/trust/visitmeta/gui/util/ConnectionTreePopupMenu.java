@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,6 +55,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
@@ -72,6 +73,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 
 public class ConnectionTreePopupMenu extends JPopupMenu {
 
@@ -107,7 +109,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 
 	private Data mSelectedData;
 
-	private ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData){
+	private ConnectionTreePopupMenu(RESTConnectionTree connectionTree, Data selectedData) {
 		mSelectedData = selectedData;
 		mConnectionTree = connectionTree;
 	}
@@ -120,24 +122,24 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 		if (mSelectedData instanceof Dataservices) {
 			initAddButton("Dataservice");
 
-		}else if (mSelectedData instanceof DataserviceConnection){
+		} else if (mSelectedData instanceof DataserviceConnection) {
 			initCloneButton("Dataservice");
 			initDeleteButton("Dataservice");
 			super.addSeparator();
 			initAddButton("Connection");
-			
-		}else if (mSelectedData instanceof MapServerConnection){
+
+		} else if (mSelectedData instanceof MapServerConnection) {
 			initCloneButton("Connection");
 			initDeleteButton("Connection");
 			super.addSeparator();
 			initAddButton("Subscription");
-	
-		}else if (mSelectedData instanceof Subscription) {
+
+		} else if (mSelectedData instanceof Subscription) {
 			initCloneButton("Subscription");
 			initDeleteButton("Subscription");
-			
+
 		}
-			
+
 		super.addSeparator();
 
 		initDefaultButton(mConnectionDialog);
@@ -240,7 +242,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 				} catch (ConnectionException e) {
 					LOGGER.warn(e.toString());
 					LOGGER.info("Start retry connection...");
-					String title = "Connecting to " + ((Connection) mSelectedData).getConnectionName();
+					String title = "Connecting to "
+							+ ((Connection) mSelectedData).getConnectionName();
 					RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, (Connection) mSelectedData,
 							mMainWindow);
 					retryDialog.showDialog();
@@ -267,6 +270,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Connection) mSelectedData).disconnect();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -285,6 +290,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Subscription) mSelectedData).startSubscription();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -303,6 +310,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Subscription) mSelectedData).stopSubscription();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
+					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -311,7 +320,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initAddButton(String expression) {
-		mAdd = new JCheckBoxMenuItem("Add " + expression, ADD_ICON);
+		mAdd = new JCheckBoxMenuItem("Add "
+				+ expression, ADD_ICON);
 		mAdd.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mAdd.addActionListener(new ActionListener() {
 			@Override
@@ -324,7 +334,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initCloneButton(String expression) {
-		mClone = new JCheckBoxMenuItem("Clone " + expression, CLONE_ICON);
+		mClone = new JCheckBoxMenuItem("Clone "
+				+ expression, CLONE_ICON);
 		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mClone.addActionListener(new ActionListener() {
 			@Override
@@ -347,6 +358,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 							component));
 				} catch (PropertyException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, e.toString(), e.getClass().getSimpleName(),
+							JOptionPane.ERROR_MESSAGE);
 				}
 
 				mConnectionTree.expandAllNodes();
@@ -359,7 +372,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initDeleteButton(String expression) {
-		mDelete = new JCheckBoxMenuItem("Delete " + expression, DELETE_ICON);
+		mDelete = new JCheckBoxMenuItem("Delete "
+				+ expression, DELETE_ICON);
 		mDelete.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mDelete.addActionListener(new ActionListener() {
 			@Override
@@ -368,6 +382,8 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					mConnectionDialog.eventDeleteData();
 				} catch (PropertyException | RESTException e) {
 					LOGGER.error(e.toString());
+					JOptionPane.showMessageDialog(null, e.toString(), e.getClass().getSimpleName(),
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.4.2,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,6 +37,8 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.gui.util;
+
+import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
@@ -56,6 +58,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.network.ProxyGraphService;
+import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 
 public class MapServerRestConnectionImpl extends MapServerDataImpl implements MapServerConnection {
 
@@ -87,7 +90,8 @@ public class MapServerRestConnectionImpl extends MapServerDataImpl implements Ma
 		super.setAuthenticationBasic(true); // default is true
 
 		for (Data subscriptonData : connectionData.getSubscriptions()) {
-			if (!(subscriptonData instanceof RestSubscriptionImpl) && subscriptonData instanceof SubscriptionData) {
+			if (!(subscriptonData instanceof RestSubscriptionImpl)
+					&& subscriptonData instanceof SubscriptionData) {
 				super.addSubscription(new RestSubscriptionImpl(this, (SubscriptionData) subscriptonData));
 			}
 		}
@@ -164,6 +168,8 @@ public class MapServerRestConnectionImpl extends MapServerDataImpl implements Ma
 
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
+			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
+					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -226,8 +232,8 @@ public class MapServerRestConnectionImpl extends MapServerDataImpl implements Ma
 		throw new UnsupportedOperationException();
 	}
 
-	public void resetData(){
-		if(mOldData != null){
+	public void resetData() {
+		if (mOldData != null) {
 			super.changeData(mOldData);
 			mOldData = null;
 		}

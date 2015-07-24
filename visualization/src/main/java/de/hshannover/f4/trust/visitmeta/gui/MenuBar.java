@@ -105,7 +105,7 @@ public class MenuBar extends JMenuBar {
 		mntmAddConnection.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				ConnectionDialog cD = new ConnectionDialog(guiController);
+				ConnectionDialog cD = new ConnectionDialog();
 				cD.setVisible(true);
 			}
 		});

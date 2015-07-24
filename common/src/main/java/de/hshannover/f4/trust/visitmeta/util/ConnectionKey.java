@@ -52,8 +52,10 @@ public class ConnectionKey {
 	public static final String USE_CONNECTION_AS_STARTUP = "useConnectionAsStartup";
 	public static final String MAX_POLL_RESULT_SIZE = "maxPollResultSize";
 	public static final String SUBSCRIPTIONS = "subscriptions";
+	public static final String IS_CONNECTED = "isConnected";
 
 	// for visualization
 	public static final String DATASERVICE_REST_URL = "dataserviceRestUrl";
 	public static final String RAW_XML = "rawXml";
+	public static final String CONNECTED = "connected";
 }

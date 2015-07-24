@@ -21,15 +21,25 @@ http://example.com:8000/default/subscribe
 \end{lstlisting}
 \end{minipage}
 
+If the suffix \textit{?onlyActive=true} is given, only active subscriptions will be returned.
+
+\begin{lstlisting}
+HTTP:GET
+http://example.com:8000/default/subscribe?onlyActive=true
+\end{lstlisting}
+
+
 \subsection{Subscribe}
 \begin{lstlisting}
 HTTP:PUT
 http://example.com:8000/{Connection Name}/subscribe/update
 Content-Type: application/json
 {
-  subscribeName:{Subscription Name},
-  identifierType:{Identifier Type},
-  identifier:{Identifier}
+  "{Subscription Name}":
+  {
+    "startIdentifier": "{Identifier Name}",
+    "identifierType": "{Identifier Type}"
+  }
 }
 \end{lstlisting}
 Identifier Types are:
@@ -47,9 +57,11 @@ HTTP:PUT
 http://example.com:8000/default/subscribe/update
 Content-Type: application/json
 {
-  subscribeName:exampleSub,
-  identifierType:device,
-  identifier:exampleDevice
+  "subExample":
+  {
+    "startIdentifier": "freeradius-pdp",
+    "identifierType": "device"
+  }
 }
 \end{lstlisting}
 \end{minipage}
@@ -61,19 +73,63 @@ INFO: subscribe successfully
 \end{lstlisting}
 \end{minipage}
 
+Only to save subscriptions then use:
+
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/subscribe
+Content-Type: application/json
+...
+\end{lstlisting}
+
+\subsection{Start Subscription}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/{Connection Name}/subscribe
+	/start/{Subscription Name}
+\end{lstlisting}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/subscribe/start/subExample
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+INFO: subscription('subExample') enabled
+\end{lstlisting}
+
+\subsection{Stop Subscription}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/{Connection Name}/subscribe
+	/stop/{Subscription Name}
+\end{lstlisting}
+
+\textbf{Example Request:}
+\begin{lstlisting}
+HTTP:PUT
+http://example.com:8000/default/subscribe/stop/subExample
+\end{lstlisting}
+
+\textbf{Response:}
+\begin{lstlisting}
+INFO: subscription('subExample') disabled
+\end{lstlisting}
+
 \subsection{Delete Subscription}
 \begin{lstlisting}
 HTTP:DELETE
 http://example.com:8000/{Connection Name}/
-	subscribe/delete/{Subscription Name}
+	subscribe/{Subscription Name}
 \end{lstlisting}
 
 \begin{minipage}{\linewidth}
 \textbf{Example Request:}
 \begin{lstlisting}
 HTTP:DELETE
-http://example.com:8000/default/
-	subscribe/delete/exampleSub
+http://example.com:8000/default/subscribe/exampleSub
 \end{lstlisting}
 \end{minipage}
 
@@ -88,21 +144,20 @@ INFO: delete subscription(exampleSub) successfully
 \begin{lstlisting}
 HTTP:DELETE
 http://example.com:8000/{Connection Name}/
-	subscribe/delete?deleteAll=true
+	subscribe?deleteAll=true
 \end{lstlisting}
 
 \begin{minipage}{\linewidth}
 \textbf{Example Request:}
 \begin{lstlisting}
 HTTP:DELETE
-http://example.com:8000/default/
-	subscribe/delete?deleteAll=true
+http://example.com:8000/default/subscribe?deleteAll=true
 \end{lstlisting}
 \end{minipage}
 
 \begin{minipage}{\linewidth}
 \textbf{Response:}
 \begin{lstlisting}
-INFO: delete all active subscriptions successfully
+INFO: delete all subscriptions successfully
 \end{lstlisting}
 \end{minipage}

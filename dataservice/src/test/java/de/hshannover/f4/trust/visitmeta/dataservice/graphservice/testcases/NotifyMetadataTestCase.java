@@ -54,8 +54,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 
 public class NotifyMetadataTestCase extends AbstractTestCase {
-	private final String TESTCASE_FILENAME = TESTCASES_DIRECTORY
-			+ File.separator + "NotifyMetadata.yml";
+	private final String TESTCASE_FILENAME = TESTCASES_DIRECTORY + File.separator + "NotifyMetadata.yml";
 
 	@Override
 	public String getTestcaseFilename() {
@@ -79,7 +78,6 @@ public class NotifyMetadataTestCase extends AbstractTestCase {
 		List<IdentifierGraph> graphAt = mService.getGraphAt(timestamp);
 
 		assertTrue(graphAt.isEmpty());
-		System.out.println(toJson(graphAt));
 
 		JSONArray actual = toJson(graphAt);
 		JSONArray expected = new JSONArray();
@@ -145,13 +143,11 @@ public class NotifyMetadataTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(notifiesAt);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection(
-					"device1", "device2", "event1");
-			JSONObject subGraph1 = createJSON(timestamp, idPair1);
 
-			expected.put(subGraph1);
-		}
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "device2", "event1");
+		JSONObject subGraph1 = createJSON(timestamp, idPair1);
+
+		expected.put(subGraph1);
 
 		assertTrue(jsonsEqual(actual, expected));
 	}
@@ -163,12 +159,10 @@ public class NotifyMetadataTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(notifiesAt);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection(
-					"device3", "event3");
-			JSONObject subGraph1 = createJSON(timestamp, idPair1);
-			expected.put(subGraph1);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device3", "event3");
+		JSONObject subGraph1 = createJSON(timestamp, idPair1);
+		expected.put(subGraph1);
 
 		assertTrue(jsonsEqual(actual, expected));
 	}
@@ -180,12 +174,10 @@ public class NotifyMetadataTestCase extends AbstractTestCase {
 
 		JSONArray actual = toJson(notifiesAt);
 		JSONArray expected = new JSONArray();
-		{
-			JSONObject idPair1 = createJSONIdentifierMetadataConnection(
-					"device1", "device3", "event3");
-			JSONObject subGraph1 = createJSON(timestamp, idPair1);
-			expected.put(subGraph1);
-		}
+
+		JSONObject idPair1 = createJSONIdentifierMetadataConnection("device1", "device3", "event3");
+		JSONObject subGraph1 = createJSON(timestamp, idPair1);
+		expected.put(subGraph1);
 
 		assertTrue(jsonsEqual(actual, expected));
 	}

@@ -38,15 +38,26 @@
  */
 package de.hshannover.f4.trust.visitmeta.util.yaml;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.RetryConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.util.ConnectionKey;
 
 public class DataservicePersister extends Properties {
+
+	private static final Logger LOGGER = Logger.getLogger(DataservicePersister.class);
 
 	/**
 	 * Create a JyamlPersister for data-services
@@ -58,50 +69,89 @@ public class DataservicePersister extends Properties {
 		super(fileName);
 	}
 
-	public void persist(DataserviceConnection connection)
-			throws PropertyException {
+	public void persist(DataserviceConnection connection) throws PropertyException {
 		String connectionName = connection.getName();
 		String dataserviceRestUrl = connection.getUrl();
 		boolean rawXml = connection.isRawXml();
+		boolean connected = connection.isConnected();
 
 		setPropertyDataserviceRestUrl(connectionName, dataserviceRestUrl);
 		setPropertyRawXml(connectionName, rawXml);
+		setPropertyConnected(connectionName, connected);
 	}
 
-	public List<DataserviceConnection> loadDataserviceConnections()
-			throws PropertyException {
-		List<DataserviceConnection> dataserviceConnectionList = new ArrayList<DataserviceConnection>();
+	public void removeDataserviceConnection(String connectionName) throws PropertyException {
+		Map<String, Object> propertyMap = load();
+
+		for (Entry<String, Object> entry : propertyMap.entrySet()) {
+			if (entry.getKey().equals(connectionName)) {
+				propertyMap.remove(entry.getKey());
+				break;
+			}
+		}
+
+		save(propertyMap);
+	}
+
+	public List<Data> loadDataserviceConnections(Component component) throws PropertyException {
+		List<Data> dataserviceConnectionList = new ArrayList<Data>();
 		for (String connectionName : getKeySet()) {
 			// read values from property
 			String dataserviceRestUrl = getPropertyDataserviceRestUrl(connectionName);
 			boolean rawXml = getPropertyRawXml(connectionName);
-			DataserviceConnection tmpDataserviceConnection = new DataserviceConnection(
-					connectionName, dataserviceRestUrl, rawXml);
+			boolean connected = getPropertyConnected(connectionName);
+			DataserviceRestConnectionImpl tmpDataserviceConnection = new DataserviceRestConnectionImpl(connectionName,
+					dataserviceRestUrl, rawXml);
+			tmpDataserviceConnection.setConnected(connected);
+
 			dataserviceConnectionList.add(tmpDataserviceConnection);
 		}
+
+		for (Data data : dataserviceConnectionList) {
+			if (data instanceof DataserviceRestConnectionImpl) {
+				DataserviceRestConnectionImpl connection = (DataserviceRestConnectionImpl) data;
+				if (connection.isConnected()) {
+					try {
+						connection.update(); // To update all sub connections
+					} catch (ConnectionException e) {
+						connection.setConnected(false);
+						LOGGER.warn(e.toString());
+						LOGGER.info("Start retry connection...");
+						String title = "Connecting to " + connection.getConnectionName();
+						RetryConnectionDialog retryDialog = new RetryConnectionDialog(title, connection, component);
+						retryDialog.showDialog();
+						retryDialog.connect();
+					}
+				}
+			}
+		}
+
 		return dataserviceConnectionList;
 	}
 
-	private boolean getPropertyRawXml(String connectionName)
-			throws PropertyException {
+	private boolean getPropertyRawXml(String connectionName) throws PropertyException {
 		return super.get(connectionName).getBoolean(ConnectionKey.RAW_XML);
 	}
 
-	private String getPropertyDataserviceRestUrl(String connectionName)
-			throws PropertyException {
-		return super.get(connectionName).getString(
-				ConnectionKey.DATASERVICE_REST_URL);
+	private boolean getPropertyConnected(String connectionName) throws PropertyException {
+		return super.get(connectionName).getBoolean(ConnectionKey.CONNECTED);
 	}
 
-	private void setPropertyRawXml(String connectionName, boolean rawXml)
-			throws PropertyException {
+	private String getPropertyDataserviceRestUrl(String connectionName) throws PropertyException {
+		return super.get(connectionName).getString(ConnectionKey.DATASERVICE_REST_URL);
+	}
+
+	private void setPropertyRawXml(String connectionName, boolean rawXml) throws PropertyException {
 		super.set(connectionName + "." + ConnectionKey.RAW_XML, rawXml);
 	}
 
-	private void setPropertyDataserviceRestUrl(String connectionName,
-			String dataserviceRestUrl) throws PropertyException {
-		super.set(connectionName + "." + ConnectionKey.DATASERVICE_REST_URL,
-				dataserviceRestUrl);
+	private void setPropertyConnected(String connectionName, boolean connected) throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.CONNECTED, connected);
+	}
+
+	private void setPropertyDataserviceRestUrl(String connectionName, String dataserviceRestUrl)
+			throws PropertyException {
+		super.set(connectionName + "." + ConnectionKey.DATASERVICE_REST_URL, dataserviceRestUrl);
 	}
 
 }

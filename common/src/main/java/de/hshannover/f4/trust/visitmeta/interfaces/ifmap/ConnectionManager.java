@@ -39,22 +39,26 @@
 package de.hshannover.f4.trust.visitmeta.interfaces.ifmap;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import de.hshannover.f4.trust.ifmapj.messages.SubscribeDelete;
 import de.hshannover.f4.trust.ifmapj.messages.SubscribeRequest;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionEstablishedException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NoSavedConnectionException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.NotConnectedException;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 /**
- * An interface for {@link ConnectionManager} classes, that handle all
- * {@link Connection} instances.
+ * An interface for {@link ConnectionManager} classes, that handle all {@link Connection} instances.
  *
  * @author Bastian Hellmann
  * @author Marcel Reichenbach
@@ -64,77 +68,70 @@ public interface ConnectionManager {
 	/**
 	 * Adds a connection to the connection pool.
 	 *
-	 * @param connection
-	 *            the {@link Connection} to add
+	 * @param connection the {@link Connection} to add
 	 * @throws ConnectionException
 	 */
-	public void addConnection(Connection c) throws ConnectionException;
+	public void addConnection(MapServerConnection connection) throws ConnectionException;
+
+	/**
+	 * Sets all connection properties by the new.
+	 * 
+	 * @param newData
+	 * @throws NoSavedConnectionException
+	 */
+	public void updateConnection(MapServerData newData) throws NoSavedConnectionException;
 
 	/**
 	 * Connect to a MAP-Server.
 	 *
-	 * @param connectionName
-	 *            the connection name.
+	 * @param connectionName the connection name.
 	 * @throws ConnectionException
 	 */
-	public void connect(String connectionName)
-			throws ConnectionEstablishedException, ConnectionException;
+	public void connect(String connectionName) throws ConnectionEstablishedException, ConnectionException;
 
 	/**
 	 * Constructs a new {@link Connection}.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
-	 * @param url
-	 *            URL of the {@link Connection}
-	 * @param userName
-	 *            username of the user for the new {@link Connection}
-	 * @param userPassword
-	 *            password of the user for the new {@link Connection}
+	 * @param connectionName name of the {@link Connection}
+	 * @param url URL of the {@link Connection}
+	 * @param userName username of the user for the new {@link Connection}
+	 * @param userPassword password of the user for the new {@link Connection}
 	 * @return
 	 * @throws ConnectionException
 	 */
-	public Connection createConnection(String connectionName, String url,
+	public MapServerConnection createConnection(String connectionName, String url,
 			String userName, String userPassword) throws ConnectionException;
 
 	/**
 	 * Delete a subscription.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
-	 * @param subscriptionName
-	 *            name of the subscription.
+	 * @param connectionName name of the {@link Connection}
+	 * @param subscriptionName name of the subscription.
 	 * @throws ConnectionException
 	 */
-	public void deleteSubscription(String connectionName,
-			String subscriptionName) throws ConnectionException;
+	public void deleteSubscription(String connectionName, String subscriptionName) throws ConnectionException;
 
 	/**
 	 * Deletes all active subscriptions.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @throws ConnectionException
 	 */
-	public void deleteAllSubscriptions(String connectionName)
-			throws ConnectionException;
+	public void deleteAllSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
 	 * Close a connection to the MAP-Server.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @throws ConnectionException
 	 */
-	public void disconnect(String connectionName) throws NotConnectedException,
-			ConnectionException;
+	public void disconnect(String connectionName) throws NotConnectedException, ConnectionException;
 
 	/**
 	 * Checks if the given {@link Connection} exists in the list of saved
 	 * connections.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @return
 	 */
 	public boolean doesConnectionExist(String connectionName);
@@ -142,73 +139,88 @@ public interface ConnectionManager {
 	/**
 	 * Returns all active subscriptions for a given {@link Connection}.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
-	 * @return a Set<String> with the active subscriptions.
+	 * @param connectionName name of the {@link Connection}
+	 * @return a List<SubscriptionData> with the active subscriptions.
 	 * @throws ConnectionException
 	 */
-	public Set<String> getActiveSubscriptions(String connectionName)
-			throws ConnectionException;
+	public List<SubscriptionData> getActiveSubscriptions(String connectionName) throws ConnectionException;
 
 	/**
-	 * Returns all saved connections as a String {@link Set}.
+	 * Returns all subscriptions for a given {@link Connection}.
 	 *
-	 * @return a Set<String> with all saved subscriptions.
+	 * @param connectionName name of the {@link Connection}
+	 * @return a List<SubscriptionData> with the active subscriptions.
+	 * @throws ConnectionException
 	 */
-	public Map<String, Connection> getSavedConnections();
+	public List<SubscriptionData> getSubscriptions(String connectionName) throws ConnectionException;
+
+	/**
+	 * Returns all saved connections as a String {@link Map}.
+	 *
+	 * @return a Map<String, MapServerConnection> with all saved subscriptions.
+	 */
+	public Map<String, MapServerConnection> getSavedConnections();
 
 	/**
 	 * Returns the {@link GraphService} for a given {@link Connection}.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
+	 * @param connectionName name of the {@link Connection}
 	 * @return the {@link GraphService} for a given {@link Connection}
 	 * @throws ConnectionException
 	 */
-	public GraphService getGraphService(String connectionName)
-			throws ConnectionException;
+	public GraphService getGraphService(String connectionName) throws ConnectionException;
 
 	/**
-	 * Stores a {@link Connection} in the connection pool and in the
-	 * connections-configuration file.
+	 * Stores a {@link Connection} in the connection pool and in the connections-configuration file.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
-	 * @param subscription
-	 *            a {@link JSONObject} representing the subscription
+	 * @param connectionName name of the {@link Connection}
+	 * @param subscriptionData a {@link JSONObject} representing the SubscriptionData
 	 * @throws IOException
 	 * @throws PropertyException
 	 */
-	public void storeSubscription(String connectionName,
-			Subscription subscription) throws IOException, PropertyException;
+	public void storeSubscription(String connectionName, SubscriptionData subscriptionData) throws IOException,
+			PropertyException;
 
 	/**
 	 * Delete a saved {@link Connection}.
 	 *
-	 * @param c
-	 *            a {@link Connection} instance
+	 * @param connectionName a {@link Connection} instance
 	 * @throws ConnectionException
 	 */
-	public void removeConnection(Connection c) throws ConnectionException;
+	public void removeConnection(String connectionName) throws ConnectionException;
 
 	/**
 	 * Tries to connect all saved {@link Connection}s to the MAP server that
 	 * have the flag for <i>connect at startup</i> set.
 	 *
 	 * @throws ConnectionException
+	 * @throws InterruptedException
 	 */
-	public void executeStartupConnections() throws ConnectionException;
+	public void executeStartupConnections() throws ConnectionException, InterruptedException;
 
 	/**
 	 * Send a ifmapj {@link SubscribeRequest} to the MAP server.
 	 *
-	 * @param connectionName
-	 *            name of the {@link Connection}
-	 * @param request
-	 *            the ifmapj {@link SubscribeRequest}.
+	 * @param connectionName name of the {@link Connection}
+	 * @param request the ifmapj {@link SubscribeRequest}.
 	 * @throws ConnectionException
 	 */
-	public void subscribe(String connectionName, SubscribeRequest request)
-			throws ConnectionException;
+	public void startSubscription(String connectionName, String subscriptionName) throws ConnectionException;
+
+	/**
+	 * Send a ifmapj {@link SubscribeDelete} to the MAP server.
+	 *
+	 * @param connectionName name of the {@link Connection}
+	 * @param subscriptionName the ifmapj {@link Subscription}.
+	 * @throws ConnectionException
+	 */
+	public void stopSubscription(String connectionName, String subscriptionName) throws ConnectionException;
+
+	/**
+	 * Sets all subscription properties by the new.
+	 * 
+	 * @param newData
+	 */
+	public void updateSubscription(String connectionName, SubscriptionData newData);
 
 }

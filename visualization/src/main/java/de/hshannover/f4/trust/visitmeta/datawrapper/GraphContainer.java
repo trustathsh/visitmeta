@@ -43,11 +43,10 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator.CalculatorType;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
-import de.hshannover.f4.trust.visitmeta.network.Connection;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
+import de.hshannover.f4.trust.visitmeta.network.GraphNetworkConnection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
-import de.hshannover.f4.trust.visitmeta.network.FactoryConnection;
-import de.hshannover.f4.trust.visitmeta.network.FactoryConnection.ConnectionType;
 import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 
 /**
@@ -58,11 +57,12 @@ import de.hshannover.f4.trust.visitmeta.network.GraphPool;
  *
  */
 public class GraphContainer {
-	private String mName = null;
-	private String mRestConnectionName;
-	private Connection mConnection = null;
+	// private String mName = null;
+	// private String mMapServerConnectionName;
+	private GraphNetworkConnection mConnection = null;
 	private Calculator mCalculator = null;
-	private DataserviceConnection mDataserviceConnection = null;
+	// private DataserviceConnection mDataserviceConnection = null;
+	private MapServerRestConnectionImpl mMapSeverConnection = null;
 	private FacadeNetwork mFacadeNetwork = null;
 	private FacadeLogic mFacadeLogic = null;
 	private GraphConnection mGraphConnection = null;
@@ -71,7 +71,15 @@ public class GraphContainer {
 	private TimeManagerCreation mTimeManagerCreation = null;
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
-	private String mRestUrl;
+
+	private Thread mFacadeNetworkThread;
+	private Thread mFacadeLogicThread;
+	private Thread mTimeManagerCreationThread;
+	private Thread mTimeManagerDeletionThread;
+
+	private boolean mGraphStarted;
+
+	// private String mRestUrl;
 
 	/**
 	 * The constructor initializes and connects all classes needed for a
@@ -82,31 +90,46 @@ public class GraphContainer {
 	 * @param dataserviceConnection
 	 *            is the connection to the selected dataservice
 	 */
-	public GraphContainer(String restConnectionName,
-			DataserviceConnection dataserviceConnection) {
-		mName = dataserviceConnection.getName() + ":" + restConnectionName;
-		mRestConnectionName = restConnectionName;
-		mRestUrl = dataserviceConnection.getUrl() + "/" + restConnectionName
-				+ "/graph";
+	public GraphContainer(MapServerRestConnectionImpl mapServerConnection, GraphService graphService) {
+		mMapSeverConnection = mapServerConnection;
+
 		mTimeHolder = new TimeHolder();
 		mGraphPool = new GraphPool();
 		mSettingManager = new SettingManager(this);
 		mTimeManagerCreation = new TimeManagerCreation(this);
 		mTimeManagerDeletion = new TimeManagerDeletion(this);
 
-		mDataserviceConnection = dataserviceConnection;
-
-		mConnection = FactoryConnection
-				.getConnection(ConnectionType.REST, this);
+		mConnection = new GraphNetworkConnection(graphService, this);
 		mCalculator = FactoryCalculator.getCalculator(CalculatorType.JUNG);
 		mFacadeNetwork = new FacadeNetwork(this);
 		mFacadeLogic = new FacadeLogic(this);
 		mGraphConnection = new GraphConnection(this);
 
-		new Thread(mFacadeNetwork).start();
-		new Thread(mFacadeLogic).start();
-		new Thread(mTimeManagerCreation).start();
-		new Thread(mTimeManagerDeletion).start();
+		String ConnectionThreadName = "-Thread('" + mMapSeverConnection.getConnectionName() + "')";
+		mFacadeNetworkThread = new Thread(mFacadeNetwork, "FacadeNetwork" + ConnectionThreadName);
+		mFacadeLogicThread = new Thread(mFacadeLogic, "FacadeLogic" + ConnectionThreadName);
+		mTimeManagerCreationThread = new Thread(mTimeManagerCreation, "TimeManagerCreation" + ConnectionThreadName);
+		mTimeManagerDeletionThread = new Thread(mTimeManagerDeletion, "TimeManagerDeletion" + ConnectionThreadName);
+
+		mFacadeNetworkThread.start();
+		mFacadeLogicThread.start();
+		mTimeManagerCreationThread.start();
+		mTimeManagerDeletionThread.start();
+		mGraphStarted = true;
+	}
+
+	public void finish() {
+		mTimeManagerDeletion.finish();
+		mTimeManagerCreation.finish();
+		mFacadeLogic.finish();
+		mFacadeNetwork.finish();
+		mFacadeNetworkThread.interrupt();
+
+		mGraphStarted = false;
+	}
+
+	public boolean isGraphStarted() {
+		return mGraphStarted;
 	}
 
 	public TimeHolder getTimeHolder() {
@@ -126,11 +149,15 @@ public class GraphContainer {
 	}
 
 	public String getName() {
-		return mName;
+		return getDataserviceConnectionName() + ":" + getMapServerConnectionName();
 	}
 
-	public String getRestConnectionName() {
-		return mRestConnectionName;
+	public String getDataserviceConnectionName() {
+		return mMapSeverConnection.getDataserviceConnection().getConnectionName();
+	}
+
+	public String getMapServerConnectionName() {
+		return mMapSeverConnection.getConnectionName();
 	}
 
 	public GraphConnection getGraphConnection() {
@@ -153,21 +180,18 @@ public class GraphContainer {
 		return mFacadeLogic;
 	}
 
-	public Connection getConnection() {
+	public GraphNetworkConnection getConnection() {
 		return mConnection;
 	}
 
-	public DataserviceConnection getDataserviceConnection() {
-		return mDataserviceConnection;
-	}
-
 	public String getRestUrl() {
-		return mRestUrl;
+		return mMapSeverConnection.getDataserviceConnection().getUrl() + "/" + mMapSeverConnection.getConnectionName()
+				+ "/graph";
 	}
 
 	@Override
 	public int hashCode() {
-		return mName.hashCode();
+		return getName().hashCode();
 	}
 
 	@Override
@@ -175,6 +199,6 @@ public class GraphContainer {
 		if (o == null || !(o instanceof GraphContainer)) {
 			return false;
 		}
-		return mName.equals((((GraphContainer) o).mName));
+		return getName().equals((((GraphContainer) o).getName()));
 	}
 }

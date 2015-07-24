@@ -54,7 +54,7 @@ import de.hshannover.f4.trust.visitmeta.dataservice.rest.RestService;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.ifmap.ConnectionManagerImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.DataserviceModule;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.ConnectionManager;
 import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
@@ -100,10 +100,8 @@ public abstract class Application {
 
 		initComponents();
 
-		List<DataserviceModule> modules = DataserviceModuleConnector
-				.initializeModules(mManager);
+		List<DataserviceModule> modules = DataserviceModuleConnector.initializeModules(mManager);
 		log.info(modules.size() + " dataservice modules were loaded.");
-		startRestService(modules);
 
 		try {
 			loadPersistentConnections();
@@ -116,8 +114,10 @@ public abstract class Application {
 		try {
 			startupConnect();
 		} catch (ConnectionException e) {
-			log.error("error while startupConnect", e);
+			log.error(e.toString());
 		}
+
+		startRestService(modules);
 
 		log.info("dataservice started successfully");
 	}
@@ -136,10 +136,9 @@ public abstract class Application {
 		return mManager;
 	}
 
-	private static void startupConnect() throws ConnectionException {
+	private static void startupConnect() throws ConnectionException, InterruptedException {
 		log.debug("startupConnect...");
 		mManager.executeStartupConnections();
-		;
 	}
 
 	private static void loadPersistentConnections() throws IOException {
@@ -149,25 +148,20 @@ public abstract class Application {
 		try {
 			keySet = mConnections.getKeySet();
 		} catch (PropertyException e) {
-			log.error("error while getKeySet from ConnectionsProperties -> "
-					+ e.toString(), e);
+			log.error("error while getKeySet from ConnectionsProperties -> " + e.toString(), e);
 		}
 
 		for (String s : keySet) {
-			Connection tmp = null;
+			MapServerConnection tmp = null;
 			try {
 				tmp = mConnections.buildConnection(s);
 			} catch (ConnectionException | PropertyException e) {
-				log.error(
-						"error while build new connection from Properties -> "
-								+ e.toString(), e);
+				log.error("error while build new connection from Properties -> " + e.toString(), e);
 			}
 			try {
 				mManager.addConnection(tmp);
 			} catch (ConnectionException e) {
-				log.error(
-						"error while adding connection to the connection pool",
-						e);
+				log.error("error while adding connection to the connection pool", e);
 			}
 		}
 	}

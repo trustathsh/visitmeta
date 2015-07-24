@@ -69,6 +69,7 @@ public class InMemoryLink extends InternalLink {
 		return new InternalIdentifierPair(mFirstIdentifier, mSecondIdentifier);
 	}
 
+	@Override
 	public void clearMetadata() {
 		mMeta.clear();
 	}
@@ -124,6 +125,16 @@ public class InMemoryLink extends InternalLink {
 	public boolean hasMetadata(InternalMetadata meta) {
 		for (InternalMetadata m : mMeta) {
 			if (m.equalsForLinks(meta)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean equalsSingleValue(InternalMetadata meta) {
+		for (InternalMetadata m : mMeta) {
+			if (m.equalsSingleValue(meta)) {
 				return true;
 			}
 		}

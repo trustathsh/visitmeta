@@ -61,6 +61,8 @@ public abstract class InternalLink {
 
 	public abstract List<InternalMetadata> getMetadata();
 
+	public abstract boolean equalsSingleValue(InternalMetadata meta);
+
 	@Override
 	public String toString() {
 		StringBuffer tmp = new StringBuffer();
@@ -81,21 +83,25 @@ public abstract class InternalLink {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null)
+		if (o == null) {
 			return false;
-		if (!(o instanceof InternalLink))
+		}
+		if (!(o instanceof InternalLink)) {
 			return false;
+		}
 		InternalLink other = (InternalLink) o;
 		if (getIdentifiers().getFirst().equals(
 				other.getIdentifiers().getFirst())) {
 			if (getIdentifiers().getSecond().equals(
-					other.getIdentifiers().getSecond()))
+					other.getIdentifiers().getSecond())) {
 				return true;
+			}
 		} else if (getIdentifiers().getFirst().equals(
 				other.getIdentifiers().getSecond())) {
 			if (getIdentifiers().getSecond().equals(
-					other.getIdentifiers().getFirst()))
+					other.getIdentifiers().getFirst())) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -119,7 +125,7 @@ public abstract class InternalLink {
 	 */
 	public boolean isValidAt(long timestamp) {
 		for (InternalMetadata m : getMetadata()) {
-			if (((InternalMetadata) m).isValidAt(timestamp)) {
+			if (m.isValidAt(timestamp)) {
 				return true;
 			}
 		}

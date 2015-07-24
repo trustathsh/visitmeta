@@ -38,108 +38,72 @@
  */
 package de.hshannover.f4.trust.visitmeta.ifmap;
 
+import de.hshannover.f4.trust.visitmeta.data.SubscriptionDataImpl;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.util.yaml.ConnectionsProperties;
 
-public class SubscriptionImpl implements Subscription {
+public class SubscriptionImpl extends SubscriptionDataImpl implements Subscription {
 
-	public String name;
-	public String identifier;
-	public String identifierType;
-	public String filterLinks;
-	public String filterResult;
-	public String terminalIdentifierTypes;
-	public boolean startupSubscribe;
-	public int maxDepth;
-	public int maxSize;
+	private MapServerConnection mMapServerConnection;
 
-	@Override
-	public String getName() {
-		return name;
+	public SubscriptionImpl(String subscriptionName, MapServerConnection mapServerConnection) {
+		super(subscriptionName);
+		mMapServerConnection = mapServerConnection;
+
+		init();
+	}
+
+	public SubscriptionImpl(MapServerConnection mapServerConnection, SubscriptionData subscriptionData) {
+		this(subscriptionData.getName(), mapServerConnection);
+
+		super.setStartIdentifier(subscriptionData.getStartIdentifier());
+		super.setIdentifierType(subscriptionData.getIdentifierType());
+		super.setMatchLinksFilter(subscriptionData.getMatchLinksFilter());
+		super.setResultFilter(subscriptionData.getResultFilter());
+		super.setTerminalIdentifierTypes(subscriptionData.getTerminalIdentifierTypes());
+		super.setStartupSubscribe(subscriptionData.isStartupSubscribe());
+		super.setActive(subscriptionData.isActive());
+
+		if (subscriptionData.getMaxSize() > 0) {
+			super.setMaxSize(subscriptionData.getMaxSize());
+		}
+		if (subscriptionData.getMaxDepth() > 0) {
+			super.setMaxDepth(subscriptionData.getMaxDepth());
+		}
+	}
+
+	private void init() {
+		// set default data
+		super.setMaxDepth(ConnectionsProperties.DEFAULT_SUBSCRIPTION_MAX_DEPTH);
+		super.setMaxSize(ConnectionsProperties.DEFAULT_MAX_POLL_RESULT_SIZE);
 	}
 
 	@Override
-	public void setName(String name) {
-		this.name = name;
+	public SubscriptionImpl copy() {
+		SubscriptionData dataCopy = super.copy();
+		SubscriptionImpl tmpCopy = new SubscriptionImpl(mMapServerConnection, dataCopy);
+		return tmpCopy;
 	}
 
 	@Override
-	public String getStartIdentifier() {
-		return identifier;
+	public SubscriptionImpl clone() {
+		return (SubscriptionImpl) super.clone();
 	}
 
 	@Override
-	public void setStartIdentifier(String identifier) {
-		this.identifier = identifier;
+	public void stopSubscription() throws ConnectionException {
+		mMapServerConnection.subscribe(this, false);
+
+		super.setActive(false);
 	}
 
 	@Override
-	public String getIdentifierType() {
-		return identifierType;
-	}
-
-	@Override
-	public void setIdentifierType(String identifierType) {
-		this.identifierType = identifierType;
-	}
-
-	@Override
-	public String getMatchLinksFilter() {
-		return filterLinks;
-	}
-
-	@Override
-	public void setMatchLinksFilter(String filterLinks) {
-		this.filterLinks = filterLinks;
-	}
-
-	@Override
-	public String getResultFilter() {
-		return filterResult;
-	}
-
-	@Override
-	public void setResultFilter(String filterResult) {
-		this.filterResult = filterResult;
-	}
-
-	@Override
-	public String getTerminalIdentifierTypes() {
-		return terminalIdentifierTypes;
-	}
-
-	@Override
-	public void setTerminalIdentifierTypes(String terminalIdentifierTypes) {
-		this.terminalIdentifierTypes = terminalIdentifierTypes;
-	}
-
-	@Override
-	public boolean isStartupSubscribe() {
-		return startupSubscribe;
-	}
-
-	@Override
-	public void setStartupSubscribe(boolean startupSubscribe) {
-		this.startupSubscribe = startupSubscribe;
-	}
-
-	@Override
-	public int getMaxDepth() {
-		return maxDepth;
-	}
-
-	@Override
-	public void setMaxDepth(int maxDepth) {
-		this.maxDepth = maxDepth;
-	}
-
-	@Override
-	public int getMaxSize() {
-		return maxSize;
-	}
-
-	@Override
-	public void setMaxSize(int maxSize) {
-		this.maxSize = maxSize;
+	public void startSubscription() throws ConnectionException {
+		mMapServerConnection.subscribe(this, true);
+		super.setActive(true);
 	}
 
 }

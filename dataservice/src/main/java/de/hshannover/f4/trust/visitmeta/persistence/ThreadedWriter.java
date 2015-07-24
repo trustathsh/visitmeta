@@ -79,8 +79,8 @@ public class ThreadedWriter implements Runnable, Writer {
 				log.debug("Processing PollResult ...");
 				mWriter.submitPollResult(pr);
 			} catch (InterruptedException e) {
-				log.fatal("Writer thread got interrupted");
-				e.printStackTrace();
+				log.warn("STOP Writer thread");
+				break;
 			}
 		}
 

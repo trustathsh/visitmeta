@@ -8,29 +8,63 @@ HTTP:GET
 http://example.com:8000
 \end{lstlisting}
 
-If the suffix \textit{?onlyActive=true} is given, only active connections will be returned.
-
-\begin{lstlisting}
-HTTP:GET
-http://example.com:8000?onlyActive=true
-\end{lstlisting}
-
 \textbf{Response:}
 \begin{lstlisting}
-["default", "exampleConn"]
+[
+  {
+    "default":
+    {
+      "ifmapServerUrl": "https://localhost:8443",
+      "userName": "visitmeta",
+      "userPassword": "visitmeta",
+      "authenticationBasic": true,
+      "truststorePath": "/visitmeta.jks",
+      "truststorePassword": "visitmeta",
+      "useAsStartup": true,
+      "maxPollResultSize": 1000000000,
+      "isConnected": false,
+      "subscriptions":
+      [
+        {
+          "subDefault":
+          {
+            "startIdentifier": "freeradius-pdp",
+            "identifierType": "device",
+            "useAsStartup": false,
+            "maxDepth": 1000,
+            "maxSize": 1000000000,
+            "isActive": false
+          }
+        }
+      ]
+    }
+  }
+]
 \end{lstlisting}
 The Response returns a JSON-Array which contains every \{Connection Name\} saved in the dataservice. 
 
-\subsection{Save Connection}
+\subsection{Save or Update Connection}
 \begin{lstlisting}
 HTTP:PUT
 http://example.com:8000/
 Content-Type: application/json
 {
-	connectionName:{Connection Name}
-	ifmapServerUrl:{map-Server},
-	userName:{Username},
-	userPassword:{Password}
+  "{Connection Name}":
+  {
+    "ifmapServerUrl": "{map-Server}",
+    "userName": "{Username}",
+    "userPassword": "{Password}",
+    "subscriptions":
+    [
+      {
+        "{Subscription Name}":
+        {
+          "startIdentifier": "{Identifier Name}",
+          "identifierType": "{Identifier Type}"
+        }
+      }
+    ]
+  }
 }
 \end{lstlisting}
 List of required parameters:
@@ -42,10 +76,12 @@ List of required parameters:
 \end{itemize}
 List of optional parameters:
 \begin{itemize}
+\item subscriptions
 \item authenticationBasic
+\item authenticationCert (is not implemented yet)
 \item truststorePath
 \item truststorePassword
-\item useConnectionAsStartup
+\item useAsStartup
 \item maxPollResultSize
 \end{itemize}
 
@@ -55,20 +91,32 @@ HTTP:PUT
 http://example.com:8000/
 Content-Type: application/json
 {
-	connectionName: exampleConn
-	ifmapServerUrl:"https://localhost:8443",
-	userName:visitmeta,
-	userPassword:visitmeta
+  "connExample":
+  {
+    "ifmapServerUrl": "https://localhost:8443",
+    "userName": "visitmeta",
+    "userPassword": "visitmeta",
+    "subscriptions":
+    [
+      {
+        "subExample":
+        {
+          "startIdentifier": "freeradius-pdp",
+          "identifierType": "device"
+        }
+      }
+    ]
+  }
 }
 \end{lstlisting}
 
 \textbf{Response:}
 \begin{lstlisting}
-exampleConn was saved
+connExample was saved or updated
 \end{lstlisting}
 
 \subsection{Delete Connection}
-\textbf{Not implemented as of \today}
+
 \begin{lstlisting}
 HTTP:DELETE
 http://example.com:8000/{Connection Name}
@@ -77,12 +125,12 @@ http://example.com:8000/{Connection Name}
 \textbf{Example Request:}
 \begin{lstlisting}
 HTTP:DELETE
-http://example.com:8000/default
+http://example.com:8000/conExample
 \end{lstlisting}
 
 \textbf{Response:}
 \begin{lstlisting}
-Not implemented
+INFO: delete connection(conExample) successfully
 \end{lstlisting}
 
 \subsection{Connect}

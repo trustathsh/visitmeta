@@ -41,13 +41,11 @@ package de.hshannover.f4.trust.visitmeta.ifmap;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.channel.ARC;
-import de.hshannover.f4.trust.ironcommon.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.dataservice.Application;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalIdentifierFactory;
 import de.hshannover.f4.trust.visitmeta.dataservice.factories.InternalMetadataFactory;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionCloseException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
-import de.hshannover.f4.trust.visitmeta.interfaces.ifmap.Connection;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.persistence.Writer;
 
 /**
@@ -65,9 +63,7 @@ public class UpdateService implements Runnable {
 	protected final static int DEFAULT_MAX_RETRY = 10;
 	protected final static int DEFAULT_RETRY_INTERVAL = 10;
 
-	protected Properties config = Application.getConfig();
-
-	private Connection mConnection;
+	private MapServerConnection mConnection;
 
 	protected Writer mWriter;
 
@@ -85,7 +81,7 @@ public class UpdateService implements Runnable {
 	 * @param identifierFactory
 	 * @param metadataFactory
 	 */
-	public UpdateService(Connection connection, Writer writer,
+	public UpdateService(MapServerConnection connection, Writer writer,
 			InternalIdentifierFactory identifierFactory,
 			InternalMetadataFactory metadataFactory) {
 		log.trace("new UpdateService() ...");
@@ -121,8 +117,7 @@ public class UpdateService implements Runnable {
 		log.debug("run() ...");
 
 		while (!Thread.interrupted()) {
-			PollTask task = new PollTask(mConnection, mMetadataFactory,
-					mIfmapJHelper);
+			PollTask task = new PollTask(mConnection, mMetadataFactory, mIfmapJHelper);
 			try {
 
 				PollResult pollResult = task.call();

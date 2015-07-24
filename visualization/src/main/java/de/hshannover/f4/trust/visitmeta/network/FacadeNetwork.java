@@ -43,8 +43,8 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.datawrapper.SettingManager;
 import de.hshannover.f4.trust.visitmeta.datawrapper.TimeHolder;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 
@@ -56,7 +56,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	private static final Logger LOGGER = Logger.getLogger(FacadeNetwork.class);
 
 	private GraphContainer mConnection = null;
-	private Connection mNetworkConnection = null;
+	private GraphNetworkConnection mNetworkConnection = null;
 	private TimeHolder mTimeHolder = null;
 	private GraphPool mGraphPool = null;
 	private SettingManager mSettingManager = null;
@@ -88,14 +88,14 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Ends the main loop.
 	 */
-	public synchronized void finish() {
+	public void finish() {
 		mIsDone = true;
 	}
 
 	/**
 	 * Loads the initial graph. This method notifies the observer.
 	 * 
-	 * @see Connection#loadGraphAtDeltaStart()
+	 * @see GraphNetworkConnection#loadGraphAtDeltaStart()
 	 */
 	public synchronized void loadGraphAtDeltaStart() {
 		clearGraph();
@@ -111,14 +111,14 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Loads the current graph. This method notifies the observer.
 	 * 
-	 * @see Connection#loadCurrentGraph()
+	 * @see GraphNetworkConnection#loadCurrentGraph()
 	 */
 	public synchronized void loadCurrentGraph() {
 		clearGraph();
 		try {
 			mNetworkConnection.loadCurrentGraph();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.debug("Interrupted loadCurrentGraph()");
 		}
 		setChanged();
 		notifyObservers();
@@ -127,7 +127,7 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 	/**
 	 * Loads the delta. This method notifies the observer.
 	 * 
-	 * @see Connection#loadDelta()
+	 * @see GraphNetworkConnection#loadDelta()
 	 */
 	public synchronized void loadDelta() {
 		mNetworkConnection.loadDelta();
@@ -144,32 +144,38 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 
 	@Override
 	public void run() {
-		try {
-			synchronized (this) {
-				loadCurrentGraph();
-				while (!mIsDone) {
-					mNetworkConnection.loadChangesMap();
+		synchronized (this) {
+			loadCurrentGraph();
+			while (!mIsDone) {
+				mNetworkConnection.loadChangesMap();
+
+				try {
 					if (mLoadNewest && mNetworkConnection.updateGraph()) {
 						setChanged();
 						notifyObservers();
 					}
+				} catch (InterruptedException e) {
+					LOGGER.debug("Interrupted updateGraph()");
+				}
+
+				try {
 					wait(mInterval);
+				} catch (InterruptedException e) {
+					LOGGER.debug("Interrupted wait()");
 				}
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		LOGGER.info("Loop which updates the Graph has ended.");
 	}
 
 	@Override
 	public void update(Observable observable, Object obj) {
-		synchronized (this) {
 			if (observable instanceof TimeHolder) {
+			synchronized (this) {
 				mLoadNewest = mTimeHolder.isLiveView();
+			}
 			} else if (observable instanceof SettingManager) {
 				mInterval = mSettingManager.getNetworkInterval();
 			}
-		}
 	}
 }

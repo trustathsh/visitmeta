@@ -41,18 +41,19 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
 public class GuiController {
-	private static final Logger LOGGER = Logger
-			.getLogger(GraphConnection.class);
+
+	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
+
 	private MainWindow mMainWindow = null;
+
 	private ConnectionTab mSelectedConnection = null;
 
 	public GuiController(MotionControllerHandler motionController) {
@@ -70,21 +71,15 @@ public class GuiController {
 
 		mMainWindow.getConnectionTree().addTreeSelectionListener(
 				new TreeSelectionListener() {
-
 					@Override
 					public void valueChanged(TreeSelectionEvent e) {
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
-								.getPath().getLastPathComponent();
-						if (node.getUserObject() instanceof ConnectionTab) {
-							setSelectedConnectionTab((ConnectionTab) node
-									.getUserObject());
+						Object selectedComponent = e.getPath().getLastPathComponent();
+						if (selectedComponent instanceof MapServerRestConnectionImpl) {
+							MapServerRestConnectionImpl connection = (MapServerRestConnectionImpl) selectedComponent;
+							setSelectedConnectionTab(connection.getConnectionTab());
 						}
 					}
 				});
-	}
-
-	public void updateRestConnections() {
-		mMainWindow.updateRestConnections();
 	}
 
 	public GraphConnection getSelectedConnection() {
@@ -100,24 +95,13 @@ public class GuiController {
 	}
 
 	/**
-	 * Adds a connection to the GuiController
-	 *
-	 * @param name
-	 *            of the connection
-	 * @param connection
-	 *            ConnectionController object
-	 */
-	public void addDataserviceConnection(DataserviceConnection dataservice) {
-		mMainWindow.addDataserviceConnection(dataservice);
-	}
-
-	/**
 	 * Pack and set visible.
 	 */
 	public void show() {
 		LOGGER.trace("Method show() called.");
 		mMainWindow.pack();
 		mMainWindow.setVisible(true);
+		mMainWindow.openConnectedMapServerConnections();
 	}
 
 	/**
@@ -126,8 +110,7 @@ public class GuiController {
 	public void showColorSettings() {
 		LOGGER.trace("Method showColorSettings() called.");
 		if (checkForSelectedConnection(
-				"A connection must be selected to edit the color settings.",
-				"Color settings")) {
+				"A connection must be selected to edit the color settings.", "Color settings")) {
 			mSelectedConnection.showColorSettings(mMainWindow);
 		}
 	}
@@ -138,8 +121,7 @@ public class GuiController {
 	public void showSettings() {
 		LOGGER.trace("Method showSettings() called.");
 		if (checkForSelectedConnection(
-				"A connection must be selected to edit the window settings.",
-				"Window settings")) {
+				"A connection must be selected to edit the window settings.", "Window settings")) {
 			mSelectedConnection.showSettings(mMainWindow);
 		}
 	}
@@ -151,24 +133,21 @@ public class GuiController {
 	 */
 	public void setLayoutType(LayoutType layoutType) {
 		if (checkForSelectedConnection(
-				"A connection must be selected to change the layout algorithm.",
-				"Layout settings")) {
+				"A connection must be selected to change the layout algorithm.", "Layout settings")) {
 			mSelectedConnection.getConnection().setLayoutType(layoutType);
 		}
 	}
 
 	public void redrawGraph() {
 		if (checkForSelectedConnection(
-				"A connection must be selected to redraw the graph.",
-				"Redraw graph")) {
+				"A connection must be selected to redraw the graph.", "Redraw graph")) {
 			mSelectedConnection.getConnection().redrawGraph();
 		}
 	}
 
 	public String switchGraphMotion() {
 		if (checkForSelectedConnection(
-				"A connection must be selected to change the animation of the graph.",
-				"Change graph animation")) {
+				"A connection must be selected to change the animation of the graph.", "Change graph animation")) {
 			if (mSelectedConnection.getConnection().isGraphMotion()) {
 				mSelectedConnection.getConnection().stopGraphMotion();
 				return "Start";
@@ -189,8 +168,7 @@ public class GuiController {
 		if (mSelectedConnection != null) {
 			return true;
 		} else {
-			JOptionPane.showMessageDialog(mMainWindow, message, title,
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mMainWindow, message, title, JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
 	}

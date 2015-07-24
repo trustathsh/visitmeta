@@ -116,6 +116,11 @@ public class InternalIdentifierStub extends InternalIdentifier {
 	}
 
 	@Override
+	public boolean equalsSingleValue(InternalMetadata meta) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void clearLinks() {
 		throw new UnsupportedOperationException();
 	}

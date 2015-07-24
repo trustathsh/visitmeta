@@ -38,70 +38,67 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICES_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.DATASERVICE_NOT_PERSISTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_CONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_DISCONNECTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.MAPSERVER_NOT_PERSISTED_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_ACTIVE_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_INACTIVE_ICON;
+import static de.hshannover.f4.trust.visitmeta.util.ImageIconLoader.SUBSCRIPTION_NOT_PERSISTED_ICON;
+
 import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class ConnectionTreeCellRenderer extends DefaultTreeCellRenderer {
-	private static final long serialVersionUID = 1L;
-	private ImageIcon[] connectionStatusIcon = null;
-	private ImageIcon dataserviceIcon = null;
-	private ImageIcon connectionIcon = null;
+	
+	private static final long serialVersionUID = 7918592799908870099L;
 
 	public ConnectionTreeCellRenderer() {
 		super();
-		if (dataserviceIcon == null) {
-			dataserviceIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("dataservice.png").getPath());
-		}
-
-		if (connectionIcon == null) {
-			connectionIcon = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("connection.png").getPath());
-		}
-
-		if (connectionStatusIcon == null) {
-			connectionStatusIcon = new ImageIcon[2];
-			connectionStatusIcon[0] = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("connected.png").getPath());
-			connectionStatusIcon[1] = new ImageIcon(ConnectionTreeCellRenderer.class.getClassLoader()
-					.getResource("disconnected.png").getPath());
-		}
 	}
 
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
 			boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		Object tmpValue = ((DefaultMutableTreeNode) value).getUserObject();
-		if (!leaf) {
-			if (tmpValue instanceof String) {
-				if (((String) tmpValue).equals("Dataservices")) {
-					setIcon(dataserviceIcon);
-				}
-			} else if (tmpValue instanceof DataserviceConnection) {
-				setIcon(connectionIcon);
-			}
-		} else {
-			if (tmpValue instanceof ConnectionTab) {
-				ConnectionTab tmp = (ConnectionTab) tmpValue;
-				setIcon(getStatusIcon(tmp.isConnected()));
-			}
-		}
 
+		if (value instanceof Data) {
+			setIcon(getStatusIcon((Data) value));
+		}
 		return this;
 	}
 
-	private ImageIcon getStatusIcon(boolean status) {
-		if (status) {
-			return connectionStatusIcon[0];
-		} else {
-			return connectionStatusIcon[1];
+	private ImageIcon getStatusIcon(Data data) {
+		if (data instanceof DataserviceRestConnectionImpl) {
+			if (((DataserviceRestConnectionImpl) data).isNotPersised()) {
+				return DATASERVICE_NOT_PERSISTED_ICON;
+			} else if (((DataserviceRestConnectionImpl) data).isConnected()) {
+				return DATASERVICE_CONNECTED_ICON;
+			}
+			return DATASERVICE_DISCONNECTED_ICON;
+		} else if (data instanceof MapServerRestConnectionImpl) {
+			if (((MapServerRestConnectionImpl) data).isNotPersised()) {
+				return MAPSERVER_NOT_PERSISTED_ICON;
+			} else if (((MapServerRestConnectionImpl) data).isConnected()) {
+				return MAPSERVER_CONNECTED_ICON;
+			}
+			return MAPSERVER_DISCONNECTED_ICON;
+		} else if (data instanceof RestSubscriptionImpl) {
+			if (((RestSubscriptionImpl) data).isNotPersised()) {
+				return SUBSCRIPTION_NOT_PERSISTED_ICON;
+			} else if (((RestSubscriptionImpl) data).isActive()) {
+				return SUBSCRIPTION_ACTIVE_ICON;
+			}
+			return SUBSCRIPTION_INACTIVE_ICON;
 		}
+		return DATASERVICES_ICON;
 	}
 }

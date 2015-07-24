@@ -41,18 +41,18 @@ package de.hshannover.f4.trust.visitmeta.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -68,23 +68,35 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DataServiceParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.MapServerParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.SubscriptionParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
-import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
+import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
+import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterListener;
+import de.hshannover.f4.trust.visitmeta.gui.util.ParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.util.RESTConnectionTree;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestHelper;
+import de.hshannover.f4.trust.visitmeta.gui.util.RestSubscriptionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
 public class MainWindow extends JFrame {
 
@@ -101,10 +113,14 @@ public class MainWindow extends JFrame {
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
 	private JPanel mRightMainPanel = null;
+	private JPanel mJpParameter;
+	private ParameterPanel mJpParameterValues;
+	private JPanel mJpParameterSouth;
+	private JButton mJbParameterSave;
+	private JButton mJbParameterReset;
 	private JTabbedPane mTabbedConnectionPane = null;
 	private JScrollPane mConnectionScrollPane = null;
-	private JTree mConnectionTree = null;
-	private DefaultMutableTreeNode mTreeRoot = null;
+	private RESTConnectionTree mConnectionTree = null;
 	private ConnectionTreeCellRenderer mTreeRenderer = null;
 	private static List<SupportedLaF> supportedLaFs = new ArrayList<SupportedLaF>();
 	private ImageIcon[] mCancelIcon = null;
@@ -124,96 +140,23 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 *
-	 * @param connection
-	 */
-	public void addDataserviceConnection(DataserviceConnection dataservice) {
-		if (!existsDataservice(dataservice)) {
-			addDataserviceTreeNode(dataservice);
-			updateRestConnections();
-			mConnectionTree.expandPath(new TreePath(mTreeRoot.getPath()));
-		}
-	}
-
-	public void updateRestConnections() {
-		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
-					.getChildAt(i);
-			DataserviceConnection treeNodedataservice = (DataserviceConnection) tmpNode
-					.getUserObject();
-			List<String> restConnections;
-			try {
-				restConnections = treeNodedataservice.loadRestConnectionNames();
-
-				tmpNode.removeAllChildren();
-				for (String restConnectionName : restConnections) {
-					GraphContainer graphContainer = new GraphContainer(
-							restConnectionName, treeNodedataservice);
-					tmpNode.add(new DefaultMutableTreeNode(new ConnectionTab(
-							graphContainer, this)));
-				}
-			} catch (ClientHandlerException | UniformInterfaceException
-					| JSONException e) {
-				LOGGER.warn("Exception while load rest connection names, from "
-						+ treeNodedataservice.getName() + " -> "
-						+ e.getMessage());
-			}
-		}
-		mConnectionTree.updateUI();
-	}
-
-	private boolean existsDataservice(DataserviceConnection dataservice) {
-		String dataserviceName = dataservice.getName();
-		for (int i = 0; i < mTreeRoot.getChildCount(); i++) {
-			DefaultMutableTreeNode tmpNode = (DefaultMutableTreeNode) mTreeRoot
-					.getChildAt(i);
-			DataserviceConnection tmpDataserviceConnection = (DataserviceConnection) tmpNode
-					.getUserObject();
-			if (tmpDataserviceConnection.getName().equals(dataserviceName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void addDataserviceTreeNode(DataserviceConnection dataservice) {
-		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(dataservice);
-		mTreeRoot.add(newNode);
-		mConnectionTree.updateUI();
-	}
-
-	/**
-	 * Removes a connection
-	 *
-	 * @param connection
-	 *            the should be removed
-	 */
-	public void removeConnection(ConnectionTab connection) {
-		// TODO implement
-	}
-
-	/**
 	 * Initializes the main panel
 	 */
 	private void init() {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		Image visitMetaIcon16px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath())
-				.getImage();
-		Image visitMetaIcon32px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath())
-				.getImage();
-		Image visitMetaIcon64px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath())
-				.getImage();
-		Image visitMetaIcon128px = new ImageIcon(MainWindow.class
-				.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath())
-				.getImage();
+		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX)
+				.getPath()).getImage();
+		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX)
+				.getPath()).getImage();
+		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX)
+				.getPath()).getImage();
+		Image visitMetaIcon128px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX)
+				.getPath()).getImage();
 
-		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px,
-				visitMetaIcon32px, visitMetaIcon64px, visitMetaIcon128px);
+		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px, visitMetaIcon32px, visitMetaIcon64px,
+				visitMetaIcon128px);
 		this.setIconImages(visitMetaIcons);
 
 		initLeftHandSide();
@@ -235,85 +178,104 @@ public class MainWindow extends JFrame {
 	 * Initializes the left hand side of the main panel
 	 */
 	private void initLeftHandSide() {
+		try {
+			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
+		} catch (PropertyException e) {
+			LOGGER.error(e.toString(), e);
+		}
+
+		mConnectionTree.expandAllNodes();
+		mConnectionTree.addMouseListener(new ConnectionTreeMainWindowListener(this));
+
 		mTreeRenderer = new ConnectionTreeCellRenderer();
-		mTreeRoot = new DefaultMutableTreeNode("Dataservices");
-
-		mConnectionTree = new JTree(mTreeRoot);
-		mConnectionTree.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				mConnectionTree.setSelectionRow(mConnectionTree
-						.getClosestRowForLocation(e.getX(), e.getY()));
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getClosestPathForLocation(e.getX(), e.getY())
-							.getLastPathComponent()).getUserObject();
-					if (tmp instanceof ConnectionTab) {
-						new ConnectionTabListMenu((ConnectionTab) tmp).show(
-								mConnectionTree, e.getX(), e.getY());
-					}
-				} else if (e.getButton() == MouseEvent.BUTTON1
-						&& e.getClickCount() > 1) {
-					Object tmp = ((DefaultMutableTreeNode) mConnectionTree
-							.getLastSelectedPathComponent()).getUserObject();
-					if (tmp instanceof ConnectionTab) {
-						ConnectionTab tmpTab = (ConnectionTab) tmp;
-						boolean alreadyOpen = false;
-						for (Component t : mTabbedConnectionPane
-								.getComponents()) {
-							if (t.equals(tmpTab)) {
-								alreadyOpen = true;
-							}
-						}
-						if (!alreadyOpen) {
-							addClosableTab(tmpTab);
-						} else {
-							mTabbedConnectionPane.setSelectedComponent(tmpTab);
-						}
-					}
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-
 		mConnectionTree.setCellRenderer(mTreeRenderer);
+
 		mConnectionScrollPane = new JScrollPane(mConnectionTree);
 
 		mLeftMainPanel = new JPanel();
-		mLeftMainPanel.setLayout(new GridLayout());
-		mLeftMainPanel.add(mConnectionScrollPane);
+		mLeftMainPanel.setLayout(new GridBagLayout());
+
+		// x y w h wx wy
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.mLblInsets);
+	}
+
+	public void changeParameterPanel() {
+		if (mLeftMainPanel.getComponents().length > 1) {
+			mLeftMainPanel.remove(mLeftMainPanel.getComponents().length - 1);
+		}
+
+		mJpParameter = new JPanel();
+		mJpParameter.setLayout(new GridBagLayout());
+		mJpParameter.setBorder(BorderFactory.createTitledBorder("Parameter"));
+
+		mJbParameterSave = new JButton("Save");
+		mJbParameterSave.setEnabled(false);
+		mJbParameterSave.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				savePropertyChanges();
+			}
+		});
+
+		mJbParameterReset = new JButton("Reset");
+		mJbParameterReset.setEnabled(false);
+		mJbParameterReset.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				resetPropertyChanges();
+			}
+		});
+
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			mJpParameterValues = new DataServiceParameterPanel(((DataserviceData) selectedComponent).copy());
+			mJbParameterSave.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbParameterReset.setEnabled(((DataserviceRestConnectionImpl) selectedComponent).isNotPersised());
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			mJpParameterValues = new MapServerParameterPanel(((MapServerData) selectedComponent).copy());
+			mJbParameterSave.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+			mJbParameterReset.setEnabled(((MapServerRestConnectionImpl) selectedComponent).isNotPersised());
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			mJpParameterValues = new SubscriptionParameterPanel(((SubscriptionData) selectedComponent).copy());
+			mJbParameterSave.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
+			mJbParameterReset.setEnabled(((RestSubscriptionImpl) selectedComponent).isNotPersised());
+		}
+
+		if (mJpParameterValues != null) {
+			mJpParameterValues.addParameterListener(new ParameterListener() {
+				@Override
+				public void parameterChanged() {
+					Data changedData = mJpParameterValues.getData();
+					propertiesDataChanged(changedData);
+				}
+			});
+
+			mJpParameterSouth = new JPanel();
+			mJpParameterSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+			mJpParameterSouth.add(mJbParameterReset);
+			mJpParameterSouth.add(mJbParameterSave);
+
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
+			mLeftMainPanel.updateUI();
+		}
 	}
 
 	/**
-	 * Adds a component to a JTabbedPane with a little "close tab" button on the
-	 * right side of the tab.
+	 * Adds a component to a JTabbedPane with a little "close tab" button on the right side of the tab.
 	 *
-	 * @param cTab
-	 *            the ConnectionTab that should be added
+	 * @param cTab the ConnectionTab that should be added
 	 */
 	private void addClosableTab(final ConnectionTab cTab) {
 		if (mCancelIcon == null) {
 			mCancelIcon = new ImageIcon[2];
-			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader()
-					.getResource("close.png").getPath());
-			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader()
-					.getResource("closeHover.png").getPath());
+			mCancelIcon[0] = new ImageIcon(MainWindow.class.getClassLoader().getResource("close.png").getPath());
+			mCancelIcon[1] = new ImageIcon(MainWindow.class.getClassLoader().getResource("closeHover.png").getPath());
 		}
 		mTabbedConnectionPane.addTab(cTab.getConnName(), cTab);
 		int pos = mTabbedConnectionPane.indexOfComponent(cTab);
@@ -345,8 +307,7 @@ public class MainWindow extends JFrame {
 		ActionListener listener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mTabbedConnectionPane.remove(cTab);
-				mMotionControllerHandler.removeConnectionTab(cTab);
+				closeConnectionTab(cTab);
 			}
 		};
 		btnClose.addActionListener(listener);
@@ -368,14 +329,10 @@ public class MainWindow extends JFrame {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane
-						.getSelectedComponent();
+				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
 				if (currentTab != null) {
-					mMotionControllerHandler
-							.setCurrentConnectionTab(currentTab);
-					;
-					LOGGER.debug("Tab changed to "
-							+ currentTab.getConnName());
+					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
+					LOGGER.debug("Tab changed to " + currentTab.getConnName());
 				}
 			}
 		});
@@ -383,6 +340,29 @@ public class MainWindow extends JFrame {
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPane);
+	}
+
+	public void openConnectedMapServerConnections() {
+		Dataservices dataservices = (Dataservices) mConnectionTree.getModel().getRoot();
+
+		for (Data dataservice : dataservices.getSubData()) {
+			for (Data mapServerConnection : dataservice.getSubData()) {
+				if (mapServerConnection instanceof MapServerRestConnectionImpl) {
+					if (((MapServerRestConnectionImpl) mapServerConnection).isConnected()) {
+						showConnectedGraph((MapServerRestConnectionImpl) mapServerConnection);
+					}
+				}
+			}
+		}
+	}
+
+	private void showConnectedGraph(MapServerRestConnectionImpl mapServerConnection) {
+		if (!mapServerConnection.isGraphStarted()) {
+			mapServerConnection.initGraph();
+		}
+
+		addClosableTab(mapServerConnection.getConnectionTab());
+		mTabbedConnectionPane.setSelectedComponent(mapServerConnection.getConnectionTab());
 	}
 
 	/**
@@ -450,8 +430,7 @@ public class MainWindow extends JFrame {
 	private void setLookAndFeel() {
 		LOGGER.trace("Method setLookAndFeel() called.");
 
-		UIManager.LookAndFeelInfo[] installedLafs = UIManager
-				.getInstalledLookAndFeels();
+		UIManager.LookAndFeelInfo[] installedLafs = UIManager.getInstalledLookAndFeels();
 		for (UIManager.LookAndFeelInfo lafInfo : installedLafs) {
 			try {
 				@SuppressWarnings("rawtypes")
@@ -463,7 +442,7 @@ public class MainWindow extends JFrame {
 
 				}
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				LOGGER.error(e.getMessage(), e);
 				continue;
 			}
 		}
@@ -475,7 +454,7 @@ public class MainWindow extends JFrame {
 					UIManager.setLookAndFeel(laf);
 					lAf.menuItem.setSelected(true);
 				} catch (UnsupportedLookAndFeelException e) {
-					System.out.println(e.getMessage());
+					LOGGER.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -487,5 +466,177 @@ public class MainWindow extends JFrame {
 
 	public JTree getConnectionTree() {
 		return mConnectionTree;
+	}
+
+	public JTabbedPane getTabbedConnectionPane() {
+		return mTabbedConnectionPane;
+	}
+
+	public void showAllMapServerConnections(boolean b) {
+		mConnectionTree.showAllMapServerConnections(b);
+	}
+
+	public void showAllSubscriptions(boolean b) {
+		mConnectionTree.showAllSubscriptions(b);
+	}
+
+	public void propertiesDataChanged(Data changedData) {
+		mJbParameterSave.setEnabled(true);
+		mJbParameterReset.setEnabled(true);
+
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			if (!dataserviceConnection.isNotPersised()) {
+				dataserviceConnection.setOldData(((DataserviceData) dataserviceConnection).copy());
+			}
+			dataserviceConnection.changeData((DataserviceData) changedData);
+			dataserviceConnection.setNotPersised(true);
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			if (!mapServerConnection.isNotPersised()) {
+				mapServerConnection.setOldData(((MapServerData) mapServerConnection).copy());
+			}
+			mapServerConnection.changeData((MapServerData) changedData);
+			mapServerConnection.setNotPersised(true);
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			if (!subscription.isNotPersised()) {
+				subscription.setOldData(((SubscriptionData) subscription).copy());
+			}
+			subscription.changeData((SubscriptionData) changedData);
+			subscription.setNotPersised(true);
+		}
+
+		mConnectionTree.updateUI();
+	}
+
+	public void resetPropertyChanges() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			dataserviceConnection.resetData();
+			dataserviceConnection.setNotPersised(false);
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+			mapServerConnection.resetData();
+			mapServerConnection.setNotPersised(false);
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			subscription.resetData();
+			subscription.setNotPersised(false);
+
+		}
+		mConnectionTree.updateUI();
+		changeParameterPanel();
+	}
+
+	public void savePropertyChanges() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+
+		if (selectedComponent instanceof DataserviceRestConnectionImpl) {
+			DataserviceRestConnectionImpl dataserviceConnection = (DataserviceRestConnectionImpl) selectedComponent;
+			try {
+				Main.getDataservicePersister().persist(dataserviceConnection);
+				dataserviceConnection.setNotPersised(false);
+			} catch (PropertyException e) {
+				LOGGER.error(e.toString());
+			}
+
+		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			try {
+				RestHelper.saveMapServerConnection(mapServerConnection.getDataserviceConnection(), mapServerConnection);
+				mapServerConnection.setNotPersised(false);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
+				LOGGER.error(e.toString());
+			}
+
+		} else if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+			Data parentData = mConnectionTree.getSelectedParentData();
+			if (parentData instanceof MapServerRestConnectionImpl) {
+				MapServerRestConnectionImpl connectionData = (MapServerRestConnectionImpl) parentData;
+				try {
+					RestHelper.saveSubscription(connectionData.getDataserviceConnection(), connectionData.getName(),
+							subscription);
+					subscription.setNotPersised(false);
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
+						| ConnectionException e) {
+					LOGGER.error(e.toString());
+				}
+			}
+		}
+		mConnectionTree.updateUI();
+		mJbParameterSave.setEnabled(false);
+		mJbParameterReset.setEnabled(false);
+	}
+
+	public void showConnectionTreePopupMenu(int x, int y) {
+		TreePath mouseTreePath = mConnectionTree.getClosestPathForLocation(x, y);
+
+		selectPath(mouseTreePath);
+
+		Object selectedComponent = mouseTreePath.getLastPathComponent();
+
+		ConnectionTreePopupMenu popUp = new ConnectionTreePopupMenu(mConnectionTree, this, (Data) selectedComponent);
+		popUp.show(mConnectionTree, x, y);
+	}
+
+	public void openMapServerConnectionTab() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof MapServerRestConnectionImpl) {
+			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
+
+			if (!mapServerConnection.isGraphStarted()) {
+				mapServerConnection.initGraph();
+			}
+
+			boolean alreadyOpen = false;
+			Component tmpComponent = null;
+			for (Component t : mTabbedConnectionPane.getComponents()) {
+				if (mapServerConnection.getConnectionTab().equals(t)) {
+					alreadyOpen = true;
+					tmpComponent = t;
+				}
+			}
+			if (!alreadyOpen) {
+				addClosableTab(mapServerConnection.getConnectionTab());
+			} else {
+				closeConnectionTab((ConnectionTab) tmpComponent);
+			}
+		}
+	}
+
+	public void closeConnectionTab(ConnectionTab connectionTab) {
+		connectionTab.finishGraphContainer();
+		mTabbedConnectionPane.remove(connectionTab);
+		mMotionControllerHandler.removeConnectionTab(connectionTab);
+	}
+
+	public void mouseDoubleClicked() {
+		Object selectedComponent = mConnectionTree.getLastSelectedPathComponent();
+		if (selectedComponent instanceof RestSubscriptionImpl) {
+			RestSubscriptionImpl subscription = (RestSubscriptionImpl) selectedComponent;
+
+			if (subscription.isActive()) {
+				subscription.stopSubscription();
+			} else {
+				subscription.startSubscription();
+			}
+
+			mConnectionTree.updateUI();
+		}
+	}
+
+	public void selectPath(TreePath newPath) {
+		mConnectionTree.setSelectionPath(newPath);
+		changeParameterPanel();
 	}
 }

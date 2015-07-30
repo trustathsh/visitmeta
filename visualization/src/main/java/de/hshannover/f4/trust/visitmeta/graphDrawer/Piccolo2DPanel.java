@@ -202,30 +202,24 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		mMetadataInformationStrategy = MetadataInformationStrategyFactory
 				.create(metadataInformationStyleType);
 
-		String metadataNodeRenderer = mConfig.getString(
-				VisualizationConfig.KEY_PICCOLO2D_METADATA_NODE_STYLE,
+		mPiccolo2dMetadataRenderer = createPiccolo2dRenderer(VisualizationConfig.KEY_PICCOLO2D_METADATA_NODE_STYLE,
 				VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_METADATA_NODE_STYLE);
-		Piccolo2dNodeRendererType metadataNodeRendererType;
-		try {
-			metadataNodeRendererType = Piccolo2dNodeRendererType.valueOf(metadataNodeRenderer);
-		} catch (IllegalArgumentException e) {
-			metadataNodeRendererType =
-					Piccolo2dNodeRendererType.valueOf(VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_METADATA_NODE_STYLE);
-		}
-		mPiccolo2dMetadataRenderer = Piccolo2dNodeRendererFactory.create(metadataNodeRendererType);
 
-		String identifierNodeRenderer = mConfig.getString(
-				VisualizationConfig.KEY_PICCOLO2D_IDENTIFIER_NODE_STYLE,
+		mPiccolo2dIdentifierRenderer = createPiccolo2dRenderer(VisualizationConfig.KEY_PICCOLO2D_IDENTIFIER_NODE_STYLE,
 				VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_IDENTIFIER_NODE_STYLE);
-		Piccolo2dNodeRendererType identifierNodeRendererType;
+	}
+
+	private Piccolo2dNodeRenderer createPiccolo2dRenderer(String key, String defaultValue) {
+		String configEntry = mConfig.getString(key, defaultValue);
+		Piccolo2dNodeRendererType type;
 		try {
-			identifierNodeRendererType = Piccolo2dNodeRendererType.valueOf(identifierNodeRenderer);
+			type = Piccolo2dNodeRendererType.valueOf(configEntry);
 		} catch (IllegalArgumentException e) {
-			identifierNodeRendererType =
+			type =
 					Piccolo2dNodeRendererType
-							.valueOf(VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_IDENTIFIER_NODE_STYLE);
+					.valueOf(defaultValue);
 		}
-		mPiccolo2dIdentifierRenderer = Piccolo2dNodeRendererFactory.create(identifierNodeRendererType);
+		return Piccolo2dNodeRendererFactory.create(type);
 	}
 
 	@Override
@@ -246,9 +240,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
 			vText.setOffset(-0.5F
 					* (float) vText.getWidth(), -0.5F
-							* (float) vText.getHeight());
+					* (float) vText.getHeight());
 
-			final PPath vNode = mPiccolo2dIdentifierRenderer.createNode(vText);
+			final PPath vNode = mPiccolo2dIdentifierRenderer.createNode(pNode.getIdentifier(), vText);
 
 			/* Composite */
 			final PComposite vCom = new PComposite();
@@ -256,12 +250,12 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.addChild(vText);
 			vCom.setOffset( // Set position
 					mAreaOffsetX
-							+ pNode.getX()
-									* mAreaWidth, // x
+					+ pNode.getX()
+					* mAreaWidth, // x
 					mAreaOffsetY
-							+ pNode.getY()
-									* mAreaHeight // y
-			);
+					+ pNode.getY()
+					* mAreaHeight // y
+					);
 			// Add edges to node
 			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
@@ -283,7 +277,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		LOGGER.trace("Method addMetadata("
 				+ pNode + ") called.");
 		if (!mMapNode.containsKey(pNode)) {
-			final String vPublisher = MetadataHelper.findPublisherId(pNode.getMetadata());
+			final String vPublisher = MetadataHelper.extractPublisherId(pNode.getMetadata());
 			if (!mPublisher.contains(vPublisher)) {
 				mPublisher.add(vPublisher);
 			}
@@ -294,10 +288,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vText.setFont(new Font(null, Font.PLAIN, mFontSize));
 			vText.setOffset(-0.5F
 					* (float) vText.getWidth(), -0.5F
-							* (float) vText.getHeight());
+					* (float) vText.getHeight());
 
 			/* Rectangle */
-			final PPath vNode = mPiccolo2dMetadataRenderer.createNode(vText);
+			final PPath vNode = mPiccolo2dMetadataRenderer.createNode(pNode.getMetadata(), vText);
 
 			/* Composite */
 			final PComposite vCom = new PComposite();
@@ -305,10 +299,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.addChild(vText);
 			vCom.setOffset(mAreaOffsetX
 					+ pNode.getX()
-							* mAreaWidth,
+					* mAreaWidth,
 					mAreaOffsetY
-							+ pNode.getY()
-									* mAreaHeight);
+					+ pNode.getY()
+					* mAreaHeight);
 			vCom.addAttribute("type", NodeType.METADATA);
 			vCom.addAttribute("publisher", vPublisher);
 			vCom.addAttribute("position", pNode);
@@ -429,10 +423,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		if (!pNode.isInUse()) {
 			final double vX = mAreaOffsetX
 					+ pNode.getX()
-							* mAreaWidth;
+					* mAreaWidth;
 			final double vY = mAreaOffsetY
 					+ pNode.getY()
-							* mAreaHeight;
+					* mAreaHeight;
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -460,7 +454,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 								public void getSourceMatrix(
 										final double[] aSource) {
 									vNode.getTransformReference(true)
-											.getMatrix(aSource);
+									.getMatrix(aSource);
 								}
 							};
 							PActivity vNodeTranslation = new PTransformActivity(
@@ -641,13 +635,13 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		PPath vShadow = PPath.createEllipse(-0.5F
 				* vShadowWidth, // x
 				-0.5F
-						* vShadowHeight, // y
+				* vShadowHeight, // y
 				vShadowWidth, // width
 				vShadowHeight // height
-		);
+				);
 		vShadow.setOffset((float) (vPosition.getX()), // x
 				(float) (vPosition.getY()) // y
-		);
+				);
 		vShadow.setStroke(null);
 		Color opaqueHighlight = new Color(pHighlight.getRed(),
 				pHighlight.getGreen(), pHighlight.getBlue(), 255);
@@ -722,13 +716,13 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			int vOffset = 50;
 			final PBounds vBounds = new PBounds(xMin
 					- vOffset, yMin
-							- vOffset,
+					- vOffset,
 					xMax
-							- xMin + 2
-									* vOffset,
+					- xMin + 2
+					* vOffset,
 					yMax
-							- yMin + 2
-									* vOffset);
+					- yMin + 2
+					* vOffset);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {

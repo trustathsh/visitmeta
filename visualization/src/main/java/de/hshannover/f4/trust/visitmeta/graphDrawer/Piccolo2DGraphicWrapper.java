@@ -38,47 +38,61 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
-import org.apache.log4j.Logger;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.geom.Point2D;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
 
-public final class GraphPanelFactory {
+public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 
-	/**
-	 *
-	 */
-	private GraphPanelFactory() {
+	private PPath mNode;
+	private PText mText;
+
+	public Piccolo2DGraphicWrapper(PPath node, PText text) {
+		mNode = node;
+		mText = text;
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(GraphPanelFactory.class);
-
-	/**
-	 * Return a Panel that shows the graph.
-	 *
-	 * @param type
-	 *            define witch Panel to return. "Piccolo2D" a Panel that use
-	 *            Piccolo2D to draw the graph. TODO "OpenGL" a Panel that use
-	 *            OpenGL to draw the graph.
-	 * @return a Panel that shows the graph.
-	 */
-	public static GraphPanel getGraphPanel(String type, GraphConnection connection) {
-		LOGGER.trace("Method getGraphPanel("
-				+ type + ") called.");
-		GraphPanel panel;
-		switch (type) {
-			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
-			default:
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-		}
+	@Override
+	public void setPaint(Paint color) {
+		this.mNode.setPaint(color);
 	}
+
+	@Override
+	public Paint getStrokePaint() {
+		return mNode.getStrokePaint();
+	}
+
+	@Override
+	public void setTextPaint(Paint color) {
+		mText.setTextPaint(color);
+	}
+
+	@Override
+	public double getWidth() {
+		return mNode.getWidth();
+	}
+
+	@Override
+	public double getHeight() {
+		return mNode.getHeight();
+	}
+
+	@Override
+	public void setStrokePaint(Color color) {
+		this.mNode.setStrokePaint(color);
+	}
+
+	@Override
+	public void setTransparency(float f) {
+		this.mNode.setTransparency(f);
+	}
+
+	@Override
+	public Point2D getCenter2D() {
+		return mNode.getBounds().getCenter2D();
+	}
+
 }

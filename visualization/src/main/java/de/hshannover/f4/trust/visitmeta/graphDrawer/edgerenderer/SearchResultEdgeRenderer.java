@@ -36,49 +36,40 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer;
 
-import org.apache.log4j.Logger;
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+public class SearchResultEdgeRenderer implements EdgeRenderer {
 
-public final class GraphPanelFactory {
+	private static final Properties mConfig = Main.getConfig();
 
-	/**
-	 *
-	 */
-	private GraphPanelFactory() {
+	private float mHideSearchMismatchesTransparency;
+
+	private Searchable mSearchable;
+
+	public SearchResultEdgeRenderer(GraphPanel panel) {
+		if (panel instanceof Searchable) {
+			mSearchable = (Searchable) panel;
+		}
+
+		mHideSearchMismatchesTransparency = (float) mConfig.getDouble(
+				VisualizationConfig.KEY_SEARCH_AND_FILTER_TRANSPARENCY,
+				VisualizationConfig.DEFAULT_VALUE_SEARCH_AND_FILTER_TRANSPARENCY);
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(GraphPanelFactory.class);
-
-	/**
-	 * Return a Panel that shows the graph.
-	 *
-	 * @param type
-	 *            define witch Panel to return. "Piccolo2D" a Panel that use
-	 *            Piccolo2D to draw the graph. TODO "OpenGL" a Panel that use
-	 *            OpenGL to draw the graph.
-	 * @return a Panel that shows the graph.
-	 */
-	public static GraphPanel getGraphPanel(String type, GraphConnection connection) {
-		LOGGER.trace("Method getGraphPanel("
-				+ type + ") called.");
-		GraphPanel panel;
-		switch (type) {
-			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
-			default:
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
+	@Override
+	public void paintEdge(GraphicWrapper g) {
+		if (mSearchable.getHideSearchMismatches()) {
+			g.setTransparency(mHideSearchMismatchesTransparency);
+		} else {
+			g.setTransparency(1.0f);
 		}
 	}
+
 }

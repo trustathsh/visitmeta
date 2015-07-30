@@ -36,49 +36,21 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 
-public final class GraphPanelFactory {
+public class EdgeRendererFactory {
 
-	/**
-	 *
-	 */
-	private GraphPanelFactory() {
-	}
+	public static List<EdgeRenderer> getEdgeRenderer(GraphPanel panel) {
+		List<EdgeRenderer> result = new ArrayList<>();
 
-	private static final Logger LOGGER = Logger.getLogger(GraphPanelFactory.class);
+		result.add(new DefaultEdgeRenderer(panel));
+		result.add(new SearchResultEdgeRenderer(panel));
 
-	/**
-	 * Return a Panel that shows the graph.
-	 *
-	 * @param type
-	 *            define witch Panel to return. "Piccolo2D" a Panel that use
-	 *            Piccolo2D to draw the graph. TODO "OpenGL" a Panel that use
-	 *            OpenGL to draw the graph.
-	 * @return a Panel that shows the graph.
-	 */
-	public static GraphPanel getGraphPanel(String type, GraphConnection connection) {
-		LOGGER.trace("Method getGraphPanel("
-				+ type + ") called.");
-		GraphPanel panel;
-		switch (type) {
-			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
-			default:
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-		}
+		return result;
 	}
 }

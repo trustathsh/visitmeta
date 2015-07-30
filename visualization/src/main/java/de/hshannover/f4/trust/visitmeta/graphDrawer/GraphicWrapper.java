@@ -38,47 +38,25 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
-import org.apache.log4j.Logger;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.geom.Point2D;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+public interface GraphicWrapper {
 
-public final class GraphPanelFactory {
+	public void setPaint(Paint color);
 
-	/**
-	 *
-	 */
-	private GraphPanelFactory() {
-	}
+	public Paint getStrokePaint();
 
-	private static final Logger LOGGER = Logger.getLogger(GraphPanelFactory.class);
+	public void setTextPaint(Paint color);
 
-	/**
-	 * Return a Panel that shows the graph.
-	 *
-	 * @param type
-	 *            define witch Panel to return. "Piccolo2D" a Panel that use
-	 *            Piccolo2D to draw the graph. TODO "OpenGL" a Panel that use
-	 *            OpenGL to draw the graph.
-	 * @return a Panel that shows the graph.
-	 */
-	public static GraphPanel getGraphPanel(String type, GraphConnection connection) {
-		LOGGER.trace("Method getGraphPanel("
-				+ type + ") called.");
-		GraphPanel panel;
-		switch (type) {
-			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
-			default:
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-		}
-	}
+	public double getWidth();
+
+	public double getHeight();
+
+	public void setStrokePaint(Color color);
+
+	public void setTransparency(float f);
+
+	public Point2D getCenter2D();
 }

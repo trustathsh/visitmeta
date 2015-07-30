@@ -36,49 +36,45 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer;
+package de.hshannover.f4.trust.visitmeta.util;
 
-import org.apache.log4j.Logger;
+import java.util.List;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
-public final class GraphPanelFactory {
+public class MetadataHelper {
 
-	/**
-	 *
-	 */
-	private GraphPanelFactory() {
+	private MetadataHelper() {
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(GraphPanelFactory.class);
-
 	/**
-	 * Return a Panel that shows the graph.
+	 * Tries to extract the IF-MAP publisher id of a {@link Metadata} object.
 	 *
-	 * @param type
-	 *            define witch Panel to return. "Piccolo2D" a Panel that use
-	 *            Piccolo2D to draw the graph. TODO "OpenGL" a Panel that use
-	 *            OpenGL to draw the graph.
-	 * @return a Panel that shows the graph.
+	 * @param propable
+	 *            a {@link Metadata} object
+	 * @return the IF-MAP publisher id for the given {@link Metadata} object, if
+	 *         it is found in the properties; otherweise, a empty string is
+	 *         returned
 	 */
-	public static GraphPanel getGraphPanel(String type, GraphConnection connection) {
-		LOGGER.trace("Method getGraphPanel("
-				+ type + ") called.");
-		GraphPanel panel;
-		switch (type) {
-			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
-			default:
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
-				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
-				return panel;
+	public static String extractPublisherId(Metadata metadata) {
+		List<String> properties = metadata.getProperties();
+		for (String p : properties) {
+			if (p.contains(IfmapStrings.PUBLISHER_ID_ATTR)) {
+				return metadata.valueFor(p);
+			}
 		}
+
+		return "";
+	}
+
+	public static String findPublisherId(Metadata metadata) {
+		for (String property : metadata.getProperties()) {
+			if (property.contains("[@ifmap-publisher-id]")) {
+				return metadata.valueFor(property);
+			}
+		}
+
+		return "";
 	}
 }

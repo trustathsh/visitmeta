@@ -59,6 +59,8 @@ public interface Searchable {
 	 */
 	public void search(String searchTerm);
 
+	public String getSearchTerm();
+
 	/**
 	 * Setter for a {@link SearchAndFilterStrategy}. Can then be used to
 	 * delegate the decision, if a given node matches the given search term back
@@ -68,7 +70,9 @@ public interface Searchable {
 	 *            implementation of the {@link SearchAndFilterStrategy}
 	 *            interface
 	 */
-	void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy);
+	public void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy);
+
+	public SearchAndFilterStrategy getSearchAndFilterStrategy();
 
 	/**
 	 * Sets a flag if mismatches of a given search term shall be "hidden" or
@@ -81,4 +85,5 @@ public interface Searchable {
 	 */
 	public void setHideSearchMismatches(boolean b);
 
+	public boolean getHideSearchMismatches();
 }

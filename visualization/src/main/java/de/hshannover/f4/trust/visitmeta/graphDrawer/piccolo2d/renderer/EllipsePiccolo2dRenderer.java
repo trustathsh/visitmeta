@@ -38,6 +38,43 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer;
 
-public enum Piccolo2dNodeRendererType {
-	RECTANGLES_WITH_ROUNDED_CORNERS, RECTANGLES_WITH_SQUARE_CORNERS, ELLIPSE
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PBounds;
+
+public class EllipsePiccolo2dRenderer implements Piccolo2dNodeRenderer {
+
+	private double mGlowWidth = 80.0;
+	private double mGlowHeight = 40.0;
+
+	public PPath createNode(PText text) {
+		PBounds bounds = text.getFullBoundsReference();
+		float width = (float) (
+				bounds.getWidth()
+				+ mGlowWidth);
+		float height = (float) (bounds.getHeight()
+				+ mGlowHeight);
+
+		PPath result = PPath.createEllipse(-0.5F
+				* width, // x
+				-0.5F
+				* height, // y
+				width, // width
+				height // height
+				);
+
+		return result;
+	}
+
+	@Override
+	public PPath createNode(Identifier identifier, PText text) {
+		return createNode(text);
+	}
+
+	@Override
+	public PPath createNode(Metadata metadata, PText text) {
+		return createNode(text);
+	}
 }

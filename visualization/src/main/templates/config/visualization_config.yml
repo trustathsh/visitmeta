@@ -40,6 +40,12 @@ visualization:
       # If true, the prefix 'extended identifier: ' is shown before the actual name of an extended identifier.
       # This is not supported by all styles. 
       showextendedidentifierprefix: true
+    node:
+      # Sets the geometric style of identifier nodes; possible values are:
+      # RECTANGLES_WITH_ROUNDED_CORNERS
+      # RECTANGLES_WITH_SQUARE_CORNERS
+      # ELLIPSE
+      style: RECTANGLES_WITH_ROUNDED_CORNERS
   metadata:
     text:
       # Sets the text style for metadata nodes; possible values are:
@@ -47,6 +53,12 @@ visualization:
       # WITH_TIMESTAMP: adds a line with the publisher timestamp to the typename
       # COMPACT:        further information on additional lines
       style: COMPACT
+    node:
+      # Sets the geometric style of identifier nodes; possible values are:
+      # RECTANGLES_WITH_ROUNDED_CORNERS
+      # RECTANGLES_WITH_SQUARE_CORNERS
+      # ELLIPSE
+      style: RECTANGLES_WITH_SQUARE_CORNERS
   history:
     navigation:
       # Sets the control mechanism for history navigation; possible values are:

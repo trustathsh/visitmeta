@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,9 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRenderer;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer.Piccolo2dNodeRenderer;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer.Piccolo2dNodeRendererFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer.Piccolo2dNodeRendererType;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
@@ -134,6 +137,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private List<NodeRenderer> mNodeRenderer = new ArrayList<>();
 	private List<EdgeRenderer> mEdgeRenderer = new ArrayList<>();
 
+	private Piccolo2dNodeRenderer mPiccolo2dIdentifierRenderer = null;
+	private Piccolo2dNodeRenderer mPiccolo2dMetadataRenderer = null;
+
 	private boolean mHideSearchMismatches = false;
 
 	public Piccolo2DPanel(GraphConnection connection) {
@@ -195,6 +201,31 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		}
 		mMetadataInformationStrategy = MetadataInformationStrategyFactory
 				.create(metadataInformationStyleType);
+
+		String metadataNodeRenderer = mConfig.getString(
+				VisualizationConfig.KEY_PICCOLO2D_METADATA_NODE_STYLE,
+				VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_METADATA_NODE_STYLE);
+		Piccolo2dNodeRendererType metadataNodeRendererType;
+		try {
+			metadataNodeRendererType = Piccolo2dNodeRendererType.valueOf(metadataNodeRenderer);
+		} catch (IllegalArgumentException e) {
+			metadataNodeRendererType =
+					Piccolo2dNodeRendererType.valueOf(VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_METADATA_NODE_STYLE);
+		}
+		mPiccolo2dMetadataRenderer = Piccolo2dNodeRendererFactory.create(metadataNodeRendererType);
+
+		String identifierNodeRenderer = mConfig.getString(
+				VisualizationConfig.KEY_PICCOLO2D_IDENTIFIER_NODE_STYLE,
+				VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_IDENTIFIER_NODE_STYLE);
+		Piccolo2dNodeRendererType identifierNodeRendererType;
+		try {
+			identifierNodeRendererType = Piccolo2dNodeRendererType.valueOf(identifierNodeRenderer);
+		} catch (IllegalArgumentException e) {
+			identifierNodeRendererType =
+					Piccolo2dNodeRendererType
+							.valueOf(VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_IDENTIFIER_NODE_STYLE);
+		}
+		mPiccolo2dIdentifierRenderer = Piccolo2dNodeRendererFactory.create(identifierNodeRendererType);
 	}
 
 	@Override
@@ -217,19 +248,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 					* (float) vText.getWidth(), -0.5F
 							* (float) vText.getHeight());
 
-			final PPath vNode = PPath.createRoundRectangle(-5
-					- 0.5F
-							* (float) vText.getWidth(), // x
-					-5
-							- 0.5F
-									* (float) vText.getHeight(), // y
-					(float) vText.getWidth()
-							+ 10, // width TODO Add offset
-					(float) vText.getHeight()
-							+ 10, // height TODO Add offset
-					20.0f, // arcWidth TODO Design variable
-					20.0f // arcHeight TODO Design variable
-			);
+			final PPath vNode = mPiccolo2dIdentifierRenderer.createNode(vText);
+
 			/* Composite */
 			final PComposite vCom = new PComposite();
 			vCom.addChild(vNode);
@@ -242,12 +262,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 							+ pNode.getY()
 									* mAreaHeight // y
 			);
+			// Add edges to node
 			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
-			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
-			// edges
-			// to
-			// node
+			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>());
 
 			paintIdentifierNode(pNode.getIdentifier(), pNode, vNode, vText);
 
@@ -279,18 +297,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 							* (float) vText.getHeight());
 
 			/* Rectangle */
-			final PPath vNode = PPath.createRectangle(
-					-5
-							- 0.5F
-									* (float) vText.getWidth(), // x
-					-5
-							- 0.5F
-									* (float) vText.getHeight(), // y
-					(float) vText.getWidth()
-							+ 10, // width TODO Add offset
-					(float) vText.getHeight()
-							+ 10 // height TODO Add offset
-			);
+			final PPath vNode = mPiccolo2dMetadataRenderer.createNode(vText);
+
 			/* Composite */
 			final PComposite vCom = new PComposite();
 			vCom.addChild(vNode);
@@ -508,10 +516,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			Point2D vStart = vNode1.getFullBoundsReference().getCenter2D();
 			Point2D vEnd = vNode2.getFullBoundsReference().getCenter2D();
 			pEdge.reset();
-			/* Set edge color */
 			pEdge.moveTo((float) vStart.getX(), (float) vStart.getY());
 			pEdge.lineTo((float) vEnd.getX(), (float) vEnd.getY());
 
+			/* Set edge color */
 			paintEdge(pEdge);
 
 			pEdge.repaint();

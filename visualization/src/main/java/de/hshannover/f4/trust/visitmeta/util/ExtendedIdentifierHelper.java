@@ -36,8 +36,38 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer;
+package de.hshannover.f4.trust.visitmeta.util;
 
-public enum Piccolo2dNodeRendererType {
-	RECTANGLES_WITH_ROUNDED_CORNERS, RECTANGLES_WITH_SQUARE_CORNERS, ELLIPSE, EXAMPLE
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+
+public class ExtendedIdentifierHelper {
+
+	private ExtendedIdentifierHelper() {
+	}
+
+	public static boolean isExtendedIdentifier(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String type = wrapper.getValueForXpathExpressionOrElse("@"
+				+ IfmapStrings.IDENTITY_ATTR_TYPE, "type"); // type
+		if (type.equals("other")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static String getExtendedIdentifierInnerTypeName(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String name = wrapper.getValueForXpathExpressionOrElse("@"
+				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
+
+		int idxFirstSemicolon = name.indexOf(";");
+		if (idxFirstSemicolon != -1) {
+			return (name.substring(name.indexOf(";") + 1,
+					name.indexOf(" ")));
+		}
+		return "";
+	}
+
 }

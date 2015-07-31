@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,41 +38,47 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer;
 
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
-public class RectanglesWithRounderCornersPiccolo2dRenderer implements Piccolo2dNodeRenderer {
-
-	private float mArcWidth = 20.0f;
-	private float mArcHeight = 20.0f;
-	private float mOffsetWidth = 10.0f;
-	private float mOffsetHeight = 10.0f;
-
-	public PPath createNode(PText text) {
-		return PPath.createRoundRectangle(-5
-				- 0.5F
-				* (float) text.getWidth(), // x
-				-5
-				- 0.5F
-				* (float) text.getHeight(), // y
-				(float) text.getWidth()
-				+ mOffsetWidth, // width + offset
-				(float) text.getHeight()
-				+ mOffsetHeight, // height + offset
-				mArcWidth, // arcWidth
-				mArcHeight // arcHeight
-				);
-	}
+public class ExamplePiccolo2dRenderer implements Piccolo2dNodeRenderer {
 
 	@Override
 	public PPath createNode(Identifier identifier, PText text) {
-		return createNode(text);
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String typeName = wrapper.getTypeName();
+		switch (typeName) {
+		case IfmapStrings.IDENTITY_EL_NAME:
+			if (ExtendedIdentifierHelper.isExtendedIdentifier(identifier)) {
+				String extendedIdentifierTypeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
+				if (extendedIdentifierTypeName.equals("service")) {
+					return EllipsePiccolo2dRenderer.createNode(text);
+				}
+			}
+		case IfmapStrings.ACCESS_REQUEST_EL_NAME:
+		case IfmapStrings.DEVICE_EL_NAME:
+		case IfmapStrings.IP_ADDRESS_EL_NAME:
+		case IfmapStrings.MAC_ADDRESS_EL_NAME:
+		default:
+			return RectanglesWithRoundedCornersPiccolo2dRenderer.createNode(text);
+		}
 	}
 
 	@Override
 	public PPath createNode(Metadata metadata, PText text) {
-		return createNode(text);
+		String typeName = metadata.getTypeName();
+		switch (typeName) {
+		case "device-ip":
+			return EllipsePiccolo2dRenderer.createNode(text);
+		default:
+			return RectanglesWithSquareCornersPiccolo2dRenderer.createNode(text);
+		}
 	}
+
 }

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -189,7 +189,7 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 
 	/**
 	 * Check the change-map-size.
-	 * 
+	 *
 	 * @param changesMap
 	 * @param expected
 	 */
@@ -203,12 +203,13 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 	/**
 	 * Equals the map keys and values.
 	 * All keys and values from changesMap1 may be contains in changesMap2.
-	 * 
+	 *
 	 * @param changesMap1
 	 * @param changesMap2
 	 */
 	public void assertEqualsMapValues(SortedMap<Long, Long> changesMap1, SortedMap<Long, Long> changesMap2) {
-		if (changesMap1 == null || changesMap2 == null) {
+		if (changesMap1 == null
+				|| changesMap2 == null) {
 			throw new IllegalArgumentException();
 		}
 
@@ -218,7 +219,8 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 			Long chnageMap2Value = changesMap2.get(entry.getKey());
 
 			if (chnageMap2Value == null) {
-				fail("The second changes map does not contain the key(" + entry.getKey()
+				fail("The second changes map does not contain the key("
+						+ entry.getKey()
 						+ ") from the first changes map.");
 			}
 
@@ -229,19 +231,22 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 	/**
 	 * Equals new values from the second changes map with the expected value.
 	 * New values from the second changes map does not contains in the first changes map.
-	 * 
+	 *
 	 * @param changesMap1
 	 * @param changesMap2
 	 */
-	public void assertEqualsNewValues(SortedMap<Long, Long> changesMap1, SortedMap<Long, Long> changesMap2, long expectedValue) {
-		if (changesMap1 == null || changesMap2 == null) {
+	public void assertEqualsNewValues(SortedMap<Long, Long> changesMap1, SortedMap<Long, Long> changesMap2,
+			long expectedValue) {
+		if (changesMap1 == null
+				|| changesMap2 == null) {
 			throw new IllegalArgumentException();
 		}
 
 		for (Entry<Long, Long> entry : changesMap2.entrySet()) {
 			if (!changesMap1.containsKey(entry.getKey())) {
 				// only for new keys in the second changes map
-				assertEquals("Because the value from the key(" + entry.getKey() + ") is not right.", expectedValue,
+				assertEquals("Because the value from the key("
+						+ entry.getKey() + ") is not right.", expectedValue,
 						entry.getValue().longValue());
 				break;
 			}
@@ -256,7 +261,8 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 		int count = 0;
 		for (IdentifierGraph graph : graphList) {
 			List<Identifier> identifiers = graph.getIdentifiers();
-			count = count + identifiers.size();
+			count = count
+					+ identifiers.size();
 		}
 		return count;
 	}
@@ -268,25 +274,33 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 			List<Identifier> identifiers = graph.getIdentifiers();
 			for (Identifier identifier : identifiers) {
 				List<Metadata> metadataList = identifier.getMetadata();
-				metadatacount = metadatacount + metadataList.size();
+				metadatacount = metadatacount
+						+ metadataList.size();
 
 				List<Link> linksList = identifier.getLinks();
 				for (Link link : linksList) {
 					List<Metadata> linkMetadataList = link.getMetadata();
-					linkMetadatacount = linkMetadatacount + linkMetadataList.size();
+					linkMetadatacount = linkMetadatacount
+							+ linkMetadataList.size();
 				}
 			}
 		}
-		return metadatacount + (linkMetadatacount / 2);
+		return metadatacount
+				+ (linkMetadatacount
+						/ 2);
 	}
 
 	/**
 	 * Equals the expected Graph|Identifier|Metadata list size with the current from the graphList.
-	 * 
-	 * @param graphList e.g. the current graph
-	 * @param expectedGraphCount The current graph list size
-	 * @param expectedIdentifierCount All identifier in the current graph
-	 * @param expectedMetadataCount In the current graph all metadata on identifier and links
+	 *
+	 * @param graphList
+	 *            e.g. the current graph
+	 * @param expectedGraphCount
+	 *            The current graph list size
+	 * @param expectedIdentifierCount
+	 *            All identifier in the current graph
+	 * @param expectedMetadataCount
+	 *            In the current graph all metadata on identifier and links
 	 */
 	protected void assertRightGraph(List<IdentifierGraph> graphList, int expectedGraphCount,
 			int expectedIdentifierCount, int expectedMetadataCount) {
@@ -295,23 +309,28 @@ public abstract class AbstractMultiSubscriptionTestCase extends IfmapjMock {
 		int currendIdentifierCount = countIdentifier(graphList);
 		int currendMetadataCount = countMetadata(graphList);
 
-		if (currendGraphCount != expectedGraphCount || currendIdentifierCount != expectedIdentifierCount
+		if (currendGraphCount != expectedGraphCount
+				|| currendIdentifierCount != expectedIdentifierCount
 				|| currendMetadataCount != expectedMetadataCount) {
-			fail("GraphCount: " + currendGraphCount + "(" + expectedGraphCount + ") IdentifierCount: "
+			fail("GraphCount: "
+					+ currendGraphCount + "(" + expectedGraphCount + ") IdentifierCount: "
 					+ currendIdentifierCount + "(" + expectedIdentifierCount + ")MetadataCount: "
 					+ currendMetadataCount + "(" + expectedMetadataCount + ") [example: 'currend'('expected')]");
 		}
 	}
 
 	protected void printNeo4jDB() {
-		Neo4JTestDatabaseFactory.printDB(mGraphDb);
+		String db = Neo4JTestDatabaseFactory.printDB(mGraphDb);
+		mLog.debug("Neo4J database: "
+				+ db);
 	}
 
 	protected void printCurrentGraph() {
 		List<IdentifierGraph> currentGraph = mService.getCurrentGraph();
 		JSONArray currentGraphJSON = mJsonMarshaller.toJson(currentGraph);
 
-		System.out.println(currentGraphJSON);
+		mLog.debug("JSON: "
+				+ currentGraphJSON);
 	}
 
 }

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +37,6 @@
  * #L%
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.util;
-
-
 
 import java.util.List;
 
@@ -57,66 +55,85 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
 public class PrintHelper {
 
-	public static void printIdentifierGraph(IdentifierGraph graph) {
-		System.out.println("---- IdentifierGraph ----");
-		System.out.println("timestamp: " + graph.getTimestamp());
+	public static String printIdentifierGraph(IdentifierGraph graph) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("---- IdentifierGraph ----\n");
+		sb.append("timestamp: "
+				+ graph.getTimestamp());
 		for (Identifier i : graph.getIdentifiers()) {
-			System.out.println(i);
+			sb.append(i);
 			for (Metadata m : i.getMetadata()) {
-				System.out.println("\t" + m);
+				sb.append("\t"
+						+ m);
 			}
 			for (Link l : i.getLinks()) {
-				System.out.println("\t" + l);
+				sb.append("\t"
+						+ l);
 				for (Metadata m : l.getMetadata()) {
-					System.out.println("\t\t" + m);
+					sb.append("\t\t"
+							+ m);
 				}
 			}
 		}
-		System.out.println("---- ----");
+		sb.append("---- ----\n");
+		return sb.toString();
 	}
 
-	public static void printIdentifierGraph(InternalIdentifierGraph graph) {
-		System.out.println("---- IdentifierGraph ----");
-		System.out.println("timestamp: " + graph.getTimestamp());
+	public static String printIdentifierGraph(InternalIdentifierGraph graph) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("---- IdentifierGraph ----\n");
+		sb.append("timestamp: "
+				+ graph.getTimestamp() + "\n");
 		for (InternalIdentifier i : graph.getIdentifiers()) {
-			System.out.println(i);
+			sb.append(i
+					+ "\n");
 			for (InternalMetadata m : i.getMetadata()) {
-				System.out.println("\t" + m);
+				sb.append("\t"
+						+ m + "\n");
 			}
 			for (InternalLink l : i.getLinks()) {
-				System.out.println("\t" + l);
+				sb.append("\t"
+						+ l + "\n");
 				for (InternalMetadata m : l.getMetadata()) {
-					System.out.println("\t\t" + m);
+					sb.append("\t\t"
+							+ m + "\n");
 				}
 			}
 		}
-		System.out.println("---- ----");
-		System.out.println("---- ----");
+		sb.append("---- ----\n");
+		sb.append("---- ----\n");
+		return sb.toString();
 	}
 
 	public static void printIdentifierGraphs(List<IdentifierGraph> graphs) {
-		System.out.println("---- List<IdentifierGraph> ----");
+		StringBuilder sb = new StringBuilder();
+		sb.append("---- List<IdentifierGraph> ----\n");
 		for (IdentifierGraph g : graphs) {
-			printIdentifierGraph(g);
+			sb.append(printIdentifierGraph(g));
 		}
-		System.out.println("---- ----");
+		sb.append("---- ----");
 	}
 
-	public static void printInternalIdentifierGraphs(List<InternalIdentifierGraph> graphs) {
-		System.out.println("---- List<InternalIdentifierGraph> ----");
+	public static String printInternalIdentifierGraphs(List<InternalIdentifierGraph> graphs) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("---- List<InternalIdentifierGraph> ----\n");
 		for (InternalIdentifierGraph g : graphs) {
-			printIdentifierGraph(g);
+			sb.append(printIdentifierGraph(g));
 		}
-		System.out.println("---- ----");
+		sb.append("---- ----\n");
+		return sb.toString();
 	}
 
-	public static void printNeo4JDump(GraphDatabaseService db) {
+	public static String printNeo4JDump(GraphDatabaseService db) {
+		StringBuilder sb = new StringBuilder();
 		for (Node n : GlobalGraphOperations.at(db).getAllNodes()) {
 			for (String s : n.getPropertyKeys()) {
-				System.out.println(s + " : " + n.getProperty(s));
+				sb.append(s
+						+ " : " + n.getProperty(s) + "\n");
 			}
-			System.out.println();
+			sb.append("\n");
 		}
+		return sb.toString();
 	}
 
 }

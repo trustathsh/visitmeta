@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,48 +84,59 @@ public class Neo4JTestDatabaseFactory {
 		return db;
 	}
 
-	public static void printDB(GraphDatabaseService db) {
+	public static String printDB(GraphDatabaseService db) {
 		try (Transaction tx = db.beginTx()) {
+			StringBuilder sb = new StringBuilder();
 			GlobalGraphOperations p = GlobalGraphOperations.at(db);
 			Iterator<Node> i = p.getAllNodes().iterator();
 
 			while (i.hasNext()) {
 				Node tmp = i.next();
 				if (tmp.hasLabel(Neo4JTypeLabels.LINK)) {
-					System.out.println("LINK-------------------------");
-					System.out.println("ID: " + tmp.getId());
+					sb.append("LINK-------------------------\n");
+					sb.append("ID: "
+							+ tmp.getId() + "\n");
 					for (String key : tmp.getPropertyKeys()) {
-						System.out.println(key + ": " + tmp.getProperty(key));
+						sb.append(key
+								+ ": " + tmp.getProperty(key) + "\n");
 					}
-					System.out.println("/LINK------------------------");
+					sb.append("/LINK------------------------\n");
 				} else if (tmp.hasLabel(Neo4JTypeLabels.IDENTIFIER)) {
-					System.out.println("IDENTIFIER-------------------");
-					System.out.println("ID: " + tmp.getId());
+					sb.append("IDENTIFIER-------------------\n");
+					sb.append("ID: "
+							+ tmp.getId() + "\n");
 					for (String key : tmp.getPropertyKeys()) {
-						System.out.println(key + ": " + tmp.getProperty(key));
+						sb.append(key
+								+ ": " + tmp.getProperty(key) + "\n");
 					}
-					System.out.println("/IDENTIFIER------------------");
+					sb.append("/IDENTIFIER------------------\n");
 				} else if (tmp.hasLabel(Neo4JTypeLabels.METADATA)) {
-					System.out.println("METADATA---------------------");
-					System.out.println("ID: " + tmp.getId());
+					sb.append("METADATA---------------------\n");
+					sb.append("ID: "
+							+ tmp.getId() + "\n");
 					for (String key : tmp.getPropertyKeys()) {
-						System.out.println(key + ": " + tmp.getProperty(key));
+						sb.append(key
+								+ ": " + tmp.getProperty(key) + "\n");
 					}
 					if (tmp.hasLabel(Neo4JTypeLabels.NOTIFY)) {
-						System.out.println("NOTIFY METADATA");
+						sb.append("NOTIFY METADATA\n");
 					}
-					System.out.println("/METADATA--------------------");
+					sb.append("/METADATA--------------------\n");
 				} else if (tmp.hasLabel(Neo4JTypeLabels.CHANGE)) {
-					System.out.println("CHANGESMAP-------------------");
-					System.out.println("ID: " + tmp.getId());
+					sb.append("CHANGESMAP-------------------\n");
+					sb.append("ID: "
+							+ tmp.getId() + "\n");
 					for (String key : tmp.getPropertyKeys()) {
-						System.out.println(key + ": " + tmp.getProperty(key));
+						sb.append(key
+								+ ": " + tmp.getProperty(key));
 					}
-					System.out.println("/CHANGESMAP------------------");
+					sb.append("/CHANGESMAP------------------\n");
 				} else {
-					System.out.println("UNKNOWN----------------------");
+					sb.append("UNKNOWN----------------------\n");
 				}
 			}
+
+			return sb.toString();
 		}
 	}
 
@@ -167,7 +178,8 @@ public class Neo4JTestDatabaseFactory {
 				link.createRelationshipTo(
 						createMetadata(
 								(HashMap<String, Object>) metadata.get(key),
-								db, timestampManager), LinkTypes.Meta);
+								db, timestampManager),
+						LinkTypes.Meta);
 			}
 			tx.success();
 		}
@@ -230,12 +242,13 @@ public class Neo4JTestDatabaseFactory {
 			meta.setProperty(KEY_TYPE_NAME, map.get("type"));
 			meta.setProperty(KEY_META_CARDINALITY, ((boolean) map
 					.get("singleValue")) ? VALUE_META_CARDINALITY_SINGLE
-					: VALUE_META_CARDINALITY_MULTI);
+							: VALUE_META_CARDINALITY_MULTI);
 			meta.setProperty(KEY_TIMESTAMP_PUBLISH, map.get("pubStamp"));
 			meta.setProperty(KEY_TIMESTAMP_DELETE, map.get("delStamp"));
 			meta.setProperty(KEY_RAW_DATA, map.get("rawData"));
 			meta.setProperty(KEY_HASH, map.get("rawData"));
-			if (map.containsKey("notify") && ((Boolean) map.get("notify"))) {
+			if (map.containsKey("notify")
+					&& ((Boolean) map.get("notify"))) {
 				meta.addLabel(Neo4JTypeLabels.NOTIFY);
 			}
 			HashMap<String, Object> properties = (HashMap<String, Object>) map

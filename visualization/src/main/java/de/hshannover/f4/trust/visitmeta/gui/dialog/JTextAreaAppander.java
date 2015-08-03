@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,11 +48,14 @@ import javax.swing.JTextArea;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
 public class JTextAreaAppander implements Appender {
+
+	private static final Logger LOGGER = Logger.getLogger(JTextAreaAppander.class);
 
 	private static final String mNewline = System.getProperty("line.separator");
 
@@ -67,21 +70,21 @@ public class JTextAreaAppander implements Appender {
 
 	private static List<JTextArea> mJtaMain;
 
-	public JTextAreaAppander(){
+	public JTextAreaAppander() {
 		timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.GERMANY);
 		mJtaMain = new ArrayList<JTextArea>();
 	}
 
-	public static void addJTextArea(JTextArea textArea){
+	public static void addJTextArea(JTextArea textArea) {
 		mJtaMain.add(textArea);
 		textArea.setText(mJtaMain.get(0).getText());
 	}
 
-	public void removeJTextArea(JTextArea textArea){
+	public void removeJTextArea(JTextArea textArea) {
 		mJtaMain.remove(textArea);
 	}
 
-	public static void clearJTextAreas(){
+	public static void clearJTextAreas() {
 		mJtaMain.clear();
 	}
 
@@ -100,26 +103,35 @@ public class JTextAreaAppander implements Appender {
 
 	@Override
 	public void doAppend(LoggingEvent event) {
-		if(!mClosed){
+		if (!mClosed) {
 
 			Throwable throwable = null;
 
-			if(event.getThrowableInformation() != null){
+			if (event.getThrowableInformation() != null) {
 				throwable = event.getThrowableInformation().getThrowable();
 			}
 
-			for(JTextArea textArea: mJtaMain){
+			for (JTextArea textArea : mJtaMain) {
 
 				switch (event.getLevel().toInt()) {
-				case Level.INFO_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
-				break;
-				case Level.ERROR_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
-				break;
-				case Level.WARN_INT: textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(), event.getTimeStamp(), throwable) + mNewline);
-				break;
+					case Level.INFO_INT:
+						textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(),
+								event.getTimeStamp(), throwable)
+								+ mNewline);
+						break;
+					case Level.ERROR_INT:
+						textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(),
+								event.getTimeStamp(), throwable)
+								+ mNewline);
+						break;
+					case Level.WARN_INT:
+						textArea.append(toString(event.getLoggerName(), event.getLevel(), event.getMessage().toString(),
+								event.getTimeStamp(), throwable)
+								+ mNewline);
+						break;
 
-				default:
-					break;
+					default:
+						break;
 				}
 
 				textArea.setCaretPosition(textArea.getDocument().getLength());
@@ -130,36 +142,36 @@ public class JTextAreaAppander implements Appender {
 
 	}
 
-	private String toString(String name, Level level, String message, long time, Throwable throwable){
+	private String toString(String name, Level level, String message, long time, Throwable throwable) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(timeFormat.format(time));
 
 		sb.append(" [");
 
-		if(level != null){
+		if (level != null) {
 			sb.append(level.toString());
-		}else{
+		} else {
 			sb.append("LEVEL NULL");
 		}
 
 		sb.append("] ");
 
-		if(message != null){
+		if (message != null) {
 			sb.append(message);
 		}
 
 		sb.append(' ');
 
-		if(throwable != null){
+		if (throwable != null) {
 			sb.append(throwable.toString());
-			//			StackTraceElement[] stackTrace = throwable.getStackTrace();
-			//			for (int i = 0; i < stackTrace.length; i++) {
-			//				StackTraceElement element = stackTrace[i];
-			//				sb.append(mNewline);
-			//				sb.append("\tat ");
-			//				sb.append(element.toString());
-			//			}
+			// StackTraceElement[] stackTrace = throwable.getStackTrace();
+			// for (int i = 0; i < stackTrace.length; i++) {
+			// StackTraceElement element = stackTrace[i];
+			// sb.append(mNewline);
+			// sb.append("\tat ");
+			// sb.append(element.toString());
+			// }
 		}
 
 		return sb.toString();
@@ -167,19 +179,19 @@ public class JTextAreaAppander implements Appender {
 
 	@Override
 	public ErrorHandler getErrorHandler() {
-		System.out.println("getErrorHandler");
+		LOGGER.trace("getErrorHandler");
 		return null;
 	}
 
 	@Override
 	public Filter getFilter() {
-		System.out.println("getFilter");
+		LOGGER.trace("getFilter");
 		return null;
 	}
 
 	@Override
 	public Layout getLayout() {
-		System.out.println("getLayout");
+		LOGGER.trace("getLayout");
 		return null;
 	}
 

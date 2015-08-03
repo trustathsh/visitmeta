@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,6 +47,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,11 +63,13 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
  * a plain XML tree representation of {@link Identifier} and {@link Metadata}.
  * Plain XML means that the inner structure of the associated {@link Document}
  * object is directly converted to a {@link JTree} data model.
- * 
+ *
  * @author Bastian Hellmann
  *
  */
 public class NodeInformationPlainXML extends NodeInformationStrategy {
+
+	private static final Logger LOGGER = Logger.getLogger(NodeInformationPlainXML.class);
 
 	private DocumentBuilderFactory mFactory;
 	private DocumentBuilder mBuilder;
@@ -76,7 +79,7 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 		try {
 			mBuilder = mFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 	}
 
@@ -94,10 +97,11 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 	 * Creates a plain XML tree structure for a given {@link Propable} instance.
 	 * Handles both {@link Metadata} and {@link Identifier} the same way,
 	 * traversing through the associated {@link Document} data.
-	 * 
-	 * @param propable a instance implementing the {@link Propable} interface
+	 *
+	 * @param propable
+	 *            a instance implementing the {@link Propable} interface
 	 * @return a {@link DefaultMutableTreeNode} containing the whole tree
-	 * structure for the given {@link Propable} instance
+	 *         structure for the given {@link Propable} instance
 	 */
 	private DefaultMutableTreeNode fill(Propable propable) {
 		Document vDocument = null;
@@ -105,7 +109,7 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 		try {
 			vDocument = mBuilder.parse(new InputSource(new StringReader(propable.getRawData())));
 		} catch (SAXException | IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		if (vDocument == null) {
 			vRoot = new DefaultMutableTreeNode("No Data.");
@@ -119,7 +123,7 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 
 	/**
 	 * Walks throw the tree.
-	 * 
+	 *
 	 * @param pNode
 	 *            the Node.
 	 * @param pLevel
@@ -137,7 +141,8 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 				Node vChild = vList.item(i);
 				if (vChild.getNodeType() == Node.TEXT_NODE) {
 					String vValue = vChild.getNodeValue();
-					if (vValue != null && vValue.length() > 0) {
+					if (vValue != null
+							&& vValue.length() > 0) {
 						vChildNode = new DefaultMutableTreeNode(vValue);
 						vChildNode.setAllowsChildren(false);
 						pParentNode.add(vChildNode);
@@ -150,7 +155,8 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 			}
 		} else {
 			String vValue = pNode.getNodeValue();
-			if (vValue != null && vValue.length() > 0) {
+			if (vValue != null
+					&& vValue.length() > 0) {
 				vChildNode = new DefaultMutableTreeNode(vValue);
 				vChildNode.setAllowsChildren(false);
 				pParentNode.add(vChildNode);
@@ -160,7 +166,7 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 
 	/**
 	 * Returns the Label for the node.
-	 * 
+	 *
 	 * @param pNode
 	 *            the node.
 	 * @return String with NodeName + attributes (NodeName + NodeValue).
@@ -169,7 +175,8 @@ public class NodeInformationPlainXML extends NodeInformationStrategy {
 		StringBuffer vResult = new StringBuffer();
 		vResult.append(pNode.getNodeName());
 		if (pNode.hasAttributes()) {
-			int vLastIndex = pNode.getAttributes().getLength() - 1;
+			int vLastIndex = pNode.getAttributes().getLength()
+					- 1;
 			vResult.append(" (");
 			/* Attributes */
 			for (int k = 0; k < vLastIndex; ++k) {

@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,9 +48,9 @@ public abstract class TimeManager implements Runnable, Observer {
 
 	/**
 	 * Simple Pair class. (copied from ifmapj)
-	 * 
+	 *
 	 * @author aw
-	 * 
+	 *
 	 * @param <T>
 	 * @param <V>
 	 */
@@ -88,12 +88,13 @@ public abstract class TimeManager implements Runnable, Observer {
 
 	/**
 	 * Add a node to the list.
-	 * 
+	 *
 	 * @param pNode
 	 *            the node.
 	 */
 	public void addNode(Position pNode) {
-		LOGGER.trace("Method addNewNode(" + pNode + ") called.");
+		LOGGER.trace("Method addNewNode("
+				+ pNode + ") called.");
 		synchronized (this) {
 			mNodes.add(new Pair<Long, Position>(System.currentTimeMillis(), pNode));
 		}
@@ -134,7 +135,8 @@ public abstract class TimeManager implements Runnable, Observer {
 
 	@Override
 	public synchronized void update(Observable pO, Object pArg) {
-		LOGGER.trace("Method update(" + pO + ", " + pArg + ") called.");
+		LOGGER.trace("Method update("
+				+ pO + ", " + pArg + ") called.");
 		if (pO instanceof TimeHolder) {
 			synchronized (this) {
 				boolean vLiveView = mTimeHolder.isLiveView();
@@ -158,8 +160,10 @@ public abstract class TimeManager implements Runnable, Observer {
 		try {
 			synchronized (this) {
 				while (!mIsDone) {
-					if (mNodes.size() > 0 && mLiveView) {
-						long vTime = mNodes.get(0).first + mTimeout - System.currentTimeMillis();
+					if (mNodes.size() > 0
+							&& mLiveView) {
+						long vTime = mNodes.get(0).first
+								+ mTimeout - System.currentTimeMillis();
 						if (vTime > 0) {
 							/* Wait */
 							wait(vTime);
@@ -178,8 +182,7 @@ public abstract class TimeManager implements Runnable, Observer {
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 	}
 

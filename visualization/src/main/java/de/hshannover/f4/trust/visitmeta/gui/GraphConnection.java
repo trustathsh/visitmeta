@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,7 +78,8 @@ public class GraphConnection implements Observer {
 	private boolean mIsPropablePicked = false;
 
 	/**
-	 * @param container Contains information about the Connection.
+	 * @param container
+	 *            Contains information about the Connection.
 	 */
 	public GraphConnection(GraphContainer container) {
 		mConnetion = container;
@@ -120,10 +121,12 @@ public class GraphConnection implements Observer {
 	/**
 	 * Add the identifier in the list to the graph.
 	 *
-	 * @param pIdentifier the list with identifier.
+	 * @param pIdentifier
+	 *            the list with identifier.
 	 */
 	private synchronized void addIdentifier(List<NodeIdentifier> pIdentifier) {
-		LOGGER.trace("Method addIdentifier(" + pIdentifier + ") called.");
+		LOGGER.trace("Method addIdentifier("
+				+ pIdentifier + ") called.");
 		for (NodeIdentifier vIdentifier : pIdentifier) {
 			mGraphPanel.addIdentifier(vIdentifier);
 			if (mAddHighlights) {
@@ -138,11 +141,14 @@ public class GraphConnection implements Observer {
 	/**
 	 * Add the metadata of the list and create the edges to the identifier in the graph.
 	 *
-	 * @param pIdentifier the identifier.
-	 * @param pMetadata the list with metadata.
+	 * @param pIdentifier
+	 *            the identifier.
+	 * @param pMetadata
+	 *            the list with metadata.
 	 */
 	private synchronized void addMetadata(NodeIdentifier pIdentifier, List<NodeMetadata> pMetadata) {
-		LOGGER.trace("Method addMetadata(" + pIdentifier + ", " + pMetadata + ") called.");
+		LOGGER.trace("Method addMetadata("
+				+ pIdentifier + ", " + pMetadata + ") called.");
 		for (NodeMetadata vMetadata : pMetadata) {
 			mGraphPanel.addMetadata(pIdentifier, vMetadata);
 			if (mAddHighlights) {
@@ -157,11 +163,14 @@ public class GraphConnection implements Observer {
 	/**
 	 * Add the metadata of the list and create the edges of the link in the graph.
 	 *
-	 * @param pLink the link.
-	 * @param pMetadata the list with metadata.
+	 * @param pLink
+	 *            the link.
+	 * @param pMetadata
+	 *            the list with metadata.
 	 */
 	private synchronized void addMetadata(ExpandedLink pLink, List<NodeMetadata> pMetadata) {
-		LOGGER.trace("Method addMetadata(" + pLink + ", " + pMetadata + ") called.");
+		LOGGER.trace("Method addMetadata("
+				+ pLink + ", " + pMetadata + ") called.");
 		for (NodeMetadata vMetadata : pMetadata) {
 			mGraphPanel.addMetadata(pLink, vMetadata);
 			if (mAddHighlights) {
@@ -176,10 +185,12 @@ public class GraphConnection implements Observer {
 	/**
 	 * Remove the IdentifierNode.
 	 *
-	 * @param pIdentifier the NodeIdentifier to identify the node in the graph.
+	 * @param pIdentifier
+	 *            the NodeIdentifier to identify the node in the graph.
 	 */
 	private synchronized void deleteIdentifier(List<NodeIdentifier> pIdentifier) {
-		LOGGER.trace("Method deleteIdentifier(" + pIdentifier + ") called.");
+		LOGGER.trace("Method deleteIdentifier("
+				+ pIdentifier + ") called.");
 		if (mAddHighlights) {
 			for (NodeIdentifier vIdentifier : pIdentifier) {
 				mGraphPanel.markAsDelete(vIdentifier);
@@ -191,10 +202,12 @@ public class GraphConnection implements Observer {
 	/**
 	 * Delete the MetadataNode and the edges to the node from the graph.
 	 *
-	 * @param pMetadata the NodeMetadata to identify the node and edges in the graph.
+	 * @param pMetadata
+	 *            the NodeMetadata to identify the node and edges in the graph.
 	 */
 	private synchronized void deleteMetadata(List<NodeMetadata> pMetadata) {
-		LOGGER.trace("Method deleteMetadata(" + pMetadata + ") called.");
+		LOGGER.trace("Method deleteMetadata("
+				+ pMetadata + ") called.");
 		if (mAddHighlights) {
 			for (NodeMetadata vMetadata : pMetadata) {
 				mGraphPanel.markAsDelete(vMetadata);
@@ -208,7 +221,8 @@ public class GraphConnection implements Observer {
 	 * @param pNode
 	 */
 	public synchronized void deleteNode(Position pNode) {
-		LOGGER.trace("Method deleteNode(" + pNode + ") called.");
+		LOGGER.trace("Method deleteNode("
+				+ pNode + ") called.");
 		mGraphPanel.deleteNode(pNode);
 		pNode.deleteObserver(this);
 		mObservables.remove(pNode);
@@ -219,21 +233,28 @@ public class GraphConnection implements Observer {
 	 * @param pNode
 	 */
 	public synchronized void removeHighlight(Position pNode) {
-		LOGGER.trace("Method removeHighlight(" + pNode + ") called.");
+		LOGGER.trace("Method removeHighlight("
+				+ pNode + ") called.");
 		mGraphPanel.clearHighlight(pNode);
 	}
 
 	/**
 	 * Set the new position for a Position-Object.
 	 *
-	 * @param pNode the Object.
-	 * @param pNewX the new x coordinate.
-	 * @param pNewY the new y coordinate.
-	 * @param pNewZ the new z coordinate.
-	 * @param pinNode TODO
+	 * @param pNode
+	 *            the Object.
+	 * @param pNewX
+	 *            the new x coordinate.
+	 * @param pNewY
+	 *            the new y coordinate.
+	 * @param pNewZ
+	 *            the new z coordinate.
+	 * @param pinNode
+	 *            TODO
 	 */
 	public void updateNode(Position pNode, double pNewX, double pNewY, double pNewZ, boolean pinNode) {
-		LOGGER.trace("Method updateNode(" + pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
+		LOGGER.trace("Method updateNode("
+				+ pNode + ", " + pNewX + ", " + pNewY + ", " + pNewZ + ") called.");
 		mFacadeLogic.updateNode(pNode, pNewX, pNewY, pNewZ, pinNode);
 	}
 
@@ -250,8 +271,10 @@ public class GraphConnection implements Observer {
 	/**
 	 * Repaint nodes of a specific type and publisher.
 	 *
-	 * @param pPublisher the id of the current publisher, empty if the default color is changed.
-	 * @param pType the type of the node,
+	 * @param pPublisher
+	 *            the id of the current publisher, empty if the default color is changed.
+	 * @param pType
+	 *            the type of the node,
 	 */
 	public void repaintNodes(NodeType pType) {
 		LOGGER.trace("Method repaintMetadata() called.");
@@ -393,7 +416,8 @@ public class GraphConnection implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		LOGGER.trace("Method update(" + o + ", " + arg + ") called.");
+		LOGGER.trace("Method update("
+				+ o + ", " + arg + ") called.");
 		if (o instanceof FacadeLogic) {
 			fillGraph(mFacadeLogic.getUpdate());
 			mGraphPanel.repaint();
@@ -424,7 +448,8 @@ public class GraphConnection implements Observer {
 	 *            the {@link Propable} object to show
 	 */
 	public void pickAndShowProperties(Propable propable) {
-		LOGGER.trace("Method pickAndShowProperties(" + propable + ") called.");
+		LOGGER.trace("Method pickAndShowProperties("
+				+ propable + ") called.");
 		mIsPropablePicked = true;
 		mParentTab.showPropertiesOfNode(propable);
 		mGraphPanel.selectNode(propable);
@@ -434,10 +459,12 @@ public class GraphConnection implements Observer {
 	 * Just shows the properties of the given {@link Propable} object, without
 	 * marking it as selected or storing whether it was picked.
 	 *
-	 * @param propable the {@link Propable} object to show
+	 * @param propable
+	 *            the {@link Propable} object to show
 	 */
 	public void showProperty(Propable propable) {
-		LOGGER.trace("Method showProperties(" + propable + ") called.");
+		LOGGER.trace("Method showProperties("
+				+ propable + ") called.");
 		mParentTab.showPropertiesOfNode(propable);
 	}
 

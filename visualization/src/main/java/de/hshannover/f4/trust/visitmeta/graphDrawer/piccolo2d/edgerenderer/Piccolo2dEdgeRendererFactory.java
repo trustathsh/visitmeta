@@ -36,23 +36,25 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
 
-public class Piccolo2dNodeRendererFactory {
+public class Piccolo2dEdgeRendererFactory {
 
-	public static Piccolo2dNodeRenderer create(Piccolo2dNodeRendererType type) {
+	public static Piccolo2dEdgeRenderer create(Piccolo2dEdgeRendererType type) {
 		switch (type) {
-		case RECTANGLES_WITH_ROUNDED_CORNERS:
-			return new RectanglesWithRoundedCornersPiccolo2dRenderer();
-		case RECTANGLES_WITH_SQUARE_CORNERS:
-			return new RectanglesWithSquareCornersPiccolo2dRenderer();
-		case ELLIPSE:
-			return new EllipsePiccolo2dRenderer();
-		case EXAMPLE:
-			return new ExamplePiccolo2dRenderer();
-		default:
-			throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
-					+ type + "'");
+			case STRAIGHT_LINE:
+				return new StraightLinePiccolo2dEdgeRenderer();
+			case STRAIGHT_DASHED_LINE:
+				return new StraightDashedLinePiccolo2dEdgeRenderer();
+			case ORTHOGONAL_LINE:
+				return new OrthogonalLinePiccolo2dEdgeRenderer();
+			case CURVED_LINE:
+				return new CurvedLinePiccolo2dEdgeRenderer();
+			case EXAMPLE:
+				return new ExamplePiccolo2dEdgeRenderer();
+			default:
+				throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
+						+ type + "'");
 		}
 	}
 

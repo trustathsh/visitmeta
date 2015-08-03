@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,6 +48,8 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
@@ -70,7 +72,8 @@ public class NodeEventHandler extends PDragEventHandler {
 
 	@Override
 	protected void startDrag(PInputEvent e) {
-		LOGGER.trace("Method startDrag(" + e + ") called.");
+		LOGGER.trace("Method startDrag("
+				+ e + ") called.");
 		PNode pickedNode = e.getPickedNode();
 		if (pickedNode instanceof PComposite) {
 			super.startDrag(e);
@@ -89,9 +92,10 @@ public class NodeEventHandler extends PDragEventHandler {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	protected void drag(PInputEvent e) {
-		LOGGER.trace("Method drag(" + e + ") called.");
+		LOGGER.trace("Method drag("
+				+ e + ") called.");
 		PNode pickedNode = e.getPickedNode();
 		if (pickedNode instanceof PComposite) {
 			super.drag(e);
@@ -100,7 +104,7 @@ public class NodeEventHandler extends PDragEventHandler {
 			/* Redraw edges */
 			ArrayList<PPath> vEdges = (ArrayList<PPath>) vNode.getAttribute("edges");
 			for (PPath vEdge : vEdges) {
-				mPanel.updateEdge(vEdge);
+				mPanel.updateEdge(vEdge, (Position) vNode.getAttribute("position"));
 			}
 			/* TODO Redraw the shadow */
 			PPath vShadow = (PPath) vNode.getAttribute("glow");
@@ -112,7 +116,8 @@ public class NodeEventHandler extends PDragEventHandler {
 
 	@Override
 	protected void endDrag(PInputEvent e) {
-		LOGGER.trace("Method endDrag(" + e + ") called.");
+		LOGGER.trace("Method endDrag("
+				+ e + ") called.");
 		PNode pickedNode = e.getPickedNode();
 		if (pickedNode instanceof PComposite) {
 			super.endDrag(e);
@@ -121,18 +126,22 @@ public class NodeEventHandler extends PDragEventHandler {
 			boolean pinNode = e.isControlDown() ? true : false;
 			Position vNode = (Position) e.getPickedNode().getAttribute("position");
 			mConnection.updateNode(vNode, // Position-Object
-					(vPoint.getX() / mPanel.getAreaWidth()) + mPanel.getAreaOffsetX(), // x
-					(vPoint.getY() / mPanel.getAreaHeight()) + mPanel.getAreaOffsetY(), // y
+					(vPoint.getX()
+							/ mPanel.getAreaWidth())
+							+ mPanel.getAreaOffsetX(), // x
+					(vPoint.getY()
+							/ mPanel.getAreaHeight())
+							+ mPanel.getAreaOffsetY(), // y
 					0.0, // z
-					pinNode
-					);
+					pinNode);
 			vNode.setInUse(false);
 		}
 	}
 
 	@Override
 	public void mouseEntered(PInputEvent e) {
-		LOGGER.trace("Method mouseEntered(" + e + ") called.");
+		LOGGER.trace("Method mouseEntered("
+				+ e + ") called.");
 		super.mouseEntered(e);
 
 		if (!mConnection.isPropablePicked()) {
@@ -140,17 +149,37 @@ public class NodeEventHandler extends PDragEventHandler {
 			if (pickedNode instanceof PComposite) {
 				Object vNode = pickedNode.getAttribute("position");
 				if (vNode instanceof NodeIdentifier) {
-					mConnection.showProperty(((NodeIdentifier) vNode).getIdentifier());
+					Identifier identifier = ((NodeIdentifier) vNode).getIdentifier();
+					mConnection.showProperty(identifier);
+					mPanel.mouseEntered(identifier);
 				} else if (vNode instanceof NodeMetadata) {
-					mConnection.showProperty(((NodeMetadata) vNode).getMetadata());
+					Metadata metadata = ((NodeMetadata) vNode).getMetadata();
+					mConnection.showProperty(metadata);
+					mPanel.mouseEntered(metadata);
 				}
 			}
 		}
 	}
 
 	@Override
+	public void mouseExited(PInputEvent e) {
+		LOGGER.trace("Method mouseExited("
+				+ e + ") called.");
+		super.mouseExited(e);
+
+		if (!mConnection.isPropablePicked()) {
+			PNode pickedNode = e.getPickedNode();
+			if (pickedNode instanceof PComposite) {
+			}
+		}
+
+		mPanel.mouseExited();
+	}
+
+	@Override
 	public void mouseClicked(PInputEvent e) {
-		LOGGER.trace("Method mouseClicked (" + e + ") called.");
+		LOGGER.trace("Method mouseClicked ("
+				+ e + ") called.");
 		super.mouseClicked(e);
 
 		if (e.getButton() == MOUSE_LEFT_BUTTON) {

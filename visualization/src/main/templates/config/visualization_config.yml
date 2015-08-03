@@ -61,6 +61,14 @@ visualization:
       # ELLIPSE
       # EXAMPLE (shows how different types of identifier/metadata can be rendered differently)
       style: RECTANGLES_WITH_SQUARE_CORNERS
+  edge:
+    # Sets the style of edges; possible values are:
+    # STRAIGHT_LINE
+    # STRAIGHT_DASHED_LINE
+    # ORTHOGONAL_LINE
+    # CURVED_LINE
+    # EXAMPLE (shows how different types of identifier/metadata can be rendered differently)
+    style: STRAIGHT_LINE
   history:
     navigation:
       # Sets the control mechanism for history navigation; possible values are:
@@ -106,6 +114,7 @@ color:
     delete: '0xA73946'
     selected: '0xCEB100'
     search: '0x88A538'
+    mouseover: '0x708090'
   identifier:
     access-request:
       text: '0x000000'

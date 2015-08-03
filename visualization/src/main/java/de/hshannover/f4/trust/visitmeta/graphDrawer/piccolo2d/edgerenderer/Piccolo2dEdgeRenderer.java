@@ -36,24 +36,16 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
 
-public class Piccolo2dNodeRendererFactory {
+import java.awt.geom.Point2D;
 
-	public static Piccolo2dNodeRenderer create(Piccolo2dNodeRendererType type) {
-		switch (type) {
-		case RECTANGLES_WITH_ROUNDED_CORNERS:
-			return new RectanglesWithRoundedCornersPiccolo2dRenderer();
-		case RECTANGLES_WITH_SQUARE_CORNERS:
-			return new RectanglesWithSquareCornersPiccolo2dRenderer();
-		case ELLIPSE:
-			return new EllipsePiccolo2dRenderer();
-		case EXAMPLE:
-			return new ExamplePiccolo2dRenderer();
-		default:
-			throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
-					+ type + "'");
-		}
-	}
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import edu.umd.cs.piccolo.nodes.PPath;
 
+public interface Piccolo2dEdgeRenderer {
+
+	public void drawEdge(PPath pEdge, Point2D vStart, Point2D vEnd, Metadata metadata,
+			Identifier identifier);
 }

@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.renderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;

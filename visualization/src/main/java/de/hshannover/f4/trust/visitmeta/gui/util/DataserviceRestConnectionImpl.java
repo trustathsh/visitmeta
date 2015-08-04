@@ -45,6 +45,8 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.data.DataserviceDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
@@ -54,16 +56,20 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.util.StringHelper;
+import de.hshannover.f4.trust.visitmeta.util.yaml.DataservicePersister;
 
 public class DataserviceRestConnectionImpl extends DataserviceDataImpl implements DataserviceConnection {
 
 	private static final Logger LOGGER = Logger.getLogger(DataserviceRestConnectionImpl.class);
+
+	private static final DataservicePersister mPersister = Main.getDataservicePersister();
 
 	private boolean mNotPersised;
 
 	private boolean mConnected;
 
 	private DataserviceData mOldData;
+
 
 	public DataserviceRestConnectionImpl(String name, String url, boolean rawXml) {
 		super(name, url, rawXml);
@@ -88,12 +94,23 @@ public class DataserviceRestConnectionImpl extends DataserviceDataImpl implement
 
 	@Override
 	public void connect() throws ConnectionException {
+		update();
 		setConnected(true);
+		try {
+			mPersister.persist(this);
+		} catch (PropertyException e) {
+			throw new ConnectionException(e.toString());
+		}
 	}
 
 	@Override
 	public void disconnect() throws ConnectionException {
 		setConnected(false);
+		try {
+			mPersister.persist(this);
+		} catch (PropertyException e) {
+			throw new ConnectionException(e.toString());
+		}
 	}
 
 	@Override

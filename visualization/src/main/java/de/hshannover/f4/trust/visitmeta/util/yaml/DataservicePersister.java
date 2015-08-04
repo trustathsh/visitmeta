@@ -114,7 +114,6 @@ public class DataservicePersister extends Properties {
 					try {
 						connection.update(); // To update all sub connections
 					} catch (ConnectionException e) {
-						connection.setConnected(false);
 						LOGGER.warn(e.toString());
 						LOGGER.info("Start retry connection...");
 						String title = "Connecting to " + connection.getConnectionName();

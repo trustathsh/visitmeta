@@ -44,6 +44,7 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -62,6 +63,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreeCellRenderer;
 import de.hshannover.f4.trust.visitmeta.gui.util.ConnectionTreePopupMenu;
 import de.hshannover.f4.trust.visitmeta.gui.util.DataserviceRestConnectionImpl;
@@ -89,6 +91,8 @@ public class ConnectionDialog extends JDialog {
 	private static final Logger LOGGER = Logger.getLogger(ConnectionDialog.class);
 
 	private static DataservicePersister mDataservicePersister;
+
+	private MainWindow mMainWindow;
 
 	private JTextArea mJtaLogWindows;
 
@@ -122,7 +126,8 @@ public class ConnectionDialog extends JDialog {
 		LOGGER.addAppender(new JTextAreaAppander());
 	}
 
-	public ConnectionDialog() {
+	public ConnectionDialog(MainWindow mainWindow) {
+		mMainWindow = mainWindow;
 		mDataservicePersister = Main.getDataservicePersister();
 
 		createDialog();
@@ -230,7 +235,9 @@ public class ConnectionDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				savePropertyChanges();
+				updateMainWindowTree();
 			}
+
 		});
 
 		mJbReset = new JButton("Reset");
@@ -468,6 +475,7 @@ public class ConnectionDialog extends JDialog {
 			mJtConnections.updateModel();
 		}
 
+		updateMainWindowTree();
 	}
 
 	public void eventCloneData() {
@@ -620,6 +628,13 @@ public class ConnectionDialog extends JDialog {
 	public void selectPath(TreePath newPath) {
 		mJtConnections.setSelectionPath(newPath);
 		changeParameterPanel();
+	}
+
+	private void updateMainWindowTree() {
+		List<Data> dataserviceList = ((Dataservices) mJtConnections.getModel().getRoot()).getSubData();
+		mMainWindow.getConnectionTree().updateConnections(dataserviceList);
+		mMainWindow.getConnectionTree().expandAllNodes();
+		mMainWindow.reopenConnectionTabs();
 	}
 
 }

@@ -63,7 +63,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -362,6 +361,16 @@ public class MainWindow extends JFrame {
 		}
 	}
 
+	public void reopenConnectionTabs() {
+		for (Component c : getTabbedConnectionPane().getComponents()) {
+			if (c instanceof ConnectionTab) {
+				ConnectionTab connectionTab = (ConnectionTab) c;
+				closeConnectionTab(connectionTab);
+			}
+		}
+		openConnectedMapServerConnections();
+	}
+
 	private void showConnectedGraph(MapServerRestConnectionImpl mapServerConnection) {
 		if (!mapServerConnection.isGraphStarted()) {
 			mapServerConnection.initGraph();
@@ -474,7 +483,7 @@ public class MainWindow extends JFrame {
 		return supportedLaFs;
 	}
 
-	public JTree getConnectionTree() {
+	public RESTConnectionTree getConnectionTree() {
 		return mConnectionTree;
 	}
 

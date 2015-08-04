@@ -41,7 +41,7 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRendererFactory;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRendererFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainterFactory;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 
 public final class GraphPanelFactory {
@@ -70,13 +70,13 @@ public final class GraphPanelFactory {
 		switch (type) {
 			case "Piccolo2D":
 				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
+				panel.addNodePainter(NodePainterFactory.getNodePainter(panel));
 				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
 				return panel;
 			// case "OpenGL" : return new OpenGLPanel(pController);
 			default:
 				panel = new Piccolo2DPanel(connection);
-				panel.addNodeRenderer(NodeRendererFactory.getNodeRenderer(panel));
+				panel.addNodePainter(NodePainterFactory.getNodePainter(panel));
 				panel.addEdgeRenderer(EdgeRendererFactory.getEdgeRenderer(panel));
 				return panel;
 		}

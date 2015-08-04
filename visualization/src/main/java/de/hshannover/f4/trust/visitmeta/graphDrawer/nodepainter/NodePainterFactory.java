@@ -36,22 +36,22 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 
-public class NodeRendererFactory {
+public class NodePainterFactory {
 
-	public static List<NodeRenderer> getNodeRenderer(GraphPanel panel) {
-		List<NodeRenderer> result = new ArrayList<>();
+	public static List<NodePainter> getNodePainter(GraphPanel panel) {
+		List<NodePainter> result = new ArrayList<>();
 
-		result.add(new DefaultNodeRenderer(panel));
-		result.add(new SelectionNodeRenderer(panel));
-		result.add(new SearchResultNodeRenderer(panel));
-		result.add(new MouseOverNodeRenderer(panel));
+		result.add(new DefaultNodePainter(panel));
+		result.add(new SelectionNodePainter(panel));
+		result.add(new SearchResultNodePainter(panel));
+		result.add(new MouseOverNodePainter(panel));
 
 		return result;
 	}

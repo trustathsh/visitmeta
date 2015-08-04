@@ -66,7 +66,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.I
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategy;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata.MetadataInformationStrategyType;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer.NodeRenderer;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainter;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ClickEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.NodeEventHandler;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.ZoomEventHandler;
@@ -139,7 +139,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private String mSearchTerm = "";
 	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
 
-	private List<NodeRenderer> mNodeRenderer = new ArrayList<>();
+	private List<NodePainter> mNodePainter = new ArrayList<>();
 	private List<EdgeRenderer> mEdgeRenderer = new ArrayList<>();
 
 	private Piccolo2dNodeRenderer mPiccolo2dIdentifierRenderer = null;
@@ -282,7 +282,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.addAttribute("data", pNode.getIdentifier());
 			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>());
 
-			paintIdentifierNode(pNode.getIdentifier(), pNode, vNode, vText);
+			paintIdentifierNode(pNode.getIdentifier(), vNode, vText);
 
 			mMapNode.put(pNode, vCom); // Add node to HashMap.
 			SwingUtilities.invokeLater(new Runnable() {
@@ -333,7 +333,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			// to
 			// node
 
-			paintMetadataNode(pNode.getMetadata(), pNode, vNode, vText);
+			paintMetadataNode(pNode.getMetadata(), vNode, vText);
 			mMapNode.put(pNode, vCom); // Add node to HashMap.
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -790,31 +790,29 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeIdentifier i = (NodeIdentifier) key;
 					Identifier identifier = i.getIdentifier();
-					paintIdentifierNode(identifier, i, vNode, vText);
+					paintIdentifierNode(identifier, vNode, vText);
 				}
 			} else if (pType == NodeType.METADATA) {
 				if (vCom.getAttribute("type").equals(pType)) {
 					NodeMetadata m = (NodeMetadata) key;
 					Metadata metadata = m.getMetadata();
-					paintMetadataNode(metadata, m, vNode, vText);
+					paintMetadataNode(metadata, vNode, vText);
 				}
 			}
 		}
 	}
 
-	private void paintMetadataNode(Metadata metadata, NodeMetadata m,
-			PPath vNode, PText vText) {
+	private void paintMetadataNode(Metadata metadata, PPath vNode, PText vText) {
 		GraphicWrapper g = new Piccolo2DGraphicWrapper(vNode, vText);
-		for (NodeRenderer r : mNodeRenderer) {
-			r.paintMetadataNode(metadata, m, g);
+		for (NodePainter r : mNodePainter) {
+			r.paintMetadataNode(metadata, g);
 		}
 	}
 
-	private void paintIdentifierNode(Identifier identifier, NodeIdentifier i,
-			PPath vNode, PText vText) {
+	private void paintIdentifierNode(Identifier identifier, PPath vNode, PText vText) {
 		GraphicWrapper g = new Piccolo2DGraphicWrapper(vNode, vText);
-		for (NodeRenderer r : mNodeRenderer) {
-			r.paintIdentifierNode(identifier, i, g);
+		for (NodePainter r : mNodePainter) {
+			r.paintIdentifierNode(identifier, g);
 		}
 	}
 
@@ -929,8 +927,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void addNodeRenderer(List<NodeRenderer> nodeRenderer) {
-		this.mNodeRenderer.addAll(nodeRenderer);
+	public void addNodePainter(List<NodePainter> nodeRenderer) {
+		this.mNodePainter.addAll(nodeRenderer);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package de.hshannover.f4.trust.visitmeta.graphDrawer.noderenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -8,8 +8,6 @@ import java.util.List;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
-import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
@@ -17,7 +15,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
-public class MouseOverNodeRenderer implements NodeRenderer {
+public class MouseOverNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();
 
@@ -28,7 +26,7 @@ public class MouseOverNodeRenderer implements NodeRenderer {
 	private List<String> mConnectedNodeTypeNames =
 			Arrays.asList(new String[] {IfmapStrings.IP_ADDRESS_EL_NAME, IfmapStrings.MAC_ADDRESS_EL_NAME, "ip-mac"});
 
-	public MouseOverNodeRenderer(GraphPanel panel) {
+	public MouseOverNodePainter(GraphPanel panel) {
 		mGraphPanel = panel;
 
 		String vColorMouseOverNode = mConfig.getString(VisualizationConfig.KEY_COLOR_NODE_MOUSE_OVER,
@@ -38,7 +36,7 @@ public class MouseOverNodeRenderer implements NodeRenderer {
 	}
 
 	@Override
-	public void paintMetadataNode(Metadata metadata, NodeMetadata m, GraphicWrapper graphic) {
+	public void paintMetadataNode(Metadata metadata, GraphicWrapper graphic) {
 		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
 		if (mouseOverNode != null) {
 			boolean isMouseOver = isMouseOver(mouseOverNode, metadata);
@@ -51,7 +49,7 @@ public class MouseOverNodeRenderer implements NodeRenderer {
 	}
 
 	@Override
-	public void paintIdentifierNode(Identifier identifier, NodeIdentifier i, GraphicWrapper graphic) {
+	public void paintIdentifierNode(Identifier identifier, GraphicWrapper graphic) {
 		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
 		if (mouseOverNode != null) {
 			boolean isMouseOver = isMouseOver(mouseOverNode, identifier);

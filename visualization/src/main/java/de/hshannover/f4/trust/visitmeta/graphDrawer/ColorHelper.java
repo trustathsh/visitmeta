@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,7 +49,6 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
@@ -110,14 +109,13 @@ public class ColorHelper {
 	 *            the identifier node.
 	 * @return the color.
 	 */
-	public static Paint getColor(GraphicWrapper g, NodeIdentifier pNode) {
+	public static Paint getColor(GraphicWrapper g, Identifier identifier) {
 		LOGGER.trace("Method getColor("
-				+ g + ", " + pNode + ") called.");
+				+ g + ", " + identifier + ") called.");
 
 		String vIdentifierInside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE;
 		String vIdentifierOutside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE;
 
-		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
@@ -176,11 +174,10 @@ public class ColorHelper {
 	 *
 	 * @return the text color.
 	 */
-	public static Color getColorIdentifierText(NodeIdentifier pNode) {
+	public static Color getColorIdentifierText(Identifier identifier) {
 		LOGGER.trace("Method getColorIdentifierStroke() called.");
 		String vColor = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_TEXT;
 
-		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
@@ -213,11 +210,10 @@ public class ColorHelper {
 	 *
 	 * @return the stroke color.
 	 */
-	public static Color getColorIdentifierStroke(NodeIdentifier pNode) {
+	public static Color getColorIdentifierStroke(Identifier identifier) {
 		LOGGER.trace("Method getColorIdentifierStroke() called.");
 		String vOutside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_BORDER;
 
-		Identifier identifier = pNode.getIdentifier();
 		String typeName = identifier.getTypeName();
 
 		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {

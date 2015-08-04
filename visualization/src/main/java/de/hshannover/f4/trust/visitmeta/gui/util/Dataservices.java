@@ -53,7 +53,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
  */
 public class Dataservices extends DataImpl {
 
-	List<Data> mList;
+	List<DataserviceConnection> mList;
 
 	@Override
 	public String getName() {
@@ -69,10 +69,11 @@ public class Dataservices extends DataImpl {
 		mList.remove(dataservice);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Data copy() {
 		Dataservices tmpCopy = new Dataservices();
-		tmpCopy.mList = getSubData();
+		tmpCopy.mList = (List<DataserviceConnection>) (List<?>) getSubData();
 		return tmpCopy;
 	}
 

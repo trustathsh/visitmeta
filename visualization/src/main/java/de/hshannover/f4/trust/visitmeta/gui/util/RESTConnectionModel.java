@@ -47,6 +47,7 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class RESTConnectionModel implements TreeModel {
@@ -63,13 +64,13 @@ public class RESTConnectionModel implements TreeModel {
 		mTreeModelListeners = new HashSet<TreeModelListener>();
 	}
 
-	public RESTConnectionModel(List<Data> graphNodes) {
+	public RESTConnectionModel(List<DataserviceConnection> dataserviceList) {
 		this();
 		mRootNode = new Dataservices();
-		mRootNode.mList = graphNodes;
+		mRootNode.mList = dataserviceList;
 	}
 
-	public void updateConnections(List<Data> graphNodes) {
+	public void updateConnections(List<DataserviceConnection> graphNodes) {
 		Dataservices oldRoot = mRootNode;
 
 		mRootNode = new Dataservices();

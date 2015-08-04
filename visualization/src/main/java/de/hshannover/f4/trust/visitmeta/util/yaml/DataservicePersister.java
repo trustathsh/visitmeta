@@ -93,8 +93,8 @@ public class DataservicePersister extends Properties {
 		save(propertyMap);
 	}
 
-	public List<Data> loadDataserviceConnections(Component component) throws PropertyException {
-		List<Data> dataserviceConnectionList = new ArrayList<Data>();
+	public List<DataserviceConnection> loadDataserviceConnections(Component component) throws PropertyException {
+		List<DataserviceConnection> dataserviceConnectionList = new ArrayList<DataserviceConnection>();
 		for (String connectionName : getKeySet()) {
 			// read values from property
 			String dataserviceRestUrl = getPropertyDataserviceRestUrl(connectionName);

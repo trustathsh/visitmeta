@@ -60,6 +60,9 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
+import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 /**
  *
@@ -103,9 +106,15 @@ public class MenuBar extends JMenuBar {
 		//
 		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
 		mntmAddConnection.addActionListener(new ActionListener() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				ConnectionDialog cD = new ConnectionDialog(mContoller.getMainWindow());
+				MainWindow mainWindow = mContoller.getMainWindow();
+				List<Data> dataserviceList = ((Dataservices) mainWindow.getConnectionTree().getModel().getRoot())
+						.getSubData();
+
+				ConnectionDialog cD = new ConnectionDialog(mainWindow,
+						(List<DataserviceConnection>) (List<?>) dataserviceList);
 				cD.setVisible(true);
 			}
 		});

@@ -44,14 +44,15 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 
 public class RESTConnectionTree extends JTree {
 
 	private static final long serialVersionUID = -5319549107764511043L;
 
-	public RESTConnectionTree(List<Data> graphNodes) {
-		super(new RESTConnectionModel(graphNodes));
+	public RESTConnectionTree(List<DataserviceConnection> dataserviceList) {
+		super(new RESTConnectionModel(dataserviceList));
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 		// DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -68,7 +69,7 @@ public class RESTConnectionTree extends JTree {
 		expandAllNodes();
 	}
 
-	public void updateConnections(List<Data> graphNodes) {
+	public void updateConnections(List<DataserviceConnection> graphNodes) {
 		((RESTConnectionModel) super.getModel()).updateConnections(graphNodes);
 	}
 

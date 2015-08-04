@@ -94,6 +94,8 @@ public class ConnectionDialog extends JDialog {
 
 	private MainWindow mMainWindow;
 
+	private List<DataserviceConnection> mDataserviceList;
+
 	private JTextArea mJtaLogWindows;
 
 	private JScrollPane mJspLogWindows;
@@ -126,8 +128,9 @@ public class ConnectionDialog extends JDialog {
 		LOGGER.addAppender(new JTextAreaAppander());
 	}
 
-	public ConnectionDialog(MainWindow mainWindow) {
+	public ConnectionDialog(MainWindow mainWindow, List<DataserviceConnection> dataserviceList) {
 		mMainWindow = mainWindow;
+		mDataserviceList = dataserviceList;
 		mDataservicePersister = Main.getDataservicePersister();
 
 		createDialog();
@@ -272,12 +275,8 @@ public class ConnectionDialog extends JDialog {
 	 * Initializes the left hand side of the JSplitPane
 	 */
 	private void initLeftHandSide() {
+		mJtConnections = new RESTConnectionTree(mDataserviceList);
 
-		try {
-			mJtConnections = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
-		} catch (PropertyException e) {
-			LOGGER.error(e.getMessage());
-		}
 		mJtConnections.expandAllNodes();
 		mJtConnections.addMouseListener(new ConnectionTreeDialogListener(this));
 
@@ -630,9 +629,10 @@ public class ConnectionDialog extends JDialog {
 		changeParameterPanel();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void updateMainWindowTree() {
 		List<Data> dataserviceList = ((Dataservices) mJtConnections.getModel().getRoot()).getSubData();
-		mMainWindow.getConnectionTree().updateConnections(dataserviceList);
+		mMainWindow.getConnectionTree().updateConnections((List<DataserviceConnection>) (List<?>) dataserviceList);
 		mMainWindow.getConnectionTree().expandAllNodes();
 		mMainWindow.reopenConnectionTabs();
 	}

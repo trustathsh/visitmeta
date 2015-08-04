@@ -36,21 +36,12 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
+public interface EdgePainter {
 
-public class EdgeRendererFactory {
+	public void paintEdge(GraphicWrapper g);
 
-	public static List<EdgeRenderer> getEdgeRenderer(GraphPanel panel) {
-		List<EdgeRenderer> result = new ArrayList<>();
-
-		result.add(new DefaultEdgeRenderer(panel));
-		result.add(new SearchResultEdgeRenderer(panel));
-
-		return result;
-	}
 }

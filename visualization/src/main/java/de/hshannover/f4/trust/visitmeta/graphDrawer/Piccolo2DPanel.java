@@ -59,7 +59,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRenderer;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainter;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategy;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyType;
@@ -140,7 +140,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
 
 	private List<NodePainter> mNodePainter = new ArrayList<>();
-	private List<EdgeRenderer> mEdgeRenderer = new ArrayList<>();
+	private List<EdgePainter> mEdgeRenderer = new ArrayList<>();
 
 	private Piccolo2dNodeRenderer mPiccolo2dIdentifierRenderer = null;
 	private Piccolo2dNodeRenderer mPiccolo2dMetadataRenderer = null;
@@ -818,7 +818,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 
 	private void paintEdge(PPath pEdge) {
 		GraphicWrapper g = new Piccolo2DGraphicWrapper(pEdge, null);
-		for (EdgeRenderer r : mEdgeRenderer) {
+		for (EdgePainter r : mEdgeRenderer) {
 			r.paintEdge(g);
 		}
 	}
@@ -932,7 +932,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void addEdgeRenderer(List<EdgeRenderer> edgeRenderer) {
+	public void addEdgeRenderer(List<EdgePainter> edgeRenderer) {
 		this.mEdgeRenderer.addAll(edgeRenderer);
 	}
 

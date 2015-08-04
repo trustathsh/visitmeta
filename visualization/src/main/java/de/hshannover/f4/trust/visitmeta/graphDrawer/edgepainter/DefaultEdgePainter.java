@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
 
 import java.awt.Color;
 
@@ -46,13 +46,13 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
-public class DefaultEdgeRenderer implements EdgeRenderer {
+public class DefaultEdgePainter implements EdgePainter {
 
 	private static final Properties mConfig = Main.getConfig();
 
 	private Color mColorEdge = null;
 
-	public DefaultEdgeRenderer(GraphPanel panel) {
+	public DefaultEdgePainter(GraphPanel panel) {
 		String vColorEdge =
 				mConfig.getString(VisualizationConfig.KEY_COLOR_EDGE, VisualizationConfig.DEFAULT_VALUE_COLOR_EDGE);
 		mColorEdge = Color.decode(vColorEdge);

@@ -36,12 +36,40 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
-public interface EdgeRenderer {
+public class SearchResultEdgePainter implements EdgePainter {
 
-	public void paintEdge(GraphicWrapper g);
+	private static final Properties mConfig = Main.getConfig();
+
+	private float mHideSearchMismatchesTransparency;
+
+	private Searchable mSearchable;
+
+	public SearchResultEdgePainter(GraphPanel panel) {
+		if (panel instanceof Searchable) {
+			mSearchable = (Searchable) panel;
+		}
+
+		mHideSearchMismatchesTransparency = (float) mConfig.getDouble(
+				VisualizationConfig.KEY_SEARCH_AND_FILTER_TRANSPARENCY,
+				VisualizationConfig.DEFAULT_VALUE_SEARCH_AND_FILTER_TRANSPARENCY);
+	}
+
+	@Override
+	public void paintEdge(GraphicWrapper g) {
+		if (mSearchable.getHideSearchMismatches()) {
+			g.setTransparency(mHideSearchMismatchesTransparency);
+		} else {
+			g.setTransparency(1.0f);
+		}
+	}
 
 }

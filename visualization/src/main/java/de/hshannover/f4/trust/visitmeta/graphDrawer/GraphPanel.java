@@ -48,7 +48,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.edgerenderer.EdgeRenderer;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainter;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainter;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
@@ -194,7 +194,7 @@ public interface GraphPanel {
 
 	public void addNodePainter(List<NodePainter> nodeRenderer);
 
-	public void addEdgeRenderer(List<EdgeRenderer> edgeRenderer);
+	public void addEdgeRenderer(List<EdgePainter> edgeRenderer);
 
 	public Propable getSelectedNode();
 

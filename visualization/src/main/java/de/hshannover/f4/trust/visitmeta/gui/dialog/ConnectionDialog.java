@@ -608,19 +608,63 @@ public class ConnectionDialog extends JDialog {
 			Data parentData = mJtConnections.getSelectedParentData();
 			if (parentData instanceof MapServerRestConnectionImpl) {
 				MapServerRestConnectionImpl connectionData = (MapServerRestConnectionImpl) parentData;
-				try {
-					RestHelper.saveSubscription(connectionData.getDataserviceConnection(), connectionData.getName(),
-							subscription);
-					subscription.setNotPersised(false);
-				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
-						| ConnectionException e) {
-					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+
+				if (valideSubscriptionData(subscription)) {
+					try {
+						RestHelper.saveSubscription(connectionData.getDataserviceConnection(),
+								connectionData.getName(), subscription);
+						subscription.setNotPersised(false);
+					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
+							| ConnectionException e) {
+						LOGGER.error(e.toString());
+						JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e
+								.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Subscriptions required \"Start Identifier\" and \"Start "
+							+ "Identifier Type\" \n Valid Identifier Types are: 'device' 'access-request' "
+							+ "'ip-address' 'mac-address' \n On identifier type: ip-address: \"[type],[value]\" e.g. "
+							+ "\"IPv4,10.1.1.1\"", "Subscription-Data not Valid!", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		}
 		changeParameterPanel();
+	}
+
+	private boolean valideSubscriptionData(RestSubscriptionImpl subscription) {
+		if (subscription.getStartIdentifier() == null) {
+			return false;
+		}
+		if (subscription.getIdentifierType() == null) {
+			return false;
+		}
+		if (!valideIdentifierType(subscription.getIdentifierType(), subscription.getStartIdentifier())) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean valideIdentifierType(String identifierType, String identifier) {
+		switch (identifierType) {
+			case "device":
+				return true;
+			case "access-request":
+				return true;
+			case "ip-address":
+				String[] split = identifier.split(",");
+				switch (split[0]) {
+					case "IPv4":
+						return true;
+					case "IPv6":
+						return true;
+					default:
+						return false;
+				}
+			case "mac-address":
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	public void selectPath(TreePath newPath) {

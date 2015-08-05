@@ -204,7 +204,7 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 
 	@Override
 	public Data getData() {
-		mSubscription.setName(mJtfName.getText().trim());
+		mSubscription.setName(mJtfName.getText().trim().replace(' ', '_'));
 		mSubscription.setStartIdentifier(mJtfStartIdentifier.getText().trim());
 		mSubscription.setIdentifierType(mJtfStartIdentifierType.getText().trim());
 		mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());

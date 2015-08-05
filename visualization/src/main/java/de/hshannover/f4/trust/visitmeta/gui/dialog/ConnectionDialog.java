@@ -505,8 +505,8 @@ public class ConnectionDialog extends JDialog {
 
 		} else if (selectedComponent instanceof DataserviceConnection) {
 			DataserviceConnection dataserviceConnection = (DataserviceConnection) selectedComponent;
-			MapServerRestConnectionImpl newMapServerConnection = new MapServerRestConnectionImpl(
-					dataserviceConnection, "New Map-Server-Connection "
+			MapServerRestConnectionImpl newMapServerConnection = new MapServerRestConnectionImpl(dataserviceConnection,
+					"New Map-Server-Connection "
 							+ (dataserviceConnection.getSubDataCount()
 									+ 1));
 			newMapServerConnection.setNotPersised(true);
@@ -515,10 +515,9 @@ public class ConnectionDialog extends JDialog {
 
 		} else if (selectedComponent instanceof MapServerConnection) {
 			MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) selectedComponent;
-			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl(
-					"New Subscription "
-							+ (mapServerConnection.getSubDataCount()
-									+ 1),
+			RestSubscriptionImpl newSubscription = new RestSubscriptionImpl("New_Subscription_"
+					+ (mapServerConnection.getSubDataCount()
+							+ 1),
 					mapServerConnection);
 			newSubscription.setNotPersised(true);
 

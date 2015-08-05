@@ -319,8 +319,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initAddButton(String expression) {
-		mAdd = new JCheckBoxMenuItem("Add "
-				+ expression, ADD_ICON);
+		mAdd = new JCheckBoxMenuItem("Add " + expression, ADD_ICON);
 		mAdd.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mAdd.addActionListener(new ActionListener() {
 			@Override
@@ -333,8 +332,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 	}
 
 	private void initCloneButton(String expression) {
-		mClone = new JCheckBoxMenuItem("Clone "
-				+ expression, CLONE_ICON);
+		mClone = new JCheckBoxMenuItem("Clone " + expression, CLONE_ICON);
 		mClone.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mClone.addActionListener(new ActionListener() {
 			@Override

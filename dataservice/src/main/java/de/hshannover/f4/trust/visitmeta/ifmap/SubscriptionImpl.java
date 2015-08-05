@@ -67,10 +67,10 @@ public class SubscriptionImpl extends SubscriptionDataImpl implements Subscripti
 		super.setStartupSubscribe(subscriptionData.isStartupSubscribe());
 		super.setActive(subscriptionData.isActive());
 
-		if (subscriptionData.getMaxSize() > 0) {
+		if (subscriptionData.getMaxSize() >= 0) {
 			super.setMaxSize(subscriptionData.getMaxSize());
 		}
-		if (subscriptionData.getMaxDepth() > 0) {
+		if (subscriptionData.getMaxDepth() >= 0) {
 			super.setMaxDepth(subscriptionData.getMaxDepth());
 		}
 	}

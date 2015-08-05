@@ -65,6 +65,8 @@ public class SubscriptionDataImpl extends DataImpl implements SubscriptionData {
 
 	public SubscriptionDataImpl(String subscriptionName) {
 		super.setName(subscriptionName);
+		setMaxDepth(-1);
+		setMaxSize(-1);
 	}
 
 	@Override

@@ -13,7 +13,7 @@
 			<directory>${basedir}/../</directory>
 			<includes>
 				<include>pom.xml</include>
-				<include>README.txt</include>
+				<include>README.md</include>
 				<include>LICENSE.txt</include>
 				<include>NOTICE.txt</include>
 				<include>CHANGELOG.txt</include>

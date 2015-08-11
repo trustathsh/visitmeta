@@ -65,6 +65,7 @@ public class NodePainterFactory {
 		result.add(new SelectionNodePainter(panel));
 		result.add(new SearchResultNodePainter(panel));
 		result.add(new MouseOverNodePainter(panel));
+		result.add(new SubgraphIpMacMouseOverNodePainter(panel));
 
 		return result;
 	}

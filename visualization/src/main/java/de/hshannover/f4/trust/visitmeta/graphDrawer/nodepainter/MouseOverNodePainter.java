@@ -2,11 +2,8 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter;
 
 import java.awt.Color;
 import java.awt.Paint;
-import java.util.Arrays;
-import java.util.List;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
@@ -16,10 +13,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
- * A {@link NodePainter} implementation that paints all node that are hovered over by the user with the mouse pointer,
- * and all nodes that included in a list of typenames.
- * As an example, this class paints IP address and MAC address identifier and ip-mac medadata objects, when one of them
- * is hovered over.
+ * A {@link NodePainter} implementation that paints the node that is hovered over by the user with the mouse pointer.
  *
  * @author Bastian Hellmann
  *
@@ -28,12 +22,9 @@ public class MouseOverNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();
 
-	private GraphPanel mGraphPanel;
+	protected GraphPanel mGraphPanel;
 
-	private Paint mColorMouseOverNode;
-
-	private List<String> mConnectedNodeTypeNames =
-			Arrays.asList(new String[] {IfmapStrings.IP_ADDRESS_EL_NAME, IfmapStrings.MAC_ADDRESS_EL_NAME, "ip-mac"});
+	protected Paint mColorMouseOverNode;
 
 	public MouseOverNodePainter(GraphPanel panel) {
 		mGraphPanel = panel;
@@ -49,9 +40,7 @@ public class MouseOverNodePainter implements NodePainter {
 		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
 		if (mouseOverNode != null) {
 			boolean isMouseOver = isMouseOver(mouseOverNode, metadata);
-			boolean isConnected = isConnected(mouseOverNode, metadata);
-			if (isMouseOver
-					|| isConnected) {
+			if (isMouseOver) {
 				graphic.setPaint(mColorMouseOverNode);
 			}
 		}
@@ -62,15 +51,13 @@ public class MouseOverNodePainter implements NodePainter {
 		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
 		if (mouseOverNode != null) {
 			boolean isMouseOver = isMouseOver(mouseOverNode, identifier);
-			boolean isConnected = isConnected(mouseOverNode, identifier);
-			if (isMouseOver
-					|| isConnected) {
+			if (isMouseOver) {
 				graphic.setPaint(mColorMouseOverNode);
 			}
 		}
 	}
 
-	private boolean isMouseOver(Propable mouseOverNode, Propable toTest) {
+	protected boolean isMouseOver(Propable mouseOverNode, Propable toTest) {
 		if (mouseOverNode == null) {
 			return false;
 		} else {
@@ -79,18 +66,6 @@ public class MouseOverNodePainter implements NodePainter {
 			} else {
 				return false;
 			}
-		}
-	}
-
-	private boolean isConnected(Propable mouseOverNode, Propable toTest) {
-		String mouseOverTypeName = mouseOverNode.getTypeName();
-		String toTestTypeName = toTest.getTypeName();
-
-		if (mConnectedNodeTypeNames.contains(toTestTypeName)
-				&& mConnectedNodeTypeNames.contains(mouseOverTypeName)) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 

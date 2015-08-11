@@ -38,10 +38,11 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * Interface that defines methods how to draw nodes within Piccolo2D.

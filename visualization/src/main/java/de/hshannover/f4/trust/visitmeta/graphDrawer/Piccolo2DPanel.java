@@ -51,6 +51,18 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.PLayer;
+import org.piccolo2d.PNode;
+import org.piccolo2d.activities.PActivity;
+import org.piccolo2d.activities.PTransformActivity;
+import org.piccolo2d.extras.nodes.PComposite;
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+import org.piccolo2d.util.PAffineTransform;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
+import org.piccolo2d.util.PUtil;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
@@ -84,18 +96,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.MetadataHelper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
-import edu.umd.cs.piccolo.activities.PTransformActivity;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PAffineTransform;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
-import edu.umd.cs.piccolo.util.PUtil;
-import edu.umd.cs.piccolox.nodes.PComposite;
 
 /**
  * Implementation of the {@link GraphPanel} and {@link Searchable} interfaces.
@@ -381,7 +381,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		LOGGER.trace("Method addEdge("
 				+ pKey + ", " + pNodeFirst + ", "
 				+ pNodeSecond + ") called.");
-		PPath vEdge = new PPath();
+		PPath vEdge = new PPath.Float();
 		PComposite vNodeFirst = mMapNode.get(pNodeFirst);
 		PComposite vNodeSecond = mMapNode.get(pNodeSecond);
 		/* Add Edge to Node. */

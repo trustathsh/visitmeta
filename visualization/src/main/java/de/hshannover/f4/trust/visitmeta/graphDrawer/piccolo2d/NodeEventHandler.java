@@ -42,6 +42,12 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.piccolo2d.PNode;
+import org.piccolo2d.activities.PActivity;
+import org.piccolo2d.event.PDragEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.extras.nodes.PComposite;
+import org.piccolo2d.nodes.PPath;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
@@ -50,12 +56,6 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
-import edu.umd.cs.piccolo.event.PDragEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolox.nodes.PComposite;
 
 public class NodeEventHandler extends PDragEventHandler {
 
@@ -78,7 +78,7 @@ public class NodeEventHandler extends PDragEventHandler {
 		if (pickedNode instanceof PComposite) {
 			super.startDrag(e);
 			e.setHandled(true);
-			pickedNode.moveToFront();
+			pickedNode.raiseToTop();
 			Position position = (Position) pickedNode.getAttribute("position");
 			if (position != null) {
 				position.setInUse(true);

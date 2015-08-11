@@ -38,14 +38,15 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * {@link Piccolo2dNodeRenderer} that shows possible usage of the interface.

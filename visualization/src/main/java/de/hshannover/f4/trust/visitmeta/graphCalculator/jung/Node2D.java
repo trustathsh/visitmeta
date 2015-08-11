@@ -43,6 +43,7 @@ package de.hshannover.f4.trust.visitmeta.graphCalculator.jung;
 
 
 import org.apache.log4j.Logger;
+
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 
 

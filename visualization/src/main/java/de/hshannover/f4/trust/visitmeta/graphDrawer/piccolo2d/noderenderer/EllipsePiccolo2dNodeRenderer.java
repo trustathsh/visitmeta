@@ -38,11 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+import org.piccolo2d.util.PBounds;
+
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * {@link Piccolo2dNodeRenderer} that draws nodes as ellipses.

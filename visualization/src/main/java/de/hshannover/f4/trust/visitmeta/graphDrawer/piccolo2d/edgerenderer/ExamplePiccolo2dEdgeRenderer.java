@@ -2,10 +2,11 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
 
 import java.awt.geom.Point2D;
 
+import org.piccolo2d.nodes.PPath;
+
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
  * {@link Piccolo2dEdgeRenderer} that shows possible usage of the interface.

@@ -39,12 +39,12 @@
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d;
 
 import org.apache.log4j.Logger;
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PZoomEventHandler;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PZoomEventHandler;
 
 /**
  * EventHandler for mouse wheel zoom in the panel.

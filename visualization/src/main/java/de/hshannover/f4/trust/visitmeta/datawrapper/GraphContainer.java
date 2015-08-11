@@ -45,8 +45,8 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator.Calcul
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.network.GraphNetworkConnection;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
+import de.hshannover.f4.trust.visitmeta.network.GraphNetworkConnection;
 import de.hshannover.f4.trust.visitmeta.network.GraphPool;
 
 /**

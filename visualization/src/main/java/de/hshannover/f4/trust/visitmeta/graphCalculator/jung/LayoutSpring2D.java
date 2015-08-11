@@ -43,8 +43,10 @@ package de.hshannover.f4.trust.visitmeta.graphCalculator.jung;
 
 
 import java.awt.Dimension;
+
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
+
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
 
 

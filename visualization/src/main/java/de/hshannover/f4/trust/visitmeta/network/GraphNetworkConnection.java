@@ -251,7 +251,8 @@ public class GraphNetworkConnection {
 			timeEnd = mTimeHolder.getDeltaTimeEnd();
 			newestTime = mTimeHolder.getNewestTime();
 			if (mKnownChangesMap != null && Check.chageMapHasChangeInThePast(timeEnd, mKnownChangesMap, mChangesMap)) {
-				timeEnd = mTimeHolder.getDeltaTimeStart();
+				loadCurrentGraph();
+				return true;
 			}
 		}
 

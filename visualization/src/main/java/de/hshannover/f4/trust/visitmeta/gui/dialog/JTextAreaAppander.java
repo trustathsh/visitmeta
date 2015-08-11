@@ -59,9 +59,6 @@ public class JTextAreaAppander implements Appender {
 
 	private static final String mNewline = System.getProperty("line.separator");
 
-	private static final String DEFAULT_DELIMITER = "-";
-
-	private SimpleDateFormat dateFormat;
 	private static SimpleDateFormat timeFormat;
 
 	private String mName;

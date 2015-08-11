@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,8 +52,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Logger;
-
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
@@ -61,8 +59,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 public class RetryConnectionDialog extends JDialog {
 
 	private static final long serialVersionUID = -4809177642344881613L;
-
-	private static final Logger LOGGER = Logger.getLogger(RetryConnectionDialog.class);
 
 	private Thread mConnectionThread;
 
@@ -184,20 +180,26 @@ public class RetryConnectionDialog extends JDialog {
 
 	private void retryConnect(Connection connection, int retry) throws ConnectionException, InterruptedException {
 		for (int i = 0; i < retry; i++) {
-			appendMassage("Try to connect(" + (i + 1) + "/" + retry + ")...", Color.BLACK, 0,
+			appendMassage("Try to connect("
+					+ (i
+							+ 1)
+					+ "/" + retry + ")...", Color.BLACK, 0,
 					mJpMessage.getComponentCount());
 			try {
 				if (connection instanceof DataserviceRestConnectionImpl) {
 					((DataserviceRestConnectionImpl) connection).update();
 				}
 				connection.connect();
-				appendMassage("Connected!", new Color(59, 186, 63), 1, mJpMessage.getComponentCount() - 1);
+				appendMassage("Connected!", new Color(59, 186, 63), 1, mJpMessage.getComponentCount()
+						- 1);
 				mJbClose.setEnabled(true);
 				mJbCancel.setEnabled(false);
 				break;
 			} catch (ConnectionException e) {
-				if (i + 1 < retry) {
-					appendMassage(e.getClass().getSimpleName(), Color.RED, 1, mJpMessage.getComponentCount() - 1);
+				if (i
+						+ 1 < retry) {
+					appendMassage(e.getClass().getSimpleName(), Color.RED, 1, mJpMessage.getComponentCount()
+							- 1);
 					appendMassage("wait 3 seconds...", Color.BLACK, 0, mJpMessage.getComponentCount());
 					Thread.sleep(3000);
 				} else {
@@ -206,7 +208,7 @@ public class RetryConnectionDialog extends JDialog {
 			}
 		}
 	}
-	
+
 	public void connect() {
 		mConnectionThread = new Thread(new Runnable() {
 
@@ -217,7 +219,8 @@ public class RetryConnectionDialog extends JDialog {
 				try {
 					retryConnect(mConnection, 3);
 				} catch (ConnectionException | InterruptedException e) {
-					appendMassage(e.getClass().getSimpleName(), Color.RED, 1, mJpMessage.getComponentCount() - 1);
+					appendMassage(e.getClass().getSimpleName(), Color.RED, 1, mJpMessage.getComponentCount()
+							- 1);
 					mJbCancel.setEnabled(false);
 					mJbClose.setEnabled(true);
 					mJbTryAgain.setEnabled(true);

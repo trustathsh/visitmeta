@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,15 +47,15 @@ import org.mockito.Mockito;
 import org.neo4j.cypher.ExecutionEngine;
 import org.neo4j.cypher.ExecutionResult;
 
-import scala.collection.Iterator;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
+import scala.collection.Iterator;
 
 /**
  * Test-class for Neo4JExecutor.
- * 
+ *
  * @author Johannes Busch
- * 
+ *
  */
 public class Neo4JExecutorTest {
 
@@ -77,6 +77,7 @@ public class Neo4JExecutorTest {
 	private void givenNewIdentifierExecutor(GraphType type) {
 		cypher = Mockito.mock(ExecutionEngine.class);
 
+		@SuppressWarnings("unchecked")
 		Iterator<Object> nodes = Mockito.mock(Iterator.class);
 
 		Mockito.when(nodes.hasNext()).thenReturn(true);
@@ -96,13 +97,16 @@ public class Neo4JExecutorTest {
 	}
 
 	private void buildIdentifierQuerieAtCurrent() {
-		String source = "START i=node:node_auto_index('" + NODE_TYPE_KEY + ":"
+		String source = "START i=node:node_auto_index('"
+				+ NODE_TYPE_KEY + ":"
 				+ VALUE_TYPE_NAME_IDENTIFIER + "')";
 		String match = "MATCH (m)-[:Meta]-(i)-[:Link]-(l)-[:Meta]-(m)";
 		String countReturn = "RETURN count(distinct i) as result";
-		String current = "WHERE (m." + KEY_TIMESTAMP_DELETE + " = "
+		String current = "WHERE (m."
+				+ KEY_TIMESTAMP_DELETE + " = "
 				+ InternalMetadata.METADATA_NOT_DELETED_TIMESTAMP + ")";
 
-		query = source + " " + match + " " + current + " " + countReturn;
+		query = source
+				+ " " + match + " " + current + " " + countReturn;
 	}
 }

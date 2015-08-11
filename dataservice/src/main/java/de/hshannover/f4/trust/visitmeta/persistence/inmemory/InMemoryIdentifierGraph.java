@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-dataservice, version 0.5.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.persistence.inmemory;
 
-
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +50,6 @@ import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalId
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
 import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.persistence.Repository;
-
 
 /**
  * Implementation of IdentifierGraph that holds only one startidentifier in
@@ -83,13 +79,11 @@ public class InMemoryIdentifierGraph implements InternalIdentifierGraph, Reposit
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends InternalIdentifier> getAllIdentifier(){
+	public List<? extends InternalIdentifier> getAllIdentifier() {
 		return new ArrayList<>(mIdentifiers.values());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<? extends InternalIdentifier> getIdentifiers() {
 		return new ArrayList<>(mIdentifiers.values());
@@ -157,20 +151,22 @@ public class InMemoryIdentifierGraph implements InternalIdentifierGraph, Reposit
 		InMemoryIdentifier idGraph1 = (InMemoryIdentifier) id1;
 		InMemoryIdentifier idGraph2 = (InMemoryIdentifier) id2;
 
-		if (mIdentifiers.containsKey(id1.hashCode()) && mIdentifiers.containsKey(id2.hashCode())) {
+		if (mIdentifiers.containsKey(id1.hashCode())
+				&& mIdentifiers.containsKey(id2.hashCode())) {
 
-		if (idGraph1 == null || idGraph2 == null)
-			return null;
-		for (InternalLink l : idGraph1.getLinks()) {
-			if (l.getIdentifiers().getFirst() == idGraph2)
-				return (InternalLink) l;
-			else if (l.getIdentifiers().getSecond() == idGraph2)
-				return (InternalLink) l;
-		}
-		InMemoryLink l = new InMemoryLink(idGraph1, idGraph2);
-		idGraph1.addLink(l);
-		idGraph2.addLink(l);
-		return l;
+			if (idGraph1 == null
+					|| idGraph2 == null)
+				return null;
+			for (InternalLink l : idGraph1.getLinks()) {
+				if (l.getIdentifiers().getFirst() == idGraph2)
+					return (InternalLink) l;
+				else if (l.getIdentifiers().getSecond() == idGraph2)
+					return (InternalLink) l;
+			}
+			InMemoryLink l = new InMemoryLink(idGraph1, idGraph2);
+			idGraph1.addLink(l);
+			idGraph2.addLink(l);
+			return l;
 		}
 		log.error("Someone is trying to connect Identifiers that are not in the graph");
 		return null;
@@ -178,14 +174,16 @@ public class InMemoryIdentifierGraph implements InternalIdentifierGraph, Reposit
 
 	@Override
 	public void connectMeta(InternalLink link, InternalMetadata meta) {
-		if (link == null || meta == null)
+		if (link == null
+				|| meta == null)
 			return;
 		link.addMetadata(meta);
 	}
 
 	@Override
 	public void connectMeta(InternalIdentifier id, InternalMetadata meta) {
-		if (id == null || meta == null)
+		if (id == null
+				|| meta == null)
 			return;
 		id.addMetadata(meta);
 	}
@@ -201,7 +199,7 @@ public class InMemoryIdentifierGraph implements InternalIdentifierGraph, Reposit
 		i.clearLinks();
 		i.clearMetadata();
 		this.mIdentifiers.remove(i.hashCode());
-		}
+	}
 
 	@Override
 	public void setTimestamp(long timestamp) {

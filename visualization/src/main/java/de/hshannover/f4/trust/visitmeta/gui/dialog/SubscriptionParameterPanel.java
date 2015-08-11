@@ -207,10 +207,19 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mSubscription.setName(mJtfName.getText().trim().replace(' ', '_'));
 		mSubscription.setStartIdentifier(mJtfStartIdentifier.getText().trim());
 		mSubscription.setIdentifierType(mJtfStartIdentifierType.getText().trim());
-		mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());
-		mSubscription.setResultFilter(mJtfFilterResult.getText().trim());
-		mSubscription.setTerminalIdentifierTypes(mJtfTerminalIdentifierTypes.getText().trim());
 		mSubscription.setStartupSubscribe(mJcbStartupSubscribe.isSelected());
+
+		if (!mJtfFilterLinks.getText().trim().equals("")) {
+			mSubscription.setMatchLinksFilter(mJtfFilterLinks.getText().trim());
+		}
+
+		if (!mJtfFilterResult.getText().trim().equals("")) {
+			mSubscription.setResultFilter(mJtfFilterResult.getText().trim());
+		}
+
+		if (!mJtfTerminalIdentifierTypes.getText().trim().equals("")) {
+			mSubscription.setTerminalIdentifierTypes(mJtfTerminalIdentifierTypes.getText().trim());
+		}
 
 		if (mJtfMaxDepth.getValue() != null) {
 			mSubscription.setMaxDepth(((Number) mJtfMaxDepth.getValue()).intValue());

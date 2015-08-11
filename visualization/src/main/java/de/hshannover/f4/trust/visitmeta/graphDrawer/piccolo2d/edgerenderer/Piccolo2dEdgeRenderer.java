@@ -44,8 +44,28 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.nodes.PPath;
 
+/**
+ * Interface that defines methods how to draw edges within Piccolo2D.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public interface Piccolo2dEdgeRenderer {
 
+	/**
+	 * Draw an edge between two {@link Point2D}.
+	 *
+	 * @param pEdge
+	 *            the {@link PPath} object representing the edge in Piccolo2D
+	 * @param vStart
+	 *            the starting point of the edge
+	 * @param vEnd
+	 *            the end point of the edge
+	 * @param metadata
+	 *            the {@link Metadata} object
+	 * @param identifier
+	 *            the {@link Identifier} object
+	 */
 	public void drawEdge(PPath pEdge, Point2D vStart, Point2D vEnd, Metadata metadata,
 			Identifier identifier);
 }

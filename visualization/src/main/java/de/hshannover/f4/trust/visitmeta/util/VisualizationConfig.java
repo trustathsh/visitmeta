@@ -175,7 +175,7 @@ public class VisualizationConfig {
 
 	public static final String KEY_PICCOLO2D_METADATA_NODE_STYLE = "visualization.metadata.node.style";
 	public static final String DEFAULT_VALUE_PICCOLO2D_METADATA_NODE_STYLE =
-			Piccolo2dNodeRendererType.RECTANGLES_WITH_SQUARE_CORNERS.name();
+			Piccolo2dNodeRendererType.RECTANGLES_WITH_RECTANGULAR_CORNERS.name();
 
 	public static final String KEY_PICCOLO2D_IDENTIFIER_NODE_STYLE = "visualization.identifier.node.style";
 	public static final String DEFAULT_VALUE_PICCOLO2D_IDENTIFIER_NODE_STYLE =

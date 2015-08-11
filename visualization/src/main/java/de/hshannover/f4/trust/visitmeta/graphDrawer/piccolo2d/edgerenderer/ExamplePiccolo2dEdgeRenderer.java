@@ -7,6 +7,17 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.nodes.PPath;
 
+/**
+ * {@link Piccolo2dEdgeRenderer} that shows possible usage of the interface.
+ * All edges are rendered as straight lines, except edges between IP address identifier nodes and ip-mac metadata nodes,
+ * as well as MAC address identifier nodes and ip-mac metadata nodes. These are rendered as straight dashed lines.
+ *
+ * Uses static methods from {@link StraightDashedLinePiccolo2dEdgeRenderer} and
+ * {@link StraightLinePiccolo2dEdgeRenderer}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class ExamplePiccolo2dEdgeRenderer implements Piccolo2dEdgeRenderer {
 
 	@Override

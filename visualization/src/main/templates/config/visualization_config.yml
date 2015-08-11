@@ -43,7 +43,7 @@ visualization:
     node:
       # Sets the geometric style of identifier nodes; possible values are:
       # RECTANGLES_WITH_ROUNDED_CORNERS
-      # RECTANGLES_WITH_SQUARE_CORNERS
+      # RECTANGLES_WITH_RECTANGULAR_CORNERS
       # ELLIPSE
       # EXAMPLE (shows how different types of identifier/metadata can be rendered differently)
       style: RECTANGLES_WITH_ROUNDED_CORNERS
@@ -57,10 +57,10 @@ visualization:
     node:
       # Sets the geometric style of identifier nodes; possible values are:
       # RECTANGLES_WITH_ROUNDED_CORNERS
-      # RECTANGLES_WITH_SQUARE_CORNERS
+      # RECTANGLES_WITH_RECTANGULAR_CORNERS
       # ELLIPSE
       # EXAMPLE (shows how different types of identifier/metadata can be rendered differently)
-      style: RECTANGLES_WITH_SQUARE_CORNERS
+      style: RECTANGLES_WITH_RECTANGULAR_CORNERS
   edge:
     # Sets the style of edges; possible values are:
     # STRAIGHT_LINE

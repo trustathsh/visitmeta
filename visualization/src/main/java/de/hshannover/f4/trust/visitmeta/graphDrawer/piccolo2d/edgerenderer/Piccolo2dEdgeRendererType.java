@@ -38,6 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
 
+/**
+ * An {@link Enum} for {@link Piccolo2dEdgeRenderer} types.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public enum Piccolo2dEdgeRendererType {
 	STRAIGHT_LINE, STRAIGHT_DASHED_LINE, ORTHOGONAL_LINE, CURVED_LINE, EXAMPLE
 }

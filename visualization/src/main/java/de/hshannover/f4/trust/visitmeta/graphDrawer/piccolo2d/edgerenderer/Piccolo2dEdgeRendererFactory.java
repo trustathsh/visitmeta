@@ -38,8 +38,21 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
 
+/**
+ * Factory class that creates {@link Piccolo2dEdgeRenderer} based on a given {@link Piccolo2dEdgeRendererType}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class Piccolo2dEdgeRendererFactory {
 
+	/**
+	 * Creates a new {@link Piccolo2dEdgeRenderer}.
+	 *
+	 * @param type
+	 *            type of the {@link Piccolo2dEdgeRenderer}
+	 * @return a new {@link Piccolo2dEdgeRenderer}
+	 */
 	public static Piccolo2dEdgeRenderer create(Piccolo2dEdgeRendererType type) {
 		switch (type) {
 			case STRAIGHT_LINE:

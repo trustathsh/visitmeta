@@ -42,30 +42,38 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
 
-public class EllipsePiccolo2dRenderer implements Piccolo2dNodeRenderer {
+/**
+ * {@link Piccolo2dNodeRenderer} that draws nodes as rectangles with rectangular corners.
+ *
+ * @author Bastian Hellmann
+ *
+ */
+public class RectanglesWithRectangularCornersPiccolo2dNodeRenderer implements Piccolo2dNodeRenderer {
 
-	private static double mGlowWidth = 80.0;
-	private static double mGlowHeight = 40.0;
+	private static float mOffsetWidth = 10.0f;
+	private static float mOffsetHeight = 10.0f;
 
+	/**
+	 * Creates a new {@link PPath} object as a rectangle.
+	 *
+	 * @param text
+	 *            the {@link PText} object
+	 * @return a {@link PPath} object
+	 */
 	public static PPath createNode(PText text) {
-		PBounds bounds = text.getFullBoundsReference();
-		float width = (float) (
-				bounds.getWidth()
-				+ mGlowWidth);
-		float height = (float) (bounds.getHeight()
-				+ mGlowHeight);
-
-		PPath result = PPath.createEllipse(-0.5F
-				* width, // x
-				-0.5F
-				* height, // y
-				width, // width
-				height // height
-				);
-
-		return result;
+		return PPath.createRectangle(
+				-5
+						- 0.5F
+								* (float) text.getWidth(), // x
+				-5
+						- 0.5F
+								* (float) text.getHeight(), // y
+				(float) text.getWidth()
+						+ mOffsetWidth, // width + offset
+				(float) text.getHeight()
+						+ mOffsetHeight // height + offset
+		);
 	}
 
 	@Override

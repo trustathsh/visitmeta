@@ -6,6 +6,12 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.nodes.PPath;
 
+/**
+ * {@link Piccolo2dEdgeRenderer} that draws edges as a curved line.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class CurvedLinePiccolo2dEdgeRenderer implements Piccolo2dEdgeRenderer {
 
 	@Override

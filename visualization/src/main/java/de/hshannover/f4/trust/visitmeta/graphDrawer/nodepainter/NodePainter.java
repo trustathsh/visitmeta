@@ -42,10 +42,32 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 
+/**
+ * Interface that defines how identifier and metadata nodes shall be painted.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public interface NodePainter {
 
-	void paintMetadataNode(Metadata metadata, GraphicWrapper graphic);
+	/**
+	 * Paints a {@link Metadata} node.
+	 *
+	 * @param metadata
+	 *            a {@link Metadata} instance
+	 * @param graphic
+	 *            a {@link GraphicWrapper}, representing the {@link Metadata} object
+	 */
+	public void paintMetadataNode(Metadata metadata, GraphicWrapper graphic);
 
-	void paintIdentifierNode(Identifier identifier, GraphicWrapper graphic);
+	/**
+	 * Paints a {@link Identifier} node.
+	 *
+	 * @param identifier
+	 *            a {@link Identifier} instance
+	 * @param graphic
+	 *            a {@link GraphicWrapper}, representing the {@link Identifier} object
+	 */
+	public void paintIdentifierNode(Identifier identifier, GraphicWrapper graphic);
 
 }

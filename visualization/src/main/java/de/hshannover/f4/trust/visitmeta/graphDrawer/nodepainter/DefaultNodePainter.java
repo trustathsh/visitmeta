@@ -50,6 +50,13 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.util.MetadataHelper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
+/**
+ * A {@link NodePainter} implementation that handles the basic colorization of nodes, according to their type (in case
+ * of {@link Identifier}) or publisher-id (in case of {@link Metadata}).
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class DefaultNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();

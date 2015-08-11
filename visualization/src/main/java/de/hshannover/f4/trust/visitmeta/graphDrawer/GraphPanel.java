@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer;
 
-/* Imports ********************************************************************/
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -52,14 +51,10 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainter;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainter;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
-/* Class **********************************************************************/
 /**
  * A Panel that shows the graph.
  */
 public interface GraphPanel {
-	/* Attributes *****************************************************************/
-	/* Constructors ***************************************************************/
-	/* Methods ********************************************************************/
 	/**
 	 * Return a Panel with the graph.
 	 *
@@ -192,15 +187,48 @@ public interface GraphPanel {
 	 */
 	public void unselectNode();
 
-	public void addNodePainter(List<NodePainter> nodeRenderer);
+	/**
+	 * Adds a new {@link NodePainter}.
+	 *
+	 * @param nodePainter
+	 *            a {@link NodePainter} instance
+	 */
+	public void addNodePainter(List<NodePainter> nodePainter);
 
-	public void addEdgeRenderer(List<EdgePainter> edgeRenderer);
+	/**
+	 * Adds a new {@link EdgePainter}.
+	 *
+	 * @param edgePainter
+	 *            a {@link EdgePainter} instance
+	 */
+	public void addEdgeRenderer(List<EdgePainter> edgePainter);
 
+	/**
+	 * Returns the node that was selected by the user (if any).
+	 *
+	 * @return
+	 * 		the {@link Propable} object representing the selected node.
+	 */
 	public Propable getSelectedNode();
 
+	/**
+	 * Can be called when another components detects that the mouse entered a given node.
+	 *
+	 * @param node
+	 *            the {@link Propable} object that the mouse entered.
+	 */
 	public void mouseEntered(Propable node);
 
+	/**
+	 * Can be called when another component detects that the mouse no longer is inside/over any node.
+	 */
 	public void mouseExited();
 
+	/**
+	 * Returns the node that the user has indirectly selected by moving the mouse over it, but not selecting it.
+	 *
+	 * @return
+	 * 		the {@link Propable} object representing the hovered-over node.
+	 */
 	public Propable getMouseOverNode();
 }

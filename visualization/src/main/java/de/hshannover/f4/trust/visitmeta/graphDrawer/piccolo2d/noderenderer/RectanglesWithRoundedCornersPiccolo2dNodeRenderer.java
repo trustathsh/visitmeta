@@ -38,47 +38,54 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
-import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
-import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
-import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
-public class ExamplePiccolo2dRenderer implements Piccolo2dNodeRenderer {
+/**
+ * {@link Piccolo2dNodeRenderer} that draws nodes as rectangles with rounded corners.
+ *
+ * @author Bastian Hellmann
+ *
+ */
+public class RectanglesWithRoundedCornersPiccolo2dNodeRenderer implements Piccolo2dNodeRenderer {
+
+	private static float mArcWidth = 20.0f;
+	private static float mArcHeight = 20.0f;
+	private static float mOffsetWidth = 10.0f;
+	private static float mOffsetHeight = 10.0f;
+
+	/**
+	 * Creates a {@link PPath} object as a rectangle that has rounded corners.
+	 *
+	 * @param text
+	 *            the {@link PText} object
+	 * @return a {@link PPath} object
+	 */
+	public static PPath createNode(PText text) {
+		return PPath.createRoundRectangle(-5
+				- 0.5F
+						* (float) text.getWidth(), // x
+				-5
+						- 0.5F
+								* (float) text.getHeight(), // y
+				(float) text.getWidth()
+						+ mOffsetWidth, // width + offset
+				(float) text.getHeight()
+						+ mOffsetHeight, // height + offset
+				mArcWidth, // arcWidth
+				mArcHeight // arcHeight
+		);
+	}
 
 	@Override
 	public PPath createNode(Identifier identifier, PText text) {
-		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-		String typeName = wrapper.getTypeName();
-		switch (typeName) {
-		case IfmapStrings.IDENTITY_EL_NAME:
-			if (ExtendedIdentifierHelper.isExtendedIdentifier(identifier)) {
-				String extendedIdentifierTypeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
-				if (extendedIdentifierTypeName.equals("service")) {
-					return EllipsePiccolo2dRenderer.createNode(text);
-				}
-			}
-		case IfmapStrings.ACCESS_REQUEST_EL_NAME:
-		case IfmapStrings.DEVICE_EL_NAME:
-		case IfmapStrings.IP_ADDRESS_EL_NAME:
-		case IfmapStrings.MAC_ADDRESS_EL_NAME:
-		default:
-			return RectanglesWithRoundedCornersPiccolo2dRenderer.createNode(text);
-		}
+		return createNode(text);
 	}
 
 	@Override
 	public PPath createNode(Metadata metadata, PText text) {
-		String typeName = metadata.getTypeName();
-		switch (typeName) {
-		case "device-ip":
-			return EllipsePiccolo2dRenderer.createNode(text);
-		default:
-			return RectanglesWithSquareCornersPiccolo2dRenderer.createNode(text);
-		}
+		return createNode(text);
 	}
-
 }

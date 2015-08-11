@@ -54,8 +54,18 @@ import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
+/**
+ * Utility class for creating colors depending on node types.
+ * Uses {@link GraphicWrapper} to encapsulate concrete implementations like Piccolo2D.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class ColorHelper {
 
+	/**
+	 * Private constructor, as the the class only contains static methods.
+	 */
 	private ColorHelper() {
 	}
 
@@ -65,8 +75,8 @@ public class ColorHelper {
 	/**
 	 * Create a gradient color depending on the node size.
 	 *
-	 * @param pNode
-	 *            the node.
+	 * @param g
+	 *            the wrapper for the graphic object.
 	 * @param pColorInside
 	 *            the color inside of the gradient.
 	 * @param pColorOutside
@@ -104,9 +114,12 @@ public class ColorHelper {
 
 	/**
 	 * Get the color for an identifier node.
+	 * Takes into account the typename and whether it is an extended identifier.
 	 *
-	 * @param pNode
-	 *            the identifier node.
+	 * @param g
+	 *            the wrapper for the graphic object.
+	 * @param identifier
+	 *            the identifier object.
 	 * @return the color.
 	 */
 	public static Paint getColor(GraphicWrapper g, Identifier identifier) {
@@ -155,7 +168,7 @@ public class ColorHelper {
 	 * Get the text color for a metadata node.
 	 *
 	 * @param pPublisher
-	 *            the publisher of the metadata.
+	 *            the publisher-id of the metadata.
 	 * @return the text color.
 	 */
 	public static Paint getColorText(String pPublisher) {
@@ -171,7 +184,10 @@ public class ColorHelper {
 
 	/**
 	 * Get the text color for an identifier node.
+	 * Takes into account the typename and whether it is an extended identifier.
 	 *
+	 * @param identifier
+	 *            the identifier object
 	 * @return the text color.
 	 */
 	public static Color getColorIdentifierText(Identifier identifier) {
@@ -207,7 +223,10 @@ public class ColorHelper {
 
 	/**
 	 * Get the stroke color for an identifier node.
+	 * Takes into account the typename and whether it is an extended identifier.
 	 *
+	 * @param identifier
+	 *            the identifier object
 	 * @return the stroke color.
 	 */
 	public static Color getColorIdentifierStroke(Identifier identifier) {
@@ -245,7 +264,7 @@ public class ColorHelper {
 	 * Get the stroke color for a metadata node.
 	 *
 	 * @param pPublisher
-	 *            the publisher of the metadata.
+	 *            the publisher-id of the metadata.
 	 * @return the stroke color.
 	 */
 	public static Color getColorMetadataStroke(String pPublisher) {
@@ -265,8 +284,8 @@ public class ColorHelper {
 	 *
 	 * @param pPublisher
 	 *            the publisher of the metadata.
-	 * @param pNode
-	 *            the metadata node.
+	 * @param g
+	 *            the wrapper for the graphic object.
 	 * @return the color.
 	 */
 	public static Paint getColor(String pPublisher, GraphicWrapper g) {

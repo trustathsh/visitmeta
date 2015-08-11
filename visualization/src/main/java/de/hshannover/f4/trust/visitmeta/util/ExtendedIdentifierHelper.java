@@ -41,11 +41,28 @@ package de.hshannover.f4.trust.visitmeta.util;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 
+/**
+ * Utility class that helps extracting information of extended identifier objects.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class ExtendedIdentifierHelper {
 
+	/**
+	 * Private constructor, as the the class only contains static methods.
+	 */
 	private ExtendedIdentifierHelper() {
 	}
 
+	/**
+	 * Checks whether a given {@link Identifier} is an extended identifier or not.
+	 * Searches for the <i>type</i> attribute and checks if it is <i>other</i> or not.
+	 *
+	 * @param identifier
+	 *            the {@link Identifier} oject
+	 * @return true if the {@link Identifier} object is an extended identifier
+	 */
 	public static boolean isExtendedIdentifier(Identifier identifier) {
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		String type = wrapper.getValueForXpathExpressionOrElse("@"
@@ -57,6 +74,16 @@ public class ExtendedIdentifierHelper {
 		}
 	}
 
+	/**
+	 * Extracts the inner type name of an extended identifier.
+	 * Searches for the <i>name</i> attribute.
+	 * Tries to find the first <i>;</i>; if found, it returns the string starting after that <i>;</i> and ending before
+	 * the first single whitespace character.
+	 *
+	 * @param identifier
+	 *            the {@link Identifier} oject
+	 * @return the <i>inner</i< typename of the extended identifier
+	 */
 	public static String getExtendedIdentifierInnerTypeName(Identifier identifier) {
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		String name = wrapper.getValueForXpathExpressionOrElse("@"
@@ -64,7 +91,8 @@ public class ExtendedIdentifierHelper {
 
 		int idxFirstSemicolon = name.indexOf(";");
 		if (idxFirstSemicolon != -1) {
-			return (name.substring(name.indexOf(";") + 1,
+			return (name.substring(name.indexOf(";")
+					+ 1,
 					name.indexOf(" ")));
 		}
 		return "";

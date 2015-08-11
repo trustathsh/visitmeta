@@ -38,6 +38,12 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+/**
+ * An {@link Enum} for {@link Piccolo2dNodeRenderer} types.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public enum Piccolo2dNodeRendererType {
-	RECTANGLES_WITH_ROUNDED_CORNERS, RECTANGLES_WITH_SQUARE_CORNERS, ELLIPSE, EXAMPLE
+	RECTANGLES_WITH_ROUNDED_CORNERS, RECTANGLES_WITH_RECTANGULAR_CORNERS, ELLIPSE, EXAMPLE
 }

@@ -38,21 +38,34 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+/**
+ * Factory class that creates {@link Piccolo2dNodeRenderer} based on a given {@link Piccolo2dNodeRendererType}.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class Piccolo2dNodeRendererFactory {
 
+	/**
+	 * Creates a new {@link Piccolo2dNodeRenderer}.
+	 *
+	 * @param type
+	 *            type of the {@link Piccolo2dNodeRenderer}
+	 * @return a new {@link Piccolo2dNodeRenderer}
+	 */
 	public static Piccolo2dNodeRenderer create(Piccolo2dNodeRendererType type) {
 		switch (type) {
-		case RECTANGLES_WITH_ROUNDED_CORNERS:
-			return new RectanglesWithRoundedCornersPiccolo2dRenderer();
-		case RECTANGLES_WITH_SQUARE_CORNERS:
-			return new RectanglesWithSquareCornersPiccolo2dRenderer();
-		case ELLIPSE:
-			return new EllipsePiccolo2dRenderer();
-		case EXAMPLE:
-			return new ExamplePiccolo2dRenderer();
-		default:
-			throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
-					+ type + "'");
+			case RECTANGLES_WITH_ROUNDED_CORNERS:
+				return new RectanglesWithRoundedCornersPiccolo2dNodeRenderer();
+			case RECTANGLES_WITH_RECTANGULAR_CORNERS:
+				return new RectanglesWithRectangularCornersPiccolo2dNodeRenderer();
+			case ELLIPSE:
+				return new EllipsePiccolo2dNodeRenderer();
+			case EXAMPLE:
+				return new ExamplePiccolo2dNodeRenderer();
+			default:
+				throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
+						+ type + "'");
 		}
 	}
 

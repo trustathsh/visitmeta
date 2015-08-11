@@ -7,6 +7,12 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import edu.umd.cs.piccolo.nodes.PPath;
 
+/**
+ * {@link Piccolo2dEdgeRenderer} that draws edges as straight dashed lines.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class StraightDashedLinePiccolo2dEdgeRenderer implements Piccolo2dEdgeRenderer {
 
 	@Override
@@ -15,6 +21,16 @@ public class StraightDashedLinePiccolo2dEdgeRenderer implements Piccolo2dEdgeRen
 		drawStraightDashedLine(pEdge, vStart, vEnd);
 	}
 
+	/**
+	 * Draws a straight dashed line.
+	 *
+	 * @param pEdge
+	 *            the {@link PPath} object representing the edge
+	 * @param vStart
+	 *            the starting point of the edge
+	 * @param vEnd
+	 *            the end point of the edge
+	 */
 	public static void drawStraightDashedLine(PPath pEdge, Point2D vStart, Point2D vEnd) {
 		float[] dash = {10.0f};
 		pEdge.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT,

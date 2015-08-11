@@ -38,41 +38,61 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer;
 
+import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
-public class RectanglesWithRoundedCornersPiccolo2dRenderer implements Piccolo2dNodeRenderer {
-
-	private static float mArcWidth = 20.0f;
-	private static float mArcHeight = 20.0f;
-	private static float mOffsetWidth = 10.0f;
-	private static float mOffsetHeight = 10.0f;
-
-	public static PPath createNode(PText text) {
-		return PPath.createRoundRectangle(-5
-				- 0.5F
-				* (float) text.getWidth(), // x
-				-5
-				- 0.5F
-				* (float) text.getHeight(), // y
-				(float) text.getWidth()
-				+ mOffsetWidth, // width + offset
-				(float) text.getHeight()
-				+ mOffsetHeight, // height + offset
-				mArcWidth, // arcWidth
-				mArcHeight // arcHeight
-				);
-	}
+/**
+ * {@link Piccolo2dNodeRenderer} that shows possible usage of the interface.
+ * All identifiers are rendered as rectangles with rounded corners, but extended identifiers as ellipses.
+ * All metadata nodes are rendered as rectangles with rectangular corners, except device-ip metadata (rendered as
+ * ellipses).
+ *
+ * Uses the static methods from {@link EllipsePiccolo2dNodeRenderer},
+ * {@link RectanglesWithRectangularCornersPiccolo2dNodeRenderer} and
+ * {@link RectanglesWithRoundedCornersPiccolo2dNodeRenderer} classes.
+ *
+ * @author Bastian Hellmann
+ *
+ */
+public class ExamplePiccolo2dNodeRenderer implements Piccolo2dNodeRenderer {
 
 	@Override
 	public PPath createNode(Identifier identifier, PText text) {
-		return createNode(text);
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String typeName = wrapper.getTypeName();
+		switch (typeName) {
+			case IfmapStrings.IDENTITY_EL_NAME:
+				if (ExtendedIdentifierHelper.isExtendedIdentifier(identifier)) {
+					String extendedIdentifierTypeName =
+							ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
+					if (extendedIdentifierTypeName.equals("service")) {
+						return EllipsePiccolo2dNodeRenderer.createNode(text);
+					}
+				}
+			case IfmapStrings.ACCESS_REQUEST_EL_NAME:
+			case IfmapStrings.DEVICE_EL_NAME:
+			case IfmapStrings.IP_ADDRESS_EL_NAME:
+			case IfmapStrings.MAC_ADDRESS_EL_NAME:
+			default:
+				return RectanglesWithRoundedCornersPiccolo2dNodeRenderer.createNode(text);
+		}
 	}
 
 	@Override
 	public PPath createNode(Metadata metadata, PText text) {
-		return createNode(text);
+		String typeName = metadata.getTypeName();
+		switch (typeName) {
+			case "device-ip":
+				return EllipsePiccolo2dNodeRenderer.createNode(text);
+			default:
+				return RectanglesWithRectangularCornersPiccolo2dNodeRenderer.createNode(text);
+		}
 	}
+
 }

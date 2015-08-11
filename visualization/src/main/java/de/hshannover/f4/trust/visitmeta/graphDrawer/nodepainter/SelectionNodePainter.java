@@ -50,6 +50,12 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
+/**
+ * A {@link NodePainter} implementation that paints a node in a specific color if it was selected by the user.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class SelectionNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();

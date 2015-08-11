@@ -66,6 +66,12 @@ import org.xml.sax.SAXException;
  */
 public class DocumentUtils {
 
+	/**
+	 * Private constructor, as the the class only contains static methods.
+	 */
+	private DocumentUtils() {
+	}
+
 	private static final Logger LOGGER = Logger.getLogger(DocumentUtils.class);
 
 	private static final String[] NAME_TYPE_VALUE_ARRAY = new String[] {

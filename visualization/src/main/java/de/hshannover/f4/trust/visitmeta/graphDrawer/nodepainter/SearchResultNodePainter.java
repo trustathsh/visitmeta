@@ -51,6 +51,13 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
+/**
+ * A {@link NodePainter} implementation that paints a node in a specific color if it was in the result of a search.
+ * Also paints all non-matching nodes transparent, if this function is activated.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class SearchResultNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();

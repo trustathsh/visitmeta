@@ -43,8 +43,21 @@ import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 
+/**
+ * A factory class to get all registered {@link NodePainter} implementations in their correct order.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class NodePainterFactory {
 
+	/**
+	 * Returns a list of {@link NodePainter} in the order they are going to be executed.
+	 *
+	 * @param panel
+	 *            a {@link GraphPanel} instance
+	 * @return a {@link List} of {@link NodePainter} in execution order
+	 */
 	public static List<NodePainter> getNodePainter(GraphPanel panel) {
 		List<NodePainter> result = new ArrayList<>();
 

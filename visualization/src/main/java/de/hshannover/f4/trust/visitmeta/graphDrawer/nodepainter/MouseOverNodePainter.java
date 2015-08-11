@@ -15,6 +15,15 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
+/**
+ * A {@link NodePainter} implementation that paints all node that are hovered over by the user with the mouse pointer,
+ * and all nodes that included in a list of typenames.
+ * As an example, this class paints IP address and MAC address identifier and ip-mac medadata objects, when one of them
+ * is hovered over.
+ *
+ * @author Bastian Hellmann
+ *
+ */
 public class MouseOverNodePainter implements NodePainter {
 
 	private static final Properties mConfig = Main.getConfig();

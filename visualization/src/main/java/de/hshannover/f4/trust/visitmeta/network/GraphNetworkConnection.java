@@ -59,6 +59,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.interfaces.Link;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
+import de.hshannover.f4.trust.visitmeta.util.Check;
 
 /**
  * Class for managing a graph received from a dataservice. Contains methods to
@@ -73,6 +74,7 @@ public class GraphNetworkConnection {
 	private TimeHolder mTimeHolder = null;
 	private GraphPool mGraphPool = null;
 	private SortedMap<Long, Long> mChangesMap = null;
+	private SortedMap<Long, Long> mKnownChangesMap = null;
 
 	private SettingManager mSettingManager = null;
 	int mInterval = 0;
@@ -154,7 +156,9 @@ public class GraphNetworkConnection {
 	 * Loads the ChangesMap from the dataservice.
 	 */
 	public synchronized void loadChangesMap() {
+		mKnownChangesMap = mChangesMap;
 		mChangesMap = mGraphService.getChangesMap();
+
 		if (mChangesMap != null && 0 < mChangesMap.size()) {
 			LOGGER.debug("Server has " + mChangesMap.size() + " changes.");
 			mTimeHolder.setChangesMap(mChangesMap);
@@ -242,10 +246,15 @@ public class GraphNetworkConnection {
 
 		long timeEnd = 0L;
 		long newestTime = 0L;
+
 		synchronized (mTimeHolder) {
 			timeEnd = mTimeHolder.getDeltaTimeEnd();
 			newestTime = mTimeHolder.getNewestTime();
+			if (mKnownChangesMap != null && Check.chageMapHasChangeInThePast(timeEnd, mKnownChangesMap, mChangesMap)) {
+				timeEnd = mTimeHolder.getDeltaTimeStart();
+			}
 		}
+
 		if (timeEnd < newestTime) {
 			Delta delta = mGraphService.getDelta(timeEnd, newestTime);
 			debugGraphContent(delta);

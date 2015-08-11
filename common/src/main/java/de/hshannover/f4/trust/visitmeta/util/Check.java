@@ -38,6 +38,9 @@
  */
 package de.hshannover.f4.trust.visitmeta.util;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -109,6 +112,32 @@ public class Check {
 	 */
 	public static void defaultJSONKeys(JSONObject jsonData) throws JSONHandlerException, JSONException {
 		existJSONKey(jsonData, JSONDataKey.NAME);
+	}
+
+	/**
+	 * All timeStamps which are smaller than presenceTimeStamp must have the same changes and contains in both
+	 * changeMaps.
+	 * 
+	 * @param presenceTimeStamp
+	 * @param knownChangeMap
+	 * @param newChangeMap
+	 * @return
+	 */
+	public static boolean chageMapHasChangeInThePast(long presenceTimeStamp, Map<Long, Long> knownChangeMap,
+			Map<Long, Long> newChangeMap) {
+		Iterator<Long> iterator = newChangeMap.keySet().iterator();
+		while (iterator.hasNext()) {
+			Long key = iterator.next();
+			if (presenceTimeStamp >= key) {
+				if (knownChangeMap.get(key) == null
+						|| knownChangeMap.get(key).longValue() != newChangeMap.get(key).longValue()) {
+					return true;
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 
 }

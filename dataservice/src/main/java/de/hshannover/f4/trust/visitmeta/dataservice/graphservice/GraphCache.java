@@ -70,4 +70,9 @@ public interface GraphCache {
 	 */
 	public void put(long timestamp, List<InternalIdentifierGraph> graph);
 
+	/**
+	 * Deletes all caching data.
+	 */
+	public void clearCache();
+
 }

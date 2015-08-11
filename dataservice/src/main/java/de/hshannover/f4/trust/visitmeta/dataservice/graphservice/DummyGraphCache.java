@@ -64,7 +64,12 @@ public class DummyGraphCache implements GraphCache {
 
 	@Override
 	public void put(long timestamp, List<InternalIdentifierGraph> graph) {
+		// nothing ToDo
+	}
 
+	@Override
+	public void clearCache() {
+		// nothing ToDo
 	}
 
 }

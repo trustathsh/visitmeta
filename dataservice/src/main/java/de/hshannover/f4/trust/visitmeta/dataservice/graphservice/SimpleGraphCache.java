@@ -148,4 +148,11 @@ public class SimpleGraphCache implements GraphCache {
 		}
 	}
 
+	@Override
+	public void clearCache() {
+		mCache.clear();
+		mCacheToTouched.clear();
+		mTouched.clear();
+	}
+
 }

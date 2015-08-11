@@ -70,6 +70,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
+import de.hshannover.f4.trust.visitmeta.util.Check;
 
 public class SimpleGraphService implements GraphService {
 
@@ -85,6 +86,8 @@ public class SimpleGraphService implements GraphService {
 	private DocumentBuilder mBuilder;
 
 	private DocumentBuilderFactory mBuilderFactory;
+
+	private SortedMap<Long, Long> mChanges;
 
 	private SimpleGraphService() {
 		log.trace("new SimpleGraphService");
@@ -161,6 +164,7 @@ public class SimpleGraphService implements GraphService {
 					return new ArrayList<InternalIdentifierGraph>();
 				}
 			}
+			
 			if (mCache.lookup(closestTimestamp)) {
 				return mCache.fetch(closestTimestamp);
 			} else {
@@ -443,7 +447,13 @@ public class SimpleGraphService implements GraphService {
 	@Override
 	public SortedMap<Long, Long> getChangesMap() {
 		log.trace("Method getChangesMap() called.");
-		return mReader.getChangesMap();
+		SortedMap<Long, Long> mKnownChangesMap = mChanges;
+		mChanges = mReader.getChangesMap();
+		if (mKnownChangesMap != null && !mKnownChangesMap.isEmpty()
+				&& Check.chageMapHasChangeInThePast(mKnownChangesMap.lastKey(), mKnownChangesMap, mChanges)) {
+			mCache.clearCache();
+		}
+		return mChanges;
 	}
 
 	public IdentifierGraph filterGraph(List<InternalIdentifierGraph> graphList, GraphFilter filter) {

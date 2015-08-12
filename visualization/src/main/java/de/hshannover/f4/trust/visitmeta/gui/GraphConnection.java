@@ -232,7 +232,7 @@ public class GraphConnection implements Observer {
 	 *
 	 * @param pNode
 	 */
-	public synchronized void removeHighlight(Position pNode) {
+	public void removeHighlight(Position pNode) {
 		LOGGER.trace("Method removeHighlight("
 				+ pNode + ") called.");
 		mGraphPanel.clearHighlight(pNode);

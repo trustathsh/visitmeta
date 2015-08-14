@@ -63,6 +63,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.ColorHelper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class WindowColorSettings extends JFrame implements ActionListener {
@@ -184,6 +185,7 @@ public class WindowColorSettings extends JFrame implements ActionListener {
 									.substring(2);
 					try {
 						mConfig.set(vProperty, vColor);
+						ColorHelper.propertyChanged(vProperty, vColor);
 					} catch (PropertyException e) {
 						LOGGER.fatal(e.toString(), e);
 						throw new RuntimeException("could not save property");

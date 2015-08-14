@@ -170,10 +170,9 @@ public class NodeEventHandler extends PDragEventHandler {
 		if (!mConnection.isPropablePicked()) {
 			PNode pickedNode = e.getPickedNode();
 			if (pickedNode instanceof PComposite) {
+				mPanel.mouseExited();
 			}
 		}
-
-		mPanel.mouseExited();
 	}
 
 	@Override

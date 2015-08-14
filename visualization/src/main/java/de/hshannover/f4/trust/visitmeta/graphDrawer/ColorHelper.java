@@ -43,6 +43,8 @@ import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -63,14 +65,28 @@ import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
  */
 public class ColorHelper {
 
+	private static final Logger LOGGER = Logger.getLogger(ColorHelper.class);
+
+	private static final Properties mConfig = Main.getConfig();
+
+	private static Map<String, Paint> mIdentifierColor = new HashMap<String, Paint>();
+
+	private static Map<String, Color> mIdentifierColorText = new HashMap<String, Color>();
+
+	private static Map<String, Color> mIdentifierColorStroke = new HashMap<String, Color>();
+
+	private static Map<String, Paint> mPublisherColor = new HashMap<String, Paint>();
+
+	private static Map<String, Paint> mPublisherColorText = new HashMap<String, Paint>();
+
+	private static Map<String, Color> mPublisherColorStroke = new HashMap<String, Color>();
+
+
 	/**
 	 * Private constructor, as the the class only contains static methods.
 	 */
 	private ColorHelper() {
 	}
-
-	private static final Logger LOGGER = Logger.getLogger(ColorHelper.class);
-	private static final Properties mConfig = Main.getConfig();
 
 	/**
 	 * Create a gradient color depending on the node size.
@@ -126,42 +142,49 @@ public class ColorHelper {
 		LOGGER.trace("Method getColor("
 				+ g + ", " + identifier + ") called.");
 
-		String vIdentifierInside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE;
-		String vIdentifierOutside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE;
+		String typName = identifier.getTypeName();
 
-		String typeName = identifier.getTypeName();
+		if (!mIdentifierColor.containsKey(typName)) {
 
-		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vIdentifierInside =
-					mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
-							+ typeName + VisualizationConfig.KEY_COLOR_INSIDE_POSTFIX,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE);
-			vIdentifierOutside =
-					mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
-							+ typeName + VisualizationConfig.KEY_COLOR_OUTSIDE_POSTFIX,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE);
+			String vIdentifierInside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE;
+			String vIdentifierOutside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE;
 
-			// Special case: extended identifier
-			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper
-						.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@"
-						+ IfmapStrings.IDENTITY_ATTR_TYPE);
-				if (type != null
-						&& type.equals("other")) {
-					vIdentifierInside = mConfig.getString(
-							VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_INSIDE,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_INSIDE);
-					vIdentifierOutside = mConfig.getString(
-							VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_OUTSIDE,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_OUTSIDE);
+			String typeName = identifier.getTypeName();
+
+			if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
+				vIdentifierInside =
+						mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
+								+ typeName + VisualizationConfig.KEY_COLOR_INSIDE_POSTFIX,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE);
+				vIdentifierOutside =
+						mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
+								+ typeName + VisualizationConfig.KEY_COLOR_OUTSIDE_POSTFIX,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE);
+
+				// Special case: extended identifier
+				if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
+					IdentifierWrapper wrapper = IdentifierHelper
+							.identifier(identifier);
+					String type = wrapper.getValueForXpathExpression("@"
+							+ IfmapStrings.IDENTITY_ATTR_TYPE);
+					if (type != null
+							&& type.equals("other")) {
+						vIdentifierInside = mConfig.getString(
+								VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_INSIDE,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_INSIDE);
+						vIdentifierOutside = mConfig.getString(
+								VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_OUTSIDE,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_OUTSIDE);
+					}
 				}
 			}
+
+			Color vColorInside = Color.decode(vIdentifierInside);
+			Color vColorOutside = Color.decode(vIdentifierOutside);
+			mIdentifierColor.put(typName, ColorHelper.createGradientColor(g, vColorInside, vColorOutside));
 		}
 
-		Color vColorInside = Color.decode(vIdentifierInside);
-		Color vColorOutside = Color.decode(vIdentifierOutside);
-		return ColorHelper.createGradientColor(g, vColorInside, vColorOutside);
+		return mIdentifierColor.get(typName);
 	}
 
 	/**
@@ -172,14 +195,17 @@ public class ColorHelper {
 	 * @return the text color.
 	 */
 	public static Paint getColorText(String pPublisher) {
-		LOGGER.trace("Method getColorText("
-				+ pPublisher + ") called.");
-		String vDefaultText = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_TEXT_DEFAULT,
-				VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_TEXT_DEFAULT);
-		String vText = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
-				+ pPublisher + VisualizationConfig.KEY_COLOR_TEXT_POSTFIX,
-				vDefaultText);
-		return Color.decode(vText);
+		LOGGER.trace("Method getColorText(" + pPublisher + ") called.");
+
+		if (!mPublisherColorText.containsKey(pPublisher)) {
+			String vDefaultText = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_TEXT_DEFAULT,
+					VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_TEXT_DEFAULT);
+			String vText = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
+					+ pPublisher + VisualizationConfig.KEY_COLOR_TEXT_POSTFIX, vDefaultText);
+
+			mPublisherColorText.put(pPublisher, Color.decode(vText));
+		}
+		return mPublisherColorText.get(pPublisher);
 	}
 
 	/**
@@ -196,29 +222,33 @@ public class ColorHelper {
 
 		String typeName = identifier.getTypeName();
 
-		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vColor =
-					mConfig.getString(
-							VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
-									+ typeName + VisualizationConfig.KEY_COLOR_TEXT_POSTFIX,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_TEXT);
+		if (!mIdentifierColorText.containsKey(typeName)) {
 
-			// Special case: extended identifier
-			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper
-						.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@"
-						+ IfmapStrings.IDENTITY_ATTR_TYPE);
-				if (type != null
-						&& type.equals("other")) {
-					vColor = mConfig.getString(
-							VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_TEXT,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_TEXT);
+			if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
+				vColor =
+						mConfig.getString(
+								VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
+										+ typeName + VisualizationConfig.KEY_COLOR_TEXT_POSTFIX,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_TEXT);
+
+				// Special case: extended identifier
+				if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
+					IdentifierWrapper wrapper = IdentifierHelper
+							.identifier(identifier);
+					String type = wrapper.getValueForXpathExpression("@"
+							+ IfmapStrings.IDENTITY_ATTR_TYPE);
+					if (type != null
+							&& type.equals("other")) {
+						vColor = mConfig.getString(
+								VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_TEXT,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_TEXT);
+					}
 				}
 			}
+			mIdentifierColorText.put(typeName, Color.decode(vColor));
 		}
 
-		return Color.decode(vColor);
+		return mIdentifierColorText.get(typeName);
 	}
 
 	/**
@@ -235,29 +265,33 @@ public class ColorHelper {
 
 		String typeName = identifier.getTypeName();
 
-		if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
-			vOutside =
-					mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
-							+ typeName
-							+ VisualizationConfig.KEY_COLOR_BORDER_POSTFIX,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_BORDER);
+		if (!mIdentifierColorStroke.containsKey(typeName)) {
 
-			// Special case: extended identifier
-			if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
-				IdentifierWrapper wrapper = IdentifierHelper
-						.identifier(identifier);
-				String type = wrapper.getValueForXpathExpression("@"
-						+ IfmapStrings.IDENTITY_ATTR_TYPE);
-				if (type != null
-						&& type.equals("other")) {
-					vOutside = mConfig.getString(
-							VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_BORDER,
-							VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_BORDER);
+			if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
+				vOutside =
+						mConfig.getString(VisualizationConfig.KEY_COLOR_IDENTIFIER_PREFIX
+								+ typeName
+								+ VisualizationConfig.KEY_COLOR_BORDER_POSTFIX,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_BORDER);
+
+				// Special case: extended identifier
+				if (typeName.equals(IfmapStrings.IDENTITY_EL_NAME)) {
+					IdentifierWrapper wrapper = IdentifierHelper
+							.identifier(identifier);
+					String type = wrapper.getValueForXpathExpression("@"
+							+ IfmapStrings.IDENTITY_ATTR_TYPE);
+					if (type != null
+							&& type.equals("other")) {
+						vOutside = mConfig.getString(
+								VisualizationConfig.KEY_COLOR_IDENTIFIER_EXTENDED_BORDER,
+								VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_EXTENDED_BORDER);
+					}
 				}
 			}
+			mIdentifierColorStroke.put(typeName, Color.decode(vOutside));
 		}
 
-		return Color.decode(vOutside);
+		return mIdentifierColorStroke.get(typeName);
 	}
 
 	/**
@@ -268,15 +302,16 @@ public class ColorHelper {
 	 * @return the stroke color.
 	 */
 	public static Color getColorMetadataStroke(String pPublisher) {
-		LOGGER.trace("Method getColorMetadataStroke("
-				+ pPublisher
-				+ ") called.");
-		String vDefaultStroke = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_BORDER_DEFAULT,
-				VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_BORDER_DEFAULT);
-		String vStroke = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
-				+ pPublisher + VisualizationConfig.KEY_COLOR_BORDER_POSTFIX,
-				vDefaultStroke);
-		return Color.decode(vStroke);
+		LOGGER.trace("Method getColorMetadataStroke(" + pPublisher + ") called.");
+
+		if (!mPublisherColorStroke.containsKey(pPublisher)) {
+			String vDefaultStroke = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_BORDER_DEFAULT,
+					VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_BORDER_DEFAULT);
+			String vStroke = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
+					+ pPublisher + VisualizationConfig.KEY_COLOR_BORDER_POSTFIX, vDefaultStroke);
+			mPublisherColorStroke.put(pPublisher, Color.decode(vStroke));
+		}
+		return mPublisherColorStroke.get(pPublisher);
 	}
 
 	/**
@@ -289,22 +324,35 @@ public class ColorHelper {
 	 * @return the color.
 	 */
 	public static Paint getColor(String pPublisher, GraphicWrapper g) {
-		LOGGER.trace("Method getColor("
-				+ pPublisher + ", " + g
-				+ ") called.");
+		LOGGER.trace("Method getColor(" + pPublisher + ", " + g + ") called.");
 
-		String vDefaultInside = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_INSIDE_DEFAULT,
-				VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_INSIDE_DEFAULT);
-		String vDefaultOutside = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_OUTSIDE_DEFAULT,
-				VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_OUTSIDE_DEFAULT);
-		String vInside = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
-				+ pPublisher + VisualizationConfig.KEY_COLOR_INSIDE_POSTFIX,
-				vDefaultInside);
-		String vOutside = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
-				+ pPublisher + VisualizationConfig.KEY_COLOR_OUTSIDE_POSTFIX,
-				vDefaultOutside);
-		Color vColorInside = Color.decode(vInside);
-		Color vColorOutside = Color.decode(vOutside);
-		return ColorHelper.createGradientColor(g, vColorInside, vColorOutside);
+		if (!mPublisherColor.containsKey(pPublisher)) {
+			String vDefaultInside = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_INSIDE_DEFAULT,
+					VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_INSIDE_DEFAULT);
+			String vDefaultOutside = mConfig.getString(VisualizationConfig.KEY_COLOR_METADATA_OUTSIDE_DEFAULT,
+					VisualizationConfig.DEFAULT_VALUE_COLOR_METADATA_OUTSIDE_DEFAULT);
+			String vInside = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
+					+ pPublisher + VisualizationConfig.KEY_COLOR_INSIDE_POSTFIX, vDefaultInside);
+			String vOutside = mConfig.getString(VisualizationConfig.KEY_COLOR_PREFIX
+					+ pPublisher + VisualizationConfig.KEY_COLOR_OUTSIDE_POSTFIX, vDefaultOutside);
+			Color vColorInside = Color.decode(vInside);
+			Color vColorOutside = Color.decode(vOutside);
+
+			mPublisherColor.put(pPublisher, ColorHelper.createGradientColor(g, vColorInside, vColorOutside));
+		}
+		return mPublisherColor.get(pPublisher);
+	}
+
+	public static void propertyChanged(String vProperty, String vColor) {
+		clearPaintCache();
+	}
+
+	private static void clearPaintCache() {
+		mIdentifierColor.clear();
+		mIdentifierColorStroke.clear();
+		mIdentifierColorText.clear();
+		mPublisherColor.clear();
+		mPublisherColorStroke.clear();
+		mPublisherColorText.clear();
 	}
 }

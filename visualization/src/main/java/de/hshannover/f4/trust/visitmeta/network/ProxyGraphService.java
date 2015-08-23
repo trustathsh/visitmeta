@@ -402,7 +402,7 @@ public class ProxyGraphService implements GraphService {
 
 			if (key.contains("@ifmap-cardinality")) {
 				isSingleValue = value.equalsIgnoreCase("singleValue") ? true : false;
-			} else if (key.equals("@ifmap-timestamp")) {
+			} else if (key.contains("[@ifmap-timestamp]")) {
 				publishTimestamp = getXsdStringAsCalendar(value);
 			}
 

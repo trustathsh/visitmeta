@@ -1,9 +1,4 @@
 visualization:
-  connection:
-    default:
-      name: localhost
-      url: http://localhost:8000
-      rawxml: true
   network:
     # The time interval (milliseconds) to request the dataservice for new changes.
     interval: 10000
@@ -86,9 +81,6 @@ visualization:
     # value in 0.0 to 1.0 for transparency of elements that do not match a search value
     transparency : 0.2
       
-dataservice:
-  connectiontype: rest
-  
 guicontroller:
   zfactor: 0.03
   xyfactor: 20.0

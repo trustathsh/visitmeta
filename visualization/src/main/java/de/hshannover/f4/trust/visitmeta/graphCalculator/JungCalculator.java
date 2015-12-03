@@ -58,7 +58,7 @@ public class JungCalculator implements Calculator {
 
 	private static final Logger LOGGER = Logger.getLogger(JungCalculator.class);
 
-	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED;
+	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED_JUNG;
 	
 	private Graph2D             mGraph2D;
 	private LayoutType          mLayoutType;
@@ -270,7 +270,7 @@ public class JungCalculator implements Calculator {
 	@Override
 	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier){
 		mGraph2D.setLayoutForceDirected(attractionMultiplier, repulsionMultiplier);
-		mLayoutType = LayoutType.FORCE_DIRECTED;
+		mLayoutType = LayoutType.FORCE_DIRECTED_JUNG;
 	}
 
 	@Override
@@ -278,13 +278,13 @@ public class JungCalculator implements Calculator {
 			int dimensionY, double stretch, double forceMultiplier, int repulsionRange){
 		mGraph2D.setLayoutSpring(useIndividualEdgeLength, dimensionX, dimensionY, stretch,
 			forceMultiplier, repulsionRange);
-		mLayoutType = LayoutType.SPRING;
+		mLayoutType = LayoutType.SPRING_JUNG;
 	}
 
 	@Override
 	public void setLayoutBipartite(){
 		mGraph2D.setLayoutBipartite();
-		mLayoutType = LayoutType.BIPARTITE;
+		mLayoutType = LayoutType.BIPARTITE_JUNG;
 	}
 
 }

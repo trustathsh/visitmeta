@@ -197,11 +197,11 @@ public class Graph2D {
 		LOGGER.trace("Method setLayoutType("
 				+ layoutType + ") called.");
 		mLayoutType = layoutType;
-		if (layoutType == LayoutType.FORCE_DIRECTED) {
+		if (layoutType == LayoutType.FORCE_DIRECTED_JUNG) {
 			mLayout2D = new LayoutForceDirected2D(this);
-		} else if (layoutType == LayoutType.SPRING) {
+		} else if (layoutType == LayoutType.SPRING_JUNG) {
 			mLayout2D = new LayoutSpring2D(this);
-		} else if (layoutType == LayoutType.BIPARTITE) {
+		} else if (layoutType == LayoutType.BIPARTITE_JUNG) {
 			mLayout2D = new LayoutBipartite2D(this);
 		}
 
@@ -229,7 +229,7 @@ public class Graph2D {
 	 *            How much nodes try to push each other apart.
 	 */
 	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier) {
-		mLayoutType = LayoutType.FORCE_DIRECTED;
+		mLayoutType = LayoutType.FORCE_DIRECTED_JUNG;
 		mLayout2D = new LayoutForceDirected2D(this, attractionMultiplier, repulsionMultiplier);
 	}
 
@@ -251,7 +251,7 @@ public class Graph2D {
 	 */
 	public void setLayoutSpring(boolean useIndividualEdgeLength, int dimensionX,
 			int dimensionY, double stretch, double forceMultiplier, int repulsionRange) {
-		mLayoutType = LayoutType.SPRING;
+		mLayoutType = LayoutType.SPRING_JUNG;
 		mLayout2D = new LayoutSpring2D(this, useIndividualEdgeLength, dimensionX, dimensionY,
 				stretch, forceMultiplier, repulsionRange);
 	}
@@ -260,7 +260,7 @@ public class Graph2D {
 	 * Set layout (bipartite).
 	 */
 	public void setLayoutBipartite() {
-		mLayoutType = LayoutType.BIPARTITE;
+		mLayoutType = LayoutType.BIPARTITE_JUNG;
 		mLayout2D = new LayoutBipartite2D(this);
 	}
 

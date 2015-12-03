@@ -7,14 +7,14 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.util;
 
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer.Piccolo2dEdgeRendererType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer.Piccolo2dNodeRendererType;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
@@ -90,11 +91,14 @@ public class VisualizationConfig {
 			SearchAndFilterStrategyType.SIMPLE_SEARCH_AND_NO_FILTER
 					.name();
 
+	public static final String KEY_NETWORK_INTERVAL = "visualization.network.interval";
+	public static final int DEFAULT_VALUE_NETWORK_INTERVAL = 10000;
+
 	public static final String KEY_CALCUCATION_ITERATIONS = "visualization.calculation.iterations";
 	public static final int DEFAULT_VALUE_CALCUCATION_ITERATIONS = 100;
 
-	public static final String KEY_NETWORK_INTERVAL = "visualization.network.interval";
-	public static final int DEFAULT_VALUE_NETWORK_INTERVAL = 10000;
+	public static final String KEY_CALCULATION_LAYOUTTYPE = "visualization.calculation.layouttype";
+	public static final String DEFAULT_VALUE_CALCULATION_LAYOUTTYPE = LayoutType.FORCE_DIRECTED_JUNG.name();
 
 	public static final String KEY_CALCULATION_INTERVAL = "visualization.calculation.interval";
 	public static final int DEFAULT_VALUE_CALCULATION_INTERVAL = 3000;

@@ -7,14 +7,14 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
  * 
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,13 +56,15 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
  *
@@ -72,6 +74,8 @@ public class MenuBar extends JMenuBar {
 	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
 	private GuiController mController = null;
+	private Properties mConfig = Main.getConfig();
+
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuTheme = null;
@@ -257,11 +261,12 @@ public class MenuBar extends JMenuBar {
 		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(
 				LayoutType.class) {
 			{
-				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem(
+				put(LayoutType.FORCE_DIRECTED_JUNG, new JCheckBoxMenuItem(
 						"Force-directed (JUNG2)"));
-				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
+				put(LayoutType.SPRING_JUNG, new JCheckBoxMenuItem("Spring (JUNG2)"));
 				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
 				put(LayoutType.CIRCULAR, new JCheckBoxMenuItem("Circular"));
+				put(LayoutType.FORCE_DIRECTED_ALTERNATIVE, new JCheckBoxMenuItem("Force-directed (Own implementation)"));
 			}
 		};
 
@@ -282,10 +287,6 @@ public class MenuBar extends JMenuBar {
 			});
 		}
 
-		// TODO: Initialize layout type from user settings/preferences, remove
-		// dependency on JungCalculator. <VA> 2014-08-05
-		layoutMap.get(JungCalculator.DEFAULT_LAYOUT_TYPE).setSelected(true);
-
 		mMenuItemDualViewGraph = new JCheckBoxMenuItem("Dual View");
 		mnSettings.add(mMenuItemDualViewGraph);
 
@@ -300,6 +301,12 @@ public class MenuBar extends JMenuBar {
 				}
 			}
 		});
+
+		String layoutTypeString = mConfig.getString(VisualizationConfig.KEY_CALCULATION_LAYOUTTYPE,
+				VisualizationConfig.DEFAULT_VALUE_CALCULATION_LAYOUTTYPE);
+		LayoutType layoutType = LayoutType.valueOf(layoutTypeString);
+
+		layoutMap.get(layoutType).setSelected(true);
 	}
 
 }

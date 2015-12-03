@@ -197,11 +197,12 @@ public class Graph2D {
 		LOGGER.trace("Method setLayoutType("
 				+ layoutType + ") called.");
 		mLayoutType = layoutType;
+		
 		switch (mLayoutType) {
-		case FORCE_DIRECTED:
+		case FORCE_DIRECTED_JUNG:
 			mLayout2D = new LayoutForceDirected2D(this);
 			break;
-		case SPRING:
+		case SPRING_JUNG:
 			mLayout2D = new LayoutSpring2D(this);
 			break;
 		case BIPARTITE:
@@ -209,6 +210,9 @@ public class Graph2D {
 			break;
 		case CIRCULAR:
 			mLayout2D = new LayoutCircular2D(this);
+			break;
+		case FORCE_DIRECTED_ALTERNATIVE:
+			mLayout2D = new LayoutForceDirectedAlternative2D(this);
 			break;
 		default:
 			mLayout2D = new LayoutForceDirected2D(this);
@@ -228,58 +232,6 @@ public class Graph2D {
 		}
 		mLayout2D.reset();
 		adjustAllNodes(mIterations);
-	}
-
-	/**
-	 * Set layout (force-directed).
-	 * 
-	 * @param attractionMultiplier
-	 *            How much edges try to keep their nodes together.
-	 * @param repulsionMultiplier
-	 *            How much nodes try to push each other apart.
-	 */
-	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier) {
-		mLayoutType = LayoutType.FORCE_DIRECTED;
-		mLayout2D = new LayoutForceDirected2D(this, attractionMultiplier, repulsionMultiplier);
-	}
-
-	/**
-	 * Set layout (spring).
-	 * 
-	 * @param useIndividualEdgeLength
-	 *            true if every edge has to have its individual length
-	 * @param dimensionX
-	 *            Dimension of provided space for graph in x-dimension
-	 * @param dimensionY
-	 *            Dimension of provided space for graph in y-dimension
-	 * @param stretch
-	 *            The tendency of an edge to change its length
-	 * @param forceMultiplier
-	 *            How strongly an edge tries to maintain its length
-	 * @param repulsionRange
-	 *            Outside this radius, nodes do not repel each other
-	 */
-	public void setLayoutSpring(boolean useIndividualEdgeLength, int dimensionX,
-			int dimensionY, double stretch, double forceMultiplier, int repulsionRange) {
-		mLayoutType = LayoutType.SPRING;
-		mLayout2D = new LayoutSpring2D(this, useIndividualEdgeLength, dimensionX, dimensionY,
-				stretch, forceMultiplier, repulsionRange);
-	}
-
-	/**
-	 * Set layout (bipartite).
-	 */
-	public void setLayoutBipartite() {
-		mLayoutType = LayoutType.BIPARTITE;
-		mLayout2D = new LayoutBipartite2D(this);
-	}
-	
-	/**
-	 * Set layout (circular).
-	 */
-	public void setLayoutCircular(double radius) {
-		mLayoutType = LayoutType.CIRCULAR;
-		mLayout2D = new LayoutCircular2D(this);
 	}
 
 	/**

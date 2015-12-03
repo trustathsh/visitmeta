@@ -58,7 +58,7 @@ public class JungCalculator implements Calculator {
 
 	private static final Logger LOGGER = Logger.getLogger(JungCalculator.class);
 
-	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED;
+	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED_JUNG;
 	
 	private Graph2D             mGraph2D;
 	private LayoutType          mLayoutType;
@@ -66,7 +66,7 @@ public class JungCalculator implements Calculator {
 	private MetadataCollocation mIdentifierEdgeType;
 
 	public JungCalculator() {
-
+		
 		// TODO: Initialize layout type (and layout parameters) from user settings/preferences. <VA> 2014-08-05
 		mLayoutType         = DEFAULT_LAYOUT_TYPE;
 		mExpandedEdgeType   = MetadataCollocation.FORK;

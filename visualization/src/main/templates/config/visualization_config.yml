@@ -36,6 +36,12 @@ visualization:
     interval: 5000
     # Count of Iterations for the position calculation of the nodes.
     iterations: 100
+    # Layout type on startup; possible values are:
+    # FORCE_DIRECTED_JUNG
+    # SPRING_JUNG
+    # BIPARTITE_JUNG
+    # FORCE_DIRECTED_PREFUSE
+    layouttype: FORCE_DIRECTED_JUNG
   highlights:
     # Timeout (milliseconds) to show the highlights for new and deleted nodes.
     timeout: 5000

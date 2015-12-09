@@ -84,6 +84,8 @@ public class GraphConnection implements Observer {
 	private ConnectionTab mParentTab = null;
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 	private boolean mIsPropablePicked = false;
+	private JPopupMenu mContextMenu;
+	private Propable mLastPickedNode;
 
 	/**
 	 * @param container
@@ -499,9 +501,26 @@ public class GraphConnection implements Observer {
 		return mIsPropablePicked;
 	}
 
-	public void pickAndShowContextMenu(final Propable node, Point point) {
-		JPopupMenu menu = new JPopupMenu("Node actions");
-		menu.setLightWeightPopupEnabled(false);
+	public void showContextMenu(final Propable node, Point point) {
+		if (mContextMenu == null) {
+			mContextMenu = createContextMenu(node);
+			mLastPickedNode = node;
+			mContextMenu.setLocation(point);
+		} else if (mLastPickedNode != node) {
+			mContextMenu.setVisible(false);
+			mContextMenu = createContextMenu(node);
+			mLastPickedNode = node;
+			mContextMenu.setLocation(point);
+		}
+
+		mContextMenu.setVisible(true);
+	}
+
+	private JPopupMenu createContextMenu(final Propable node) {
+		JPopupMenu result = new JPopupMenu("Node actions");
+		result.setLightWeightPopupEnabled(false);
+
+		// TODO initialize per Reflection/List of registered and Interface implementing classes
 		JButton showGraphFromHereButton = new JButton("Show graph from here");
 		showGraphFromHereButton.addActionListener(new ActionListener() {
 			@Override
@@ -509,9 +528,9 @@ public class GraphConnection implements Observer {
 				startTreeWalk(node);
 			}
 		});
-		menu.add(new JMenuBar().add(showGraphFromHereButton));
-		menu.setLocation(point);
-		menu.setVisible(true);
+		result.add(new JMenuBar().add(showGraphFromHereButton));
+
+		return result;
 	}
 
 	private void startTreeWalk(Propable node) {
@@ -519,6 +538,12 @@ public class GraphConnection implements Observer {
 
 		} else if (node instanceof NodeMetadata) {
 
+		}
+	}
+
+	public void hideContextMenu() {
+		if (mContextMenu != null) {
+			mContextMenu.setVisible(false);
 		}
 	}
 

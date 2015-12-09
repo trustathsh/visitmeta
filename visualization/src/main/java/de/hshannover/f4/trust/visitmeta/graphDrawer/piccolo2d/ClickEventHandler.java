@@ -68,10 +68,13 @@ public class ClickEventHandler extends MouseAdapter {
 			} else {
 				Propable mouseOverNode = mPanel.getMouseOverNode();
 				if (mouseOverNode != null) {
-					mPanel.getConnection().pickAndShowContextMenu(mouseOverNode,
-							MouseInfo.getPointerInfo().getLocation());
+					mPanel.getConnection().showContextMenu(mouseOverNode, MouseInfo.getPointerInfo().getLocation());
+				} else {
+					mPanel.getConnection().hideContextMenu();
 				}
 			}
+		} else {
+			mPanel.getConnection().hideContextMenu();
 		}
 	}
 }

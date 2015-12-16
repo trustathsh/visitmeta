@@ -270,6 +270,7 @@ public class ConnectionTab extends JPanel {
 	public void showPropertiesOfNode(final Propable propable) {
 		mPanelXmlTree.fill(propable);
 		mPanelXmlTree.repaint();
+		mPanelXmlTree.expandAllNodes();
 	}
 
 	/**

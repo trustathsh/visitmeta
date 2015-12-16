@@ -92,4 +92,17 @@ public class PanelXmlTree extends JScrollPane {
 		mTree.setModel(new DefaultTreeModel(vRoot, true));
 		repaint();
 	}
+	
+	/**
+	 * Expands all nodes in the XML tree.
+	 */
+	public void expandAllNodes() {
+		int j = mTree.getRowCount();
+		int i = 0;
+		while (i < j) {
+			mTree.expandRow(i);
+			i++;
+			j = mTree.getRowCount();
+		}
+	}
 }

@@ -130,7 +130,7 @@ public class TimeHolder extends Observable {
 					setDeltaTimeStart(mChangesMap.lastKey(), false);
 					setDeltaTimeEnd(mChangesMap.lastKey(), false);
 					mIsInitialized = true;
-					LOGGER.info("TimeHoler is initialized successfully.");
+					LOGGER.info("TimeHolder is initialized successfully.");
 				} else {
 					setDeltaTimeStart(mChangesMap.firstKey(), false);
 				}

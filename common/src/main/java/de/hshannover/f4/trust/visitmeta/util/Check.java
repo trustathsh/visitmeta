@@ -60,7 +60,7 @@ public class Check {
 	 * @param msg NullPointer-Error massage
 	 * @throws NullPointerException with massage msg
 	 */
-	public static void ifNull(Object obj, String msg) throws NullPointerException {
+	public static void isNull(Object obj, String msg) throws NullPointerException {
 		if (obj == null) {
 			throw new NullPointerException(msg);
 		}
@@ -123,7 +123,7 @@ public class Check {
 	 * @param newChangeMap
 	 * @return
 	 */
-	public static boolean chageMapHasChangeInThePast(long presenceTimeStamp, Map<Long, Long> knownChangeMap,
+	public static boolean changeMapHasChangesInThePast(long presenceTimeStamp, Map<Long, Long> knownChangeMap,
 			Map<Long, Long> newChangeMap) {
 		Iterator<Long> iterator = newChangeMap.keySet().iterator();
 		while (iterator.hasNext()) {

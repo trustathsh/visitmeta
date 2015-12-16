@@ -250,7 +250,7 @@ public class GraphNetworkConnection {
 		synchronized (mTimeHolder) {
 			timeEnd = mTimeHolder.getDeltaTimeEnd();
 			newestTime = mTimeHolder.getNewestTime();
-			if (mKnownChangesMap != null && Check.chageMapHasChangeInThePast(timeEnd, mKnownChangesMap, mChangesMap)) {
+			if (mKnownChangesMap != null && Check.changeMapHasChangesInThePast(timeEnd, mKnownChangesMap, mChangesMap)) {
 				loadCurrentGraph();
 				return true;
 			}

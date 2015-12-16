@@ -83,7 +83,7 @@ public enum JSONDataKey {
 	 * @throws IllegalArgumentException if no Enum specified for this key
 	 */
 	public static JSONDataKey getJSONDataKey(String dataKey) {
-		Check.ifNull(dataKey, "For methode getJSONEventKey(String) the String is null!");
+		Check.isNull(dataKey, "For methode getJSONEventKey(String) the String is null!");
 		for (JSONDataKey b : JSONDataKey.values()) {
 			for (String value : b.mValues) {
 				if (dataKey.equalsIgnoreCase(value)) {
@@ -103,7 +103,7 @@ public enum JSONDataKey {
 	 * @throws JSONException
 	 */
 	public String getContainingString(JSONObject jsonObject) throws IllegalArgumentException, JSONException {
-		Check.ifNull(jsonObject, "For methode getContainingString(JSONObject) the JSONObject is null!");
+		Check.isNull(jsonObject, "For methode getContainingString(JSONObject) the JSONObject is null!");
 
 		JSONArray jsonKeys = jsonObject.names();
 		if (jsonKeys != null) {

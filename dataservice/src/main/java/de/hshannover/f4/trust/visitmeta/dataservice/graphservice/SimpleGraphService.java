@@ -450,7 +450,7 @@ public class SimpleGraphService implements GraphService {
 		SortedMap<Long, Long> mKnownChangesMap = mChanges;
 		mChanges = mReader.getChangesMap();
 		if (mKnownChangesMap != null && !mKnownChangesMap.isEmpty()
-				&& Check.chageMapHasChangeInThePast(mKnownChangesMap.lastKey(), mKnownChangesMap, mChanges)) {
+				&& Check.changeMapHasChangesInThePast(mKnownChangesMap.lastKey(), mKnownChangesMap, mChanges)) {
 			mCache.clearCache();
 		}
 		return mChanges;

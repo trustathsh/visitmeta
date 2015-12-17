@@ -44,7 +44,7 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.ColorHelper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.util.MetadataHelper;

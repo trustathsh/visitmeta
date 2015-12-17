@@ -122,20 +122,20 @@ public class MapServerParameterPanel extends ParameterPanel {
 		mJtfMaxPollResultSize = new HintTextField("Optional", NumberFormat.getIntegerInstance());
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlBasicAuthentication, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlUsername, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbBasicAuthentication, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfUsername, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlBasicAuthentication, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlUsername, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlPassword, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlMaxPollResultSize, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlConnectingAtStartUp, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbBasicAuthentication, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfUsername, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfPassword, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfMaxPollResultSize, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJcbConnectingAtStartUp, LayoutHelper.LABEL_INSETS);
 	}
 
 	private void addChangeListeners() {

@@ -44,7 +44,7 @@ import java.awt.Paint;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -61,7 +61,7 @@ public class SelectionNodePainter implements NodePainter {
 	private static final Properties mConfig = Main.getConfig();
 	private GraphPanel mPanel;
 
-	private Paint mColorSelectedNode = null;
+	protected Paint mColorSelectedNode = null;
 
 	public SelectionNodePainter(GraphPanel panel) {
 		mPanel = panel;
@@ -74,20 +74,25 @@ public class SelectionNodePainter implements NodePainter {
 
 	@Override
 	public void paintMetadataNode(Metadata metadata, GraphicWrapper graphic) {
-		Propable selectedNode = mPanel.getSelectedNode();
-		boolean isSelected = isSelected(selectedNode, metadata);
-		if (isSelected) {
-			graphic.setPaint(mColorSelectedNode);
+		GraphicWrapper wrapper = mPanel.getSelectedNode();
+		if (wrapper != null) {
+			Propable selectedNode = wrapper.getData();
+			boolean isSelected = isSelected(selectedNode, metadata);
+			if (isSelected) {
+				graphic.setPaint(mColorSelectedNode);
+			}
 		}
-
 	}
 
 	@Override
 	public void paintIdentifierNode(Identifier identifier, GraphicWrapper graphic) {
-		Propable selectedNode = mPanel.getSelectedNode();
-		boolean isSelected = isSelected(selectedNode, identifier);
-		if (isSelected) {
-			graphic.setPaint(mColorSelectedNode);
+		GraphicWrapper wrapper = mPanel.getSelectedNode();
+		if (wrapper != null) {
+			Propable selectedNode = wrapper.getData();
+			boolean isSelected = isSelected(selectedNode, identifier);
+			if (isSelected) {
+				graphic.setPaint(mColorSelectedNode);
+			}
 		}
 	}
 

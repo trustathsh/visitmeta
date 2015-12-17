@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 
 /**
  * Interface that defines how edges (IF-MAP links) shall be painted.

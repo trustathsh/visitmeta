@@ -127,24 +127,24 @@ public class SubscriptionParameterPanel extends ParameterPanel {
 		mJcbStartupSubscribe = new JCheckBox();
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlStartIdentifier, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlStartIdentifierType, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlMatchFilterLinks, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlResultFilter, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlTerminalIdentifierTypes, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlMaxDepth, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlMaxSize, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 8, 1, 1, 1.0, 1.0, this, mJlStartupSubscribe, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfStartIdentifier, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJtfStartIdentifierType, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfFilterLinks, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfFilterResult, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfTerminalIdentifierTypes, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJtfMaxDepth, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJtfMaxSize, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 8, 1, 1, 1.0, 1.0, this, mJcbStartupSubscribe, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlStartIdentifier, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlStartIdentifierType, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, this, mJlMatchFilterLinks, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, this, mJlResultFilter, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 5, 1, 1, 1.0, 1.0, this, mJlTerminalIdentifierTypes, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 6, 1, 1, 1.0, 1.0, this, mJlMaxDepth, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 7, 1, 1, 1.0, 1.0, this, mJlMaxSize, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 8, 1, 1, 1.0, 1.0, this, mJlStartupSubscribe, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfStartIdentifier, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJtfStartIdentifierType, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 3, 1, 1, 1.0, 1.0, this, mJtfFilterLinks, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 4, 1, 1, 1.0, 1.0, this, mJtfFilterResult, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 5, 1, 1, 1.0, 1.0, this, mJtfTerminalIdentifierTypes, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 6, 1, 1, 1.0, 1.0, this, mJtfMaxDepth, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 7, 1, 1, 1.0, 1.0, this, mJtfMaxSize, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 8, 1, 1, 1.0, 1.0, this, mJcbStartupSubscribe, LayoutHelper.LABEL_INSETS);
 	}
 
 	private void addChangeListeners() {

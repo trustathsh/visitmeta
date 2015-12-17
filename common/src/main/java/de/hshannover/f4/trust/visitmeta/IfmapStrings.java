@@ -90,6 +90,8 @@ public class IfmapStrings {
 	/**
 	 * End of copied block
 	 */
+	
+	public static final String TIMESTAMP_FRACTION_ATTR = "ifmap-timestamp-fraction";
 
 	public static final List<String> IFMAP_OPERATIONAL_ATTRIBUTES = Arrays.asList(PUBLISHER_ID_ATTR, IFMAP_TIMESTAMP_ATTR, IFMAP_CARDINALITY_ATTR);
 

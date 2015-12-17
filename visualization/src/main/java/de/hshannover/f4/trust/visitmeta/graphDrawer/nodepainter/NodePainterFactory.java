@@ -66,6 +66,9 @@ public class NodePainterFactory {
 		result.add(new SearchResultNodePainter(panel));
 		result.add(new MouseOverNodePainter(panel));
 		result.add(new SubgraphIpMacMouseOverNodePainter(panel));
+		result.add(new PolicyFeatureMetadataReference(panel));
+		result.add(new PolicyActionMetadataReference(panel));
+		result.add(new PolicySelectionNodePainter(panel));
 
 		return result;
 	}

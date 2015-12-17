@@ -36,46 +36,46 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.policy;
 
-import de.hshannover.f4.trust.ironcommon.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
-import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
-import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A {@link EdgePainter} implementation that paints a edge in a transparent way if it was not in the result of a search.
- *
- * @author Bastian Hellmann
- *
- */
-public class SearchResultEdgePainter implements EdgePainter {
+public class ConditionElement {
 
-	private static final Properties mConfig = Main.getConfig();
-
-	private float mHideSearchMismatchesTransparency;
-
-	private Searchable mSearchable;
-
-	public SearchResultEdgePainter(GraphPanel panel) {
-		if (panel instanceof Searchable) {
-			mSearchable = (Searchable) panel;
-		}
-
-		mHideSearchMismatchesTransparency = (float) mConfig.getDouble(
-				VisualizationConfig.KEY_SEARCH_AND_FILTER_TRANSPARENCY,
-				VisualizationConfig.DEFAULT_VALUE_SEARCH_AND_FILTER_TRANSPARENCY);
-	}
-
-	@Override
-	public void paintEdge(GraphicWrapper g) {
-		if (mSearchable.getHideSearchMismatches()) {
-			g.setTransparency(mHideSearchMismatchesTransparency);
-		} else {
-			g.setTransparency(1.0f);
+	public enum ConditionElementType {
+		SIGNATURE,
+		ANOMALY,
+		HINT;
+		
+		public static ConditionElementType valueOfString(String type) {
+			String typeLowCase = type.toLowerCase();
+			if (typeLowCase.contains(SIGNATURE.toString().toLowerCase())) {
+				return SIGNATURE;
+			} else if (typeLowCase.contains(ANOMALY.toString().toLowerCase())) {
+				return ANOMALY;
+			} else if (typeLowCase.contains(HINT.toString().toLowerCase())) {
+				return HINT;
+			}
+			return null;
 		}
 	}
 
+	public ConditionElementType type;
+
+	public String id;
+
+	public boolean result;
+
+	public List<ConditionElement> childs;
+
+	public ConditionElement() {
+		childs = new ArrayList<ConditionElement>();
+	}
+
+	// TODO
+	// public ConditionElement(String id, boolean result) {
+	// this.id = id;
+	// this.result = result;
+	// }
 }

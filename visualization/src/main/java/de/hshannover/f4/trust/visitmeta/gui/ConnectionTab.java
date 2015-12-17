@@ -40,10 +40,11 @@ package de.hshannover.f4.trust.visitmeta.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.List;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -54,9 +55,13 @@ import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
+import de.hshannover.f4.trust.visitmeta.gui.nodeinformation.panel.ExtendedNodeInformationFactory;
+import de.hshannover.f4.trust.visitmeta.gui.nodeinformation.panel.ExtendedNodeInformationPanel;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyType;
@@ -83,6 +88,7 @@ public class ConnectionTab extends JPanel {
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
+	private JPanel mNodeInformationPanel = null;
 
 	private WindowColorSettings mWindowColorSettings;
 	private WindowSettings mWindowSettings;
@@ -90,6 +96,8 @@ public class ConnectionTab extends JPanel {
 	private MotionInformationPane mMotionInformationPane;
 	private GraphPanel mGraphPanel;
 	private PanelXmlTree mPanelXmlTree;
+	
+	private GraphicWrapper mSelectedNode;
 
 	/**
 	 * Initializes a Connection Tab. Sets the Name and arranges the Panel.
@@ -153,24 +161,29 @@ public class ConnectionTab extends JPanel {
 		mLowerPanel = new JPanel();
 
 		mUpperPanel.setLayout(new GridLayout());
-		mLowerPanel.setLayout(new BoxLayout(mLowerPanel, BoxLayout.Y_AXIS));
-
+		mLowerPanel.setLayout(new GridBagLayout());
+		
 		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
 
 		JPanel searchAndFilterPanel = mSearchAndFilterStrategy.getJPanel();
+		searchAndFilterPanel.setBorder(BorderFactory.createTitledBorder("Search and Filter"));
 		searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy.getJPanel();
+		historyNavigationStrategyPanel.setBorder(BorderFactory.createTitledBorder("History Navigation"));
 		historyNavigationStrategyPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mPanelXmlTree = new PanelXmlTree();
-		mPanelXmlTree.setPreferredSize(new Dimension(800, 200));
+		mPanelXmlTree.setBorder(BorderFactory.createTitledBorder("Node XML-Tree"));
+		mPanelXmlTree.setPreferredSize(new Dimension(800, 400));
 		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mUpperPanel.add(mMotionInformationPane);
-		mLowerPanel.add(searchAndFilterPanel);
-		mLowerPanel.add(historyNavigationStrategyPanel);
-		mLowerPanel.add(mPanelXmlTree);
+		
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLowerPanel, searchAndFilterPanel, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 0.0, mLowerPanel, historyNavigationStrategyPanel,
+				LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, mLowerPanel, mPanelXmlTree, LayoutHelper.NULL_INSETS);
 
 		mSplitPane = new JSplitPane();
 		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -285,5 +298,63 @@ public class ConnectionTab extends JPanel {
 	 */
 	public MotionInformationPane getMotionInformationPane() {
 		return mMotionInformationPane;
+	}
+	
+	private boolean isNewSelectedNode(GraphicWrapper selectedNode) {
+		// TODO redundant
+		Object selectedNodeData = selectedNode.getData();
+
+		if (selectedNodeData instanceof Propable) {
+			if (mSelectedNode == null) {
+				return true;
+			} else if (mSelectedNode.getData() != selectedNodeData) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+		
+	public void showExtendedNodeInformation(GraphicWrapper selectedNode) {
+		if (selectedNode == null) {
+			resetExtendedNodeInformation();
+			return;
+		}
+
+		if (!isNewSelectedNode(selectedNode)) {
+			return;
+		}
+
+		resetExtendedNodeInformation();
+
+		try{
+			buildExtendedNodeInformation(selectedNode);
+
+			LayoutHelper.addComponent(0, 0, 1, 1, 0.0, 0.0, mLowerPanel, mNodeInformationPanel,
+					LayoutHelper.NULL_INSETS);
+			mLowerPanel.updateUI();
+		} catch (IllegalArgumentException e) {
+			LOGGER.debug(e.getMessage());
+		}
+	}
+
+	private void resetExtendedNodeInformation() {
+		if (mNodeInformationPanel != null) {
+			mLowerPanel.remove(mNodeInformationPanel);
+		}
+
+		mLowerPanel.updateUI();
+	}
+
+	private void buildExtendedNodeInformation(GraphicWrapper selectedNode) throws IllegalArgumentException {
+		ExtendedNodeInformationPanel nodeInformation = ExtendedNodeInformationFactory.create(selectedNode);
+
+		mNodeInformationPanel = new JPanel();
+		mNodeInformationPanel.setLayout(new GridBagLayout());
+		mNodeInformationPanel.setBorder(BorderFactory.createTitledBorder("Selected-Node Information"));
+
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mNodeInformationPanel, nodeInformation,
+				LayoutHelper.NULL_INSETS);
 	}
 }

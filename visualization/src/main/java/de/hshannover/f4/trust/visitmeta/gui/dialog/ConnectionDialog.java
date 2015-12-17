@@ -166,8 +166,8 @@ public class ConnectionDialog extends JDialog {
 		changeParameterPanel();
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJspMain, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJspMain, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.LABEL_INSETS);
 	}
 
 	private int confirmCloseRequest() {
@@ -289,7 +289,7 @@ public class ConnectionDialog extends JDialog {
 		mJpLeft.setLayout(new GridBagLayout());
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpLeft, mJspLeft, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpLeft, mJspLeft, LayoutHelper.LABEL_INSETS);
 
 	}
 
@@ -320,9 +320,9 @@ public class ConnectionDialog extends JDialog {
 
 		// x y w h wx wy
 		// LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, connectionParameter, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpLog, mJspLogWindows, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRight, mJpParameter, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRight, mJpLog, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpLog, mJspLogWindows, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpRight, mJpParameter, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, mJpRight, mJpLog, LayoutHelper.LABEL_INSETS);
 	}
 
 	public void changeParameterPanel() {
@@ -367,7 +367,7 @@ public class ConnectionDialog extends JDialog {
 			});
 			mJpParameter.removeAll();
 
-			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mParameterValues, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mParameterValues, LayoutHelper.LABEL_INSETS);
 
 			mJpParameter.updateUI();
 		}

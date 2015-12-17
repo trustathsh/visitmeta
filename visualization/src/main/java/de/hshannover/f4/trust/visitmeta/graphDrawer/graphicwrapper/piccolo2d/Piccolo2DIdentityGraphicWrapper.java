@@ -36,63 +36,63 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d;
 
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.Point2D;
-
-import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PText;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-public class Piccolo2DGraphicWrapper implements GraphicWrapper {
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.IdentityGraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
 
-	private PPath mNode;
-	private PText mText;
+public class Piccolo2DIdentityGraphicWrapper extends Piccolo2DGraphicWrapper implements IdentityGraphicWrapper {
 
-	public Piccolo2DGraphicWrapper(PPath node, PText text) {
-		mNode = node;
-		mText = text;
+	private static final String ELEMENT_ID_NAME = "name";
+
+	public Piccolo2DIdentityGraphicWrapper(PNode node, PText text) {
+		super(node, text);
+	}
+
+	/**
+	 * For extendet-Identity don't deEscapeXml().
+	 */
+	@Override
+	protected Document getDocument() {
+		Object data = getData();
+
+		if (data instanceof Propable) {
+			Propable propable = (Propable) data;
+
+			return DocumentUtils.parseXmlString(propable.getRawData());
+		}
+		return null;
 	}
 
 	@Override
-	public void setPaint(Paint color) {
-		this.mNode.setPaint(color);
+	public String getName() {
+		Element rootElement = super.getRootElement();
+
+		String name = rootElement.getAttribute(ELEMENT_ID_NAME);
+
+		return name;
 	}
 
 	@Override
-	public Paint getStrokePaint() {
-		return mNode.getStrokePaint();
-	}
+	public String getExtendetNodeTypeName() {
+		String nameValue = getName();
+		
+		if (nameValue == null) {
+			return null;
+		}
 
-	@Override
-	public void setTextPaint(Paint color) {
-		mText.setTextPaint(color);
-	}
+		Document extendetIdentifier = DocumentUtils.parseEscapedXmlString(nameValue);
 
-	@Override
-	public double getWidth() {
-		return mNode.getWidth();
+		if (extendetIdentifier != null) {
+			Element rootElement = extendetIdentifier.getDocumentElement();
+			return rootElement.getNodeName();
+		}
+		return null;
 	}
-
-	@Override
-	public double getHeight() {
-		return mNode.getHeight();
-	}
-
-	@Override
-	public void setStrokePaint(Color color) {
-		this.mNode.setStrokePaint(color);
-	}
-
-	@Override
-	public void setTransparency(float f) {
-		this.mNode.setTransparency(f);
-	}
-
-	@Override
-	public Point2D getCenter2D() {
-		return mNode.getBounds().getCenter2D();
-	}
-
 }

@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
@@ -142,14 +143,12 @@ public class ColorHelper {
 		LOGGER.trace("Method getColor("
 				+ g + ", " + identifier + ") called.");
 
-		String typName = identifier.getTypeName();
+		String typeName = identifier.getTypeName();
 
-		if (!mIdentifierColor.containsKey(typName)) {
+		if (!mIdentifierColor.containsKey(typeName)) {
 
 			String vIdentifierInside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_INSIDE;
 			String vIdentifierOutside = VisualizationConfig.DEFAULT_VALUE_COLOR_IDENTIFIER_OUTSIDE;
-
-			String typeName = identifier.getTypeName();
 
 			if (IfmapStrings.IDENTIFIER_TYPES.contains(typeName)) {
 				vIdentifierInside =
@@ -181,10 +180,10 @@ public class ColorHelper {
 
 			Color vColorInside = Color.decode(vIdentifierInside);
 			Color vColorOutside = Color.decode(vIdentifierOutside);
-			mIdentifierColor.put(typName, ColorHelper.createGradientColor(g, vColorInside, vColorOutside));
+			mIdentifierColor.put(typeName, ColorHelper.createGradientColor(g, vColorInside, vColorOutside));
 		}
 
-		return mIdentifierColor.get(typName);
+		return mIdentifierColor.get(typeName);
 	}
 
 	/**

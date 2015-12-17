@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter;
 
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 

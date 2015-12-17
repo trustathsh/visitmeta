@@ -36,41 +36,55 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
+package de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d;
+
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
- * Factory class that creates {@link Piccolo2dEdgeRenderer} based on a given {@link Piccolo2dEdgeRendererType}.
+ * Factory class that creates {@link Piccolo2DGraphicWrapper} based on a given selected node {@link PPath} typName.
  *
- * @author Bastian Hellmann
+ * @author Marcel Reichenbach
  *
  */
-public class Piccolo2dEdgeRendererFactory {
+public class Piccolo2DGraphicWrapperFactory {
 
 	/**
-	 * Creates a new {@link Piccolo2dEdgeRenderer}.
+	 * Creates a new {@link Piccolo2DGraphicWrapper}.
 	 *
-	 * @param type
-	 *            type of the {@link Piccolo2dEdgeRenderer}
-	 * @return a new {@link Piccolo2dEdgeRenderer}
+	 * @param selectedNode the {@link PNode} of the selected node
+	 * @param selectedNodeText the {@link PText} of the selected node
+	 * @return a new {@link Piccolo2DGraphicWrapper}
 	 */
-	public static Piccolo2dEdgeRenderer create(Piccolo2dEdgeRendererType type) {
-		switch (type) {
-			case STRAIGHT_LINE:
-				return new StraightLinePiccolo2dEdgeRenderer();
-			case STRAIGHT_DASHED_LINE:
-				return new StraightDashedLinePiccolo2dEdgeRenderer();
-			case ORTHOGONAL_LINE:
-				return new OrthogonalLinePiccolo2dEdgeRenderer();
-			case CURVED_LINE:
-				return new CurvedLinePiccolo2dEdgeRenderer();
-			case EXAMPLE:
-				return new ExamplePiccolo2dEdgeRenderer();
-			case POLICY:
-				return new PolicyMetadataReferenceEdgeRenderer();
+	public static Piccolo2DGraphicWrapper create(PNode selectedNode, PText selectedNodeText) {
+		String typeName = getTypeName(selectedNode);
+
+		if (typeName == null) {
+			return new Piccolo2DGraphicWrapper(selectedNode, selectedNodeText);
+		}
+
+		switch (typeName) {
+			case "policy-action":
+				return new Piccolo2DPolicyActionGraphicWrapper(selectedNode, selectedNodeText);
+			case "identity":
+				return new Piccolo2DIdentityGraphicWrapper(selectedNode, selectedNodeText);
 			default:
-				throw new IllegalArgumentException("No Piccolo2dRenderer found for type '"
-						+ type + "'");
+				return new Piccolo2DGraphicWrapper(selectedNode, selectedNodeText);
 		}
 	}
 
+	private static String getTypeName(PNode node) {
+		if (node != null) {
+			Object data = node.getParent().getAttribute("data");
+			if (data instanceof Propable) {
+				Propable propable = (Propable) data;
+				String typName = propable.getTypeName();
+				return typName;
+			}
+		}
+		return null;
+	}
 }

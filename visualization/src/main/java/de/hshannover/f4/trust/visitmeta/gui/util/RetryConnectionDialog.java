@@ -101,8 +101,8 @@ public class RetryConnectionDialog extends JDialog {
 		initMessagePanel();
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJpMain, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, getContentPane(), mJpMain, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 0.0, 0.0, getContentPane(), mJpSouth, LayoutHelper.LABEL_INSETS);
 	}
 
 	private void initMainPanel() {
@@ -115,7 +115,7 @@ public class RetryConnectionDialog extends JDialog {
 		mJpMessage.setLayout(new GridBagLayout());
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpMain, mJpMessage, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mJpMain, mJpMessage, LayoutHelper.LABEL_INSETS);
 	}
 
 	private void initSouthPanel() {
@@ -173,7 +173,7 @@ public class RetryConnectionDialog extends JDialog {
 		jlMassage.setFont(new Font(jlMassage.getFont().getFontName(), Font.BOLD, jlMassage.getFont().getSize()));
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(x, y, 1, 1, 0.0, 0.0, mJpMessage, jlMassage, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(x, y, 1, 1, 0.0, 0.0, mJpMessage, jlMassage, LayoutHelper.LABEL_INSETS);
 
 		super.pack();
 	}

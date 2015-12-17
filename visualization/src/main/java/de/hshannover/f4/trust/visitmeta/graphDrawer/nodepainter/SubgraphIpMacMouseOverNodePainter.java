@@ -43,7 +43,7 @@ import java.util.List;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -68,26 +68,32 @@ public class SubgraphIpMacMouseOverNodePainter extends MouseOverNodePainter {
 
 	@Override
 	public void paintMetadataNode(Metadata metadata, GraphicWrapper graphic) {
-		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
-		if (mouseOverNode != null) {
-			boolean isMouseOver = isMouseOver(mouseOverNode, metadata);
-			boolean isConnected = isConnected(mouseOverNode, metadata);
-			if (isMouseOver
-					|| isConnected) {
-				graphic.setPaint(mColorMouseOverNode);
+		GraphicWrapper wrapper = mGraphPanel.getMouseOverNode();
+		if (wrapper != null) {
+			Propable mouseOverNode = wrapper.getData();
+			if (mouseOverNode != null) {
+				boolean isMouseOver = isMouseOver(mouseOverNode, metadata);
+				boolean isConnected = isConnected(mouseOverNode, metadata);
+				if (isMouseOver
+						|| isConnected) {
+					graphic.setPaint(mColorMouseOverNode);
+				}
 			}
 		}
 	}
 
 	@Override
 	public void paintIdentifierNode(Identifier identifier, GraphicWrapper graphic) {
-		Propable mouseOverNode = mGraphPanel.getMouseOverNode();
-		if (mouseOverNode != null) {
-			boolean isMouseOver = isMouseOver(mouseOverNode, identifier);
-			boolean isConnected = isConnected(mouseOverNode, identifier);
-			if (isMouseOver
-					|| isConnected) {
-				graphic.setPaint(mColorMouseOverNode);
+		GraphicWrapper wrapper = mGraphPanel.getMouseOverNode();
+		if (wrapper != null) {
+			Propable mouseOverNode = wrapper.getData();
+			if (mouseOverNode != null) {
+				boolean isMouseOver = isMouseOver(mouseOverNode, identifier);
+				boolean isConnected = isConnected(mouseOverNode, identifier);
+				if (isMouseOver
+						|| isConnected) {
+					graphic.setPaint(mColorMouseOverNode);
+				}
 			}
 		}
 	}

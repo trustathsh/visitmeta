@@ -72,6 +72,9 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeType;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainter;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d.Piccolo2DGraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d.Piccolo2DGraphicWrapperFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategy;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier.IdentifierInformationStrategyType;
@@ -93,7 +96,6 @@ import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
-import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.MetadataHelper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
@@ -133,8 +135,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private IdentifierInformationStrategy mIdentifierInformationStrategy;
 	private MetadataInformationStrategy mMetadataInformationStrategy;
 
-	private Propable mSelectedNode = null;
-	private Propable mMouseOverNode = null;
+	private GraphicWrapper mSelectedNode = null;
+	private GraphicWrapper mMouseOverNode = null;
 
 	private String mSearchTerm = "";
 	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
@@ -280,7 +282,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.addAttribute("type", NodeType.IDENTIFIER);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("data", pNode.getIdentifier());
-			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>());
+			vCom.addAttribute("edges", new ArrayList<PPath>());
 
 			paintIdentifierNode(pNode.getIdentifier(), vNode, vText);
 
@@ -328,7 +330,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 			vCom.addAttribute("publisher", vPublisher);
 			vCom.addAttribute("position", pNode);
 			vCom.addAttribute("data", pNode.getMetadata());
-			vCom.addAttribute("edges", new ArrayList<ArrayList<PPath>>()); // Add
+			vCom.addAttribute("edges", new ArrayList<PPath>()); // Add
 			// edges
 			// to
 			// node
@@ -375,8 +377,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	 * @param pNodeSecond
 	 *            the node where the edge ends.
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	private synchronized void addEdge(NodeMetadata pKey, Position pNodeFirst,
+	public synchronized void addEdge(NodeMetadata pKey, Position pNodeFirst,
 			Position pNodeSecond) {
 		LOGGER.trace("Method addEdge("
 				+ pKey + ", " + pNodeFirst + ", "
@@ -403,8 +406,9 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 		updateEdge(vEdge, pKey);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	private void deleteEdge(Object pKey, PPath pEdge) {
+	public void deleteEdge(Object pKey, PPath pEdge) {
 		LOGGER.trace("Method deleteEdge("
 				+ pKey + ", " + pEdge + ") called.");
 		/* Remove edge from layer */
@@ -803,21 +807,21 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	private void paintMetadataNode(Metadata metadata, PPath vNode, PText vText) {
-		GraphicWrapper g = new Piccolo2DGraphicWrapper(vNode, vText);
+		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
 		for (NodePainter r : mNodePainter) {
 			r.paintMetadataNode(metadata, g);
 		}
 	}
 
 	private void paintIdentifierNode(Identifier identifier, PPath vNode, PText vText) {
-		GraphicWrapper g = new Piccolo2DGraphicWrapper(vNode, vText);
+		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
 		for (NodePainter r : mNodePainter) {
 			r.paintIdentifierNode(identifier, g);
 		}
 	}
 
 	private void paintEdge(PPath pEdge) {
-		GraphicWrapper g = new Piccolo2DGraphicWrapper(pEdge, null);
+		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(pEdge, null);
 		for (EdgePainter r : mEdgeRenderer) {
 			r.paintEdge(g);
 		}
@@ -884,12 +888,10 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void selectNode(Propable propable) {
-		LOGGER.trace("Method selectNode("
-				+ propable + ") called.");
-		if ((propable != null)
-				&& (mSelectedNode != propable)) {
-			mSelectedNode = propable;
+	public void selectNode(GraphicWrapper selectedNode) {
+		LOGGER.trace("Method selectNode(" + selectedNode + ") called.");
+		if ((selectedNode != null) && (mSelectedNode != selectedNode)) {
+			mSelectedNode = selectedNode;
 			repaintNodes(NodeType.IDENTIFIER);
 			repaintNodes(NodeType.METADATA);
 		}
@@ -952,12 +954,12 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public Propable getSelectedNode() {
+	public GraphicWrapper getSelectedNode() {
 		return mSelectedNode;
 	}
 
 	@Override
-	public void mouseEntered(Propable node) {
+	public void mouseEntered(GraphicWrapper node) {
 		LOGGER.trace("Method mouseEntered("
 				+ node + ") called.");
 		if ((node != null)
@@ -976,7 +978,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public Propable getMouseOverNode() {
+	public GraphicWrapper getMouseOverNode() {
 		return mMouseOverNode;
 	}
+
 }

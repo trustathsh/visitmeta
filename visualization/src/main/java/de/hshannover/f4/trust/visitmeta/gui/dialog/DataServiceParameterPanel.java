@@ -96,12 +96,12 @@ public class DataServiceParameterPanel extends ParameterPanel {
 		mJcbRawXML = new JCheckBox();
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlRawXml, LayoutHelper.mLblInsets);
-		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, this, mJlName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 0, 1, 1, 1.0, 1.0, this, mJtfName, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 1.0, this, mJlUrl, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 1, 1, 1, 1.0, 1.0, this, mJtfUrl, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 1.0, this, mJlRawXml, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(1, 2, 1, 1, 1.0, 1.0, this, mJcbRawXML, LayoutHelper.LABEL_INSETS);
 	}
 
 	private void addChangeListeners() {

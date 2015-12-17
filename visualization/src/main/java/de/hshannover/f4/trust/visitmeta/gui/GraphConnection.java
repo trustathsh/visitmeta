@@ -61,6 +61,7 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class GraphConnection implements Observer {
@@ -447,12 +448,13 @@ public class GraphConnection implements Observer {
 	 * @param propable
 	 *            the {@link Propable} object to show
 	 */
-	public void pickAndShowProperties(Propable propable) {
+	public void pickAndShowProperties(GraphicWrapper wrapper) {
 		LOGGER.trace("Method pickAndShowProperties("
-				+ propable + ") called.");
+				+ wrapper + ") called.");
 		mIsPropablePicked = true;
-		mParentTab.showPropertiesOfNode(propable);
-		mGraphPanel.selectNode(propable);
+		mParentTab.showPropertiesOfNode(wrapper.getData());
+		mParentTab.showExtendedNodeInformation(wrapper);
+		mGraphPanel.selectNode(wrapper);
 	}
 
 	/**
@@ -476,6 +478,7 @@ public class GraphConnection implements Observer {
 		LOGGER.trace("Method clearProperties() called.");
 		mIsPropablePicked = false;
 		mParentTab.showPropertiesOfNode(null);
+		mParentTab.showExtendedNodeInformation(null);
 		mGraphPanel.unselectNode();
 	}
 

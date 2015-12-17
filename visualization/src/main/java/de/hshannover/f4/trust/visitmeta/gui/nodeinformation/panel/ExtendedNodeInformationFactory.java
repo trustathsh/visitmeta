@@ -36,45 +36,41 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter;
+package de.hshannover.f4.trust.visitmeta.gui.nodeinformation.panel;
 
-import de.hshannover.f4.trust.ironcommon.properties.Properties;
-import de.hshannover.f4.trust.visitmeta.Main;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
-import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
-import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
+import de.hshannover.f4.trust.visitmeta.gui.nodeinformation.panel.policy.action.PolicyActionExtendedNodeInformation;
 
 /**
- * A {@link EdgePainter} implementation that paints a edge in a transparent way if it was not in the result of a search.
+ * Factory class that creates {@link ExtendedNodeInformationPanel} based on a given selected node {@link GraphicWrapper}
+ * typName.
  *
- * @author Bastian Hellmann
+ * @author Marcel Reichenbach
  *
  */
-public class SearchResultEdgePainter implements EdgePainter {
+public class ExtendedNodeInformationFactory {
 
-	private static final Properties mConfig = Main.getConfig();
+	/**
+	 * Creates a new {@link ExtendedNodeInformationPanel}.
+	 *
+	 * @param selectedNode the {@link GraphicWrapper} of the selected node
+	 * @return a new {@link ExtendedNodeInformationPanel}
+	 * @throws IllegalArgumentException if no ExtendedNodeInformationPanel for given {@link GraphicWrapper} found
+	 */
+	public static ExtendedNodeInformationPanel create(GraphicWrapper selectedNode) throws IllegalArgumentException {
+		String typeName = selectedNode.getNodeTypeName();
 
-	private float mHideSearchMismatchesTransparency;
-
-	private Searchable mSearchable;
-
-	public SearchResultEdgePainter(GraphPanel panel) {
-		if (panel instanceof Searchable) {
-			mSearchable = (Searchable) panel;
+		if (typeName == null) {
+			return null;
 		}
 
-		mHideSearchMismatchesTransparency = (float) mConfig.getDouble(
-				VisualizationConfig.KEY_SEARCH_AND_FILTER_TRANSPARENCY,
-				VisualizationConfig.DEFAULT_VALUE_SEARCH_AND_FILTER_TRANSPARENCY);
-	}
+		switch (typeName) {
+			case "policy-action":
+				return new PolicyActionExtendedNodeInformation(selectedNode);
 
-	@Override
-	public void paintEdge(GraphicWrapper g) {
-		if (mSearchable.getHideSearchMismatches()) {
-			g.setTransparency(mHideSearchMismatchesTransparency);
-		} else {
-			g.setTransparency(1.0f);
+			default:
+				throw new IllegalArgumentException("No extended node information for given type '" + typeName
+						+ "' found");
 		}
 	}
 

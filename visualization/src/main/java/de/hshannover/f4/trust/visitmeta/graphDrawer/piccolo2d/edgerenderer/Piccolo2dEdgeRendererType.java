@@ -45,5 +45,5 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer;
  *
  */
 public enum Piccolo2dEdgeRendererType {
-	STRAIGHT_LINE, STRAIGHT_DASHED_LINE, ORTHOGONAL_LINE, CURVED_LINE, EXAMPLE
+	STRAIGHT_LINE, STRAIGHT_DASHED_LINE, ORTHOGONAL_LINE, CURVED_LINE, EXAMPLE, POLICY
 }

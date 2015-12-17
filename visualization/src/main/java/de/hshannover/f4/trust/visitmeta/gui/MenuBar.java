@@ -91,19 +91,7 @@ public class MenuBar extends JMenuBar {
 		/* Connections */
 		JMenu mnConnections = new JMenu("Connections");
 		add(mnConnections);
-		//
-		// JMenu mnConnectTo = new JMenu("Connect To");
-		// mnConnections.add(mnConnectTo);
-		//
-		// JMenuItem mntmServer = new JMenuItem("Server 1");
-		// mnConnectTo.add(mntmServer);
-		//
-		// JMenuItem mntmServer_1 = new JMenuItem("Server 2");
-		// mnConnectTo.add(mntmServer_1);
-		//
-		// JMenuItem menuItem = new JMenuItem("...");
-		// mnConnectTo.add(menuItem);
-		//
+
 		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
 		mntmAddConnection.addActionListener(new ActionListener() {
 			@SuppressWarnings("unchecked")

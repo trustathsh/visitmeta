@@ -200,7 +200,7 @@ public class MainWindow extends JFrame {
 		mLeftMainPanel.setLayout(new GridBagLayout());
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.mLblInsets);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.LABEL_INSETS);
 	}
 
 	public void changeParameterPanel() {
@@ -263,9 +263,9 @@ public class MainWindow extends JFrame {
 			mJpParameterSouth.add(mJbParameterReset);
 			mJpParameterSouth.add(mJbParameterSave);
 
-			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.mLblInsets);
-			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.mLblInsets);
-			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.mLblInsets);
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.LABEL_INSETS);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.LABEL_INSETS);
+			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.LABEL_INSETS);
 			mLeftMainPanel.updateUI();
 		}
 	}

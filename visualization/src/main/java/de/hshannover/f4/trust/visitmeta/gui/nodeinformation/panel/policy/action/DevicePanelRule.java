@@ -84,8 +84,6 @@ public class DevicePanelRule extends JPanel {
 		if (!mSelectedNode.isCurrentRuleResultForDevice()) {
 			mjlOldStatus.setVisible(true);
 		}
-
-		System.out.println("super.getPreferredSize()= " + super.getPreferredSize());
 	}
 
 	private void initPanel() {

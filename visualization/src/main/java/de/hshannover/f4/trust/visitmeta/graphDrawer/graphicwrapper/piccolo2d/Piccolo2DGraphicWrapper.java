@@ -48,10 +48,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.extras.nodes.PComposite;
 import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.nodes.PShape;
 import org.piccolo2d.nodes.PText;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,28 +64,17 @@ import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
 
 public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 
-	protected PPath mPath;
+	protected PPath mNode;
 
 	protected PText mText;
 
-	protected PNode mNode;
-	
 	protected Propable mPropable;
 
 	public Piccolo2DGraphicWrapper(PPath path, PText text) {
 		mNode = path;
-		mPath = path;
 		mText = text;
-		mPropable = (Propable) mNode.getAttribute("data");
 	}
 	
-	public Piccolo2DGraphicWrapper(PNode node, PText text) {
-		mNode = node;
-		mPath = null;
-		mText = text;
-		mPropable = (Propable) mNode.getAttribute("data");
-	}
-
 	@Override
 	public void setPaint(Paint color) {
 		this.mNode.setPaint(color);
@@ -95,11 +82,7 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 
 	@Override
 	public Paint getStrokePaint() {
-		if (mPath == null) {
-			return ((PShape) mNode).getStrokePaint();
-		} else {
-			return mPath.getStrokePaint();
-		}
+		return mNode.getStrokePaint();
 	}
 
 	@Override
@@ -119,11 +102,7 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 
 	@Override
 	public void setStrokePaint(Color color) {
-		if (mPath == null) {
-			((PShape) this.mNode).setStrokePaint(color);
-		} else {
-			this.mPath.setStrokePaint(color);
-		}
+		this.mNode.setStrokePaint(color);
 	}
 
 	@Override
@@ -138,28 +117,22 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 
 	@Override
 	public NodeType getNodeType() {
-		return (NodeType) mNode.getAttribute("type");
+		return (NodeType) mNode.getParent().getAttribute("type");
 	}
 
 	@Override
 	public Position getPosition() {
-		return (Position) mNode.getAttribute("position");
+		return (Position) mNode.getParent().getAttribute("position");
 	}
 
 	@Override
 	public Propable getData() {
-		return mPropable;
+		return (Propable) mNode.getParent().getAttribute("data");
 	}
 
 	@Override
 	public String getNodeTypeName() {
-		Object data = getData();
-		if (data instanceof Propable) {
-			Propable propable = (Propable) data;
-			String typName = propable.getTypeName();
-			return typName;
-		}
-		return null;
+		return getData().getTypeName();
 	}
 
 	@Override
@@ -209,18 +182,18 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<PPath> getEdges() {
-		return (ArrayList<PPath>) mPath.getAttribute("edges");
+		return (ArrayList<PPath>) mNode.getParent().getAttribute("edges");
 	}
 
 	@Override
 	public String getPublisher() {
-		return (String) mPath.getAttribute("publisher");
+		return (String) mNode.getParent().getAttribute("publisher");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<GraphicWrapper> getNodes() {
-		ArrayList<PComposite> nodes = (ArrayList<PComposite>) mPath.getAttribute("nodes");
+		ArrayList<PComposite> nodes = (ArrayList<PComposite>) mNode.getAttribute("nodes");
 		List<GraphicWrapper> edgesNodes = new ArrayList<GraphicWrapper>();
 		if (nodes != null) {
 			for (PComposite vCom : nodes) {
@@ -240,7 +213,7 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 		for (PComposite vCom : getEdgesCompositeNodes()) {
 			PPath vNode = (PPath) vCom.getChild(0);
 			PText vText = (PText) vCom.getChild(1);
-			if (vNode != mPath) {
+			if (vNode != mNode) {
 				GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
 				edgesNodes.add(g);
 			}
@@ -307,10 +280,6 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 			return false;
 		}
 
-		if (mPath != ((Piccolo2DGraphicWrapper) o).mPath) {
-			return false;
-		}
-		
 		if (mNode != ((Piccolo2DGraphicWrapper) o).mNode) {
 			return false;
 		}
@@ -326,19 +295,10 @@ public class Piccolo2DGraphicWrapper implements GraphicWrapper {
 	public int hashCode() {
 		int prime = 31;
 		int result = 1;
-		
-		if (mPath != null) {
-			result = prime * result + mPath.hashCode();
-		}
-		
-		if (mNode != null) {
-			result = prime * result + mNode.hashCode();
-		}
-		
+		result = prime * result + mNode.hashCode();
 		if (mText != null) {
 			result = prime * result + mText.hashCode();
 		}
-		
 		return result;
 	}
 }

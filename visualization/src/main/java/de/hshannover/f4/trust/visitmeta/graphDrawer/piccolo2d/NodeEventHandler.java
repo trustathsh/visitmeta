@@ -145,8 +145,10 @@ public class NodeEventHandler extends PDragEventHandler {
 
 		if (!mConnection.isPropablePicked()) {
 			PNode pickedNode = e.getPickedNode();
-			GraphicWrapper wrapper = Piccolo2DGraphicWrapperFactory.create(pickedNode, null);
 			if (pickedNode instanceof PComposite) {
+				PPath vNode = (PPath) pickedNode.getChild(0);
+				PText vText = (PText) pickedNode.getChild(1);
+				GraphicWrapper wrapper = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
 				mConnection.showProperty(wrapper.getData());
 				mPanel.mouseEntered(wrapper);
 			}
@@ -158,7 +160,13 @@ public class NodeEventHandler extends PDragEventHandler {
 		LOGGER.trace("Method mouseExited("
 				+ e + ") called.");
 		super.mouseExited(e);
-		mPanel.mouseExited();
+		
+		if (!mConnection.isPropablePicked()) {
+			PNode pickedNode = e.getPickedNode();
+			if (pickedNode instanceof PComposite) {
+				mPanel.mouseExited();
+			}
+		}
 	}
 
 	@Override
@@ -170,7 +178,9 @@ public class NodeEventHandler extends PDragEventHandler {
 		if (e.getButton() == MOUSE_LEFT_BUTTON) {
 			PNode pickedNode = e.getPickedNode();
 			if (pickedNode instanceof PComposite) {
-				GraphicWrapper wrapper = Piccolo2DGraphicWrapperFactory.create(pickedNode, null);
+				PPath vNode = (PPath) pickedNode.getChild(0);
+				PText vText = (PText) pickedNode.getChild(1);
+				GraphicWrapper wrapper = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
 				mConnection.pickAndShowProperties(wrapper);
 			} else {
 				mConnection.clearProperties();

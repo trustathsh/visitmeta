@@ -55,11 +55,11 @@ public class Piccolo2DGraphicWrapperFactory {
 	/**
 	 * Creates a new {@link Piccolo2DGraphicWrapper}.
 	 *
-	 * @param selectedNode the {@link PNode} of the selected node
+	 * @param selectedNode the {@link PPath} of the selected node
 	 * @param selectedNodeText the {@link PText} of the selected node
 	 * @return a new {@link Piccolo2DGraphicWrapper}
 	 */
-	public static Piccolo2DGraphicWrapper create(PNode selectedNode, PText selectedNodeText) {
+	public static Piccolo2DGraphicWrapper create(PPath selectedNode, PText selectedNodeText) {
 		String typeName = getTypeName(selectedNode);
 
 		if (typeName == null) {

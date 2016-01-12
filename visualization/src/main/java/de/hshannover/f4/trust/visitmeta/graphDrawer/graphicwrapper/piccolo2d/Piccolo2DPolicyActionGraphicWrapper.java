@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,8 +52,8 @@ import org.w3c.dom.NodeList;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.IdentityGraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.PolicyNode;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement.ConditionElementType;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.PolicyNode;
 
 public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper implements PolicyActionGraphicWrapper {
 
@@ -78,12 +78,12 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 
 	private static final String ELEMENT_TYPE_NAME_HAS_ELEMET = "has-element";
 
-	public Piccolo2DPolicyActionGraphicWrapper(PNode node, PText text) {
+	public Piccolo2DPolicyActionGraphicWrapper(PPath node, PText text) {
 		super(node, text);
 	}
 
 	public Piccolo2DPolicyActionGraphicWrapper(Piccolo2DGraphicWrapper policyAction) {
-		this(policyAction.mPath, policyAction.mText);
+		this(policyAction.mNode, policyAction.mText);
 	}
 
 	@Override

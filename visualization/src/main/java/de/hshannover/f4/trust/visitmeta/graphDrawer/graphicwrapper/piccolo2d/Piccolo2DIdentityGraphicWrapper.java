@@ -38,7 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d;
 
-import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,7 +51,7 @@ public class Piccolo2DIdentityGraphicWrapper extends Piccolo2DGraphicWrapper imp
 
 	private static final String ELEMENT_ID_NAME = "name";
 
-	public Piccolo2DIdentityGraphicWrapper(PNode node, PText text) {
+	public Piccolo2DIdentityGraphicWrapper(PPath node, PText text) {
 		super(node, text);
 	}
 

@@ -86,7 +86,7 @@ public class GraphConnection implements Observer {
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 	private boolean mIsPropablePicked = false;
 	private JPopupMenu mContextMenu;
-	private Propable mLastPickedNode;
+	private GraphicWrapper mLastPickedNode;
 	private List<ContextMenuItem> mContextMenuItems;
 
 	/**
@@ -505,7 +505,7 @@ public class GraphConnection implements Observer {
 		return mIsPropablePicked;
 	}
 
-	public void showContextMenu(final Propable node, Point point) {
+	public void showContextMenu(final GraphicWrapper node, Point point) {
 		if (mContextMenu == null) {
 			mContextMenu = createContextMenu(node);
 			mLastPickedNode = node;
@@ -520,7 +520,7 @@ public class GraphConnection implements Observer {
 		mContextMenu.setVisible(true);
 	}
 
-	private JPopupMenu createContextMenu(final Propable node) {
+	private JPopupMenu createContextMenu(final GraphicWrapper node) {
 		JPopupMenu result = new JPopupMenu();
 
 		for (final ContextMenuItem item : mContextMenuItems) {
@@ -528,11 +528,11 @@ public class GraphConnection implements Observer {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					item.actionPerformed(node);
+					item.actionPerformed(node.getData());
 				}
 			});
 
-			if (!item.canHandle(node)) {
+			if (!item.canHandle(node.getData())) {
 				menuItem.setEnabled(false);
 			}
 

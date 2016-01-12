@@ -45,7 +45,7 @@ import java.awt.event.MouseEvent;
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
-import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 
 /**
  * EventHandler for clicks in the panel.
@@ -66,7 +66,7 @@ public class ClickEventHandler extends MouseAdapter {
 			if (e.getClickCount() == 2) {
 				mPanel.setFocusToCenter();
 			} else {
-				Propable mouseOverNode = mPanel.getMouseOverNode();
+				GraphicWrapper mouseOverNode = mPanel.getMouseOverNode();
 				if (mouseOverNode != null) {
 					mPanel.getConnection().showContextMenu(mouseOverNode, MouseInfo.getPointerInfo().getLocation());
 				} else {

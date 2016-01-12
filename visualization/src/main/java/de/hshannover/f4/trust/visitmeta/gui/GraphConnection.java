@@ -46,8 +46,7 @@ import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JButton;
-import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.commons.collections15.map.HashedMap;
@@ -69,6 +68,8 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.gui.contextmenu.ContextMenuItem;
+import de.hshannover.f4.trust.visitmeta.gui.contextmenu.ContextMenuItemFactory;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class GraphConnection implements Observer {
@@ -86,6 +87,7 @@ public class GraphConnection implements Observer {
 	private boolean mIsPropablePicked = false;
 	private JPopupMenu mContextMenu;
 	private Propable mLastPickedNode;
+	private List<ContextMenuItem> mContextMenuItems;
 
 	/**
 	 * @param container
@@ -106,6 +108,8 @@ public class GraphConnection implements Observer {
 		mSettingManager.addObserver(this);
 		mFacadeLogic.addObserver(this);
 		mTimeHolder.addObserver(this);
+
+		mContextMenuItems = ContextMenuItemFactory.getAll();
 	}
 
 	public SettingManager getSettingManager() {
@@ -517,28 +521,25 @@ public class GraphConnection implements Observer {
 	}
 
 	private JPopupMenu createContextMenu(final Propable node) {
-		JPopupMenu result = new JPopupMenu("Node actions");
-		result.setLightWeightPopupEnabled(false);
+		JPopupMenu result = new JPopupMenu();
 
-		// TODO initialize per Reflection/List of registered and Interface implementing classes
-		JButton showGraphFromHereButton = new JButton("Show graph from here");
-		showGraphFromHereButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				startTreeWalk(node);
+		for (final ContextMenuItem item : mContextMenuItems) {
+			JMenuItem menuItem = new JMenuItem(item.getItemTitle());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					item.actionPerformed(node);
+				}
+			});
+
+			if (!item.canHandle(node)) {
+				menuItem.setEnabled(false);
 			}
-		});
-		result.add(new JMenuBar().add(showGraphFromHereButton));
+
+			result.add(menuItem);
+		}
 
 		return result;
-	}
-
-	private void startTreeWalk(Propable node) {
-		if (node instanceof NodeIdentifier) {
-
-		} else if (node instanceof NodeMetadata) {
-
-		}
 	}
 
 	public void hideContextMenu() {

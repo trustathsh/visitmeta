@@ -165,7 +165,7 @@ public class ProxyGraphService implements GraphService {
 		JsonNode rootNode = parseJson(json);
 		return extractGraphsFromJson(rootNode);
 	}
-
+	
 	@Override
 	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
 		//TODO not yet implemented

@@ -74,7 +74,7 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class GraphConnection implements Observer {
 	private static final Logger LOGGER = Logger.getLogger(GraphConnection.class);
-	private GraphContainer mConnetion = null;
+	private GraphContainer mContainer = null;
 	private FacadeLogic mFacadeLogic = null;
 	private GraphPanel mGraphPanel = null;
 	private SettingManager mSettingManager = null;
@@ -85,8 +85,6 @@ public class GraphConnection implements Observer {
 	private ConnectionTab mParentTab = null;
 	private HashedMap<Observable, Observable> mObservables = new HashedMap<>();
 	private boolean mIsPropablePicked = false;
-	private JPopupMenu mContextMenu;
-	private GraphicWrapper mLastPickedNode;
 	private List<ContextMenuItem> mContextMenuItems;
 
 	/**
@@ -94,14 +92,14 @@ public class GraphConnection implements Observer {
 	 *            Contains information about the Connection.
 	 */
 	public GraphConnection(GraphContainer container) {
-		mConnetion = container;
-		mFacadeLogic = mConnetion.getFacadeLogic();
-		mTimeHolder = mConnetion.getTimeHolder();
-		mSettingManager = mConnetion.getSettingManager();
+		mContainer = container;
+		mFacadeLogic = mContainer.getFacadeLogic();
+		mTimeHolder = mContainer.getTimeHolder();
+		mSettingManager = mContainer.getSettingManager();
 		mGraphPanel = GraphPanelFactory.getGraphPanel("Piccolo2D", this);
 
-		mTimerCreation = mConnetion.getTimeManagerCreation();
-		mTimerDeletion = mConnetion.getTimeManagerDeletion();
+		mTimerCreation = mContainer.getTimeManagerCreation();
+		mTimerDeletion = mContainer.getTimeManagerDeletion();
 		mTimerCreation.setController(this);
 		mTimerDeletion.setController(this);
 
@@ -506,18 +504,8 @@ public class GraphConnection implements Observer {
 	}
 
 	public void showContextMenu(final GraphicWrapper node, Point point) {
-		if (mContextMenu == null) {
-			mContextMenu = createContextMenu(node);
-			mLastPickedNode = node;
-			mContextMenu.setLocation(point);
-		} else if (mLastPickedNode != node) {
-			mContextMenu.setVisible(false);
-			mContextMenu = createContextMenu(node);
-			mLastPickedNode = node;
-			mContextMenu.setLocation(point);
-		}
-
-		mContextMenu.setVisible(true);
+		JPopupMenu contextMenu = createContextMenu(node);
+		contextMenu.show(mGraphPanel.getPanel(), point.x, point.y);
 	}
 
 	private JPopupMenu createContextMenu(final GraphicWrapper node) {
@@ -541,11 +529,5 @@ public class GraphConnection implements Observer {
 
 		return result;
 	}
-
-	public void hideContextMenu() {
-		if (mContextMenu != null) {
-			mContextMenu.setVisible(false);
-		}
-	}
-
+	
 }

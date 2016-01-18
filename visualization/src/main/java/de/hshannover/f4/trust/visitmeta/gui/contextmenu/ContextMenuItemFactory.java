@@ -5,14 +5,24 @@ import java.util.List;
 
 public class ContextMenuItemFactory {
 
-	private static List<ContextMenuItem> list = new ArrayList<>();
-
-	static {
-		list.add(new ShowGraphFromHereContextMenuItem());
-		list.add(new EditPolicyNodeContextMenuItem());
-	}
+	private static List<ContextMenuItem> mList;
 
 	public static List<ContextMenuItem> getAll() {
+		if (mList == null) {
+			mList = initList();
+		}
+		
+		return mList;
+	}
+
+	
+	private static List<ContextMenuItem> initList() {
+		List<ContextMenuItem> list = new ArrayList<>();
+		
+		list.add(new ShowGraphFromHereContextMenuItem());
+		list.add(new EditPolicyNodeContextMenuItem());
+		list.add(new RunWhatIfAnalysisOnPolicyActionContextMenuItem());
+		
 		return list;
 	}
 

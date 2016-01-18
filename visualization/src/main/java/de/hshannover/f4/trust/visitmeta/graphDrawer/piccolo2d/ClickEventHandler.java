@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d;
 
-import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -68,13 +67,9 @@ public class ClickEventHandler extends MouseAdapter {
 			} else {
 				GraphicWrapper mouseOverNode = mPanel.getMouseOverNode();
 				if (mouseOverNode != null) {
-					mPanel.getConnection().showContextMenu(mouseOverNode, MouseInfo.getPointerInfo().getLocation());
-				} else {
-					mPanel.getConnection().hideContextMenu();
+					mPanel.getConnection().showContextMenu(mouseOverNode, e.getPoint());
 				}
 			}
-		} else {
-			mPanel.getConnection().hideContextMenu();
 		}
 	}
 }

@@ -185,4 +185,27 @@ public class VisualizationConfig {
 	public static final String DEFAULT_VALUE_PICCOLO2D_EDGE_STYLE =
 			Piccolo2dEdgeRendererType.STRAIGHT_LINE.name();
 
+	public static final String KEY_CONNECTION_IRONDETECT_URL = "visualization.connection.irondetect.url";
+	public static final String DEFAULT_VALUE_CONNECTION_IRONDETECT_URL = "http://localhost:8001";
+	
+	public static final String KEY_CONNECTION_IFMAP_URL = "visualization.connection.ifmap.url";
+	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_URL = "http://localhost:8443";
+
+	public static final String KEY_CONNECTION_IFMAP_USERNAME = "visualization.connection.ifmap.username";
+	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_USERNAME = "visitmeta-publisher";
+
+	public static final String KEY_CONNECTION_IFMAP_PASSWORD = "visualization.connection.ifmap.password";
+	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_PASSWORD = "visitmeta-publisher";
+
+	public static final String KEY_CONNECTION_IFMAP_TRUSTSTORE_PATH = "visualization.connection.ifmap.truststore.path";
+	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_TRUSTSTORE_PATH = "config/visitmeta.jks";
+
+	public static final String KEY_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD = "visualization.connection.ifmap.truststore.password";
+	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD = "visitmeta";
+
+	public static final String KEY_CONNECTION_IFMAP_THREADSAFE = "visualization.connection.ifmap.threadsafe";
+	public static final boolean DEFAULT_VALUE_CONNECTION_IFMAP_THREADSAFE = true;
+
+	public static final String KEY_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT = "visualization.connection.ifmap.initialconnectiontimeout";
+	public static final int DEFAULT_VALUE_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT = (120 * 1000);
 }

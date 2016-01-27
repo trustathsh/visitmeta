@@ -1,4 +1,27 @@
 visualization:
+  connection:
+    # IF-MAP connection settings
+    ifmap:
+      # URL of the MAP server
+      url: http://localhost:8443
+      # username for basic authentication
+      username: visitmeta-publisher
+      # password for basic authentication
+      password: visitmeta-publisher
+      # Truststore configuration
+      truststore:
+        # path and filename of the keystore
+        path: config/visitmeta.jks
+        # password of the keystore
+        password: visitmeta
+      # connection uses a thread-safe SSRC
+      threadsafe: true
+      # initial connection timeout
+      initialconnectiontimeout: 120000
+    # irondetect connection settings
+    irondetect:
+      # URL of the irondetect REST service
+      url: http://localhost:8001
   network:
     # The time interval (milliseconds) to request the dataservice for new changes.
     interval: 10000

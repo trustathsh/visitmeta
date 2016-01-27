@@ -9,12 +9,15 @@ import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
 import de.hshannover.f4.trust.ifmapj.messages.PublishRequest;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class IfmapConnection {
 
+	private Properties mConfig = Main.getConfig();
+	
 	private Logger logger = Logger.getLogger(IfmapConnection.class);
 	
-	private final String FILENAME = "";
 	private SSRC mSSRC;
 	
 	public IfmapConnection() throws IfmapErrorResult, IfmapException {
@@ -26,36 +29,28 @@ public class IfmapConnection {
 	}
 
 	private SSRC init() throws IfmapErrorResult, IfmapException {
-		Properties configuration = new Properties(FILENAME);
-		String url = configuration.getString("visualization.connection.ifmap.url",
-				"http://localhost:8443");
-		String username = configuration.getString(
-				"visualization.connection.ifmap.username", "test");
-		String password = configuration.getString(
-				"visualization.connection.ifmap.password", "test");
-		String trustStorePath = configuration.getString(
-				"visualization.connection.ifmap.truststore.path",
-				"visitmeta.jks");
-		String trustStorePassword = configuration.getString(
-				"visualization.connection.ifmap.truststore.password", "visitmeta");
-		boolean threadSafe = configuration.getBoolean(
-				"visualization.connection.ifmap.threadsafe", true);
-		int initialConnectionTimeout = configuration.getInt(
-				"visualization.connection.ifmap.initialconnectiontimeout", (120 * 1000));
-		
-		logger.info("visualization.connection.ifmap.url: " + url);
-		logger.info("visualization.connection.ifmap.username: " + username);
-		logger.info("visualization.connection.ifmap.password: " + password);
-		logger.info("visualization.connection.ifmap.truststore.path: " + trustStorePath);
-		logger.info("visualization.connection.ifmap.truststore.password: "
-				+ trustStorePassword);
-		logger.info("visualization.connection.ifmap.threadsafe: " + threadSafe);
-		logger.info("visualization.connection.ifmap.initialconnectiontimeout: "
-				+ initialConnectionTimeout);
+		String url = mConfig.getString(VisualizationConfig.KEY_CONNECTION_IFMAP_URL,
+				VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_URL);
+		String username = mConfig.getString(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_USERNAME, VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_USERNAME);
+		String password = mConfig.getString(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_PASSWORD, VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_PASSWORD);
+		String trustStorePath = mConfig.getString(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_TRUSTSTORE_PATH,
+				VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_TRUSTSTORE_PATH);
+		String trustStorePassword = mConfig.getString(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD, VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD);
+		boolean threadSafe = mConfig.getBoolean(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_THREADSAFE, VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_THREADSAFE);
+		int initialConnectionTimeout = mConfig.getInt(
+				VisualizationConfig.KEY_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT, VisualizationConfig.DEFAULT_VALUE_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT);
 		
 		BasicAuthConfig config = new BasicAuthConfig(url, username, password, trustStorePath, trustStorePassword, threadSafe, initialConnectionTimeout);
+		logger.debug(config);
+
 		mSSRC = IfmapJ.createSsrc(config);
 		mSSRC.newSession();
+		logger.info("IF-MAP connection established successfully");
 		
 		return mSSRC;
 	}

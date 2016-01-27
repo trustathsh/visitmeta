@@ -8,10 +8,11 @@ import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JWindow;
+
+import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ifmapj.exception.IfmapErrorResult;
 import de.hshannover.f4.trust.ifmapj.exception.IfmapException;
@@ -20,6 +21,7 @@ import de.hshannover.f4.trust.ifmapj.messages.PublishRequest;
 import de.hshannover.f4.trust.ifmapj.messages.PublishUpdate;
 import de.hshannover.f4.trust.ifmapj.messages.Requests;
 import de.hshannover.f4.trust.visitmeta.gui.PanelXmlTree;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -29,6 +31,8 @@ import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 
 public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 
+	private Logger logger = Logger.getLogger(EditPolicyNodeContextMenuItem.class);
+	
 	private List<String> policyTypeNames = Arrays.asList("signature", "anomaly", "rule", "condition");
 
 	private IfmapConnection mIfmapConnection;
@@ -37,7 +41,8 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 		try {
 			mIfmapConnection = new IfmapConnection();
 		} catch (IfmapErrorResult | IfmapException e) {
-			e.printStackTrace();
+			DialogHelper.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -71,8 +76,7 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 					// TODO send publish request (lifetime forever) via ifmapj as (new or existing?) user; new connection with username policy-editor?
 					mIfmapConnection.send(request);
 				} catch (IfmapErrorResult | IfmapException exception) {
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), exception.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 				window.setVisible(false);
 			}

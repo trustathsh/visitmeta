@@ -38,13 +38,13 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
-import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.input.gui.MotionControllerHandler;
 
@@ -168,7 +168,7 @@ public class GuiController {
 		if (mSelectedConnection != null) {
 			return true;
 		} else {
-			JOptionPane.showMessageDialog(mMainWindow, message, title, JOptionPane.WARNING_MESSAGE);
+			DialogHelper.showWarningDialog(mMainWindow, message, title);
 			return false;
 		}
 	}

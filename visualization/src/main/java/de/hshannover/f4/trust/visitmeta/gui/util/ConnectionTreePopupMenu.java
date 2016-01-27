@@ -67,6 +67,7 @@ import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.Connection;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -269,8 +270,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Connection) mSelectedData).disconnect();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 			}
 		});
@@ -289,8 +289,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Subscription) mSelectedData).startSubscription();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 			}
 		});
@@ -309,8 +308,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					((Subscription) mSelectedData).stopSubscription();
 				} catch (ConnectionException e) {
 					LOGGER.error(e.toString(), e);
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 			}
 		});
@@ -355,8 +353,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 							component));
 				} catch (PropertyException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 
 				mConnectionTree.expandAllNodes();
@@ -381,8 +378,7 @@ public class ConnectionTreePopupMenu extends JPopupMenu {
 					mConnectionDialog.eventDeleteData();
 				} catch (PropertyException | RESTException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 				}
 			}
 		});

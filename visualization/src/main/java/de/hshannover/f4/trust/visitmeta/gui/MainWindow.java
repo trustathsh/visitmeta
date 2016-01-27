@@ -58,7 +58,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -78,6 +77,7 @@ import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.DataServiceParameterPanel;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.MapServerParameterPanel;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.SubscriptionParameterPanel;
@@ -96,7 +96,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.DataserviceData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
-import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class MainWindow extends JFrame {
@@ -184,8 +183,7 @@ public class MainWindow extends JFrame {
 			mConnectionTree = new RESTConnectionTree(Main.getDataservicePersister().loadDataserviceConnections(this));
 		} catch (PropertyException e) {
 			LOGGER.error(e.toString(), e);
-			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+			DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 		}
 
 		mConnectionTree.expandAllNodes();
@@ -459,8 +457,7 @@ public class MainWindow extends JFrame {
 				}
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
-				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+				DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 				continue;
 			}
 		}
@@ -473,8 +470,7 @@ public class MainWindow extends JFrame {
 					lAf.menuItem.setSelected(true);
 				} catch (UnsupportedLookAndFeelException e) {
 					LOGGER.error(e.getMessage(), e);
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 				}
 			}
 		}
@@ -566,8 +562,7 @@ public class MainWindow extends JFrame {
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
 				LOGGER.error(e.toString());
-				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+				DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -578,8 +573,7 @@ public class MainWindow extends JFrame {
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 				LOGGER.error(e.toString());
-				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+				DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -594,8 +588,7 @@ public class MainWindow extends JFrame {
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
 						| ConnectionException e) {
 					LOGGER.error(e.toString());
-					JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-							.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+					DialogHelper.showErrorDialog(e.toString(), e.getClass().getSimpleName());
 				}
 			}
 		}

@@ -50,6 +50,7 @@ import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
 import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import de.hshannover.f4.trust.visitmeta.gui.ConnectionTab;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
@@ -168,8 +169,7 @@ public class MapServerRestConnectionImpl extends MapServerDataImpl implements Ma
 
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
-			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+			DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 		}
 	}
 

@@ -2,6 +2,10 @@ package de.hshannover.f4.trust.visitmeta.gui.contextmenu;
 
 import org.apache.log4j.Logger;
 
+import com.sun.jersey.api.client.UniformInterfaceException;
+
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.network.otherservices.DataserviceConnection;
@@ -29,8 +33,14 @@ public class RunWhatIfAnalysisOnPolicyActionContextMenuItem implements ContextMe
 		String json = mDataserviceConnection.getGraphAt(timestamp);
 		logger.debug("Json result: " + json);
 		
-		String response = mIronDetectConnection.send(json);
-		logger.debug(response);
+		String response;
+		try {
+			response = mIronDetectConnection.send(json);
+			logger.debug(response);
+		} catch (UniformInterfaceException | PropertyException e) {
+			DialogHelper.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
+			logger.error(e.getMessage());
+		}
 	}
 
 	@Override

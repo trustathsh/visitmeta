@@ -587,8 +587,7 @@ public class ConnectionDialog extends JDialog {
 				dataserviceConnection.setNotPersised(false);
 			} catch (PropertyException e) {
 				LOGGER.error(e.toString());
-				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+				DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 			}
 
 		} else if (selectedComponent instanceof MapServerRestConnectionImpl) {
@@ -599,8 +598,7 @@ public class ConnectionDialog extends JDialog {
 				mapServerConnection.setNotPersised(false);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException e) {
 				LOGGER.error(e.toString());
-				JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-						.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+				DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 			}
 
 		} else if (selectedComponent instanceof RestSubscriptionImpl) {
@@ -617,14 +615,14 @@ public class ConnectionDialog extends JDialog {
 					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | JSONException
 							| ConnectionException e) {
 						LOGGER.error(e.toString());
-						JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e
-								.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+						DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 					}
 				} else {
-					JOptionPane.showMessageDialog(null, "Subscriptions required \"Start Identifier\" and \"Start "
+					String message = "Subscriptions required \"Start Identifier\" and \"Start "
 							+ "Identifier Type\" \n Valid Identifier Types are: 'device' 'access-request' "
 							+ "'ip-address' 'mac-address' \n On identifier type: ip-address: \"[type],[value]\" e.g. "
-							+ "\"IPv4,10.1.1.1\"", "Subscription-Data not Valid!", JOptionPane.WARNING_MESSAGE);
+							+ "\"IPv4,10.1.1.1\"";
+					DialogHelper.showWarningDialog(StringHelper.breakLongString(message, 80), "Subscription data not valid!");
 				}
 			}
 		}

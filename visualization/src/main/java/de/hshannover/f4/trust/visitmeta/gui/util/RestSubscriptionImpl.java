@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.visitmeta.data.SubscriptionDataImpl;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
+import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Subscription;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.util.StringHelper;
@@ -102,8 +103,7 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
-			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+			DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 		}
 	}
 
@@ -118,8 +118,7 @@ public class RestSubscriptionImpl extends SubscriptionDataImpl implements Subscr
 
 		} catch (RESTException e) {
 			LOGGER.error(e.toString());
-			JOptionPane.showMessageDialog(null, StringHelper.breakLongString(e.toString(), 80), e.getClass()
-					.getSimpleName(), JOptionPane.ERROR_MESSAGE);
+			DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
 		}
 	}
 

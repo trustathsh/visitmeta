@@ -188,6 +188,9 @@ public class VisualizationConfig {
 	public static final String KEY_CONNECTION_IRONDETECT_URL = "visualization.connection.irondetect.url";
 	public static final String DEFAULT_VALUE_CONNECTION_IRONDETECT_URL = "http://localhost:8001";
 	
+	public static final String KEY_CONNECTION_DATASERVICE_URL = "visualization.connection.dataservice.url";
+	public static final String DEFAULT_VALUE_CONNECTION_DATASERVICE_URL = "http://localhost:8000";
+	
 	public static final String KEY_CONNECTION_IFMAP_URL = "visualization.connection.ifmap.url";
 	public static final String DEFAULT_VALUE_CONNECTION_IFMAP_URL = "http://localhost:8443";
 

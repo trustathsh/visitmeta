@@ -22,6 +22,12 @@ visualization:
     irondetect:
       # URL of the irondetect REST service
       url: http://localhost:8001
+    # additional connection to a VisITMeta dataservice
+    dataservice:
+      # URL of the VisITMeta dataservice REST service
+      url: http://localhost:8000
+      # Connection name that is used to retrieve JSON graph data
+      connectionname: localMAPServer
   network:
     # The time interval (milliseconds) to request the dataservice for new changes.
     interval: 10000

@@ -11,9 +11,12 @@ public class DataserviceConnection extends RestConnection {
 	Properties config = Main.getConfig();
 	
 	public String getGraphAt(Long timestamp) {
-		return buildWebResource(config.getString(VisualizationConfig.KEY_CONNECTION_DATASERVICE_URL,
-				VisualizationConfig.DEFAULT_VALUE_CONNECTION_DATASERVICE_URL))
-				.path("localMAPServer").path("graph").path(timestamp.toString())
+		String connectionName = config.getString(VisualizationConfig.KEY_CONNECTION_DATASERVICE_CONNECTION_NAME,
+				VisualizationConfig.DEFAULT_VALUE_CONNECTION_DATASERVICE_CONNECTION_NAME);
+		String url = config.getString(VisualizationConfig.KEY_CONNECTION_DATASERVICE_URL,
+				VisualizationConfig.DEFAULT_VALUE_CONNECTION_DATASERVICE_URL);
+		return buildWebResource(url)
+				.path(connectionName).path("graph").path(timestamp.toString())
 				.queryParam("rawData", "true")
 				.accept(MediaType.APPLICATION_JSON).get(String.class);
 	}

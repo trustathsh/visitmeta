@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.DialogHelper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -25,7 +26,8 @@ public class RunWhatIfAnalysisOnPolicyActionContextMenuItem implements ContextMe
 	}
 	
 	@Override
-	public void actionPerformed(Propable propable) {
+	public void actionPerformed(GraphicWrapper wrapper) {
+		Propable propable = wrapper.getData();
 		Metadata metadata = (Metadata) propable;
 		Long timestamp = metadata.getPublishTimestamp();
 		logger.debug("Timestamp: " + timestamp);

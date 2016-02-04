@@ -38,8 +38,11 @@
  */
 package de.hshannover.f4.trust.visitmeta.util;
 
+import org.w3c.dom.Document;
+
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
  * Utility class that helps extracting information of extended identifier objects.
@@ -98,4 +101,18 @@ public class ExtendedIdentifierHelper {
 		return "";
 	}
 
+	public static Document getDocument(Propable propable) {
+		if (propable instanceof Identifier) {
+			Identifier i = (Identifier) propable;
+			if (isExtendedIdentifier(i)) {
+				IdentifierWrapper wrapper = IdentifierHelper.identifier(i);
+				String name = wrapper.getValueForXpathExpressionOrElse("@"
+						+ IfmapStrings.IDENTITY_ATTR_NAME, "name");
+				return DocumentUtils.parseEscapedXmlString(name);
+			}
+		}
+		
+		return null;
+	}
+	
 }

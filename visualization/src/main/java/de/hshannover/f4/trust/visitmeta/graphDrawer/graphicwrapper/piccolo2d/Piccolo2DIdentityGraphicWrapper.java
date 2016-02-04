@@ -80,7 +80,7 @@ public class Piccolo2DIdentityGraphicWrapper extends Piccolo2DGraphicWrapper imp
 	}
 
 	@Override
-	public String getExtendetNodeTypeName() {
+	public String getExtendedNodeTypeName() {
 		String nameValue = getName();
 		
 		if (nameValue == null) {

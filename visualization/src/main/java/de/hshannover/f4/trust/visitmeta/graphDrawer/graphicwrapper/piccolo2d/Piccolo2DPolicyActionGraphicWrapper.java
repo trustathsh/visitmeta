@@ -99,7 +99,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 
 				IdentityGraphicWrapper identityNode = (IdentityGraphicWrapper) edgeNode;
 
-				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendetNodeTypeName())) {
+				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendedNodeTypeName())) {
 					continue;
 				}
 
@@ -787,7 +787,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 		for (GraphicWrapper parentElement : parentsFromSelection) {
 			if (parentElement instanceof IdentityGraphicWrapper) {
 				IdentityGraphicWrapper identity = (IdentityGraphicWrapper) parentElement;
-				String nodeType = identity.getExtendetNodeTypeName();
+				String nodeType = identity.getExtendedNodeTypeName();
 				if (ELEMENT_POLICY_KEY.equals(nodeType)) {
 					return identity;
 				}
@@ -807,7 +807,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 
 				IdentityGraphicWrapper identityNode = (IdentityGraphicWrapper) edgeNode;
 
-				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendetNodeTypeName())) {
+				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendedNodeTypeName())) {
 					continue;
 				}
 
@@ -830,7 +830,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 						// identity identifier only
 						IdentityGraphicWrapper extendetIdentityNode = (IdentityGraphicWrapper) identifierNode;
 
-						if (ELEMENT_TYPE_NAME_RULE.equals(extendetIdentityNode.getExtendetNodeTypeName())) {
+						if (ELEMENT_TYPE_NAME_RULE.equals(extendetIdentityNode.getExtendedNodeTypeName())) {
 							// rule identifier only
 							return extendetIdentityNode;
 						}
@@ -859,7 +859,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 				// Identity identifier only
 				IdentityGraphicWrapper identityNode = (IdentityGraphicWrapper) identifier;
 
-				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendetNodeTypeName())) {
+				if (!ELEMENT_TYPE_NAME_ACTION.equals(identityNode.getExtendedNodeTypeName())) {
 					continue;
 				}
 
@@ -903,13 +903,13 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 		for (GraphicWrapper policyElement : policyElements) {
 			if (policyElement instanceof IdentityGraphicWrapper) {
 				IdentityGraphicWrapper identityElement = (IdentityGraphicWrapper) policyElement;
-				if ("rule".equals(identityElement.getExtendetNodeTypeName())) {
+				if ("rule".equals(identityElement.getExtendedNodeTypeName())) {
 					Set<GraphicWrapper> childs = PolicyNode.getChilds(identityElement);
 					int count = 0;
 					for (GraphicWrapper child : childs) {
 						if (child instanceof IdentityGraphicWrapper) {
 							IdentityGraphicWrapper tmpIdentityElement = (IdentityGraphicWrapper) child;
-							String typeName = tmpIdentityElement.getExtendetNodeTypeName();
+							String typeName = tmpIdentityElement.getExtendedNodeTypeName();
 							if ("action".equals(typeName)) {
 								count++;
 							}

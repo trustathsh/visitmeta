@@ -2,6 +2,7 @@ package de.hshannover.f4.trust.visitmeta.gui.contextmenu;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -11,8 +12,8 @@ public class ShowGraphFromHereContextMenuItem implements ContextMenuItem {
 	private Logger mLogger = Logger.getLogger(ShowGraphFromHereContextMenuItem.class);
 
 	@Override
-	public void actionPerformed(Propable propable) {
-		startTreeWalk(propable);
+	public void actionPerformed(GraphicWrapper wrapper) {
+		startTreeWalk(wrapper.getData());
 	}
 
 	@Override

@@ -516,7 +516,7 @@ public class GraphConnection implements Observer {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					item.actionPerformed(node.getData());
+					item.actionPerformed(node);
 				}
 			});
 

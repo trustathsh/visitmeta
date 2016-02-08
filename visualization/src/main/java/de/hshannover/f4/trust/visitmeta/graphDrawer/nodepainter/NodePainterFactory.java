@@ -53,19 +53,42 @@ public class NodePainterFactory {
 
 	/**
 	 * Returns a list of {@link NodePainter} in the order they are going to be executed.
+	 * These {@link NodePainter} will be used when the GUI is used in Analysis mode.
 	 *
 	 * @param panel
 	 *            a {@link GraphPanel} instance
 	 * @return a {@link List} of {@link NodePainter} in execution order
 	 */
-	public static List<NodePainter> getNodePainter(GraphPanel panel) {
+	public static List<NodePainter> getAnalysisNodePainter(GraphPanel panel) {
 		List<NodePainter> result = new ArrayList<>();
 
 		result.add(new DefaultNodePainter(panel));
 		result.add(new SelectionNodePainter(panel));
 		result.add(new SearchResultNodePainter(panel));
 		result.add(new MouseOverNodePainter(panel));
-		result.add(new SubgraphIpMacMouseOverNodePainter(panel));
+		result.add(new PolicyFeatureMetadataReference(panel));
+		result.add(new PolicyActionMetadataReference(panel));
+		result.add(new PolicySelectionNodePainter(panel));
+
+		return result;
+	}
+	
+	/**
+	 * Returns a list of {@link NodePainter} in the order they are going to be executed.
+	 * These {@link NodePainter} will be used when the GUI is used in Monitoring mode.
+	 *
+	 * @param panel
+	 *            a {@link GraphPanel} instance
+	 * @return a {@link List} of {@link NodePainter} in execution order
+	 */
+	public static List<NodePainter> getMonitoringNodePainter(GraphPanel panel) {
+		List<NodePainter> result = new ArrayList<>();
+
+		result.add(new BlankNodePainter(panel));
+		result.add(new HighlightNodePainter(panel));
+		result.add(new SelectionNodePainter(panel));
+		result.add(new SearchResultNodePainter(panel));
+		result.add(new MouseOverNodePainter(panel));
 		result.add(new PolicyFeatureMetadataReference(panel));
 		result.add(new PolicyActionMetadataReference(panel));
 		result.add(new PolicySelectionNodePainter(panel));

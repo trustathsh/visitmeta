@@ -125,7 +125,15 @@ public class VisualizationConfig {
 
 	public static final String KEY_COLOR_NODE_MOUSE_OVER = "color.node.mouseover";
 	public static final String DEFAULT_VALUE_COLOR_NODE_MOUSE_OVER = "0x708090";
+	
+	public static final String KEY_COLOR_NODE_BLANK = "color.node.blank";
+	public static final String DEFAULT_VALUE_COLOR_NODE_BLANK = "0xFFFFFF";
 
+	public static final String KEY_COLOR_NODE_HIGHLIGHT = "color.node.highlight.value";
+	public static final String DEFAULT_VALUE_COLOR_NODE_HIGHLIGHT = "0xFF0000";
+	public static final String KEY_COLOR_NODE_HIGHLIGHT_TYPENAMES = "color.node.highlight.typenames";
+	public static final String DEFAULT_VALUE_COLOR_NODE_HIGHLIGHT_TYPENAMES = "event,unexpected-behavior";
+	
 	public static final String KEY_SEARCH_AND_FILTER_TRANSPARENCY = "visualization.searchandfilter.transparency";
 	public static final double DEFAULT_VALUE_SEARCH_AND_FILTER_TRANSPARENCY = 0.2;
 

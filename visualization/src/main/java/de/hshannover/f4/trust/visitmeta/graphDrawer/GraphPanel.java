@@ -53,6 +53,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainter;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainter;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.GuiMode;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
@@ -214,7 +215,8 @@ public interface GraphPanel {
 	 * @param nodePainter
 	 *            a {@link NodePainter} instance
 	 */
-	public void addNodePainter(List<NodePainter> nodePainter);
+	public void addNodePainter(GuiMode mode, List<NodePainter> nodePainter);
+
 
 	/**
 	 * Adds a new {@link EdgePainter}.
@@ -222,7 +224,7 @@ public interface GraphPanel {
 	 * @param edgePainter
 	 *            a {@link EdgePainter} instance
 	 */
-	public void addEdgeRenderer(List<EdgePainter> edgePainter);
+	public void addEdgeRenderer(GuiMode mode, List<EdgePainter> edgePainter);
 
 	/**
 	 * Returns the node that was selected by the user (if any).
@@ -253,5 +255,7 @@ public interface GraphPanel {
 	 */
 	public GraphicWrapper getMouseOverNode();
 
-	GraphConnection getConnection();
+	public GraphConnection getConnection();
+
+	public void setGuiMode(GuiMode mode);
 }

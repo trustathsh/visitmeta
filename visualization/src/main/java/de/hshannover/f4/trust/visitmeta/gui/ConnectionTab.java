@@ -84,6 +84,7 @@ public class ConnectionTab extends JPanel {
 
 	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
 	private HistoryNavigationStrategy mHistoryNavigationStrategy = null;
+	private GuiModeSelection mStateSelectionPanel = null;
 
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
@@ -132,6 +133,8 @@ public class ConnectionTab extends JPanel {
 					SearchAndFilterStrategyType.valueOf(searchAndFilterStrategyType), searchable);
 			searchable.setSearchAndFilterStrategy(mSearchAndFilterStrategy);
 		}
+		
+		mStateSelectionPanel = new GuiModeSelection(mGraphPanel);
 
 		this.setLayout(new GridLayout());
 
@@ -168,22 +171,27 @@ public class ConnectionTab extends JPanel {
 		JPanel searchAndFilterPanel = mSearchAndFilterStrategy.getJPanel();
 		searchAndFilterPanel.setBorder(BorderFactory.createTitledBorder("Search and Filter"));
 		searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JPanel stateSelectionPanel = mStateSelectionPanel.getJPanel();
+		stateSelectionPanel.setBorder(BorderFactory.createTitledBorder("State selection"));
+		stateSelectionPanel.setAlignmentX(Component.CENTER_ALIGNMENT);		
 
 		JPanel historyNavigationStrategyPanel = mHistoryNavigationStrategy.getJPanel();
 		historyNavigationStrategyPanel.setBorder(BorderFactory.createTitledBorder("History Navigation"));
 		historyNavigationStrategyPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mPanelXmlTree = new PanelXmlTree();
-		mPanelXmlTree.setBorder(BorderFactory.createTitledBorder("Node XML-Tree"));
+		mPanelXmlTree.setBorder(BorderFactory.createTitledBorder("Detailed Node Information"));
 		mPanelXmlTree.setPreferredSize(new Dimension(800, 400));
 		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mUpperPanel.add(mMotionInformationPane);
 		
 		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLowerPanel, searchAndFilterPanel, LayoutHelper.NULL_INSETS);
-		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 0.0, mLowerPanel, historyNavigationStrategyPanel,
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 0.0, mLowerPanel, stateSelectionPanel, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 0.0, mLowerPanel, historyNavigationStrategyPanel,
 				LayoutHelper.NULL_INSETS);
-		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 1.0, mLowerPanel, mPanelXmlTree, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, mLowerPanel, mPanelXmlTree, LayoutHelper.NULL_INSETS);
 
 		mSplitPane = new JSplitPane();
 		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);

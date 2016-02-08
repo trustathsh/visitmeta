@@ -46,6 +46,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -92,6 +93,7 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer.Picco
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer.Piccolo2dNodeRendererFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer.Piccolo2dNodeRendererType;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.GuiMode;
 import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategy;
 import de.hshannover.f4.trust.visitmeta.gui.search.Searchable;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
@@ -141,8 +143,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private String mSearchTerm = "";
 	private SearchAndFilterStrategy mSearchAndFilterStrategy = null;
 
-	private List<NodePainter> mNodePainter = new ArrayList<>();
-	private List<EdgePainter> mEdgeRenderer = new ArrayList<>();
+	private Map<GuiMode, List<NodePainter>> mNodePainter = new HashMap<>();
+	private Map<GuiMode, List<EdgePainter>> mEdgePainter = new HashMap<>();
 
 	private Piccolo2dNodeRenderer mPiccolo2dIdentifierRenderer = null;
 	private Piccolo2dNodeRenderer mPiccolo2dMetadataRenderer = null;
@@ -151,6 +153,7 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	private boolean mHideSearchMismatches = false;
 
 	private GraphConnection mConnection;
+	private GuiMode mGuiMode;
 
 	public Piccolo2DPanel(GraphConnection connection) {
 		mConnection = connection;
@@ -232,6 +235,8 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 							.valueOf(VisualizationConfig.DEFAULT_VALUE_PICCOLO2D_EDGE_STYLE);
 		}
 		mPiccolo2dEdgeRenderer = Piccolo2dEdgeRendererFactory.create(type);
+		
+		mGuiMode = GuiMode.ANALYSIS;
 
 	}
 
@@ -812,21 +817,21 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 
 	private void paintMetadataNode(Metadata metadata, PPath vNode, PText vText) {
 		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
-		for (NodePainter r : mNodePainter) {
+		for (NodePainter r : mNodePainter.get(mGuiMode)) {
 			r.paintMetadataNode(metadata, g);
 		}
 	}
 
 	private void paintIdentifierNode(Identifier identifier, PPath vNode, PText vText) {
 		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(vNode, vText);
-		for (NodePainter r : mNodePainter) {
+		for (NodePainter r : mNodePainter.get(mGuiMode)) {
 			r.paintIdentifierNode(identifier, g);
 		}
 	}
 
 	private void paintEdge(PPath pEdge) {
 		GraphicWrapper g = Piccolo2DGraphicWrapperFactory.create(pEdge, null);
-		for (EdgePainter r : mEdgeRenderer) {
+		for (EdgePainter r : mEdgePainter.get(mGuiMode)) {
 			r.paintEdge(g);
 		}
 	}
@@ -920,6 +925,16 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
+	public void setGuiMode(GuiMode mode) {
+		if (mode != mGuiMode) {
+			mGuiMode = mode;
+			
+			repaintNodes(NodeType.IDENTIFIER);
+			repaintNodes(NodeType.METADATA);
+		}
+	}
+	
+	@Override
 	public void setSearchAndFilterStrategy(SearchAndFilterStrategy strategy) {
 		this.mSearchAndFilterStrategy = strategy;
 	}
@@ -933,13 +948,35 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	}
 
 	@Override
-	public void addNodePainter(List<NodePainter> nodeRenderer) {
-		this.mNodePainter.addAll(nodeRenderer);
+	public void addNodePainter(GuiMode mode, List<NodePainter> nodePainter) {
+		if (mNodePainter.containsKey(mode)) {
+			List<NodePainter> list = mNodePainter.get(mode);
+			if (list != null) {
+				list.addAll(nodePainter);
+			} else {
+				
+			}
+		} else {
+			List<NodePainter> list = new ArrayList<>();
+			list.addAll(nodePainter);
+			mNodePainter.put(mode, list);
+		}
 	}
 
 	@Override
-	public void addEdgeRenderer(List<EdgePainter> edgeRenderer) {
-		this.mEdgeRenderer.addAll(edgeRenderer);
+	public void addEdgeRenderer(GuiMode mode, List<EdgePainter> edgePainter) {
+		if (mEdgePainter.containsKey(mode)) {
+			List<EdgePainter> list = mEdgePainter.get(mode);
+			if (list != null) {
+				list.addAll(edgePainter);
+			} else {
+				
+			}
+		} else {
+			List<EdgePainter> list = new ArrayList<>();
+			list.addAll(edgePainter);
+			mEdgePainter.put(mode, list);
+		}
 	}
 
 	@Override

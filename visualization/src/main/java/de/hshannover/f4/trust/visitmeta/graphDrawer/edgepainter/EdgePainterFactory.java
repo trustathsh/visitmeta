@@ -53,12 +53,30 @@ public class EdgePainterFactory {
 
 	/**
 	 * Returns a list of {@link EdgePainter} in the order they are going to be executed.
+	 * These {@link EdgePainter} will be used when the GUI is used in Analysis mode.
 	 *
 	 * @param panel
 	 *            a {@link GraphPanel} instance
 	 * @return a {@link List} of {@link EdgePainter} in execution order
 	 */
-	public static List<EdgePainter> getEdgePainter(GraphPanel panel) {
+	public static List<EdgePainter> getAnalysisEdgePainter(GraphPanel panel) {
+		List<EdgePainter> result = new ArrayList<>();
+
+		result.add(new DefaultEdgePainter(panel));
+		result.add(new SearchResultEdgePainter(panel));
+
+		return result;
+	}
+	
+	/**
+	 * Returns a list of {@link EdgePainter} in the order they are going to be executed.
+	 * These {@link EdgePainter} will be used when the GUI is used in Monitoring mode.
+	 *
+	 * @param panel
+	 *            a {@link GraphPanel} instance
+	 * @return a {@link List} of {@link EdgePainter} in execution order
+	 */
+	public static List<EdgePainter> getMonitoringEdgePainter(GraphPanel panel) {
 		List<EdgePainter> result = new ArrayList<>();
 
 		result.add(new DefaultEdgePainter(panel));

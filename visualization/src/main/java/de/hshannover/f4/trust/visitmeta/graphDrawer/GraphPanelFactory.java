@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.edgepainter.EdgePainterFactory;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter.NodePainterFactory;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.GuiMode;
 
 public final class GraphPanelFactory {
 
@@ -68,16 +69,16 @@ public final class GraphPanelFactory {
 				+ type + ") called.");
 		GraphPanel panel;
 		switch (type) {
+		// case "OpenGL" : return new OpenGLPanel(pController);
 			case "Piccolo2D":
-				panel = new Piccolo2DPanel(connection);
-				panel.addNodePainter(NodePainterFactory.getNodePainter(panel));
-				panel.addEdgeRenderer(EdgePainterFactory.getEdgePainter(panel));
-				return panel;
-			// case "OpenGL" : return new OpenGLPanel(pController);
 			default:
 				panel = new Piccolo2DPanel(connection);
-				panel.addNodePainter(NodePainterFactory.getNodePainter(panel));
-				panel.addEdgeRenderer(EdgePainterFactory.getEdgePainter(panel));
+				panel.addNodePainter(GuiMode.ANALYSIS, NodePainterFactory.getAnalysisNodePainter(panel));
+				panel.addEdgeRenderer(GuiMode.ANALYSIS, EdgePainterFactory.getAnalysisEdgePainter(panel));
+				
+				panel.addNodePainter(GuiMode.MONITORING, NodePainterFactory.getMonitoringNodePainter(panel));
+				panel.addEdgeRenderer(GuiMode.MONITORING, EdgePainterFactory.getMonitoringEdgePainter(panel));
+				
 				return panel;
 		}
 	}

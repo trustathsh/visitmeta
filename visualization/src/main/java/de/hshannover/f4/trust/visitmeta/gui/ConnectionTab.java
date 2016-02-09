@@ -38,8 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.List;
@@ -47,6 +47,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
@@ -89,6 +90,7 @@ public class ConnectionTab extends JPanel {
 	private JSplitPane mSplitPane = null;
 	private JPanel mUpperPanel = null;
 	private JPanel mLowerPanel = null;
+	private JPanel mLowerContentPanel = null;
 	private JPanel mNodeInformationPanel = null;
 
 	private WindowColorSettings mWindowColorSettings;
@@ -162,9 +164,13 @@ public class ConnectionTab extends JPanel {
 	private void initPanels() {
 		mUpperPanel = new JPanel();
 		mLowerPanel = new JPanel();
+		mLowerContentPanel = new JPanel();
 
 		mUpperPanel.setLayout(new GridLayout());
-		mLowerPanel.setLayout(new GridBagLayout());
+		JScrollPane lowerPanelScrollPane = new JScrollPane(mLowerContentPanel);
+		mLowerPanel.setLayout(new BorderLayout());
+		mLowerPanel.add(lowerPanelScrollPane, BorderLayout.CENTER);
+		mLowerContentPanel.setLayout(new GridBagLayout());
 		
 		mMotionInformationPane = new MotionInformationPane(mGraphPanel.getPanel());
 
@@ -182,20 +188,19 @@ public class ConnectionTab extends JPanel {
 
 		mPanelXmlTree = new PanelXmlTree();
 		mPanelXmlTree.setBorder(BorderFactory.createTitledBorder("Detailed Node Information"));
-		mPanelXmlTree.setPreferredSize(new Dimension(800, 400));
 		mPanelXmlTree.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		mUpperPanel.add(mMotionInformationPane);
 		
-		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLowerPanel, searchAndFilterPanel, LayoutHelper.NULL_INSETS);
-		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 0.0, mLowerPanel, stateSelectionPanel, LayoutHelper.NULL_INSETS);
-		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 0.0, mLowerPanel, historyNavigationStrategyPanel,
+		LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLowerContentPanel, searchAndFilterPanel, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 2, 1, 1, 1.0, 0.0, mLowerContentPanel, stateSelectionPanel, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 3, 1, 1, 1.0, 0.0, mLowerContentPanel, historyNavigationStrategyPanel,
 				LayoutHelper.NULL_INSETS);
-		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, mLowerPanel, mPanelXmlTree, LayoutHelper.NULL_INSETS);
+		LayoutHelper.addComponent(0, 4, 1, 1, 1.0, 1.0, mLowerContentPanel, mPanelXmlTree, LayoutHelper.NULL_INSETS);
 
 		mSplitPane = new JSplitPane();
 		mSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		mSplitPane.setResizeWeight(1.0);
+		mSplitPane.setResizeWeight(0.7);
 		mSplitPane.setLeftComponent(mUpperPanel);
 		mSplitPane.setRightComponent(mLowerPanel);
 		mSplitPane.setOneTouchExpandable(true);

@@ -42,7 +42,7 @@ import de.hshannover.f4.trust.ifmapj.binding.IfmapStrings;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
-import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 
 /**
@@ -68,22 +68,24 @@ public abstract class IdentifierInformationStrategy {
 	 * @return a {@link String} containing the specific information for the given {@link Identifier}
 	 */
 	public String getText(Identifier identifier) {
-		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-
-		switch (wrapper.getTypeName()) {
+		switch (identifier.getTypeName()) {
 			case IfmapStrings.ACCESS_REQUEST_EL_NAME:
-				return createTextForAccessRequest(wrapper);
+				return createTextForAccessRequest(identifier);
 			case IfmapStrings.DEVICE_EL_NAME:
-				return createTextForDevice(wrapper);
+				return createTextForDevice(identifier);
 			case IfmapStrings.IDENTITY_EL_NAME:
-				return createTextForIdentity(wrapper);
+				if (ExtendedIdentifierHelper.isExtendedIdentifier(identifier)) {
+					return createTextForExtendedIdentifier(identifier);
+				} else {
+					return createTextForIdentity(identifier);
+				}
 			case IfmapStrings.MAC_ADDRESS_EL_NAME:
-				return createTextForMacAddress(wrapper);
+				return createTextForMacAddress(identifier);
 			case IfmapStrings.IP_ADDRESS_EL_NAME:
-				return createTextForIPAddress(wrapper);
+				return createTextForIPAddress(identifier);
 			default:
 				throw new IllegalArgumentException("Unsupported identifier type: "
-						+ wrapper.getTypeName());
+						+ identifier.getTypeName());
 		}
 	}
 
@@ -94,7 +96,7 @@ public abstract class IdentifierInformationStrategy {
 	 *            {@link IdentifierWrapper} instance (encapsulating a {@link Identifier})
 	 * @return {@link String} representing the <i>access-request</i> {@link Identifier}
 	 */
-	protected abstract String createTextForAccessRequest(IdentifierWrapper identifier);
+	protected abstract String createTextForAccessRequest(Identifier identifier);
 
 	/**
 	 * Returns a {@link String} representation of a IF-MAP <i>ip-address</i> {@link Identifier}.
@@ -103,7 +105,7 @@ public abstract class IdentifierInformationStrategy {
 	 *            {@link IdentifierWrapper} instance (encapsulating a {@link Identifier})
 	 * @return {@link String} representing the <i>ip-address</i> {@link Identifier}
 	 */
-	protected abstract String createTextForIPAddress(IdentifierWrapper identifier);
+	protected abstract String createTextForIPAddress(Identifier identifier);
 
 	/**
 	 * Returns a {@link String} representation of a IF-MAP <i>mac-address</i> {@link Identifier}.
@@ -112,7 +114,7 @@ public abstract class IdentifierInformationStrategy {
 	 *            {@link IdentifierWrapper} instance (encapsulating a {@link Identifier})
 	 * @return {@link String} representing the <i>mac-address</i> {@link Identifier}
 	 */
-	protected abstract String createTextForMacAddress(IdentifierWrapper identifier);
+	protected abstract String createTextForMacAddress(Identifier identifier);
 
 	/**
 	 * Returns a {@link String} representation of a IF-MAP <i>identity</i> {@link Identifier}.
@@ -121,8 +123,10 @@ public abstract class IdentifierInformationStrategy {
 	 *            {@link IdentifierWrapper} instance (encapsulating a {@link Identifier})
 	 * @return {@link String} representing the <i>identity</i> {@link Identifier}
 	 */
-	protected abstract String createTextForIdentity(IdentifierWrapper identifier);
+	protected abstract String createTextForIdentity(Identifier identifier);
 
+	protected abstract String createTextForExtendedIdentifier(Identifier identifier);
+	
 	/**
 	 * Returns a {@link String} representation of a IF-MAP <i>device</i> {@link Identifier}.
 	 *
@@ -130,5 +134,5 @@ public abstract class IdentifierInformationStrategy {
 	 *            {@link IdentifierWrapper} instance (encapsulating a {@link Identifier})
 	 * @return {@link String} representing the <i>device</i> {@link Identifier}
 	 */
-	protected abstract String createTextForDevice(IdentifierWrapper identifier);
+	protected abstract String createTextForDevice(Identifier identifier);
 }

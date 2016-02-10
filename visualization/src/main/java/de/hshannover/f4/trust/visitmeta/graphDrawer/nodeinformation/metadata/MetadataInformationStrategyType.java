@@ -45,5 +45,5 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata;
  *
  */
 public enum MetadataInformationStrategyType {
-	SINGLE_LINE, WITH_TIMESTAMP, COMPACT
+	SINGLE_LINE, WITH_TIMESTAMP, COMPACT, POLICY_COMPACT
 }

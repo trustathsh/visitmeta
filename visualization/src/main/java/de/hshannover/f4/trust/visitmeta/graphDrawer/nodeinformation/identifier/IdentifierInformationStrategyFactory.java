@@ -65,6 +65,8 @@ public class IdentifierInformationStrategyFactory {
 				return new IdentifierInformationMultiLine();
 			case COMPACT:
 				return new IdentifierInformationCompact();
+			case POLICY_COMPACT:
+				return new IdentifierInformationPolicyCompact();
 			default:
 				throw new IllegalArgumentException(
 						"No strategy for given type '" + type + "'");

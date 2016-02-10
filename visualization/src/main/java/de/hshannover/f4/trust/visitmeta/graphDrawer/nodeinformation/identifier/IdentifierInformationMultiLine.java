@@ -40,6 +40,7 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 
 /**
@@ -58,7 +59,8 @@ import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 public class IdentifierInformationMultiLine extends IdentifierInformationStrategy {
 
 	@Override
-	public String createTextForAccessRequest(IdentifierWrapper wrapper) {
+	public String createTextForAccessRequest(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
@@ -70,7 +72,8 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 	}
 
 	@Override
-	public String createTextForIPAddress(IdentifierWrapper wrapper) {
+	public String createTextForIPAddress(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
@@ -86,7 +89,8 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 	}
 
 	@Override
-	public String createTextForMacAddress(IdentifierWrapper wrapper) {
+	public String createTextForMacAddress(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
@@ -98,44 +102,28 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 	}
 
 	@Override
-	public String createTextForIdentity(IdentifierWrapper wrapper) {
+	public String createTextForIdentity(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "type");	// type
 		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name");	// name
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
-
-		if (type.equals("other")) {
-			sb.append("\n");
-			sb.append("[ name=");
-			sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
-			sb.append(" ]");
-			sb.append("\n");
-
-			sb.append("[ type=");
-			sb.append(type);	// type
-			sb.append(" ]");
-			sb.append("\n");
-
-			sb.append("[ other-type-definition=");
-			sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
-			sb.append(" ]");
-		} else {
-			sb.append("\n");
-			sb.append("[ name=");
-			sb.append(name);	// name
-			sb.append(" ]");
-			sb.append("\n");
-			sb.append("[ type=");
-			sb.append(type);	// type
-			sb.append(" ]");
-		}
+		sb.append("\n");
+		sb.append("[ name=");
+		sb.append(name);	// name
+		sb.append(" ]");
+		sb.append("\n");
+		sb.append("[ type=");
+		sb.append(type);	// type
+		sb.append(" ]");
 		sb.append(getAdministrativeDomain(wrapper));
 		return sb.toString();
 	}
 
 	@Override
-	public String createTextForDevice(IdentifierWrapper wrapper) {
+	public String createTextForDevice(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append("\n");
@@ -163,6 +151,40 @@ public class IdentifierInformationMultiLine extends IdentifierInformationStrateg
 			sb.append(administrativeDomain);
 			sb.append(" ]");
 		}
+		return sb.toString();
+	}
+
+	@Override
+	protected String createTextForExtendedIdentifier(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "type");	// type
+		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name");	// name
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(wrapper.getTypeName());
+		sb.append("\n");
+		sb.append("[ name=");
+		
+		int idxFirstSemicolon = name.indexOf(";");
+		if (idxFirstSemicolon != -1) {
+			sb.append(name.substring(name.indexOf(";") + 1,
+					name.indexOf(" ")));
+		} else {
+			sb.append(name);
+		}
+		
+		sb.append(" ]");
+		sb.append("\n");
+
+		sb.append("[ type=");
+		sb.append(type);	// type
+		sb.append(" ]");
+		sb.append("\n");
+
+		sb.append("[ other-type-definition=");
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"));	// other-type-definition
+		sb.append(" ]");
+		sb.append(getAdministrativeDomain(wrapper));
 		return sb.toString();
 	}
 }

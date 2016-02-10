@@ -38,16 +38,26 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
+import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
- * A class that implements {@link IdentifierInformationStrategy} and returns
- * a singleline textual representation of an {@link Identifier}, according
- * to its type.
+ * A class that implements {@link IdentifierInformationStrategy} and returns a
+ * compact textual representation of an {@link Identifier}, according to its
+ * type.
  *
  * Examples:
  * <ul>
@@ -62,7 +72,9 @@ import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
  * @author Bastian Hellmann
  *
  */
-public class IdentifierInformationSingleLine extends IdentifierInformationStrategy {
+public class IdentifierInformationPolicyCompact extends IdentifierInformationStrategy {
+
+	private static final List<String> POLICY_TYPENAMES = Arrays.asList("signature", "condition", "rule", "action", "anomaly", "hint", "policy");
 
 	@Override
 	public String createTextForAccessRequest(Identifier identifier) {
@@ -104,28 +116,118 @@ public class IdentifierInformationSingleLine extends IdentifierInformationStrate
 	@Override
 	public String createTextForIdentity(Identifier identifier) {
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String type = wrapper.getValueForXpathExpressionOrElse("@"
+				+ IfmapStrings.IDENTITY_ATTR_TYPE, "type"); // type
 		String name = wrapper.getValueForXpathExpressionOrElse("@"
 				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
-		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"); // other-type-definition
-
+		
 		StringBuilder sb = new StringBuilder();
-		boolean showExtendedIdentifierPrefix =
-				mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
-						VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
-		if (showExtendedIdentifierPrefix) {
-			sb.append("extended-identifier: ");
-		}
-		int idxFirstSemicolon = name.indexOf(";");
-		if (idxFirstSemicolon != -1) {
-			sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
-		} else {
-			sb.append(name); // name
-			sb.append(" (");
-			sb.append(otherTypeDefinition); // other-type-definition
-			sb.append(")");
-		}
+		sb.append(wrapper.getTypeName());
+		sb.append(": ");
+		sb.append(name); // name
+		sb.append(" (");
+		sb.append(type); // type
+		sb.append(")");
 		return sb.toString();
+	}
+
+	private void handlePolicyIdentifier(StringBuilder sb, Identifier identifier) {
+		String extendedTypeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
+		Document document = ExtendedIdentifierHelper.getDocument(identifier);
+		String id = document.getElementsByTagName("id").item(0).getTextContent();
+		switch (extendedTypeName) {
+		case "signature":
+			sb.append(": ");
+			sb.append(id);
+			sb.append("\n");
+			NodeList featureExpressions = document.getElementsByTagName("featureExpression");
+			for (int i = 0; i < featureExpressions.getLength(); i++) {
+				String featureExpression = featureExpressions.item(i).getTextContent();
+				sb.append("featureExpression #");
+				sb.append(i);
+				sb.append(": ");
+				sb.append(featureExpression);
+				sb.append("\n");
+			}
+			break;
+		case "condition":
+			sb.append(": ");
+			sb.append(id);
+			sb.append("\n");
+			NodeList conditionExpressions = document.getElementsByTagName("conditionExpression");
+			for (int i = 0; i < conditionExpressions.getLength(); i++) {
+				String conditionExpression = conditionExpressions.item(i).getTextContent();
+				sb.append("conditionExpression #");
+				sb.append(i);
+				sb.append(": ");
+				sb.append(conditionExpression);
+				sb.append("\n");
+			}
+			break;
+		case "rule":
+			sb.append(": ");
+			sb.append(id);
+			break;
+		case "policy":
+			sb.append(": ");
+			sb.append(id);
+			break;
+		case "action":
+			sb.append(": ");
+			sb.append(id);
+			String operation = document.getElementsByTagName("operation").item(0).getTextContent();
+			sb.append("\n");
+			sb.append("operation: ");
+			sb.append(operation);
+			break;
+		default:
+			sb.append("\n");		
+			break;
+		}
+	}
+
+	private void appendFurtherInformationWhenAvailable(StringBuilder sb,
+			Document document) {
+
+		Map<String, String> furtherInformationWhenAvailable = DocumentUtils
+				.extractInformation(document, DocumentUtils.NAME_TYPE_VALUE);
+
+		String name = furtherInformationWhenAvailable.get("name");
+		String type = furtherInformationWhenAvailable.get("value");
+		String value = furtherInformationWhenAvailable.get("type");
+
+		boolean nameExists = name != null;
+		boolean typeExists = type != null;
+		boolean valueExists = value != null;
+
+		if (nameExists) {
+			sb.append(name);
+
+			if (typeExists) {
+				sb.append(" (");
+				sb.append(type);
+
+				if (valueExists) {
+					sb.append(", ");
+					sb.append(value);
+				}
+				sb.append(")");
+			} else if (valueExists) {
+				sb.append(" (");
+				sb.append(value);
+				sb.append(")");
+			}
+		} else if (typeExists) {
+			sb.append(type);
+
+			if (valueExists) {
+				sb.append(", ");
+				sb.append(value);
+			}
+			sb.append(")");
+		} else if (valueExists) {
+			sb.append(value);
+		}
 	}
 
 	@Override
@@ -134,7 +236,8 @@ public class IdentifierInformationSingleLine extends IdentifierInformationStrate
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
-		sb.append(wrapper.getValueForXpathExpressionOrElse(IfmapStrings.DEVICE_NAME_EL_NAME, "name")); // name
+		sb.append(wrapper.getValueForXpathExpressionOrElse(
+				IfmapStrings.DEVICE_NAME_EL_NAME, "name")); // name
 		return sb.toString();
 	}
 
@@ -143,9 +246,11 @@ public class IdentifierInformationSingleLine extends IdentifierInformationStrate
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		String name = wrapper.getValueForXpathExpressionOrElse("@"
 				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
-		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"); // other-type-definition
-
+		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
+				"@"
+						+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
+				"other-type-definition"); // other-type-definition
+		
 		StringBuilder sb = new StringBuilder();
 		boolean showExtendedIdentifierPrefix =
 				mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
@@ -153,15 +258,26 @@ public class IdentifierInformationSingleLine extends IdentifierInformationStrate
 		if (showExtendedIdentifierPrefix) {
 			sb.append("extended-identifier: ");
 		}
+
 		int idxFirstSemicolon = name.indexOf(";");
 		if (idxFirstSemicolon != -1) {
-			sb.append(name.substring(name.indexOf(";") + 1, name.indexOf(" ")));
+			String extendedTypeName = name.substring(name.indexOf(";") + 1,
+					name.indexOf(" "));
+			sb.append(extendedTypeName);
+			if (POLICY_TYPENAMES.contains(extendedTypeName)) {
+				handlePolicyIdentifier(sb, identifier);
+			} else {
+				sb.append("\n");
+				Document document = DocumentUtils.parseEscapedXmlString(name);
+				appendFurtherInformationWhenAvailable(sb, document);
+			}
 		} else {
 			sb.append(name); // name
 			sb.append(" (");
 			sb.append(otherTypeDefinition); // other-type-definition
 			sb.append(")");
 		}
+		
 		return sb.toString();
 	}
 }

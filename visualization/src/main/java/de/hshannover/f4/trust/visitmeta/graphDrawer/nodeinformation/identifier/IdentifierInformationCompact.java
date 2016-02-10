@@ -45,6 +45,7 @@ import org.w3c.dom.Document;
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
+import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
@@ -69,7 +70,8 @@ import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 public class IdentifierInformationCompact extends IdentifierInformationStrategy {
 
 	@Override
-	public String createTextForAccessRequest(IdentifierWrapper wrapper) {
+	public String createTextForAccessRequest(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
@@ -79,7 +81,8 @@ public class IdentifierInformationCompact extends IdentifierInformationStrategy 
 	}
 
 	@Override
-	public String createTextForIPAddress(IdentifierWrapper wrapper) {
+	public String createTextForIPAddress(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
@@ -93,7 +96,8 @@ public class IdentifierInformationCompact extends IdentifierInformationStrategy 
 	}
 
 	@Override
-	public String createTextForMacAddress(IdentifierWrapper wrapper) {
+	public String createTextForMacAddress(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
@@ -103,46 +107,20 @@ public class IdentifierInformationCompact extends IdentifierInformationStrategy 
 	}
 
 	@Override
-	public String createTextForIdentity(IdentifierWrapper wrapper) {
+	public String createTextForIdentity(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		String type = wrapper.getValueForXpathExpressionOrElse("@"
 				+ IfmapStrings.IDENTITY_ATTR_TYPE, "type"); // type
 		String name = wrapper.getValueForXpathExpressionOrElse("@"
 				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
-		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
-				"@"
-						+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
-				"other-type-definition"); // other-type-definition
 
 		StringBuilder sb = new StringBuilder();
-		if (type.equals("other")) {
-			boolean showExtendedIdentifierPrefix =
-					mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
-							VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
-			if (showExtendedIdentifierPrefix) {
-				sb.append("extended-identifier: ");
-			}
-			int idxFirstSemicolon = name.indexOf(";");
-			if (idxFirstSemicolon != -1) {
-				sb.append(name.substring(name.indexOf(";") + 1,
-						name.indexOf(" ")));
-				sb.append("\n");
-
-				Document document = DocumentUtils.parseEscapedXmlString(name);
-				appendFurtherInformationWhenAvailable(sb, document);
-			} else {
-				sb.append(name); // name
-				sb.append(" (");
-				sb.append(otherTypeDefinition); // other-type-definition
-				sb.append(")");
-			}
-		} else {
-			sb.append(wrapper.getTypeName());
-			sb.append(": ");
-			sb.append(name); // name
-			sb.append(" (");
-			sb.append(type); // type
-			sb.append(")");
-		}
+		sb.append(wrapper.getTypeName());
+		sb.append(": ");
+		sb.append(name); // name
+		sb.append(" (");
+		sb.append(type); // type
+		sb.append(")");
 		return sb.toString();
 	}
 
@@ -191,12 +169,47 @@ public class IdentifierInformationCompact extends IdentifierInformationStrategy 
 	}
 
 	@Override
-	public String createTextForDevice(IdentifierWrapper wrapper) {
+	public String createTextForDevice(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
 		sb.append(wrapper.getValueForXpathExpressionOrElse(
 				IfmapStrings.DEVICE_NAME_EL_NAME, "name")); // name
+		return sb.toString();
+	}
+
+	@Override
+	protected String createTextForExtendedIdentifier(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String name = wrapper.getValueForXpathExpressionOrElse("@"
+				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
+		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
+				"@"
+						+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
+				"other-type-definition"); // other-type-definition
+
+		StringBuilder sb = new StringBuilder();
+		boolean showExtendedIdentifierPrefix =
+				mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
+						VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
+		if (showExtendedIdentifierPrefix) {
+			sb.append("extended-identifier: ");
+		}
+		int idxFirstSemicolon = name.indexOf(";");
+		if (idxFirstSemicolon != -1) {
+			sb.append(name.substring(name.indexOf(";") + 1,
+					name.indexOf(" ")));
+			sb.append("\n");
+
+			Document document = DocumentUtils.parseEscapedXmlString(name);
+			appendFurtherInformationWhenAvailable(sb, document);
+		} else {
+			sb.append(name); // name
+			sb.append(" (");
+			sb.append(otherTypeDefinition); // other-type-definition
+			sb.append(")");
+		}
 		return sb.toString();
 	}
 }

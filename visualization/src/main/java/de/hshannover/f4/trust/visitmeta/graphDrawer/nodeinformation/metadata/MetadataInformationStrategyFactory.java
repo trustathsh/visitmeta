@@ -65,6 +65,8 @@ public class MetadataInformationStrategyFactory {
 				return new MetadataInformationWithTimestamp();
 			case COMPACT:
 				return new MetadataInformationCompact();
+			case POLICY_COMPACT:
+				return new MetadataInformationPolicyCompact();
 			default:
 				throw new IllegalArgumentException(
 						"No strategy for given type '" + type + "'");

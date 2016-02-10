@@ -45,6 +45,6 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
  *
  */
 public enum IdentifierInformationStrategyType {
-	SINGLE_LINE, MULTI_LINE, COMPACT
+	SINGLE_LINE, MULTI_LINE, COMPACT, POLICY_COMPACT
 
 }

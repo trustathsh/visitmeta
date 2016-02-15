@@ -109,6 +109,7 @@ public class MainWindow extends JFrame {
 	private static final String VISITMETA_ICON_32PX = "visitmeta-icon-32px.png";
 	private static final String VISITMETA_ICON_64PX = "visitmeta-icon-64px.png";
 	private static final String VISITMETA_ICON_128PX = "visitmeta-icon-128px.png";
+	private boolean mDualView = false;
 
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
@@ -363,7 +364,9 @@ public class MainWindow extends JFrame {
 		mRightMainPanel = new JPanel();
 		mRightMainPanel.setLayout(new GridLayout());
 		mRightMainPanel.add(mTabbedConnectionPaneLeft);
-		mRightMainPanel.add(mTabbedConnectionPaneRight);
+		if (mDualView) {
+			mRightMainPanel.add(mTabbedConnectionPaneRight);
+		}
 	}
 
 	public void openConnectedMapServerConnections() {
@@ -395,7 +398,7 @@ public class MainWindow extends JFrame {
 			mapServerConnection.initGraph();
 		}
 
-		toggleOpenConnectionTab(mapServerConnection.getConnectionTab());
+		openConnectionTab(mapServerConnection.getConnectionTab());
 	}
 
 	/**
@@ -665,16 +668,16 @@ public class MainWindow extends JFrame {
 			if (isTabOpen(toOpenTab)) {
 				closeConnectionTab(toOpenTab.getConnName());
 			} else {
-				toggleOpenConnectionTab(toOpenTab);
+				openConnectionTab(toOpenTab);
 			}
 		}
 	}
 
-	private void toggleOpenConnectionTab(ConnectionTab tab) {
+	private void openConnectionTab(ConnectionTab tab) {
 		int openTabSizeLeft = mTabbedConnectionPaneLeft.getComponents().length;
 		int openTabSizeRight = mTabbedConnectionPaneRight.getComponents().length;
 
-		if (openTabSizeLeft > openTabSizeRight) {
+		if (mDualView && openTabSizeLeft > openTabSizeRight) {
 			addClosableTab(mTabbedConnectionPaneRight, tab);
 		} else {
 			addClosableTab(mTabbedConnectionPaneLeft, tab);
@@ -737,5 +740,21 @@ public class MainWindow extends JFrame {
 	public void selectPath(TreePath newPath) {
 		mConnectionTree.setSelectionPath(newPath);
 		changeParameterPanel();
+	}
+
+	public void showDualViewGraph() {
+		if (!mDualView) {
+			mDualView = true;
+			mRightMainPanel.add(mTabbedConnectionPaneRight);
+			reopenConnectionTabs();
+		}
+	}
+
+	public void showSingleViewGraph() {
+		if (mDualView) {
+			mDualView = false;
+			mRightMainPanel.remove(mTabbedConnectionPaneRight);
+			reopenConnectionTabs();
+		}
 	}
 }

@@ -38,7 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.identifier;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

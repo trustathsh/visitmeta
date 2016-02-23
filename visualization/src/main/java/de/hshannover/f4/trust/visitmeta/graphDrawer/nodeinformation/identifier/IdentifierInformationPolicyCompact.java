@@ -143,7 +143,7 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 			for (int i = 0; i < featureExpressions.getLength(); i++) {
 				String featureExpression = featureExpressions.item(i).getTextContent();
 				sb.append("featureExpression #");
-				sb.append(i);
+				sb.append(i + 1);
 				sb.append(": ");
 				sb.append(featureExpression);
 				sb.append("\n");
@@ -157,7 +157,7 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 			for (int i = 0; i < conditionExpressions.getLength(); i++) {
 				String conditionExpression = conditionExpressions.item(i).getTextContent();
 				sb.append("conditionExpression #");
-				sb.append(i);
+				sb.append(i + 1);
 				sb.append(": ");
 				sb.append(conditionExpression);
 				sb.append("\n");

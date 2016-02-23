@@ -110,9 +110,25 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		if (metadata.getTypeName().equals("policy-feature")) {
 		}
 		
+		// policy-evaluation
+		if (metadata.getTypeName().equals("policy-evaluation")) {
+			String ruleResult = metadata.valueFor("/policy:policy-evaluation/rule-result/result");
+			sb.append("\n");
+			sb.append("result: ");
+			sb.append(ruleResult);
+		}
+		
 		// policy-action
 		if (metadata.getTypeName().equals("policy-action")) {
 			String ruleResult = metadata.valueFor("/policy:policy-action/rule-result/result");
+			sb.append("\n");
+			sb.append("result: ");
+			sb.append(ruleResult);
+		}
+		
+		// policy-partial-result
+		if (metadata.getTypeName().equals("policy-partial-result")) {
+			String ruleResult = metadata.valueFor("/policy:policy-partial-result/rule-result/result");
 			sb.append("\n");
 			sb.append("result: ");
 			sb.append(ruleResult);

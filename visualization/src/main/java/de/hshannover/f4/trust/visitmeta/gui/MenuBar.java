@@ -71,7 +71,7 @@ public class MenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
-	private GuiController mContoller = null;
+	private GuiController mController = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
 	private JMenu mMenuTheme = null;
@@ -88,7 +88,7 @@ public class MenuBar extends JMenuBar {
 	 */
 	public MenuBar(final GuiController guiController) {
 		super();
-		mContoller = guiController;
+		mController = guiController;
 		/* Connections */
 		JMenu mnConnections = new JMenu("Connections");
 		add(mnConnections);
@@ -98,7 +98,7 @@ public class MenuBar extends JMenuBar {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				MainWindow mainWindow = mContoller.getMainWindow();
+				MainWindow mainWindow = mController.getMainWindow();
 				List<Data> dataserviceList = ((Dataservices) mainWindow.getConnectionTree().getModel().getRoot())
 						.getSubData();
 
@@ -129,7 +129,7 @@ public class MenuBar extends JMenuBar {
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				String oldState = mContoller.switchGraphMotion();
+				String oldState = mController.switchGraphMotion();
 
 				if (oldState != null) {
 					LOGGER.debug("Changed motion of the graph, old state: "
@@ -146,7 +146,7 @@ public class MenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
 				LOGGER.debug("Redraw the graph.");
-				mContoller.redrawGraph();
+				mController.redrawGraph();
 			}
 		});
 		mMenuActions.add(mItemRedrawGraph);
@@ -179,7 +179,7 @@ public class MenuBar extends JMenuBar {
 		mItemSetColors.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mContoller.showColorSettings();
+				mController.showColorSettings();
 			}
 		});
 		mnSettings.add(mItemSetColors);
@@ -188,7 +188,7 @@ public class MenuBar extends JMenuBar {
 		mItemTimings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
-				mContoller.showSettings();
+				mController.showSettings();
 			}
 		});
 		mnSettings.add(mItemTimings);
@@ -261,6 +261,7 @@ public class MenuBar extends JMenuBar {
 						"Force-directed (JUNG2)"));
 				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
 				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
+				put(LayoutType.CIRCULAR, new JCheckBoxMenuItem("Circular"));
 			}
 		};
 
@@ -270,7 +271,7 @@ public class MenuBar extends JMenuBar {
 			layout.getValue().addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					mContoller.setLayoutType(layout.getKey());
+					mController.setLayoutType(layout.getKey());
 					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap
 							.entrySet()) {
 						if (otherLayout.getKey() != layout.getKey()) {
@@ -293,9 +294,9 @@ public class MenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (mMenuItemDualViewGraph.isSelected()) {
-					mContoller.getMainWindow().showDualViewGraph();
+					mController.getMainWindow().showDualViewGraph();
 				} else {
-					mContoller.getMainWindow().showSingleViewGraph();
+					mController.getMainWindow().showSingleViewGraph();
 				}
 			}
 		});

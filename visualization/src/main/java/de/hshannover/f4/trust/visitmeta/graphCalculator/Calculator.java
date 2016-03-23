@@ -38,10 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphCalculator;
 
-
-
-
-
 import java.util.Observer;
 
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
@@ -185,29 +181,5 @@ public interface Calculator extends Observer {
 	 * Get layout type (e.g., force-directed).
 	 */
 	public LayoutType getLayoutType();
-
-	/**
-	 * Set layout type (force-directed) with user selected parameters.
-	 * @param attractionMultiplier How much edges try to keep their nodes together.
-	 * @param repulsionMultiplier How much nodes try to push each other apart.
-	 */
-	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier);
-
-	/**
-	 * Set layout type (spring).
-	 * @param useIndividualEdgeLength true if every edge has to have its individual length
-	 * @param dimensionX Dimension of provided space for graph in x-dimension
-	 * @param dimensionY Dimension of provided space for graph in y-dimension
-	 * @param stretch The tendency of an edge to change its length
-	 * @param forceMultiplier How strongly an edge tries to maintain its length
-	 * @param repulsionRange Outside this radius, nodes do not repel each other
-	 */
-	public void setLayoutSpring(boolean useIndividualEdgeLength, int dimensionX,
-			int dimensionY, double stretch, double forceMultiplier, int repulsionRange);
-
-	/**
-	 * Set layout type (bipartite).
-	 */
-	public void setLayoutBipartite();
 
 }

@@ -266,25 +266,4 @@ public class JungCalculator implements Calculator {
 	public LayoutType getLayoutType() {
 		return mLayoutType;
 	}
-
-	@Override
-	public void setLayoutForceDirected(double attractionMultiplier, double repulsionMultiplier){
-		mGraph2D.setLayoutForceDirected(attractionMultiplier, repulsionMultiplier);
-		mLayoutType = LayoutType.FORCE_DIRECTED;
-	}
-
-	@Override
-	public void setLayoutSpring(boolean useIndividualEdgeLength, int dimensionX,
-			int dimensionY, double stretch, double forceMultiplier, int repulsionRange){
-		mGraph2D.setLayoutSpring(useIndividualEdgeLength, dimensionX, dimensionY, stretch,
-			forceMultiplier, repulsionRange);
-		mLayoutType = LayoutType.SPRING;
-	}
-
-	@Override
-	public void setLayoutBipartite(){
-		mGraph2D.setLayoutBipartite();
-		mLayoutType = LayoutType.BIPARTITE;
-	}
-
 }

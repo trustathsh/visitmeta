@@ -67,5 +67,13 @@ public enum LayoutType{
 	 * <p>This implementation (LayoutBipartite2D) uses the class StaticLayout of JUNG2 for consistency.
 	 * The layout algorithm itself has been developed by Trust@HsH group.</p>
 	 */
-	BIPARTITE
+	BIPARTITE,
+	
+	/**
+	 * <p> A circular layout adapted to the specific structure of MAP graphs (with link metadata in the
+	 * inner ring, identifiers on the medium ring and metadata attached to only one identifier on the
+	 * outer ring).</p>
+	 * The layout algorithm itself has been developed by Junbiao Wu during his bachelor thesis.</p>
+	 */
+	CIRCULAR
 }

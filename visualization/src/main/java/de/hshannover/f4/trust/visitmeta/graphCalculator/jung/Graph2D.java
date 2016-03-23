@@ -197,12 +197,22 @@ public class Graph2D {
 		LOGGER.trace("Method setLayoutType("
 				+ layoutType + ") called.");
 		mLayoutType = layoutType;
-		if (layoutType == LayoutType.FORCE_DIRECTED) {
+		switch (mLayoutType) {
+		case FORCE_DIRECTED:
 			mLayout2D = new LayoutForceDirected2D(this);
-		} else if (layoutType == LayoutType.SPRING) {
+			break;
+		case SPRING:
 			mLayout2D = new LayoutSpring2D(this);
-		} else if (layoutType == LayoutType.BIPARTITE) {
+			break;
+		case BIPARTITE:
 			mLayout2D = new LayoutBipartite2D(this);
+			break;
+		case CIRCULAR:
+			mLayout2D = new LayoutCircular2D(this);
+			break;
+		default:
+			mLayout2D = new LayoutForceDirected2D(this);
+			break;
 		}
 
 		// adjust nodes according to new layout
@@ -262,6 +272,14 @@ public class Graph2D {
 	public void setLayoutBipartite() {
 		mLayoutType = LayoutType.BIPARTITE;
 		mLayout2D = new LayoutBipartite2D(this);
+	}
+	
+	/**
+	 * Set layout (circular).
+	 */
+	public void setLayoutCircular(double radius) {
+		mLayoutType = LayoutType.CIRCULAR;
+		mLayout2D = new LayoutCircular2D(this);
 	}
 
 	/**

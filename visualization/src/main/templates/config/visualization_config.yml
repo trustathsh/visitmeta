@@ -39,8 +39,9 @@ visualization:
     # Layout type on startup; possible values are:
     # FORCE_DIRECTED_JUNG
     # SPRING_JUNG
-    # BIPARTITE_JUNG
-    # FORCE_DIRECTED_PREFUSE
+    # BIPARTITE
+    # FORCE_DIRECTED_ALTERNATIVE
+    # CIRCULAR
     layouttype: FORCE_DIRECTED_JUNG
   highlights:
     # Timeout (milliseconds) to show the highlights for new and deleted nodes.

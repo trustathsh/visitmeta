@@ -67,6 +67,8 @@ public abstract class Node2D{
 	private Edge2D              mEdge2DOut;
 	private Edge2D              mEdge2DForkIn;
 	private Edge2D              mEdge2DForkOut;
+	
+	private int layer;
 
 	private boolean mAdjustPermission;
 	private boolean mWasPicked;
@@ -203,6 +205,7 @@ public abstract class Node2D{
     	return mEdge2DOut;
     }
 
+
 	public void setEdgeOut(Edge2D edge){
 		LOGGER.trace("Method setEdgeOut(" + edge + ") called.");
     	mEdge2DOut = edge;
@@ -234,6 +237,14 @@ public abstract class Node2D{
 	
 	public void setLayout(Layout2D layout2D) {
 		mLayout2D = layout2D;
+	}
+
+	public int getLayer() {
+		return layer;
+	}
+
+	public void setLayer(int layer) {
+		this.layer = layer;
 	}
 
 }

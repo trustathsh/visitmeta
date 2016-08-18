@@ -75,5 +75,9 @@ public enum LayoutType{
 	 * outer ring).</p>
 	 * The layout algorithm itself has been developed by Junbiao Wu during his bachelor thesis.</p>
 	 */
-	CIRCULAR
+	CIRCULAR,
+	
+	HIERARCHICAL_h1,
+	HIERARCHICAL_h2,
+	HIERARCHICAL_v
 }

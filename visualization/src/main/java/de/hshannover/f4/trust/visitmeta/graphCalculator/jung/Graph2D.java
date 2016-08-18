@@ -210,6 +210,15 @@ public class Graph2D {
 		case CIRCULAR:
 			mLayout2D = new LayoutCircular2D(this);
 			break;
+		case HIERARCHICAL_h1:
+			mLayout2D = new LayoutHierarchical2D_1(this);
+			break;
+		case HIERARCHICAL_h2:
+			mLayout2D = new LayoutHierarchical2D_2(this);
+			break;
+		case HIERARCHICAL_v:
+			mLayout2D = new LayoutHierarchical2D_v(this);
+			break;
 		default:
 			mLayout2D = new LayoutForceDirected2D(this);
 			break;
@@ -281,7 +290,29 @@ public class Graph2D {
 		mLayoutType = LayoutType.CIRCULAR;
 		mLayout2D = new LayoutCircular2D(this);
 	}
-
+	
+	/**
+	 * Set layout (hierarchical_h2).
+	 */
+	public void setLayoutHierarchical_h2() {
+		mLayoutType = LayoutType.HIERARCHICAL_h2;
+		mLayout2D = new LayoutHierarchical2D_2(this);
+	}
+	
+	/**
+	 * Set layout (hierarchical_h1).
+	 */
+	public void setLayoutHierarchical_h1() {
+		mLayoutType = LayoutType.HIERARCHICAL_h1;
+		mLayout2D = new LayoutHierarchical2D_1(this);
+	}
+	/**
+	 * Set layout (hierarchical_h1).
+	 */
+	public void setHierarchical_v() {
+		mLayoutType = LayoutType.HIERARCHICAL_v;
+		mLayout2D = new LayoutHierarchical2D_v(this);
+	}
 	/**
 	 * Remove all Elements from graph.
 	 * Set graph null.

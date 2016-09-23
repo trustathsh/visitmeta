@@ -66,9 +66,10 @@ public class NodePainterFactory {
 		result.add(new SelectionNodePainter(panel));
 		result.add(new SearchResultNodePainter(panel));
 		result.add(new MouseOverNodePainter(panel));
-		result.add(new PolicyFeatureMetadataReference(panel));
-		result.add(new PolicyActionMetadataReference(panel));
-		result.add(new PolicySelectionNodePainter(panel));
+		result.add(new PolicyIrondetectFeatureMetadataReference(panel));
+		result.add(new PolicyIrondetectActionMetadataReference(panel));
+		result.add(new PolicyIrondetectSelectionNodePainter(panel));
+		result.add(new PolicyIronGpmSelectionNodePainter(panel));
 
 		return result;
 	}
@@ -89,9 +90,10 @@ public class NodePainterFactory {
 		result.add(new SelectionNodePainter(panel));
 		result.add(new SearchResultNodePainter(panel));
 		result.add(new MouseOverNodePainter(panel));
-		result.add(new PolicyFeatureMetadataReference(panel));
-		result.add(new PolicyActionMetadataReference(panel));
-		result.add(new PolicySelectionNodePainter(panel));
+		result.add(new PolicyIrondetectFeatureMetadataReference(panel));
+		result.add(new PolicyIrondetectActionMetadataReference(panel));
+		result.add(new PolicyIrondetectSelectionNodePainter(panel));
+		result.add(new PolicyIronGpmSelectionNodePainter(panel));
 
 		return result;
 	}

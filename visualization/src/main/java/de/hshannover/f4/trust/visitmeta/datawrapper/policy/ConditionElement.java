@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.policy;
+package de.hshannover.f4.trust.visitmeta.datawrapper.policy;
 
 import java.util.ArrayList;
 import java.util.List;

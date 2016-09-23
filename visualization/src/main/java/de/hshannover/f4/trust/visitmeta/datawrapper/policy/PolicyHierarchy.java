@@ -36,7 +36,7 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.policy;
+package de.hshannover.f4.trust.visitmeta.datawrapper.policy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +46,11 @@ import java.util.Map;
 
 public class PolicyHierarchy {
 
-	private static Map<String, PolicyHierarchy> policyHierarchy = new HashMap<String, PolicyHierarchy>();
+	private static Map<String, PolicyHierarchy> policyHierarchyIronDetect = new HashMap<String, PolicyHierarchy>();
+	private static Map<String, PolicyHierarchy> policyHierarchyIronGpm = new HashMap<String, PolicyHierarchy>();
+	private static Map<PolicyType, Map<String, PolicyHierarchy>> policyHierarchies = new HashMap<>();
 
 	static {
-
 		PolicyHierarchy policyAction = new PolicyHierarchy("policy-action");
 		policyAction.childs = Collections.emptyList();
 
@@ -79,31 +80,57 @@ public class PolicyHierarchy {
 		PolicyHierarchy policy = new PolicyHierarchy("policy");
 		policy.childs.add(rule);
 		
-		policyHierarchy.put(policy.type, policy);
-		policyHierarchy.put(rule.type, rule);
-		policyHierarchy.put(condition.type, condition);
-		policyHierarchy.put(signature.type, signature);
-		policyHierarchy.put(anomaly.type, anomaly);
-		policyHierarchy.put(hint.type, hint);
-		policyHierarchy.put(policyFeature.type, policyFeature);
-		policyHierarchy.put(action.type, action);
-		policyHierarchy.put(policyAction.type, policyAction);
-	}
+		policyHierarchyIronDetect.put(policy.type, policy);
+		policyHierarchyIronDetect.put(rule.type, rule);
+		policyHierarchyIronDetect.put(condition.type, condition);
+		policyHierarchyIronDetect.put(signature.type, signature);
+		policyHierarchyIronDetect.put(anomaly.type, anomaly);
+		policyHierarchyIronDetect.put(hint.type, hint);
+		policyHierarchyIronDetect.put(policyFeature.type, policyFeature);
+		policyHierarchyIronDetect.put(action.type, action);
+		policyHierarchyIronDetect.put(policyAction.type, policyAction);
+		
+		PolicyHierarchy ironGpmPatternVertex = new PolicyHierarchy("patternvertex");
+		
+		PolicyHierarchy ironGpmPatternEdge = new PolicyHierarchy("patternedge");
+		ironGpmPatternEdge.childs.add(ironGpmPatternVertex);
+		
+		PolicyHierarchy ironGpmPatternMetadata = new PolicyHierarchy("patternmetadata");
+		ironGpmPatternMetadata.childs = Collections.emptyList();
 
-	private PolicyHierarchy(String type) {
-		childs = new ArrayList<PolicyHierarchy>();
-		this.type = type;
+		ironGpmPatternVertex.childs.add(ironGpmPatternMetadata);
+		ironGpmPatternVertex.childs.add(ironGpmPatternEdge);
+
+		PolicyHierarchy ironGpmRule = new PolicyHierarchy("rule");
+		ironGpmRule.childs.add(ironGpmPatternVertex);
+		
+		PolicyHierarchy ironGpmPolicy = new PolicyHierarchy("policy");
+		ironGpmPolicy.childs.add(ironGpmRule);
+		
+		policyHierarchyIronGpm.put(ironGpmPolicy.type, ironGpmPolicy);
+		policyHierarchyIronGpm.put(ironGpmRule.type, ironGpmRule);
+		policyHierarchyIronGpm.put(ironGpmPatternVertex.type, ironGpmPatternVertex);
+		policyHierarchyIronGpm.put(ironGpmPatternMetadata.type, ironGpmPatternMetadata);
+		policyHierarchyIronGpm.put(ironGpmPatternEdge.type, ironGpmPatternEdge);
+		
+		policyHierarchies.put(PolicyType.IRONDETECT, policyHierarchyIronDetect);
+		policyHierarchies.put(PolicyType.IRONGPM, policyHierarchyIronGpm);
 	}
 
 	private String type;
 
 	private List<PolicyHierarchy> childs;
 
-	public static boolean isChild(String parent, String childToCheck) {
-		return isChild(policyHierarchy.get(parent), childToCheck);
+	public PolicyHierarchy(String type) {
+		childs = new ArrayList<PolicyHierarchy>();
+		this.type = type;
 	}
 
-	private static boolean isChild(PolicyHierarchy parent, String childToCheck) {
+	public static boolean isChild(String parent, String childToCheck, PolicyType policyType) {
+		return isChild(policyHierarchies.get(policyType).get(parent), childToCheck, policyType);
+	}
+
+	private static boolean isChild(PolicyHierarchy parent, String childToCheck, PolicyType policyType) {
 		if (parent == null || childToCheck == null) {
 			return false;
 		}
@@ -115,14 +142,14 @@ public class PolicyHierarchy {
 		}
 
 		for (PolicyHierarchy child : parent.childs) {
-			return isChild(child, childToCheck);
+			return isChild(child, childToCheck, policyType);
 		}
 
 		return false;
 	}
 
-	public static boolean isParent(String child, String parentToCheck) {
-		return isChild(parentToCheck, child);
+	public static boolean isParent(String child, String parentToCheck, PolicyType policyType) {
+		return isChild(parentToCheck, child, policyType);
 	}
 
 }

@@ -46,9 +46,10 @@ import org.w3c.dom.Element;
 
 import de.hshannover.f4.trust.ifmapj.binding.IfmapStrings;
 import de.hshannover.f4.trust.ifmapj.identifier.IdentityType;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.PolicyNode;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.PolicyType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.PolicyNode;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
@@ -56,9 +57,9 @@ import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 
-public class PolicySelectionNodePainter extends SelectionNodePainter {
+public class PolicyIrondetectSelectionNodePainter extends SelectionNodePainter {
 
-	private static final Logger LOGGER = Logger.getLogger(PolicySelectionNodePainter.class);
+	private static final Logger LOGGER = Logger.getLogger(PolicyIrondetectSelectionNodePainter.class);
 
 	private static final String XMLNS_POLICY_URL_PREFIX = "@xmlns:policy";
 
@@ -82,7 +83,7 @@ public class PolicySelectionNodePainter extends SelectionNodePainter {
 
 	private Set<GraphicWrapper> mSelectedPolicyChilds;
 
-	public PolicySelectionNodePainter(GraphPanel panel) {
+	public PolicyIrondetectSelectionNodePainter(GraphPanel panel) {
 		super(panel);
 		mPanel = panel;
 	}
@@ -193,8 +194,8 @@ public class PolicySelectionNodePainter extends SelectionNodePainter {
 		mSelectedNode = selectedPropable;
 		if (checkOfPolicyNode(mSelectedNode)) {
 			mIsValid = true;
-			mSelectedPolicyChilds = PolicyNode.getAllChilds(selectedNode);
-			mSelectedPolicyParents = PolicyNode.getAllParents(selectedNode);
+			mSelectedPolicyChilds = PolicyNode.getAllChilds(selectedNode, PolicyType.IRONDETECT);
+			mSelectedPolicyParents = PolicyNode.getAllParents(selectedNode, PolicyType.IRONDETECT);
 		} else {
 			mIsValid = false;
 		}

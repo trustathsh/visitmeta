@@ -50,9 +50,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.ConditionElement;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.ConditionElement.ConditionElementType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d.PolicyActionGraphicWrapper;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement.ConditionElementType;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.LayoutHelper;
 
 public class RuleResults extends JPanel {

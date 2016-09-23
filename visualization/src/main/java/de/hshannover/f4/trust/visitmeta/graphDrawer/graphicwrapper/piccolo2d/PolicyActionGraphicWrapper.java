@@ -42,9 +42,9 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.ConditionElement;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.piccolo2d.Piccolo2DPolicyActionGraphicWrapper.RuleStatusEnum;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement;
 
 public interface PolicyActionGraphicWrapper extends GraphicWrapper {
 

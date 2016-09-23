@@ -73,7 +73,7 @@ import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
  */
 public class IdentifierInformationPolicyCompact extends IdentifierInformationStrategy {
 
-	private static final List<String> POLICY_TYPENAMES = Arrays.asList("signature", "condition", "rule", "action", "anomaly", "hint", "policy");
+	private static final List<String> POLICY_TYPENAMES = Arrays.asList("signature", "condition", "rule", "action", "anomaly", "hint", "policy", "patternvertex");
 
 	@Override
 	public String createTextForAccessRequest(Identifier identifier) {
@@ -133,7 +133,15 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 	private void handlePolicyIdentifier(StringBuilder sb, Identifier identifier) {
 		String extendedTypeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
 		Document document = ExtendedIdentifierHelper.getDocument(identifier);
-		String id = document.getElementsByTagName("id").item(0).getTextContent();
+		
+		String administrativeDomain = document.getDocumentElement().getAttribute("administrative-domain");
+		
+		String id = "";
+		NodeList idElement = document.getElementsByTagName("id");
+		if (idElement.getLength() > 0) {
+			id = idElement.item(0).getTextContent();
+		}
+		
 		switch (extendedTypeName) {
 		case "signature":
 			sb.append(": ");
@@ -164,12 +172,35 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 			}
 			break;
 		case "rule":
-			sb.append(": ");
-			sb.append(id);
+			if (administrativeDomain.equals("irongpm-policy")) {
+				String description = document.getElementsByTagName("description").item(0).getTextContent();
+				String name = document.getElementsByTagName("name").item(0).getTextContent();
+				String recommendation = document.getElementsByTagName("recommendation").item(0).getTextContent();
+				sb.append(": ");
+				sb.append(name);
+				sb.append("\n");
+				sb.append("id: ");
+				sb.append(id);
+				sb.append("\n");
+				sb.append("description: ");
+				sb.append(description);
+				sb.append("\n");
+				sb.append("recommendation: ");
+				sb.append(recommendation);
+			} else {
+				sb.append(": ");
+				sb.append(id);				
+			}
 			break;
 		case "policy":
-			sb.append(": ");
-			sb.append(id);
+			if (administrativeDomain.equals("irongpm-policy")) {
+				String name = document.getElementsByTagName("name").item(0).getTextContent();
+				sb.append(": ");
+				sb.append(name);
+			} else {
+				sb.append(": ");
+				sb.append(id);
+			}
 			break;
 		case "action":
 			sb.append(": ");
@@ -179,8 +210,19 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 			sb.append("operation: ");
 			sb.append(operation);
 			break;
+		case "patternvertex":
+			String typeName = document.getElementsByTagName("typename").item(0).getTextContent();;
+			String properties = document.getElementsByTagName("properties").item(0).getTextContent();
+			sb.append(": ");
+			sb.append(typeName);
+			if (!properties.equals("[]")) {
+				sb.append("\n");
+				sb.append("properties: ");
+				sb.append(properties);
+			}
+			break;
 		default:
-			sb.append("\n");		
+			sb.append("\n");
 			break;
 		}
 	}

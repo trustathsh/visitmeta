@@ -38,8 +38,6 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.client.WebResource;

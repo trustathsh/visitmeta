@@ -38,10 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodepainter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.piccolo2d.nodes.PPath;
 import org.w3c.dom.Document;
@@ -56,20 +53,26 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
 
-public class PolicyActionMetadataReference extends MouseOverNodePainter {
+public class PolicyIrondetectFeatureMetadataReference extends MouseOverNodePainter {
 
-	public static final String POLICY_ACTION_EL_NAME = "policy-action";
+	public static final String POLICY_FEATURE_EL_NAME = "policy-feature";
 
 	public static final String ESUKOM_FEATURE_EL_NAME = "feature";
 
 	private GraphicWrapper mMouseOverNode;
 
-	private Map<Element, List<Element>> mRevFeatureMetadatas;
+	private Element mMouseOverMetadataElement;
+
+	private Element mMouseOverIdentifierElement;
 
 	private boolean mValidMouseOver;
 
-	public PolicyActionMetadataReference(GraphPanel panel) {
+	public PolicyIrondetectFeatureMetadataReference(GraphPanel panel) {
 		super(panel);
+	}
+
+	private void setNewMouseOverNode(GraphicWrapper newMouseOverNode) {
+		mMouseOverNode = newMouseOverNode;
 	}
 
 	private void resetOldMouseOverNode() {
@@ -88,44 +91,6 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 		}
 	}
 
-	private void setFeatureMetadata(Propable newMouseOverNode) {
-		Map<Element, List<Element>> featureElements = new HashMap<Element, List<Element>>();
-
-		Document mouseOverNodeDocument = DocumentUtils.parseEscapedXmlString(newMouseOverNode.getRawData());
-
-		Element nextElement = (Element) mouseOverNodeDocument.getDocumentElement().getFirstChild().getNextSibling()
-				.getNextSibling();
-
-		do {
-
-			Element identifier = extractIdentifier(nextElement);
-			Element esukomFeatureMetadata = extractMetadata(nextElement);
-
-			if (identifier != null && esukomFeatureMetadata != null) {
-				if (!featureElements.containsKey(identifier)) {
-					featureElements.put(identifier, new ArrayList<Element>());
-				}
-				featureElements.get(identifier).add(esukomFeatureMetadata);
-			}
-
-			nextElement = (Element) nextElement.getNextSibling();
-
-		} while (nextElement != null);
-
-		mRevFeatureMetadatas = featureElements;
-	}
-
-	private Element extractMetadata(Element node) {
-		Element esukomFeatureMetadata = (Element) node.getFirstChild();
-		return esukomFeatureMetadata;
-	}
-
-	private Element extractIdentifier(Element node) {
-		Element esukomFeatureMetadata = (Element) node.getFirstChild();
-		Element identifier = (Element) esukomFeatureMetadata.getNextSibling();
-		return identifier;
-	}
-
 	private boolean isNewMouseOverNode(GraphicWrapper mouseOverNode) {
 		Object mouseOverNodeData = mouseOverNode.getData();
 
@@ -141,8 +106,20 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 		return false;
 	}
 
-	private void setNewMouseOverNode(GraphicWrapper newMouseOverNode) {
-		mMouseOverNode = newMouseOverNode;
+	private void setIsValideMouseOver(Propable mouseOverNode) {
+		if (mouseOverNode instanceof Metadata && mouseOverNode.getTypeName().equals(POLICY_FEATURE_EL_NAME)) {
+			setMouseOverElements(mouseOverNode);
+			mValidMouseOver = true;
+		} else {
+			mValidMouseOver = false;
+		}
+	}
+
+	private void setMouseOverElements(Propable mouseOverNode) {
+		Document mouseOverNodeDocument = DocumentUtils.parseEscapedXmlString(mouseOverNode.getRawData());
+		mMouseOverMetadataElement = (Element) mouseOverNodeDocument.getDocumentElement().getFirstChild()
+				.getFirstChild();
+		mMouseOverIdentifierElement = (Element) mMouseOverMetadataElement.getNextSibling().getFirstChild();
 	}
 
 	@Override
@@ -155,7 +132,7 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 			return;
 		}
 
-		// only if mouse over node a POLICY ACTION
+		// only if mouse over node a POLICY FEATURE
 		if (isNewMouseOverNode(mouseOverNode)) {
 			resetOldMouseOverNode();
 			setNewMouseOverNode(mouseOverNode);
@@ -174,7 +151,7 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 		Document paintMetadataDocument = DocumentUtils.parseEscapedXmlString(metadata.getRawData());
 		Element revMetadataElement = paintMetadataDocument.getDocumentElement();
 
-		if (containsMetadata(revMetadataElement)) {
+		if (revMetadataElement.isEqualNode(mMouseOverMetadataElement)) {
 			List<GraphicWrapper> edges = graphic.getEdgesNodes();
 			// ESUKOM_FEATURE
 			for (GraphicWrapper edge : edges) {
@@ -184,7 +161,7 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 					Document revIdentifierDocumen = DocumentUtils.parseEscapedXmlString(identifier.getRawData());
 					Element revIdentifierElement = revIdentifierDocumen.getDocumentElement();
 
-					if (containsIdentifier(revIdentifierElement)) {
+					if (revIdentifierElement.isEqualNode(mMouseOverIdentifierElement)) {
 						// set mouseOverColor
 						graphic.setPaint(mColorMouseOverNode);
 
@@ -195,37 +172,6 @@ public class PolicyActionMetadataReference extends MouseOverNodePainter {
 				}
 			}
 		}
-	}
-
-	private void setIsValideMouseOver(Propable mouseOverNode) {
-		if (mouseOverNode instanceof Metadata && mouseOverNode.getTypeName().equals(POLICY_ACTION_EL_NAME)) {
-			setFeatureMetadata(mouseOverNode);
-			mValidMouseOver = true;
-		} else {
-			mValidMouseOver = false;
-		}
-	}
-
-	private boolean containsMetadata(Element revMetadataElement) {
-		for (List<Element> list : mRevFeatureMetadatas.values()) {
-			for (Element e : list) {
-				if (e.isEqualNode(revMetadataElement)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	private boolean containsIdentifier(Element revIdentifierElement) {
-		for (Element e : mRevFeatureMetadatas.keySet()) {
-			if (e.isEqualNode(revIdentifierElement)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	@Override

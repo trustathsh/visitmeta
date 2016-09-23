@@ -64,7 +64,8 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		Map<String, String> map = DocumentUtils.extractInformation(document,
 				DocumentUtils.NAME_TYPE_VALUE);
 		StringBuilder sb = new StringBuilder();
-		sb.append(metadata.getTypeName());
+		String typeName = metadata.getTypeName();
+		sb.append(typeName);
 
 		String name = map.get("name");
 		String type = map.get("value");
@@ -107,11 +108,11 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		}
 		
 		// policy-feature
-		if (metadata.getTypeName().equals("policy-feature")) {
+		if (typeName.equals("policy-feature")) {
 		}
 		
 		// policy-evaluation
-		if (metadata.getTypeName().equals("policy-evaluation")) {
+		if (typeName.equals("policy-evaluation")) {
 			String ruleResult = metadata.valueFor("/policy:policy-evaluation/rule-result/result");
 			sb.append("\n");
 			sb.append("result: ");
@@ -119,7 +120,7 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		}
 		
 		// policy-action
-		if (metadata.getTypeName().equals("policy-action")) {
+		if (typeName.equals("policy-action")) {
 			String ruleResult = metadata.valueFor("/policy:policy-action/rule-result/result");
 			sb.append("\n");
 			sb.append("result: ");
@@ -127,7 +128,7 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		}
 		
 		// policy-partial-result
-		if (metadata.getTypeName().equals("policy-partial-result")) {
+		if (typeName.equals("policy-partial-result")) {
 			String ruleResult = metadata.valueFor("/policy:policy-partial-result/rule-result/result");
 			sb.append("\n");
 			sb.append("result: ");
@@ -135,7 +136,7 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 		}
 		
 		// feature
-		if (metadata.getTypeName().equals("feature")) {
+		if (typeName.equals("feature")) {
 			String featureId = metadata.valueFor("/esukom:feature/id");
 			String featureType = metadata.valueFor("/esukom:feature/type");
 			String featureValue = metadata.valueFor("/esukom:feature/value");
@@ -146,6 +147,39 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 			sb.append(featureType);
 			sb.append(", value: ");
 			sb.append(featureValue);
+		}
+		
+		if (typeName.equals("patternedge")) {
+			String innerTypeName = metadata.valueFor("/policy:patternedge/typename");
+			String properties = metadata.valueFor("/policy:patternedge/properties");
+			sb.append("\n");
+			sb.append("typename: ");
+			sb.append(innerTypeName);
+			if (!properties.equals("[]")) {
+				sb.append("\n");
+				sb.append("properties: ");
+				sb.append(properties);
+			}
+		}
+		
+		if (typeName.equals("patternmetadata")) {
+			String innerTypeName = metadata.valueFor("/policy:patternmetadata/typename");
+			String properties = metadata.valueFor("/policy:patternmetadata/properties");
+			sb.append("\n");
+			sb.append("typename: ");
+			sb.append(innerTypeName);
+			if (!properties.equals("[]")) {
+				sb.append("\n");
+				sb.append("properties: ");
+				sb.append(properties);
+			}
+		}
+		
+		if (typeName.equals("pattern-matched")) {
+			String timestamp = metadata.valueFor("/policy:pattern-matched/timestamp");
+			sb.append("\n");
+			sb.append("timestamp: ");
+			sb.append(timestamp);
 		}
 
 		return sb.toString();

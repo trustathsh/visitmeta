@@ -40,8 +40,6 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 

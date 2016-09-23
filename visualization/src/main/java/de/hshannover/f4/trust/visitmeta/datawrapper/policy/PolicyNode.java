@@ -36,23 +36,22 @@
  * limitations under the License.
  * #L%
  */
-package de.hshannover.f4.trust.visitmeta.graphDrawer.policy;
+package de.hshannover.f4.trust.visitmeta.datawrapper.policy;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.piccolo2d.nodes.PPath;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
+import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
-import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 
-public class PolicyNode {
+public abstract class PolicyNode {
 
-	public static Set<GraphicWrapper> getParents(GraphicWrapper selectedNode) {
+	private static Set<GraphicWrapper> getParents(GraphicWrapper selectedNode, PolicyType policyType) {
 		Set<GraphicWrapper> parents = new HashSet<GraphicWrapper>();
 		Propable selectedPropable = (Propable) selectedNode.getData();
 		List<GraphicWrapper> edgesNodes = selectedNode.getEdgesNodes();
@@ -62,15 +61,15 @@ public class PolicyNode {
 		switch (selectedNode.getNodeType()) {
 		// If selected node = IDENTIFIER
 			case IDENTIFIER:
-				identStartingType = extractExtendetIdentifierTypeName(selectedPropable);
+				identStartingType = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) selectedPropable);
 				for (GraphicWrapper edgeNode : edgesNodes) {
 					// check for edges between two policy identifier
 					List<GraphicWrapper> tmpEdgesNodes = edgeNode.getEdgesNodes();
 					for (GraphicWrapper tmpEdgeNode : tmpEdgesNodes) {
 						// now check the identifier edges
 						Propable propable = (Propable) tmpEdgeNode.getData();
-						String typeName = extractExtendetIdentifierTypeName(propable);
-						if (PolicyHierarchy.isParent(identStartingType, typeName)) {
+						String typeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) propable);
+						if (PolicyHierarchy.isParent(identStartingType, typeName, policyType)) {
 							parents.add(tmpEdgeNode);
 							parents.add(edgeNode);
 						}
@@ -81,11 +80,11 @@ public class PolicyNode {
 				// If selected node = METADATA
 				for (GraphicWrapper identifierNode : edgesNodes) {
 					Propable identifier = (Propable) identifierNode.getData();
-					identStartingType = extractExtendetIdentifierTypeName(identifier);
+					identStartingType = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) identifier);
 
 					// if selected policy-action or policy-feature metadata
 					String metadataTypeName = selectedPropable.getTypeName();
-					if (PolicyHierarchy.isParent(metadataTypeName, identStartingType)) {
+					if (PolicyHierarchy.isParent(metadataTypeName, identStartingType, policyType)) {
 						parents.add(identifierNode);
 					}
 
@@ -94,8 +93,8 @@ public class PolicyNode {
 					for (GraphicWrapper otherIdentifierNode : edgesNodes) {
 						if (identifierNode != otherIdentifierNode) {
 							Propable otherIdentifier = (Propable) otherIdentifierNode.getData();
-							String typeName = extractExtendetIdentifierTypeName(otherIdentifier);
-							if (PolicyHierarchy.isParent(identStartingType, typeName)) {
+							String typeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) otherIdentifier);
+							if (PolicyHierarchy.isParent(identStartingType, typeName, policyType)) {
 								parents.add(otherIdentifierNode);
 							}
 						}
@@ -109,18 +108,17 @@ public class PolicyNode {
 		return parents;
 	}
 
-	public static Set<GraphicWrapper> getAllChilds(GraphicWrapper selectedNode) {
+	public static Set<GraphicWrapper> getAllChilds(GraphicWrapper selectedNode, PolicyType policyType) {
 		Set<GraphicWrapper> allNodeChilds = new HashSet<GraphicWrapper>();
 		
-		Set<GraphicWrapper> selectedNodeChilds = getChilds(selectedNode);
+		Set<GraphicWrapper> selectedNodeChilds = getChilds(selectedNode, policyType);
 		allNodeChilds.addAll(selectedNodeChilds);
 
-		do{
-
+		do {
 			Set<GraphicWrapper> tmpNodeChilds = new HashSet<GraphicWrapper>();
 			
 			for (GraphicWrapper nodeChild : selectedNodeChilds) {
-				tmpNodeChilds.addAll(getChilds(nodeChild));
+				tmpNodeChilds.addAll(getChilds(nodeChild, policyType));
 			}
 
 			if (!tmpNodeChilds.isEmpty()) {
@@ -134,10 +132,10 @@ public class PolicyNode {
 		return allNodeChilds;
 	}
 
-	public static Set<GraphicWrapper> getAllParents(GraphicWrapper selectedNode) {
+	public static Set<GraphicWrapper> getAllParents(GraphicWrapper selectedNode, PolicyType type) {
 		Set<GraphicWrapper> allNodeParents = new HashSet<GraphicWrapper>();
 
-		Set<GraphicWrapper> selectedNodeParents = getParents(selectedNode);
+		Set<GraphicWrapper> selectedNodeParents = getParents(selectedNode, type);
 		allNodeParents.addAll(selectedNodeParents);
 
 		do {
@@ -145,7 +143,7 @@ public class PolicyNode {
 			Set<GraphicWrapper> tmpNodeParents = new HashSet<GraphicWrapper>();
 
 			for (GraphicWrapper nodeParent : selectedNodeParents) {
-				tmpNodeParents.addAll(getParents(nodeParent));
+				tmpNodeParents.addAll(getParents(nodeParent, type));
 			}
 
 			if (!tmpNodeParents.isEmpty()) {
@@ -159,23 +157,7 @@ public class PolicyNode {
 		return allNodeParents;
 	}
 
-	public static String extractExtendetIdentifierTypeName(Propable propable) {
-		String identityName = propable.valueFor("/identity[@name]");
-
-		if (identityName != null) {
-			Document document = DocumentUtils.parseEscapedXmlString(identityName);
-
-			if (document != null) {
-				Element extendetInformation = document.getDocumentElement();
-				String typeName = extendetInformation.getNodeName();
-				return typeName;
-			}
-		}
-
-		return null;
-	}
-
-	public static Set<GraphicWrapper> getChilds(GraphicWrapper selectedNode) {
+	public static Set<GraphicWrapper> getChilds(GraphicWrapper selectedNode, PolicyType policyType) {
 		Set<GraphicWrapper> childs = new HashSet<GraphicWrapper>();
 		Propable selectedPropable = (Propable) selectedNode.getData();
 		List<GraphicWrapper> edgesNodes = selectedNode.getEdgesNodes();
@@ -183,13 +165,13 @@ public class PolicyNode {
 		switch (selectedNode.getNodeType()) {
 			case IDENTIFIER:
 				// If selected node = IDENTIFIER
-				String identStartingType = extractExtendetIdentifierTypeName(selectedPropable);
+				String identStartingType = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) selectedPropable);
 				for (GraphicWrapper edgeNode : edgesNodes) {
 
-					// check for policy-action or policy-feature metadata
+					// check for metadata attached to identifier
 					Propable metadata = (Propable) edgeNode.getData();
 					String metadataTypeName = metadata.getTypeName();
-					if (PolicyHierarchy.isChild(identStartingType, metadataTypeName)) {
+					if (PolicyHierarchy.isChild(identStartingType, metadataTypeName, policyType)) {
 						childs.add(edgeNode);
 					}
 
@@ -198,8 +180,8 @@ public class PolicyNode {
 					for (GraphicWrapper tmpEdgeNode : tmpEdgesNodes) {
 						// now check the identifier edges
 						Propable propable = (Propable) tmpEdgeNode.getData();
-						String typeName = extractExtendetIdentifierTypeName(propable);
-						if (PolicyHierarchy.isChild(identStartingType, typeName)) {
+						String typeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) propable);
+						if (PolicyHierarchy.isChild(identStartingType, typeName, policyType)) {
 							childs.add(tmpEdgeNode);
 							childs.add(edgeNode);
 						}
@@ -211,13 +193,13 @@ public class PolicyNode {
 				// for metadata between two policy identifier
 				for (GraphicWrapper identifierNode : edgesNodes) {
 					Propable identifier = (Propable) identifierNode.getData();
-					String metaStartingType = extractExtendetIdentifierTypeName(identifier);
+					String metaStartingType = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) identifier);
 					// check who is the child
 					for (GraphicWrapper otherIdentifierNode : edgesNodes) {
 						if (identifierNode != otherIdentifierNode) {
 							Propable otherIdentifier = (Propable) otherIdentifierNode.getData();
-							String typeName = extractExtendetIdentifierTypeName(otherIdentifier);
-							if (PolicyHierarchy.isChild(metaStartingType, typeName)) {
+							String typeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName((Identifier) otherIdentifier);
+							if (PolicyHierarchy.isChild(metaStartingType, typeName, policyType)) {
 								childs.add(otherIdentifierNode);
 							}
 						}

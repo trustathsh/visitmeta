@@ -49,11 +49,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.ConditionElement;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.ConditionElement.ConditionElementType;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.PolicyNode;
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.PolicyType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.IdentityGraphicWrapper;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.ConditionElement.ConditionElementType;
-import de.hshannover.f4.trust.visitmeta.graphDrawer.policy.PolicyNode;
 
 public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper implements PolicyActionGraphicWrapper {
 
@@ -770,7 +771,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 		IdentityGraphicWrapper policy = getRootPolicyIdentifier();
 
 		if (policy != null) {
-			Set<GraphicWrapper> allPolicyElements = PolicyNode.getAllChilds(policy);
+			Set<GraphicWrapper> allPolicyElements = PolicyNode.getAllChilds(policy, PolicyType.IRONDETECT);
 
 			for (GraphicWrapper policyElement : allPolicyElements) {
 				if (policyElement instanceof PolicyActionGraphicWrapper) {
@@ -782,7 +783,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 	}
 
 	protected IdentityGraphicWrapper getRootPolicyIdentifier() {
-		Set<GraphicWrapper> parentsFromSelection = PolicyNode.getAllParents(this);
+		Set<GraphicWrapper> parentsFromSelection = PolicyNode.getAllParents(this, PolicyType.IRONDETECT);
 
 		for (GraphicWrapper parentElement : parentsFromSelection) {
 			if (parentElement instanceof IdentityGraphicWrapper) {
@@ -898,13 +899,13 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 	}
 
 	private int getActionCountForRule() {
-		Set<GraphicWrapper> policyElements = PolicyNode.getAllParents(this);
+		Set<GraphicWrapper> policyElements = PolicyNode.getAllParents(this, PolicyType.IRONDETECT);
 
 		for (GraphicWrapper policyElement : policyElements) {
 			if (policyElement instanceof IdentityGraphicWrapper) {
 				IdentityGraphicWrapper identityElement = (IdentityGraphicWrapper) policyElement;
 				if ("rule".equals(identityElement.getExtendedNodeTypeName())) {
-					Set<GraphicWrapper> childs = PolicyNode.getChilds(identityElement);
+					Set<GraphicWrapper> childs = PolicyNode.getChilds(identityElement, PolicyType.IRONDETECT);
 					int count = 0;
 					for (GraphicWrapper child : childs) {
 						if (child instanceof IdentityGraphicWrapper) {

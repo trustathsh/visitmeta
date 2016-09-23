@@ -53,8 +53,8 @@ import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 public class PolicyMetadataReferenceEdgeRenderer extends StraightLinePiccolo2dEdgeRenderer {
 
-	private static final List<String> VALIDE_METADATA_TYP_NAMES = Arrays.asList(new String[] { "policy-feature",
-			"policy-action", "feature" });
+	private static final List<String> VALID_METADATA_TYPENAMES = Arrays.asList(new String[] { "policy-feature",
+			"policy-action", "feature", "pattern-matched" });
 
 	@Override
 	public void drawEdge(PPath pEdge, Point2D vStart, Point2D vEnd, Metadata metadata, Identifier identifier) {
@@ -72,9 +72,22 @@ public class PolicyMetadataReferenceEdgeRenderer extends StraightLinePiccolo2dEd
 		} else if ("policy-action".equals(metadata.getTypeName())) {
 			drawPolicyActionMetadataReferenceDashedLine(pEdge, vStart, vEnd);
 			
+		} else if ("pattern-matched".equals(metadata.getTypeName())) {
+			drawPublishVertexToMatchedIdentifierDashedLine(pEdge, vStart, vEnd);
+			
 		} else {
 			return;
 		}
+	}
+
+	private void drawPublishVertexToMatchedIdentifierDashedLine(PPath pEdge, Point2D vStart, Point2D vEnd) {
+		Piccolo2DGraphicWrapper edge = Piccolo2DGraphicWrapperFactory.create(pEdge, null);
+		
+		if (!checkEdgeNodes(edge)) {
+			return;
+		}
+		
+		StraightDashedLinePiccolo2dEdgeRenderer.drawStraightDashedLine(pEdge, vStart, vEnd);
 	}
 
 	private void drawPolicyFeatureMetadataReferenceDashedLine(PPath pEdge, Point2D vStart, Point2D vEnd) {
@@ -109,8 +122,8 @@ public class PolicyMetadataReferenceEdgeRenderer extends StraightLinePiccolo2dEd
 			if (data instanceof Propable) {
 				Propable propable = (Propable) data;
 				String typName = propable.getTypeName();
-				// only policy-feature, policy-action or feature metadata are valid
-				if (!VALIDE_METADATA_TYP_NAMES.contains(typName)) {
+				// only policy-feature, policy-action, feature or pattern-matched metadata are valid
+				if (!VALID_METADATA_TYPENAMES.contains(typName)) {
 					return false;
 				}
 			}

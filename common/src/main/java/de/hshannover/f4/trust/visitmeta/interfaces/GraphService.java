@@ -38,7 +38,10 @@
  */
 package de.hshannover.f4.trust.visitmeta.interfaces;
 
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 /**
@@ -165,4 +168,6 @@ public interface GraphService {
 	 * @return
 	 */
 	public double meanOfEdges(long timestamp);
+
+	public Map<Long, double[][]> getAdjacencyMatrices(String name) throws ConnectionException;
 }

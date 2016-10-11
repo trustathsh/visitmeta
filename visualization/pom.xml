@@ -14,7 +14,16 @@
     <packaging>jar</packaging>
     <name>visitmeta-visualization</name>
 
-    <build>
+	<repositories>
+		<repository>
+			<id>tsne</id>
+			<name>thinktopic for TSNE</name>
+			<url>http://clojars.org/repo</url>
+		</repository>
+	</repositories>
+
+
+	<build>
         <plugins>
         
         	<plugin>
@@ -135,5 +144,21 @@
             <artifactId>jung-algorithms</artifactId>
             <version>2.0.1</version>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>gov.nist.math</groupId>
+			<artifactId>jama</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/thinktopic/tsne-core -->
+		<dependency>
+			<groupId>thinktopic</groupId>
+			<artifactId>tsne-core</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.7</version>
+		</dependency>
+	</dependencies>
 </project>

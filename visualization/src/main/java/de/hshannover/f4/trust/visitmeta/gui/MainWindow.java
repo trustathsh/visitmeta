@@ -52,23 +52,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
@@ -113,7 +102,9 @@ public class MainWindow extends JFrame {
 
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
-	private JPanel mRightMainPanel = null;
+	private JSplitPane mRightMainPanel = null;
+	private NavigationPanel mProjectionView;
+	private JPanel mGraphPanel;
 	private JPanel mJpParameter;
 	private ParameterPanel mJpParameterValues;
 	private JPanel mJpParameterSouth;
@@ -361,12 +352,23 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		mRightMainPanel = new JPanel();
-		mRightMainPanel.setLayout(new GridLayout());
-		mRightMainPanel.add(mTabbedConnectionPaneLeft);
+		mGraphPanel = new JPanel();
+		mGraphPanel.setLayout(new GridLayout());
+		mGraphPanel.add(mTabbedConnectionPaneLeft);
 		if (mDualView) {
-			mRightMainPanel.add(mTabbedConnectionPaneRight);
+			mGraphPanel.add(mTabbedConnectionPaneRight);
 		}
+
+		mProjectionView = new NavigationPanel();
+
+		mRightMainPanel = new JSplitPane();
+		mRightMainPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		mRightMainPanel.setResizeWeight(0.125);
+		mRightMainPanel.setRightComponent(mGraphPanel);
+		mRightMainPanel.setLeftComponent(mProjectionView);
+		mRightMainPanel.setOneTouchExpandable(true);
+
+
 	}
 
 	public void openConnectedMapServerConnections() {
@@ -745,7 +747,7 @@ public class MainWindow extends JFrame {
 	public void showDualViewGraph() {
 		if (!mDualView) {
 			mDualView = true;
-			mRightMainPanel.add(mTabbedConnectionPaneRight);
+			mGraphPanel.add(mTabbedConnectionPaneRight);
 			reopenConnectionTabs();
 		}
 	}
@@ -753,7 +755,7 @@ public class MainWindow extends JFrame {
 	public void showSingleViewGraph() {
 		if (mDualView) {
 			mDualView = false;
-			mRightMainPanel.remove(mTabbedConnectionPaneRight);
+			mGraphPanel.remove(mTabbedConnectionPaneRight);
 			reopenConnectionTabs();
 		}
 	}

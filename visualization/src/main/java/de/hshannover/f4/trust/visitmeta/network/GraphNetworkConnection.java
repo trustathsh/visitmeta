@@ -40,8 +40,10 @@ package de.hshannover.f4.trust.visitmeta.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -76,6 +78,7 @@ public class GraphNetworkConnection {
 	private SortedMap<Long, Long> mChangesMap = null;
 	private SortedMap<Long, Long> mKnownChangesMap = null;
 
+	private GraphContainer mContainer = null;
 	private SettingManager mSettingManager = null;
 	int mInterval = 0;
 
@@ -94,6 +97,7 @@ public class GraphNetworkConnection {
 		mGraphPool = container.getGraphPool();
 		mSettingManager = container.getSettingManager();
 		mInterval = mSettingManager.getNetworkInterval();
+		mContainer = container;
 	}
 
 	/**
@@ -475,4 +479,13 @@ public class GraphNetworkConnection {
 		debugGraphContent("update", graph.getUpdates());
 		debugGraphContent("delete", graph.getDeletes());
 	}
+
+	protected void loadAdjacencyMatrix() {
+		try {
+			mContainer.setmAdjacencis(mGraphService.getAdjacencyMatrices(null));
+		} catch (ConnectionException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

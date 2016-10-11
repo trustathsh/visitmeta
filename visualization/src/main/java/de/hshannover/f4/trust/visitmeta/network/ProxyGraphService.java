@@ -56,6 +56,12 @@ import java.util.TreeMap;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.api.json.JSONUnmarshaller;
+import com.sun.jersey.json.impl.BaseJSONUnmarshaller;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
@@ -99,6 +105,7 @@ public class ProxyGraphService implements GraphService {
 	private static final String DELTA_UPDATES = "updates";
 	private static final String DELTA_DELETES = "deletes";
 	private static final String RAW_XML = "rawData";
+	private static final String ADJACENCIES = "adjacencies";
 
 	public ProxyGraphService(WebResource service) {
 		mService = service;
@@ -214,6 +221,20 @@ public class ProxyGraphService implements GraphService {
 				.get(String.class);
 
 		return extractDeltasFromJson(json);
+	}
+
+	@Override
+	public Map<Long, double[][]> getAdjacencyMatrices(String name) throws ConnectionException {
+		String json = mService
+				.path(ADJACENCIES)
+				.accept(MediaType.APPLICATION_JSON)
+				.get(String.class);
+		Map<Long, double[][]> out = new HashMap<>();
+		//System.out.println(json);
+
+		java.lang.reflect.Type type = new TypeToken<HashMap<Long, double[][]>>(){}.getType();
+		out = new Gson().fromJson(json, type);
+		return out;
 	}
 
 	private Delta extractDeltasFromJson(String json) {

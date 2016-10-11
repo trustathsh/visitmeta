@@ -148,10 +148,10 @@ public class FacadeNetwork extends Observable implements Runnable, Observer {
 			loadCurrentGraph();
 			while (!mIsDone) {
 				mNetworkConnection.loadChangesMap();
-
 				try {
+                    mNetworkConnection.loadAdjacencyMatrix();
 					if (mLoadNewest
-							&& mNetworkConnection.updateGraph()) {
+							&& mNetworkConnection.updateGraph()	) {
 						setChanged();
 						notifyObservers();
 					}

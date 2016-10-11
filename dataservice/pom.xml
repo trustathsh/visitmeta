@@ -134,5 +134,10 @@
 			<artifactId>grizzly-servlet-webserver</artifactId>
 			<version>1.9.18-i</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.7</version>
+		</dependency>
 	</dependencies>
 </project>

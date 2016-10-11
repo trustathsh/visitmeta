@@ -38,10 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.SortedMap;
+import java.util.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -54,6 +51,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -271,6 +269,27 @@ public class GraphResource {
 		}
 
 		return jsonMarshaller().toJson(delta);
+	}
+
+	@GET
+	@Path("adjacencies")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object getAllAdjacencyMatrices(@PathParam("connectionName") String name) {
+		GraphService graphService = null;
+		Map<Long,double[][]> list = new HashMap<>();
+		try {
+			graphService = Application.getConnectionManager().getGraphService(name);
+
+			if(graphService != null)
+				list = graphService.getAdjacencyMatrices(name);
+
+		} catch (ConnectionException e) {
+			e.printStackTrace();
+		}
+		//List<Adjacency> list = new ArrayList<>();
+
+		Gson gson = new Gson();
+		return gson.toJson(list);
 	}
 
 	/**

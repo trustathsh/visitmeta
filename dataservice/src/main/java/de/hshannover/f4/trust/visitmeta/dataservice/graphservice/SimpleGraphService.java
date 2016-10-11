@@ -40,37 +40,27 @@ package de.hshannover.f4.trust.visitmeta.dataservice.graphservice;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.SortedMap;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.hshannover.f4.trust.visitmeta.dataservice.Application;
+import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.*;
+import de.hshannover.f4.trust.visitmeta.exceptions.ifmap.ConnectionException;
+import de.hshannover.f4.trust.visitmeta.interfaces.*;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.DeltaImpl;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifier;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierGraph;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalIdentifierPair;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalLink;
-import de.hshannover.f4.trust.visitmeta.dataservice.internalDatatypes.InternalMetadata;
 import de.hshannover.f4.trust.visitmeta.dataservice.util.GraphHelper;
-import de.hshannover.f4.trust.visitmeta.interfaces.Delta;
-import de.hshannover.f4.trust.visitmeta.interfaces.GraphFilter;
-import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
-import de.hshannover.f4.trust.visitmeta.interfaces.GraphType;
-import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
-import de.hshannover.f4.trust.visitmeta.interfaces.IdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.persistence.Executor;
 import de.hshannover.f4.trust.visitmeta.persistence.Reader;
 import de.hshannover.f4.trust.visitmeta.persistence.inmemory.InMemoryIdentifierGraph;
 import de.hshannover.f4.trust.visitmeta.util.Check;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SimpleGraphService implements GraphService {
 
@@ -610,5 +600,52 @@ public class SimpleGraphService implements GraphService {
 	@Override
 	public double meanOfEdges(long timestamp) {
 		return mExecutor.meanOfEdges(timestamp);
+	}
+
+	@Override
+	public Map<Long, double[][]> getAdjacencyMatrices(String name) throws ConnectionException {
+
+		Map<Long, double[][]> graphMap = new HashMap<>();
+
+		GraphService graphservice = Application.getConnectionManager().getGraphService(name);
+		SortedMap<Long, Long> graphs = graphservice.getChangesMap();
+
+		for (long timestamp: graphs.keySet() ) {
+			// List of Graphs that each is garanteed to be a simple graph
+			List<IdentifierGraph> listgraph = graphservice.getGraphAt(timestamp);
+
+			Adjacency adj = new Adjacency();
+
+			if(listgraph != null && listgraph.size() >= 1) {
+				System.out.println("NICHT null");
+				System.out.println("size: " + listgraph.size());
+
+				for (IdentifierGraph ig: listgraph ) {
+					List<Identifier> graph = ig.getIdentifiers();
+
+					for (Identifier ident : graph ) {
+						for (Link link: ident.getLinks() ) {
+							Identifier from = link.getIdentifiers().getFirst();
+							Identifier to = link.getIdentifiers().getSecond();
+							adj.addNeighbors(from, to);
+
+						}
+					}
+				}
+
+			}
+			else
+				System.out.println("NUUUULLLLLLL");
+
+			graphMap.put(timestamp, adj.getMatrix());
+
+		}
+
+
+		//List<Adjacency> list = new ArrayList<>();
+		//list.add(new Adjacency());
+//        list.add(2.0);
+//        list.add(3.0);
+		return graphMap;
 	}
 }

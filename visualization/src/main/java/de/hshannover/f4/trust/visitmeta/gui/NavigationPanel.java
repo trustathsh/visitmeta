@@ -19,11 +19,7 @@ public class NavigationPanel extends JPanel implements Observer{
 
     private DrawProjection drawProjection;
 
-    private GraphContainer graphContainer;
-
     GraphConnection connection;
-
-    Map<Long, double[][]> adjMatrix;
 
     public NavigationPanel(GraphConnection connection){}
 
@@ -39,25 +35,12 @@ public class NavigationPanel extends JPanel implements Observer{
     @Override
     public void updateUI() {
         super.updateUI();
-        System.out.println("UUPPDAAATTTEEE22");
-        if(graphContainer!= null) {
-            drawProjection.setMatrix(graphContainer.getmAdjacencis());
-            System.out.println("UUPPDAAATTTEEE22");
-            //drawProjection.updateUI();
-        }
     }
 
     @Override
     public void update(Observable o, Object arg) {
         updateUI();
-        System.out.println("UUPPDAAATTTEEE");
 
     }
-
-
-    public void setGraphContainer(GraphContainer graphContainer) {
-        this.graphContainer = graphContainer;
-    }
-
 
 }

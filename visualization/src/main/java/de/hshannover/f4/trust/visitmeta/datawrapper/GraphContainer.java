@@ -43,11 +43,15 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.FactoryCalculator.CalculatorType;
 import de.hshannover.f4.trust.visitmeta.gui.GraphConnection;
+import de.hshannover.f4.trust.visitmeta.gui.NavigationPanel;
 import de.hshannover.f4.trust.visitmeta.gui.util.MapServerRestConnectionImpl;
 import de.hshannover.f4.trust.visitmeta.interfaces.GraphService;
 import de.hshannover.f4.trust.visitmeta.network.FacadeNetwork;
 import de.hshannover.f4.trust.visitmeta.network.GraphNetworkConnection;
 import de.hshannover.f4.trust.visitmeta.network.GraphPool;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is a container class, holding the needed information about a
@@ -71,6 +75,9 @@ public class GraphContainer {
 	private TimeManagerCreation mTimeManagerCreation = null;
 	private TimeManagerDeletion mTimeManagerDeletion = null;
 	private SettingManager mSettingManager = null;
+
+	private NavigationPanel mNavigationPanel;
+	private Map<Long, double[][]> mAdjacencis = new HashMap<>();
 
 	private Thread mFacadeNetworkThread;
 	private Thread mFacadeLogicThread;
@@ -187,6 +194,17 @@ public class GraphContainer {
 	public String getRestUrl() {
 		return mMapSeverConnection.getDataserviceConnection().getUrl() + "/" + mMapSeverConnection.getConnectionName()
 				+ "/graph";
+	}
+
+	public double[][] getmAdjacencis() {
+		//TODO
+		return mAdjacencis.values().iterator().next();
+	}
+
+	public void setmAdjacencis(Map<Long, double[][]> mAdjacencis) {
+		if(mAdjacencis == null)
+			mAdjacencis = new HashMap<>();
+		this.mAdjacencis = mAdjacencis;
 	}
 
 	@Override

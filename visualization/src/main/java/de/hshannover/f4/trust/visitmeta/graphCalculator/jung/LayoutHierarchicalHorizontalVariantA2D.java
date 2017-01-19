@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.graphCalculator.jung;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +51,7 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 /**
  * @author sunnihu
  */
-public class LayoutHierarchical2D_v extends Layout2D {
+public class LayoutHierarchicalHorizontalVariantA2D extends Layout2D {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	// MEMBERS
@@ -62,11 +61,11 @@ public class LayoutHierarchical2D_v extends Layout2D {
 	protected StaticLayout<Node2D, Edge2D> mLayout; // JUNG layout class used
 													// for consistency
 
-	private double mXOffset; // vertical offset between columns
-	private ArrayList<Double> mYPositions; // vertical positions of node
-											// rows
-	private ArrayList<Double> mXPositions; // horizontal positions of next nodes
-											// in rows
+	private double mYOffset; // vertical offset between rows
+	private ArrayList<Double> mXPositions; // horizontal positions of node
+											// columns
+	private ArrayList<Double> mYPositions; // vertical positions of next nodes
+											// in columns
 	private List<Node2D> mDrawnNodes; // list of nodes that have already been
 										// drawn
 
@@ -76,7 +75,7 @@ public class LayoutHierarchical2D_v extends Layout2D {
 	// ////////////////////////////////////////////////////////////////////////////////
 	// CONSTRUCTORS
 
-	public LayoutHierarchical2D_v(Graph2D graph) {
+	public LayoutHierarchicalHorizontalVariantA2D(Graph2D graph) {
 		super(graph, true);
 
 		mDimension = new Dimension(1_000_000_000, 1_000_000_000);
@@ -84,17 +83,18 @@ public class LayoutHierarchical2D_v extends Layout2D {
 		mLayout = new StaticLayout<Node2D, Edge2D>(mGraph.getGraph());
 		mLayout.setSize(mDimension);
 
-		mXOffset = 0.25;
-
-		mYPositions = new ArrayList<>();
+		mYOffset = 0.06;
+		
 
 		mXPositions = new ArrayList<>();
+
+		mYPositions = new ArrayList<>();
 		mDrawnNodes = new ArrayList<Node2D>();
 
 		// ensure that metadata collocation is set to FORK
 		mGraph.alterMetadataCollocationForEntireGraph(MetadataCollocation.FORK);
 	}
-	
+
 	public void maxSize(List<NodeIdentifier2D> nodesId){
 		for(NodeIdentifier2D nodeId:nodesId){
 			if(nodeId.getExpandedLinks2D().size()>maxSize){
@@ -116,14 +116,13 @@ public class LayoutHierarchical2D_v extends Layout2D {
 	public void adjust(int iterations) {
 		LOGGER.trace("Method adjust(" + iterations + ") called.");
 
-		mYPositions.clear();
 		mXPositions.clear();
+		mYPositions.clear();
 
-		mYPositions.add(0.07);
-		mXPositions.add(mXOffset);
+		mXPositions.add(0.3);
+		mYPositions.add(mYOffset);
 		initLayer = 1;
 		maxSize=0;
-
 		mDrawnNodes.clear();
 
 		Collection<Node2D> nodes = mGraph.getGraph().getVertices();
@@ -142,7 +141,7 @@ public class LayoutHierarchical2D_v extends Layout2D {
 					drawNodeIdentifier(nodeId, null, initLayer);
 				}
 				initLayer = 1;
-				mXPositions.set(0, mXPositions.get(0) + mXOffset);
+				mYPositions.set(0, mYPositions.get(0) + mYOffset);
 			}
 		}
 
@@ -238,21 +237,21 @@ public class LayoutHierarchical2D_v extends Layout2D {
 			return;
 		}
 
-		if (layer > mYPositions.size()) {
-			mYPositions.add(layer * 0.07);
-			mXPositions.add(mXOffset);
+		if (layer > mXPositions.size()) {
+			mXPositions.add(layer * 0.3);
+			mYPositions.add(mYOffset);
 		}
 
 		// draw identifier node
-		int colIdy = layer - 1;
-		double x = mXPositions.get(colIdy);
+		int colIdx = layer - 1;
+		double y = mYPositions.get(colIdx);
 		if (nodeMeOld != null) {
-			x = Math.max(getNodePositionX(nodeMeOld) / getDimensionX(), x);
+			y = Math.max(getNodePositionY(nodeMeOld) / getDimensionY(), y);
 		}
 		if (nodeId2D.hasAdjustPermission() && !nodeId2D.wasPicked()) {
-			nodeId2D.setPositionTriggeredByJung(x * getDimensionX(), mYPositions.get(colIdy) * getDimensionY());
+			nodeId2D.setPositionTriggeredByJung(mXPositions.get(colIdx) * getDimensionX(), y * getDimensionY());
 		}
-		mXPositions.set(colIdy, x + mXOffset);
+		mYPositions.set(colIdx, y + mYOffset);
 
 		mDrawnNodes.add(nodeId2D);
 		layer++;
@@ -275,7 +274,9 @@ public class LayoutHierarchical2D_v extends Layout2D {
 		// }
 
 		for (Node2D neighbor2D : neighbors) {
-			assert neighbor2D instanceof NodeMetadata2D;
+			assert neighbor2D instanceof NodeMetadata2D; // neighbor of
+															// identifier must
+															// be metadata
 			NodeMetadata2D nodeMe2D = (NodeMetadata2D) neighbor2D;
 			NodeIdentifier2D end = null;
 			if (nodeId2D.equals(nodeMe2D.getExpandedLink2D().getStart())) {
@@ -289,14 +290,21 @@ public class LayoutHierarchical2D_v extends Layout2D {
 			for (Node2D neighbor : neighbors) {
 				assert neighbor instanceof NodeMetadata2D;
 				NodeMetadata2D nodeMe = (NodeMetadata2D) neighbor2D;
-				NodeIdentifier2D end2=null;
-				if (nodeId2D.equals(nodeMe.getExpandedLink2D().getStart())) {
-					end2 = nodeMe.getExpandedLink2D().getEnd();
-				} else if (nodeId2D.equals(nodeMe.getExpandedLink2D().getEnd())) {
-					end2 = nodeMe.getExpandedLink2D().getStart();
-				}
-				if (end.equals(end2)) {
-					drawNodeMetadata(nodeMe, nodeId2D, layer);
+				if (!nodeMeInLink.contains(nodeMe)) {
+					NodeIdentifier2D end2 = null;
+					// if (end.equals(nodeMe.getExpandedLink2D().getStart())
+					// || end.equals(nodeMe.getExpandedLink2D().getEnd())) {
+					// drawNodeMetadata(nodeMe, nodeId2D, layer);
+					// }
+					if (nodeId2D.equals(nodeMe.getExpandedLink2D().getStart())) {
+						end2 = nodeMe.getExpandedLink2D().getEnd();
+					} else if (nodeId2D.equals(nodeMe.getExpandedLink2D().getEnd())) {
+						end2 = nodeMe.getExpandedLink2D().getStart();
+					}
+
+					if (end2.equals(end)) {
+						drawNodeMetadata(nodeMe, nodeId2D, layer);
+					}
 				}
 			}
 		}
@@ -318,31 +326,31 @@ public class LayoutHierarchical2D_v extends Layout2D {
 		if (mDrawnNodes.contains(nodeMe2D)) {
 			return;
 		}
-		if (layer > mYPositions.size()) {
-			mYPositions.add(layer * 0.07);
-			mXPositions.add(mXOffset);
+		if (layer > mXPositions.size()) {
+			mXPositions.add(layer * 0.3);
+			mYPositions.add(mYOffset);
 		}
 		assert nodeMe2D.getExpandedLink2D() != null || nodeMe2D.getNodeIdentifier2D() != null;
 		if (nodeMe2D.getExpandedLink2D() != null) {
-			int colIdy = layer - 1;
-			double x = mXPositions.get(colIdy);
-			x = Math.max(getNodePositionX(nodeIdOld) / getDimensionX(), x);
+			int colIdx = layer - 1;
+			double y = mYPositions.get(colIdx);
+			y = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), y);
 
 			if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
-				nodeMe2D.setPositionTriggeredByJung(x * getDimensionX(), mYPositions.get(colIdy) * getDimensionY());
+				nodeMe2D.setPositionTriggeredByJung(mXPositions.get(colIdx) * getDimensionX(), y * getDimensionY());
 			}
-			mXPositions.set(colIdy, x + mXOffset);
+			mYPositions.set(colIdx, y + mYOffset);
 			mDrawnNodes.add(nodeMe2D);
 		} else if (nodeMe2D.getNodeIdentifier2D() != null) {
-			int colIdy = layer - 1;
-			double x = mXPositions.get(colIdy);
-			x = Math.max(getNodePositionX(nodeIdOld) / getDimensionX(), x);
+			int colIdx = layer - 1;
+			double y = mYPositions.get(colIdx);
+			y = Math.max(getNodePositionY(nodeIdOld) / getDimensionY(), y);
 
 			if (nodeMe2D.hasAdjustPermission() && !nodeMe2D.wasPicked()) {
-				nodeMe2D.setPositionTriggeredByJung(mXPositions.get(colIdy) * getDimensionX(),
-						mYPositions.get(colIdy) * getDimensionY());
+				nodeMe2D.setPositionTriggeredByJung(mXPositions.get(colIdx) * getDimensionX(),
+						mYPositions.get(colIdx) * getDimensionY());
 			}
-			mXPositions.set(colIdy, x + mXOffset);
+			mYPositions.set(colIdx, y + mYOffset);
 			mDrawnNodes.add(nodeMe2D);
 		}
 	}
@@ -360,6 +368,7 @@ public class LayoutHierarchical2D_v extends Layout2D {
 		if (nodeMe2D.getExpandedLink2D() != null) {
 			// draw all neighbors
 			ExpandedLink2D link = nodeMe2D.getExpandedLink2D();
+			
 			Collection<Node2D> neighbors = mGraph.getGraph().getNeighbors(nodeMe2D);
 			for (Node2D neighbor2D : neighbors) {
 				assert neighbor2D instanceof NodeIdentifier2D;

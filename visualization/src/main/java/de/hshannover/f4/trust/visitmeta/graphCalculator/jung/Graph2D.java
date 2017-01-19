@@ -210,14 +210,14 @@ public class Graph2D {
 		case CIRCULAR:
 			mLayout2D = new LayoutCircular2D(this);
 			break;
-		case HIERARCHICAL_h1:
-			mLayout2D = new LayoutHierarchical2D_1(this);
+		case HIERARCHICAL_HORIZONAL_1:
+			mLayout2D = new LayoutHierarchicalHorizontalVariantA2D(this);
 			break;
-		case HIERARCHICAL_h2:
-			mLayout2D = new LayoutHierarchical2D_2(this);
+		case HIERARCHICAL_HORIZONAL_2:
+			mLayout2D = new LayoutHierarchicalHorizontalVariantB2D(this);
 			break;
-		case HIERARCHICAL_v:
-			mLayout2D = new LayoutHierarchical2D_v(this);
+		case HIERARCHICAL_VERTICAL:
+			mLayout2D = new LayoutHierarchicalVertical2D(this);
 			break;
 		default:
 			mLayout2D = new LayoutForceDirected2D(this);
@@ -295,23 +295,23 @@ public class Graph2D {
 	 * Set layout (hierarchical_h2).
 	 */
 	public void setLayoutHierarchical_h2() {
-		mLayoutType = LayoutType.HIERARCHICAL_h2;
-		mLayout2D = new LayoutHierarchical2D_2(this);
+		mLayoutType = LayoutType.HIERARCHICAL_HORIZONAL_2;
+		mLayout2D = new LayoutHierarchicalHorizontalVariantB2D(this);
 	}
 	
 	/**
 	 * Set layout (hierarchical_h1).
 	 */
 	public void setLayoutHierarchical_h1() {
-		mLayoutType = LayoutType.HIERARCHICAL_h1;
-		mLayout2D = new LayoutHierarchical2D_1(this);
+		mLayoutType = LayoutType.HIERARCHICAL_HORIZONAL_1;
+		mLayout2D = new LayoutHierarchicalHorizontalVariantA2D(this);
 	}
 	/**
 	 * Set layout (hierarchical_h1).
 	 */
 	public void setHierarchical_v() {
-		mLayoutType = LayoutType.HIERARCHICAL_v;
-		mLayout2D = new LayoutHierarchical2D_v(this);
+		mLayoutType = LayoutType.HIERARCHICAL_VERTICAL;
+		mLayout2D = new LayoutHierarchicalVertical2D(this);
 	}
 	/**
 	 * Remove all Elements from graph.

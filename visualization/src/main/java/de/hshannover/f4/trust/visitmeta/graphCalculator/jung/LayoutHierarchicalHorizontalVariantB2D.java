@@ -40,7 +40,6 @@ package de.hshannover.f4.trust.visitmeta.graphCalculator.jung;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +51,7 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 /**
  * @author sunnihu
  */
-public class LayoutHierarchical2D_2 extends Layout2D {
+public class LayoutHierarchicalHorizontalVariantB2D extends Layout2D {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	// MEMBERS
@@ -76,7 +75,7 @@ public class LayoutHierarchical2D_2 extends Layout2D {
 	// ////////////////////////////////////////////////////////////////////////////////
 	// CONSTRUCTORS
 
-	public LayoutHierarchical2D_2(Graph2D graph) {
+	public LayoutHierarchicalHorizontalVariantB2D(Graph2D graph) {
 		super(graph, true);
 
 		mDimension = new Dimension(1_000_000_000, 1_000_000_000);

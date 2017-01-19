@@ -262,9 +262,9 @@ public class MenuBar extends JMenuBar {
 				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
 				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
 				put(LayoutType.CIRCULAR, new JCheckBoxMenuItem("Circular"));
-				put(LayoutType.HIERARCHICAL_h1, new JCheckBoxMenuItem("Hierarchical_h1"));
-				put(LayoutType.HIERARCHICAL_h2, new JCheckBoxMenuItem("Hierarchical_h2"));
-				put(LayoutType.HIERARCHICAL_v, new JCheckBoxMenuItem("Hierarchical_v"));
+				put(LayoutType.HIERARCHICAL_HORIZONAL_1, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant A)"));
+				put(LayoutType.HIERARCHICAL_HORIZONAL_2, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant B)"));
+				put(LayoutType.HIERARCHICAL_VERTICAL, new JCheckBoxMenuItem("Hierarchical (vertical)"));
 			}
 		};
 

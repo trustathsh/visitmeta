@@ -70,14 +70,28 @@ public enum LayoutType{
 	BIPARTITE,
 	
 	/**
-	 * <p> A circular layout adapted to the specific structure of MAP graphs (with link metadata in the
+	 * <p>A circular layout adapted to the specific structure of MAP graphs (with link metadata in the
 	 * inner ring, identifiers on the medium ring and metadata attached to only one identifier on the
 	 * outer ring).</p>
 	 * The layout algorithm itself has been developed by Junbiao Wu during his bachelor thesis.</p>
 	 */
 	CIRCULAR,
 	
-	HIERARCHICAL_h1,
-	HIERARCHICAL_h2,
-	HIERARCHICAL_v
+	/**
+	 * <p>A hierarchical layout that spans horizontally.</p>
+	 * <p>Developed by Sunni Hu during her bachelor thesis.</p>
+	 */
+	HIERARCHICAL_HORIZONAL_1,
+	
+	/**
+	 * <p>A hierarchical layout that spans horizontally.</p>
+	 * <p>Developed by Sunni Hu during her bachelor thesis.</p>
+	 */
+	HIERARCHICAL_HORIZONAL_2,
+	
+	/**
+	 * <p>A hierarchical layout that spans vertically.</p>
+	 * <p>Developed by Sunni Hu during her bachelor thesis.</p>
+	 */
+	HIERARCHICAL_VERTICAL
 }

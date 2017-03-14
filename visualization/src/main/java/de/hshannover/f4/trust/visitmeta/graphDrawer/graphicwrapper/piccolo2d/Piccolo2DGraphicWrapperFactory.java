@@ -42,6 +42,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 
+import de.hshannover.f4.trust.visitmeta.datawrapper.policy.PolicyType;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
 
 /**
@@ -68,7 +69,9 @@ public class Piccolo2DGraphicWrapperFactory {
 
 		switch (typeName) {
 			case "policy-action":
-				return new Piccolo2DPolicyActionGraphicWrapper(selectedNode, selectedNodeText);
+				return new Piccolo2DPolicyActionGraphicWrapper(selectedNode, selectedNodeText, PolicyType.IRONDETECT);
+			case "":
+				return new Piccolo2DPolicyActionGraphicWrapper(selectedNode, selectedNodeText, PolicyType.IRONGPM);
 			case "identity":
 				return new Piccolo2DIdentityGraphicWrapper(selectedNode, selectedNodeText);
 			default:

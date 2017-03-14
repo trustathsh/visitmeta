@@ -7,17 +7,17 @@
  *    | | | |  | |_| \__ \ |_| | (_| |  _  |\__ \|  _  |
  *    |_| |_|   \__,_|___/\__|\ \__,_|_| |_||___/|_| |_|
  *                             \____/
- * 
+ *
  * =====================================================
- * 
+ *
  * Hochschule Hannover
  * (University of Applied Sciences and Arts, Hannover)
  * Faculty IV, Dept. of Computer Science
  * Ricklinger Stadtweg 118, 30459 Hannover, Germany
- * 
+ *
  * Email: trust@f4-i.fh-hannover.de
  * Website: http://trust.f4.hs-hannover.de/
- * 
+ *
  * This file is part of visitmeta-visualization, version 0.6.0,
  * implemented by the Trust@HsH research group at the Hochschule Hannover.
  * %%
@@ -26,9 +26,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,12 +87,12 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 	private static final String POLICY_QUALIFIED_NAME = "policy";;
 	private static final String POLICY_METADATA_NS_URI = "http://www.trust.f4.hs-hannover.de/2015/POLICY/METADATA/1";
 
-	private static final String POLICY_METADATA_LINK = "has-element";
+	private static final String POLICY_LINK_CONDITION_TO_SIGNATURE = "condition-has-signature";
 
 	private Logger logger = Logger.getLogger(EditPolicyNodeContextMenuItem.class);
-	
+
 	private List<String> policyTypeNames = Arrays.asList("signature");
-//	private List<String> policyTypeNames = Arrays.asList("signature", "anomaly", "rule", "condition");
+	// private List<String> policyTypeNames = Arrays.asList("signature", "anomaly", "rule", "condition");
 
 	private IfmapConnection mIfmapConnection;
 
@@ -107,13 +107,15 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public void actionPerformed(GraphicWrapper wrapper) {
 		GraphicWrapper condition = findConditionNode(wrapper);
 		if (condition == null) {
-			logger.error("No condition identifier was found for signature: " + wrapper.getData().toString());
-			DialogHelper.showErrorDialog("No condition identifier was found for signature: " + wrapper.getData().toString(), "No condition identifier found");
+			logger.error("No condition identifier was found for signature: "
+					+ wrapper.getData().toString());
+			DialogHelper.showErrorDialog("No condition identifier was found for signature: "
+					+ wrapper.getData().toString(), "No condition identifier found");
 		} else {
 			JDialog editWindow = createGUI(wrapper, condition);
 			editWindow.setVisible(true);
@@ -122,30 +124,32 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 
 	private JDialog createGUI(final GraphicWrapper originalSignature, final GraphicWrapper condition) {
 		Propable originalSignaturePropable = originalSignature.getData();
-		
+
 		Dialog owner = null;
 		final JDialog window = new JDialog(owner, getItemTitle());
 		window.setSize(400, 200);
 		window.setLayout(new BorderLayout());
-		
+
 		final Document originalSignatureDocument = ExtendedIdentifierHelper.getDocument(originalSignaturePropable);
 		final Document newSignatureDocument = ExtendedIdentifierHelper.getDocument(originalSignaturePropable);
 		final Document conditionDocument = ExtendedIdentifierHelper.getDocument(condition.getData());
-		
+
 		String id = originalSignatureDocument.getElementsByTagName("id").item(0).getTextContent();
-		String featureExpression = originalSignatureDocument.getElementsByTagName("featureExpression").item(0).getTextContent();
-		
+		String featureExpression =
+				originalSignatureDocument.getElementsByTagName("featureExpression").item(0).getTextContent();
+
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
 		JLabel titleLabel = new JLabel("Signature");
-		JLabel idLabel = new JLabel("ID: " + id);
+		JLabel idLabel = new JLabel("ID: "
+				+ id);
 		JLabel featureExpressionLabel = new JLabel("Feature Expression:");
 		final JTextField featureExpressionValueTextField = new JTextField(featureExpression);
 		contentPanel.add(titleLabel);
 		contentPanel.add(idLabel);
 		contentPanel.add(featureExpressionLabel);
 		contentPanel.add(featureExpressionValueTextField);
-		
+
 		JPanel buttonPanel = new JPanel();
 		JButton saveButton = new JButton("Save changes");
 		saveButton.addActionListener(new ActionListener() {
@@ -153,22 +157,23 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String newFeatureExpressionValue = featureExpressionValueTextField.getText();
-					
+
 					Node node = newSignatureDocument.getElementsByTagName("featureExpression").item(0);
 					node.setTextContent(newFeatureExpressionValue);
-					
+
 					PublishRequest deleteRequest = createDeleteRequest(originalSignatureDocument, conditionDocument);
 					PublishRequest updateRequest = createUpdateRequest(newSignatureDocument, conditionDocument);
-					
+
 					mIfmapConnection.send(deleteRequest);
 					mIfmapConnection.send(updateRequest);
 				} catch (IfmapErrorResult | IfmapException exception) {
-					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80), e.getClass().getSimpleName());
+					DialogHelper.showErrorDialog(StringHelper.breakLongString(e.toString(), 80),
+							e.getClass().getSimpleName());
 				}
 				window.setVisible(false);
 			}
 		});
-		
+
 		JButton discardButton = new JButton("Discard changes");
 		discardButton.addActionListener(new ActionListener() {
 			@Override
@@ -178,28 +183,28 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 		});
 		buttonPanel.add(saveButton);
 		buttonPanel.add(discardButton);
-		
+
 		JRadioButton destinationSwitchProductive = new JRadioButton("Productive", true);
 		JRadioButton destinationSwitchWhatIf = new JRadioButton("What-If", false);
 		ButtonGroup destinationSwitch = new ButtonGroup();
 		destinationSwitch.add(destinationSwitchProductive);
 		destinationSwitch.add(destinationSwitchWhatIf);
-		
+
 		JPanel destinationSwitchPanel = new JPanel();
 		destinationSwitchPanel.add(destinationSwitchProductive);
 		destinationSwitchPanel.add(destinationSwitchWhatIf);
-		
+
 		window.add(destinationSwitchPanel, BorderLayout.NORTH);
 		window.add(contentPanel, BorderLayout.CENTER);
 		window.add(buttonPanel, BorderLayout.SOUTH);
-		
+
 		return window;
 	}
-	
+
 	private GraphicWrapper findConditionNode(GraphicWrapper wrapper) {
 		List<GraphicWrapper> edgeNodes = wrapper.getEdgesNodes();
 		for (GraphicWrapper edgeNode : edgeNodes) {
-			if (edgeNode.getNodeTypeName().equals(POLICY_METADATA_LINK)) {
+			if (edgeNode.getNodeTypeName().equals(POLICY_LINK_CONDITION_TO_SIGNATURE)) {
 				List<GraphicWrapper> edgeNodes2 = edgeNode.getEdgesNodes();
 				for (GraphicWrapper edgeNode2 : edgeNodes2) {
 					if (edgeNode2 instanceof IdentityGraphicWrapper) {
@@ -211,13 +216,13 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
 	private PublishRequest createUpdateRequest(Document signatureDocument, Document conditionDocument) {
 		PublishRequest request = Requests.createPublishReq();
-		
+
 		de.hshannover.f4.trust.ifmapj.identifier.Identifier signatureIdentifier;
 		de.hshannover.f4.trust.ifmapj.identifier.Identifier conditionIdentifier;
 		try {
@@ -227,42 +232,42 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 			PublishUpdate publishUpdate = Requests.createPublishUpdate();
 			publishUpdate.setIdentifier1(signatureIdentifier);
 			publishUpdate.setIdentifier2(conditionIdentifier);
-			publishUpdate.addMetadata(createMetadata());
+			publishUpdate.addMetadata(createLink(POLICY_LINK_CONDITION_TO_SIGNATURE));
 			publishUpdate.setLifeTime(MetadataLifetime.forever);
-			
+
 			request.addPublishElement(publishUpdate);
 		} catch (MarshalException e) {
 			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception");
 			logger.error(e.getMessage());
 		}
-		
+
 		return request;
 	}
-	
+
 	private PublishRequest createDeleteRequest(Document signatureDocument, Document conditionDocument) {
 		PublishRequest request = Requests.createPublishReq();
-		
+
 		de.hshannover.f4.trust.ifmapj.identifier.Identifier signatureIdentifier;
 		de.hshannover.f4.trust.ifmapj.identifier.Identifier conditionIdentifier;
 		try {
 			signatureIdentifier = Identifiers.createExtendedIdentity(signatureDocument);
 			conditionIdentifier = Identifiers.createExtendedIdentity(conditionDocument);
-			
+
 			PublishDelete publishDelete = Requests.createPublishDelete();
 			publishDelete.setIdentifier1(signatureIdentifier);
 			publishDelete.setIdentifier2(conditionIdentifier);
-			
+
 			request.addPublishElement(publishDelete);
 		} catch (MarshalException e) {
 			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception");
 			logger.error(e.getMessage());
 		}
-		
+
 		return request;
 	}
 
-	private Document createMetadata() {
-		Document doc = mMetadataFactory.create(POLICY_METADATA_LINK, POLICY_QUALIFIED_NAME,
+	private Document createLink(String link) {
+		Document doc = mMetadataFactory.create(link, POLICY_QUALIFIED_NAME,
 				POLICY_METADATA_NS_URI, Cardinality.singleValue);
 
 		return doc;
@@ -277,8 +282,10 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 	public boolean canHandle(Propable node) {
 		if (node instanceof Identifier) {
 			Identifier i = (Identifier) node;
-			if (ExtendedIdentifierHelper.isExtendedIdentifier(i) &&
-					policyTypeNames.contains(ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(i).toLowerCase())) {
+			if (ExtendedIdentifierHelper.isExtendedIdentifier(i)
+					&&
+					policyTypeNames
+							.contains(ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(i).toLowerCase())) {
 				return true;
 			} else if (policyTypeNames.contains(i.getTypeName())) {
 				return true;

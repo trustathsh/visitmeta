@@ -60,10 +60,11 @@ visualization:
       # COMPACT:     a style that tries to use a single line, but will use
       #              additional lines when necessary and useful (for example
       #              for Extended Identifiers)
-      style: COMPACT
+      # POLICY_COMPACT: 
+      style: POLICY_COMPACT
       # If true, the prefix 'extended identifier: ' is shown before the actual name of an extended identifier.
       # This is not supported by all styles. 
-      showextendedidentifierprefix: true
+      showextendedidentifierprefix: false
     node:
       # Sets the geometric style of identifier nodes; possible values are:
       # RECTANGLES_WITH_ROUNDED_CORNERS
@@ -77,7 +78,8 @@ visualization:
       # SINGLE_LINE:    just the typename of the metadata is used
       # WITH_TIMESTAMP: adds a line with the publisher timestamp to the typename
       # COMPACT:        further information on additional lines
-      style: COMPACT
+      # POLICY_COMPACT: 
+      style: POLICY_COMPACT
     node:
       # Sets the geometric style of identifier nodes; possible values are:
       # RECTANGLES_WITH_ROUNDED_CORNERS
@@ -91,8 +93,9 @@ visualization:
     # STRAIGHT_DASHED_LINE
     # ORTHOGONAL_LINE
     # CURVED_LINE
+    # POLICY: 
     # EXAMPLE (shows how different types of identifier/metadata can be rendered differently)
-    style: STRAIGHT_LINE
+    style: POLICY
   history:
     navigation:
       # Sets the control mechanism for history navigation; possible values are:

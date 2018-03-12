@@ -38,11 +38,16 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
+import java.net.URI;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 
+import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -101,10 +106,19 @@ public class RestService implements Runnable {
 		for (Class<?> clazz : mClasses) {
 			log.debug(clazz.getPackage() + "." + clazz.getSimpleName());
 		}
+		
+		SSLContextConfigurator sslContext = new SSLContextConfigurator();
+		sslContext.setKeyStoreFile("config/visitmeta.jks");
+		sslContext.setKeyStorePass("visitmeta");
+		HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, resourceConfig);
 
 		try {
-			HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
-					resourceConfig);
+			/*HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
+					resourceConfig); before secure */
+			
+			HttpServer server = GrizzlyServerFactory.createHttpServer(URI.create(mUrl), handler, true,
+					new SSLEngineConfigurator(sslContext, false, false, false));
+			
 			if (server.isStarted()) {
 				log.debug("REST service running.");
 			} else {

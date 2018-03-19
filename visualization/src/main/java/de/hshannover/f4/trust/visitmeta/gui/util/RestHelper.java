@@ -67,6 +67,11 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 
+// secure
+import java.security.NoSuchAlgorithmException;
+import javax.net.ssl.SSLContext;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
+
 public class RestHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(RestHelper.class);
@@ -232,6 +237,17 @@ public class RestHelper {
 		ClientConfig config = new DefaultClientConfig();
 		Client client = Client.create(config);
 
+		// secure REST-Interface, Alexander Kuzminykh, 19.03.2018
+		try {
+			config.getProperties()
+				.put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES,
+					new HTTPSProperties());
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		// eigenen HostnameVerifier? eigenen SSLContext?
+		// end secure
+		
 		URI uri_connect = UriBuilder.fromUri(dataserviceConnection.getUrl()).build();
 		WebResource resource = client.resource(uri_connect);
 		return resource;

@@ -1,4 +1,4 @@
 localDataservice:
-  dataserviceRestUrl: http://localhost:8000
+  dataserviceRestUrl: https://localhost:8000
   rawXml: true
   connected: true

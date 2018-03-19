@@ -107,17 +107,21 @@ public class RestService implements Runnable {
 			log.debug(clazz.getPackage() + "." + clazz.getSimpleName());
 		}
 		
+		// secure REST-Interface, Alexander Kuzminykh, 19.03.2018
+		
 		SSLContextConfigurator sslContext = new SSLContextConfigurator();
 		sslContext.setKeyStoreFile("config/visitmeta.jks");
 		sslContext.setKeyStorePass("visitmeta");
+		//sslContext.setTrustStoreFile("config/visitmeta.jks");
+		//sslContext.setTrustStorePass("visitmeta");
 		HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, resourceConfig);
-
+		
 		try {
 			/*HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
 					resourceConfig); before secure */
 			
-			HttpServer server = GrizzlyServerFactory.createHttpServer(URI.create(mUrl), handler, true,
-					new SSLEngineConfigurator(sslContext, false, false, false));
+ 			HttpServer server = GrizzlyServerFactory.createHttpServer(URI.create(mUrl), handler, true,
+				new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(false));
 			
 			if (server.isStarted()) {
 				log.debug("REST service running.");

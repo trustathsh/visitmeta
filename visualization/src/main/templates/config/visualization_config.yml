@@ -25,7 +25,7 @@ visualization:
     # additional connection to a VisITMeta dataservice
     dataservice:
       # URL of the VisITMeta dataservice REST service
-      url: http://localhost:8000
+      url: https://localhost:8000
       # Connection name that is used to retrieve JSON graph data
       connectionname: localMAPServer
   network:

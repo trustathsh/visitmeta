@@ -41,7 +41,9 @@ package de.hshannover.f4.trust.visitmeta.gui.util;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.NoSuchAlgorithmException;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -57,6 +59,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
@@ -230,11 +233,23 @@ public class RestHelper {
 
 	private static WebResource buildWebResource(DataserviceConnection dataserviceConnection) {
 		ClientConfig config = new DefaultClientConfig();
+		
+		// secure REST-Interface, Alexander Kuzminykh, 19.03.2018
+		try {
+			config.getProperties()
+	        .put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES,
+	                new HTTPSProperties());
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		
+		// eigenen HostnameVerifier? eigenen SSLContext?
+		// end secure
+		
 		Client client = Client.create(config);
 
 		URI uri_connect = UriBuilder.fromUri(dataserviceConnection.getUrl()).build();
 		WebResource resource = client.resource(uri_connect);
 		return resource;
 	}
-
 }

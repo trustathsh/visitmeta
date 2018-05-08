@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.dataservice.rest;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Set;
 
@@ -107,31 +108,43 @@ public class RestService implements Runnable {
 			log.debug(clazz.getPackage() + "." + clazz.getSimpleName());
 		}
 		
-		// secure REST-Interface, Alexander Kuzminykh, 19.03.2018
-		
-		SSLContextConfigurator sslContext = new SSLContextConfigurator();
-		sslContext.setKeyStoreFile("config/visitmeta.jks");
-		sslContext.setKeyStorePass("visitmeta");
-		//sslContext.setTrustStoreFile("config/visitmeta.jks");
-		//sslContext.setTrustStorePass("visitmeta");
-		HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, resourceConfig);
-		
-		try {
-			/*HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
-					resourceConfig); before secure */
-			
- 			HttpServer server = GrizzlyServerFactory.createHttpServer(URI.create(mUrl), handler, true,
-				new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(false));
-			
-			if (server.isStarted()) {
-				log.debug("REST service running.");
-			} else {
-				log.warn("REST service NOT running.");
+		// secure REST-Interface, Alexander Kuzminykh
+		if (mUrl.substring(0, 5).equals("https")) {
+			SSLContextConfigurator sslContext = new SSLContextConfigurator();
+			sslContext.setKeyStoreFile(new File("config/visitmeta.jks").getAbsolutePath());
+			sslContext.setKeyStorePass("visitmeta");
+			sslContext.setTrustStoreFile("config/visitmeta.jks");
+			sslContext.setTrustStorePass("visitmeta");
+			HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, resourceConfig);
+			try {
+	 			HttpServer server = GrizzlyServerFactory.createHttpServer(URI.create(mUrl), handler, true,
+					new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true));
+				
+				if (server.isStarted()) {
+					log.debug("REST service running.");
+				} else {
+					log.warn("REST service NOT running.");
+				}
+				// TODO shutdown server properly
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-			// TODO shutdown server properly
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} else {
+			try {
+				HttpServer server = GrizzlyServerFactory.createHttpServer(mUrl,
+						resourceConfig);
+	 			
+				if (server.isStarted()) {
+					log.debug("REST service running.");
+				} else {
+					log.warn("REST service NOT running.");
+				}
+				// TODO shutdown server properly
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
+		// end secure
 
 		try {
 			synchronized (this) {

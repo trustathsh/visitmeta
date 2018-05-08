@@ -52,6 +52,8 @@ import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyType;
  *
  */
 public class VisualizationConfig {
+	
+	public static final String CONNECTION_DATASERVICESSL_VERIFY = "visualization.connection.dataserviceSSL.verifyHostname";
 
 	public static final String KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX =
 			"visualization.identifier.text.showextendedidentifierprefix";

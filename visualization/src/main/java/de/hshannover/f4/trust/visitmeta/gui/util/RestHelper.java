@@ -38,6 +38,10 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +62,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.data.DataManager;
 import de.hshannover.f4.trust.visitmeta.exceptions.JSONHandlerException;
 import de.hshannover.f4.trust.visitmeta.exceptions.RESTException;
@@ -66,11 +73,27 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnec
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 // secure
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.SSLContext;
+
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.KeyManagerFactory;
 
 public class RestHelper {
 
@@ -235,22 +258,99 @@ public class RestHelper {
 
 	private static WebResource buildWebResource(DataserviceConnection dataserviceConnection) {
 		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
-
-		// secure REST-Interface, Alexander Kuzminykh, 19.03.2018
-		try {
-			config.getProperties()
-				.put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES,
-					new HTTPSProperties());
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error(e.getMessage(), e);
+		Properties props = Main.getConfig();
+		
+		// secure REST-Interface, Alexander Kuzminykh
+		
+		if (dataserviceConnection.getUrl().substring(0, 5).equals("https")) {
+			// enables "localhost" in url
+			
+			boolean verify = false;
+			try {
+				verify = props.getBoolean(VisualizationConfig.CONNECTION_DATASERVICESSL_VERIFY);
+			} catch (PropertyException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+			HostnameVerifier hostnameVerifier = null;
+			if (verify) {
+				hostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+			} else {
+				hostnameVerifier = new HostnameVerifier() {
+					@Override
+					public boolean verify(String hostname, SSLSession sslSession) {
+						return true;
+					}
+				};
+			}
+			
+			// disables ssl validation
+			TrustManager[] trustAllCerts = getTrustAllKeystore();
+			
+			try {
+				SSLContext ctx = SSLContext.getInstance("SSL");
+								
+				String defaultAlgo = KeyManagerFactory.getDefaultAlgorithm();
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance(defaultAlgo);
+				KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+				ks.load(new FileInputStream(
+						new File(props.getString(VisualizationConfig.KEY_CONNECTION_IFMAP_TRUSTSTORE_PATH)))
+						, props.getString(VisualizationConfig.KEY_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD).toCharArray());
+				kmf.init(ks, props.getString(VisualizationConfig.KEY_CONNECTION_IFMAP_TRUSTSTORE_PASSWORD).toCharArray());
+				
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance(defaultAlgo);
+				tmf.init(ks);
+				
+				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+				
+				config.getProperties()
+					.put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES,
+						new HTTPSProperties(hostnameVerifier, ctx));
+			} catch (NoSuchAlgorithmException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (KeyManagementException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (KeyStoreException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (CertificateException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (FileNotFoundException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (PropertyException e) {
+				LOGGER.error(e.getMessage(), e);
+			} catch (UnrecoverableKeyException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
 		}
-		// eigenen HostnameVerifier? eigenen SSLContext?
 		// end secure
+		
+		Client client = Client.create(config);
 		
 		URI uri_connect = UriBuilder.fromUri(dataserviceConnection.getUrl()).build();
 		WebResource resource = client.resource(uri_connect);
 		return resource;
 	}
+	
+	// Für den Fall, dass Servercerts nicht überprüft werden sollen
+	private static TrustManager[] getTrustAllKeystore() {
+		return new TrustManager[] {new X509TrustManager() {
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// NOTHING
+			}
 
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// NOTHING
+			}
+
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+		}};
+	}
 }

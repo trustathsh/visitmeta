@@ -1,5 +1,11 @@
 # REST-Service url for the dataservice
-restServiceUrl: https://127.0.0.1:8000/
+restServiceUrl: http://127.0.0.1:8000/
+
+# REST-Service with SSL
+restServiceSSLUrl: https://127.0.0.1:8445/
+
+# run REST-Service with SSL?
+ssl: true
 
 # settings of each database connection
 database:

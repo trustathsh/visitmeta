@@ -90,8 +90,9 @@ public abstract class Application {
 	/**
 	 * @param args
 	 * @throws InterruptedException
+	 * @throws PropertyException 
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, PropertyException {
 		log.info("VisITMeta dataservice application v" + DATASERVICE_VERSION
 				+ " started.");
 
@@ -116,7 +117,7 @@ public abstract class Application {
 		} catch (ConnectionException e) {
 			log.error(e.toString());
 		}
-
+		
 		startRestService(modules);
 
 		log.info("dataservice started successfully");
@@ -166,12 +167,20 @@ public abstract class Application {
 		}
 	}
 
-	private static void startRestService(List<DataserviceModule> modules) {
+	private static void startRestService(List<DataserviceModule> modules) throws PropertyException {
 		log.info("Start RestService");
-
+		
+		String urlVariable = "";
+		// run Service with SSL?
+		if (Application.getConfig().getBoolean("ssl")) {
+			urlVariable = "restServiceSSLUrl";
+		} else {
+			urlVariable = "restServiceUrl";
+		}
+		
 		String url = "";
 		try {
-			url = Application.getConfig().getString("restServiceUrl");
+			url = Application.getConfig().getString(urlVariable);
 		} catch (PropertyException e) {
 			log.fatal(e.toString(), e);
 			throw new RuntimeException("could not load requested properties", e);

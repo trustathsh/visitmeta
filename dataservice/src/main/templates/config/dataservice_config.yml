@@ -5,7 +5,7 @@ restServiceUrl: http://127.0.0.1:8000/
 restServiceSSLUrl: https://127.0.0.1:8445/
 
 # run REST-Service with SSL?
-ssl: true
+ssl: false
 
 # settings of each database connection
 database:

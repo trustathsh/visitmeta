@@ -38,6 +38,8 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -58,14 +60,170 @@ import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
  */
 public class MetadataInformationCompact implements MetadataInformationStrategy {
 
+	private static final List<String> TYPENAMES_FROM_METADATA_FOR_NETWORK_SECURITY = Arrays.asList("capability",
+			"device-attribute", "device-characteristic", "enforcement-report", "event", "ip-mac", "layer2-information",
+			"location", "request-for-investigation", "role", "unexpected-behavior", "wlan-information");
+
+	private static final String NAMESPACE_URI_METADATA_FOR_NETWORK_SECURITY = "meta";
+
 	@Override
 	public String getText(Metadata metadata) {
-		Document document = DocumentUtils.parseXmlString(metadata.getRawData());
-		Map<String, String> map = DocumentUtils.extractInformation(document,
-				DocumentUtils.NAME_TYPE_VALUE);
+		String typename = metadata.getTypeName();
 		StringBuilder sb = new StringBuilder();
-		sb.append(metadata.getTypeName());
 
+		sb.append(typename);
+
+		if (TYPENAMES_FROM_METADATA_FOR_NETWORK_SECURITY.contains(typename)) {
+			handleIFMAPMetadataForNetworkSecurity(typename, metadata, sb);
+		} else {
+			handleUnknownMetadata(typename, metadata, sb);
+		}
+
+		return sb.toString();
+	}
+
+	private void handleIFMAPMetadataForNetworkSecurity(String typename, Metadata metadata, StringBuilder sb) {
+		String xpathPrefixElement = "/" + NAMESPACE_URI_METADATA_FOR_NETWORK_SECURITY + ":" + typename + "/";
+		String xpathPrefixAttribute = "/" + NAMESPACE_URI_METADATA_FOR_NETWORK_SECURITY + ":" + typename + "[@";
+		String xpathPostfixAttrubute = "]";
+
+		switch (typename) {
+		case "capability":
+			// 1-1 name
+			// 0-1 administrative-domain
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "name", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "administrative-domain", " (", ")");
+			break;
+		case "device-attribute":
+			// 1-1 name
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "name", "\n", "");
+			break;
+		case "device-characteristic":
+			// 0-1 manufacturer
+			// 0-1 model
+			// 0-1 os
+			// 0-1 os-version
+			// 0 device-type
+			// 1-1 discovered-time
+			// 1-1 discoverer-id
+			// 1 discoverer-method
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "manufacturer", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "model", "/", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "os", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "os-version", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "device-type", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discovered-time", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discoverer-id", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discoverer-method", ", ", "");
+			break;
+		case "enforcement-report":
+			// 1-1 enforcement-action
+			// 0-1 other-type-definition
+			// 0-1 enforcement-reason
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "enforcement-action", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "other-type-definition", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "enforcement-reason", "\n", "");
+			break;
+		case "event":
+			// 1-1 discovered-time
+			// 1-1 discoverer-id
+			// 1-1 magnitude
+			// 1-1 confidence
+			// 1-1 significance
+			// 0-1 type
+			// 0-1 other-type-definition
+			// 0-1 information
+			// 0-1 vulnerability-uri
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discovered-time", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discoverer-id", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "magnitude", "\nmagnitude: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "confidence", "\nconfidence: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "significance", "\nsignificance: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\ntpye: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "other-type-definition", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "vulnerability-uri", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "information", "\n", "");
+			break;
+		// case "ip-mac":
+		// /meta:ip-mac/end-time
+		// 0-1 start-time
+		// 0-1 end-time
+		// 0-1 dhcp-server
+		// break;
+		case "layer2-information":
+			// 0-1 vlan
+			// 0-1 vlan-name
+			// 0-1 port
+			// 0-1 administrative-domain
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "vlan", "\nvlan #", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "vlan-name", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "port", ", port: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "administrative-domain", "\n", "");
+			break;
+		case "location":
+			// 1-x location-information
+			// attr type
+			// attr value
+			// 1-1 discovered-time
+			// 1-1 discoverer-id
+			appendIfNotEmpty(sb, metadata, xpathPrefixAttribute + "type" + xpathPostfixAttrubute, "", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixAttribute + "value" + xpathPostfixAttrubute, "", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discovered-time", "", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discoverer-id", "", "");
+			break;
+		case "request-for-investigation":
+			// 0-1 attr multi qualifier
+			appendIfNotEmpty(sb, metadata, xpathPrefixAttribute + "qualifier" + xpathPostfixAttrubute, "\nqualifier: ",
+					"");
+			break;
+		case "role":
+			// 0-1 admnistrative-domain
+			// 1-1 name
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "name", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "administrative-domain", "\n", "");
+			break;
+		case "unexpected-behavior":
+			// 1-1 discovered-time
+			// 1-1 discoverer-id
+			// 0-1 information
+			// 1-1 magnitude
+			// 0-1 confidence
+			// 1-1 significance
+			// 0-1 type
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discovered-time", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "discoverer-id", ", ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "information", "\n", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "magnitude", "\nmagnitude: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "confidence", "\nconfidence: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "significance", "\nsignificance: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\n", "");
+			break;
+		case "wlan-information":
+			// 0-1 ssid
+			// 1-x ssid-unicast-security
+			// 1-1 ssid-group-security
+			// 1-x ssid-management-security
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "ssid", "\nssid: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "ssid-unicast-security", "\nsecurity-unicast: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "ssid-group-security", ", security-group: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "ssid-management-security", ", security-management: ",
+					"");
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void appendIfNotEmpty(StringBuilder sb, Metadata metadata, String xpath, String prefix, String postfix) {
+		if (metadata.hasProperty(xpath)) {
+			sb.append(prefix + metadata.valueFor(xpath) + postfix);
+		}
+	}
+
+	private void handleUnknownMetadata(String typename, Metadata metadata, StringBuilder sb) {
+		// TODO: elements and/or attribute???
+		Document document = DocumentUtils.parseXmlString(metadata.getRawData());
+		Map<String, String> map = DocumentUtils.extractInformation(document, DocumentUtils.NAME_TYPE_VALUE);
 		String name = map.get("name");
 		String type = map.get("value");
 		String value = map.get("type");
@@ -105,8 +263,6 @@ public class MetadataInformationCompact implements MetadataInformationStrategy {
 			sb.append("\n");
 			sb.append(value);
 		}
-
-		return sb.toString();
 	}
 
 }

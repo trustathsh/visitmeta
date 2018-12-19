@@ -56,13 +56,15 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.visitmeta.graphCalculator.JungCalculator;
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.gui.MainWindow.SupportedLaF;
 import de.hshannover.f4.trust.visitmeta.gui.dialog.ConnectionDialog;
 import de.hshannover.f4.trust.visitmeta.gui.util.Dataservices;
 import de.hshannover.f4.trust.visitmeta.interfaces.connections.DataserviceConnection;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.Data;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 /**
  *
@@ -71,6 +73,8 @@ public class MenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MenuBar.class);
 
+	private Properties mConfig = Main.getConfig();
+	
 	private GuiController mController = null;
 	/* Actions */
 	private JMenu mMenuActions = null;
@@ -265,6 +269,7 @@ public class MenuBar extends JMenuBar {
 				put(LayoutType.HIERARCHICAL_HORIZONAL_1, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant A)"));
 				put(LayoutType.HIERARCHICAL_HORIZONAL_2, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant B)"));
 				put(LayoutType.HIERARCHICAL_VERTICAL, new JCheckBoxMenuItem("Hierarchical (vertical)"));
+				put(LayoutType.KAMADA_KAWAI, new JCheckBoxMenuItem("Kamada-Kawai"));
 			}
 		};
 
@@ -285,10 +290,6 @@ public class MenuBar extends JMenuBar {
 			});
 		}
 
-		// TODO: Initialize layout type from user settings/preferences, remove
-		// dependency on JungCalculator. <VA> 2014-08-05
-		layoutMap.get(JungCalculator.DEFAULT_LAYOUT_TYPE).setSelected(true);
-
 		mMenuItemDualViewGraph = new JCheckBoxMenuItem("Dual View");
 		mnSettings.add(mMenuItemDualViewGraph);
 
@@ -303,6 +304,11 @@ public class MenuBar extends JMenuBar {
 				}
 			}
 		});
+		
+		String layoutTypeString = mConfig.getString(VisualizationConfig.KEY_CALCULATION_DEFAULT_LAYOUTTYPE,
+				VisualizationConfig.DEFAULT_VALUE_CALCULATION_DEFAULT_LAYOUTTYPE);
+		LayoutType layoutType = LayoutType.valueOf(layoutTypeString);
+		layoutMap.get(layoutType).setSelected(true);
 	}
 
 }

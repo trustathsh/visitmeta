@@ -82,17 +82,18 @@ import de.hshannover.f4.trust.visitmeta.util.StringHelper;
 
 public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 
-	private static final Object POLICY_IDENTIFIER_CONDITION = "condition";
+	private static final String POLICY_IDENTIFIER_CONDITION = "condition";
+	private static final String POLICY_IDENTIFIER_SIGNATURE = "signature";
 
 	private static final String POLICY_QUALIFIED_NAME = "policy";;
 	private static final String POLICY_METADATA_NS_URI = "http://www.trust.f4.hs-hannover.de/2015/POLICY/METADATA/1";
 
-	private static final String POLICY_METADATA_LINK = "has-element";
+	private static final String POLICY_METADATA_LINK = "condition-has-signature";
 
 	private Logger logger = Logger.getLogger(EditPolicyNodeContextMenuItem.class);
 	
-	private List<String> policyTypeNames = Arrays.asList("signature");
-//	private List<String> policyTypeNames = Arrays.asList("signature", "anomaly", "rule", "condition");
+	private List<String> policyTypeNames = Arrays.asList(POLICY_IDENTIFIER_SIGNATURE);
+//	private List<String> policyTypeNames = Arrays.asList(POLICY_IDENTIFIER_SIGNATURE, "anomaly", "rule", "condition");
 
 	private IfmapConnection mIfmapConnection;
 
@@ -197,8 +198,10 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 	}
 	
 	private GraphicWrapper findConditionNode(GraphicWrapper wrapper) {
+		// get all "outgoing" edges from the selected signature-identifier/node
 		List<GraphicWrapper> edgeNodes = wrapper.getEdgesNodes();
 		for (GraphicWrapper edgeNode : edgeNodes) {
+			// for every outgoing edge, check if the link is of the type that connects a condition with a signature node
 			if (edgeNode.getNodeTypeName().equals(POLICY_METADATA_LINK)) {
 				List<GraphicWrapper> edgeNodes2 = edgeNode.getEdgesNodes();
 				for (GraphicWrapper edgeNode2 : edgeNodes2) {
@@ -232,7 +235,7 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 			
 			request.addPublishElement(publishUpdate);
 		} catch (MarshalException e) {
-			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception");
+			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception when trying to create the update request upon configuration change");
 			logger.error(e.getMessage());
 		}
 		
@@ -254,7 +257,7 @@ public class EditPolicyNodeContextMenuItem implements ContextMenuItem {
 			
 			request.addPublishElement(publishDelete);
 		} catch (MarshalException e) {
-			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception");
+			DialogHelper.showErrorDialog(e.getMessage(), "Marshal Exception when trying to create the delete request upon configuration change");
 			logger.error(e.getMessage());
 		}
 		

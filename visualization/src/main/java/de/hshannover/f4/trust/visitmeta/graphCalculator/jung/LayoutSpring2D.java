@@ -38,18 +38,15 @@
  */
 package de.hshannover.f4.trust.visitmeta.graphCalculator.jung;
 
-
-
-
-
 import java.awt.Dimension;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
-
-
 
 /**
  * <p>A spring-layout.</p>
@@ -63,8 +60,9 @@ public class LayoutSpring2D extends Layout2D{
 
 	// ///////////////////////////////////////////////////////////////////////////////////// MEMBERS
 
-
 	protected SpringLayout<Node2D, Edge2D> mLayout;
+	
+	private Properties mConfig = Main.getConfig();
 
 
 	/**
@@ -126,9 +124,9 @@ public class LayoutSpring2D extends Layout2D{
 		super(graph, false);
 
 		mDimension = new Dimension(1000, 1000);
-		mStretch = 0.7;
-		mRepulsionRange = 100;
-		mForceMultiplier = 1.0 / 3.0;
+		mStretch = mConfig.getDouble(VisualizationConfig.KEY_CALCULATION_JUNG_SPRING_STRETCH, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG__SPRING_STRETCH); 
+		mRepulsionRange = mConfig.getInt(VisualizationConfig.KEY_CALCULATION_JUNG_SPRING_REPULSIONRANGE, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_SPRING_REPULSIONRANGE); 
+		mForceMultiplier = mConfig.getDouble(VisualizationConfig.KEY_CALCULATION_JUNG_SPRING_FORCEMULTIPLIER, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_SPRING_FORCEMULTIPLIER); 
 
 		mLayout = new SpringLayout<>(mGraph.getGraph(), mLengthFunction);
 		mLayout.setStretch(mStretch);

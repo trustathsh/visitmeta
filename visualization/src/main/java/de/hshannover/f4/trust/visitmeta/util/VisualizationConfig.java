@@ -38,6 +38,7 @@
  */
 package de.hshannover.f4.trust.visitmeta.util;
 
+import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.edgerenderer.Piccolo2dEdgeRendererType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.piccolo2d.noderenderer.Piccolo2dNodeRendererType;
 import de.hshannover.f4.trust.visitmeta.gui.historynavigation.HistoryNavigationStrategyType;
@@ -53,7 +54,8 @@ import de.hshannover.f4.trust.visitmeta.gui.search.SearchAndFilterStrategyType;
  */
 public class VisualizationConfig {
 	
-	public static final String CONNECTION_DATASERVICESSL_VERIFY = "visualization.connection.dataserviceSSL.verifyHostname";
+	public static final String KEY_CONNECTION_DATASERVICESSL_VERIFY_HOSTNAME = "visualization.connection.dataservicessl.verifyhostname";
+	public static final boolean DEFAULT_VALUE_CONNECTION_DATASERVICESSL_VERIFY_HOSTNAME = false; 
 
 	public static final String KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX =
 			"visualization.identifier.text.showextendedidentifierprefix";
@@ -92,9 +94,12 @@ public class VisualizationConfig {
 			SearchAndFilterStrategyType.SIMPLE_SEARCH_AND_NO_FILTER
 					.name();
 
-	public static final String KEY_CALCUCATION_ITERATIONS = "visualization.calculation.iterations";
-	public static final int DEFAULT_VALUE_CALCUCATION_ITERATIONS = 100;
+	public static final String KEY_CALCULATION_ITERATIONS = "visualization.calculation.iterations";
+	public static final int DEFAULT_VALUE_CALCULATION_ITERATIONS = 100;
 
+	public static final String KEY_CALCULATION_DEFAULT_LAYOUTTYPE = "visualization.calculation.layouttype";
+	public static final String DEFAULT_VALUE_CALCULATION_DEFAULT_LAYOUTTYPE = LayoutType.FORCE_DIRECTED.name();
+	
 	public static final String KEY_NETWORK_INTERVAL = "visualization.network.interval";
 	public static final int DEFAULT_VALUE_NETWORK_INTERVAL = 10000;
 
@@ -223,4 +228,40 @@ public class VisualizationConfig {
 
 	public static final String KEY_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT = "visualization.connection.ifmap.initialconnectiontimeout";
 	public static final int DEFAULT_VALUE_CONNECTION_IFMAP_INITIALCONNECTIONTIMEOUT = (120 * 1000);
+	
+	public static final String KEY_GUI_NAVIGATION_PANEL = "visualization.gui.navigationpanel";
+	public static final boolean DEFAULT_VALUE_GUI_NAVIGATION_PANEL = false;
+	
+	public static final String KEY_CALCULATION_JUNG_FORCEDIRECTED_ATTRACTION_MULTIPLIER = "visualization.calculation.jung.forcedirected.attractionmultiplier";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_ATTRACTION_MULTIPLIER = 0.25;
+	
+	public static final String KEY_CALCULATION_JUNG_FORCEDIRECTED_REPULSION_MULTIPLIER = "visualization.calculation.jung.forcedirected.repulsionmultiplier";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_REPULSION_MULTIPLIER = 0.75;
+	
+	public static final String KEY_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS = "visualization.calculation.jung.forcedirected.maxiterations";
+	public static final int DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS = 500;
+
+	public static final String KEY_CALCULATION_JUNG_KAMADAKAWAI_ADJUSTFORGRAVITY = "visualization.calculation.jung.kamadakawai.adjustforgravity";
+	public static final boolean DEFAULT_VALUE_CALCULATION_JUNG_KAMADAKAWAI_ADJUSTFORGRAVITY = true;
+	
+	public static final String KEY_CALCULATION_JUNG_KAMADAKAWAI_DISCONNECTEDDISTANCEMULTIPLIER = "visualization.calculation.jung.kamadakawai.disconnecteddistancemultiplier";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG_KAMADAKAWAI_DISCONNECTEDDISTANCEMULTIPLIER = 1.0;
+	
+	public static final String KEY_CALCULATION_JUNG_KAMADAKAWAI_EXCHANGEVERTICES = "visualization.calculation.jung.kamadakawai.exchangevertices";
+	public static final boolean DEFAULT_VALUE_CALCULATION_JUNG_KAMADAKAWAI_EXCHANGEVERTICES = true;
+	
+	public static final String KEY_CALCULATION_JUNG_KAMADAKAWAI_LENGTHFACTOR = "visualization.calculation.jung.kamadakawai.lengthfactor";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG_KAMADAKAWAI_LENGTHFACTOR = 1.0;
+	
+	public static final String KEY_CALCULATION_JUNG_KAMADAKAWAI_MAX_ITERATIONS = "visualization.calculation.jung.kamadakawai.maxiterations";
+	public static final int DEFAULT_VALUE_CALCULATION_JUNG_KAMADAKAWAI_MAX_ITERATIONS = 100;
+	
+	public static final String KEY_CALCULATION_JUNG_SPRING_STRETCH = "visualization.calculation.jung.spring.stretch";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG__SPRING_STRETCH = 0.7;
+	
+	public static final String KEY_CALCULATION_JUNG_SPRING_REPULSIONRANGE = "visualization.calculation.jung.spring.repulsionrange";
+	public static final int DEFAULT_VALUE_CALCULATION_JUNG_SPRING_REPULSIONRANGE = 100;
+	
+	public static final String KEY_CALCULATION_JUNG_SPRING_FORCEMULTIPLIER = "visualization.calculation.jung.spring.forcemultiplier";
+	public static final double DEFAULT_VALUE_CALCULATION_JUNG_SPRING_FORCEMULTIPLIER = 1.0 / 3.0;
 }

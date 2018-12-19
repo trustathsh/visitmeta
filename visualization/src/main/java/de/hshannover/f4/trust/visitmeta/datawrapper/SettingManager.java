@@ -72,8 +72,8 @@ public class SettingManager extends Observable {
 				VisualizationConfig.KEY_CALCULATION_INTERVAL, VisualizationConfig.DEFAULT_VALUE_CALCULATION_INTERVAL);
 		mCalculationIterations =
 				mConfig.getInt(
-						VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
-						VisualizationConfig.DEFAULT_VALUE_CALCUCATION_ITERATIONS);
+						VisualizationConfig.KEY_CALCULATION_ITERATIONS,
+						VisualizationConfig.DEFAULT_VALUE_CALCULATION_ITERATIONS);
 		mHighlightsTimeout = mConfig.getInt(VisualizationConfig.KEY_HIGHTLIGHT_TIMEOUT,
 				VisualizationConfig.DEFAULT_VALUE_HIGHTLIGHT_TIMEOUT);
 		mNodeTranslationDuration =
@@ -89,7 +89,7 @@ public class SettingManager extends Observable {
 		LOGGER.debug("Save settings.");
 		mConfig.set(VisualizationConfig.KEY_NETWORK_INTERVAL, mNetworkInterval);
 		mConfig.set(VisualizationConfig.KEY_CALCULATION_INTERVAL, mCalculationInterval);
-		mConfig.set(VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
+		mConfig.set(VisualizationConfig.KEY_CALCULATION_ITERATIONS,
 				mCalculationIterations);
 		mConfig.set(VisualizationConfig.KEY_HIGHTLIGHT_TIMEOUT, mHighlightsTimeout);
 		mConfig.set(VisualizationConfig.KEY_NODE_TRANSLATION_DURATION,

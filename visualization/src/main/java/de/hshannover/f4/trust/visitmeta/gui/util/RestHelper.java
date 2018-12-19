@@ -43,9 +43,26 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+// secure
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -61,6 +78,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
@@ -74,26 +92,6 @@ import de.hshannover.f4.trust.visitmeta.interfaces.connections.MapServerConnecti
 import de.hshannover.f4.trust.visitmeta.interfaces.data.MapServerData;
 import de.hshannover.f4.trust.visitmeta.interfaces.data.SubscriptionData;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
-
-// secure
-import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import javax.net.ssl.SSLContext;
-
-import com.sun.jersey.client.urlconnection.HTTPSProperties;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import javax.net.ssl.KeyManagerFactory;
 
 public class RestHelper {
 
@@ -261,18 +259,12 @@ public class RestHelper {
 		Properties props = Main.getConfig();
 		
 		// secure REST-Interface, Alexander Kuzminykh
-		
 		if (dataserviceConnection.getUrl().substring(0, 5).equals("https")) {
 			// enables "localhost" in url
 			
-			boolean verify = false;
-			try {
-				verify = props.getBoolean(VisualizationConfig.CONNECTION_DATASERVICESSL_VERIFY);
-			} catch (PropertyException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
+			boolean verifyHostnames = props.getBoolean(VisualizationConfig.KEY_CONNECTION_DATASERVICESSL_VERIFY_HOSTNAME, VisualizationConfig.DEFAULT_VALUE_CONNECTION_DATASERVICESSL_VERIFY_HOSTNAME);
 			HostnameVerifier hostnameVerifier = null;
-			if (verify) {
+			if (verifyHostnames) {
 				hostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
 			} else {
 				hostnameVerifier = new HostnameVerifier() {

@@ -219,6 +219,9 @@ public class Graph2D {
 		case HIERARCHICAL_VERTICAL:
 			mLayout2D = new LayoutHierarchicalVertical2D(this);
 			break;
+		case KAMADA_KAWAI:
+			mLayout2D = new LayoutKamadaKawai2D(this);
+			break;
 		default:
 			mLayout2D = new LayoutForceDirected2D(this);
 			break;

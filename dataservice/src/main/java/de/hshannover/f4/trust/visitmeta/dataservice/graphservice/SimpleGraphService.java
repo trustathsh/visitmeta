@@ -64,8 +64,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SimpleGraphService implements GraphService {
 
-	private static final Logger log = Logger
-			.getLogger(SimpleGraphService.class);
+	private static final Logger log = Logger.getLogger(SimpleGraphService.class);
 
 	private Reader mReader;
 
@@ -102,8 +101,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getInitialGraph(GraphFilter filter) {
-		log.trace("Method getInitialGraph("
-				+ filter + ") called.");
+		log.trace("Method getInitialGraph(" + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
 			IdentifierGraph filterResult = filterGraph(getInternalGraphAt(getChangesMap().firstKey()), filter);
@@ -126,8 +124,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getCurrentGraph(GraphFilter filter) {
-		log.trace("Method getCurrentGraph("
-				+ filter + ") called.");
+		log.trace("Method getCurrentGraph(" + filter + ") called.");
 		if (getChangesMap().isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -154,7 +151,7 @@ public class SimpleGraphService implements GraphService {
 					return new ArrayList<InternalIdentifierGraph>();
 				}
 			}
-			
+
 			if (mCache.lookup(closestTimestamp)) {
 				return mCache.fetch(closestTimestamp);
 			} else {
@@ -173,8 +170,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getNotifiesAt(long timestamp) {
-		log.trace("Method getNotifiesAt("
-				+ timestamp + ") called.");
+		log.trace("Method getNotifiesAt(" + timestamp + ") called.");
 		SortedMap<Long, Long> changes = getChangesMap();
 		long closestTimestamp = 0l;
 		if (!changes.isEmpty()) {
@@ -201,8 +197,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getGraphAt(long timestamp) {
-		log.trace("Method getGraphAt("
-				+ timestamp + ") called.");
+		log.trace("Method getGraphAt(" + timestamp + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		for (InternalIdentifierGraph internalGraph : getInternalGraphAt(timestamp)) {
 			if (internalGraph.getStartIdentifier() != null) {
@@ -214,8 +209,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public List<IdentifierGraph> getGraphAt(long timestamp, GraphFilter filter) {
-		log.trace("Method getGraphAt("
-				+ timestamp + ", " + filter + ") called.");
+		log.trace("Method getGraphAt(" + timestamp + ", " + filter + ") called.");
 		List<IdentifierGraph> graph = new ArrayList<>();
 		if (!getChangesMap().isEmpty()) {
 			IdentifierGraph filterResult = filterGraph(getInternalGraphAt(timestamp), filter);
@@ -228,8 +222,7 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public Delta getDelta(long t1, long t2) {
-		log.trace("Method getDelta("
-				+ t1 + "," + t2 + ") called.");
+		log.trace("Method getDelta(" + t1 + "," + t2 + ") called.");
 		if (t1 > t2) {
 			return getDelta(t2, t1);
 		}
@@ -268,9 +261,9 @@ public class SimpleGraphService implements GraphService {
 		List<InternalIdentifierGraph> oldGraphs = getInternalGraphAt(from);
 
 		/**
-		 * Warning!
-		 * This may create separated subgraphs, which is against the overall assumption
-		 * that IdentifierGraphs always contain a complete, non-separated graph.
+		 * Warning! This may create separated subgraphs, which is against the overall
+		 * assumption that IdentifierGraphs always contain a complete, non-separated
+		 * graph.
 		 */
 		List<InternalIdentifier> allOldIdentifier = mergeToList(oldGraphs);
 		for (InternalIdentifierGraph newGraph : newGraphs) {
@@ -278,8 +271,8 @@ public class SimpleGraphService implements GraphService {
 		}
 
 		/**
-		 * This expands every possible subgraph to a single InteralIdentifierGraph,
-		 * so that the assumption is fullfilled "again".
+		 * This expands every possible subgraph to a single InteralIdentifierGraph, so
+		 * that the assumption is fullfilled "again".
 		 */
 		List<InternalIdentifierGraph> expandedNewGraph = new ArrayList<InternalIdentifierGraph>();
 		for (InternalIdentifierGraph g : newGraphs) {
@@ -330,8 +323,8 @@ public class SimpleGraphService implements GraphService {
 			}
 			seen.add(id);
 			for (InternalLink l : id.getLinks()) {
-				InternalIdentifier other = l.getIdentifiers().getFirst().equals(id)
-						? l.getIdentifiers().getSecond() : l.getIdentifiers().getFirst();
+				InternalIdentifier other = l.getIdentifiers().getFirst().equals(id) ? l.getIdentifiers().getSecond()
+						: l.getIdentifiers().getFirst();
 				if (!seen.contains(other)) {
 					InternalIdentifier insertedOther = subgraph.findIdentifier(other);
 					if (insertedOther == null) {
@@ -353,29 +346,19 @@ public class SimpleGraphService implements GraphService {
 		}
 	}
 
-	private void removeIdentifiersFromGraph(
-			List<InternalIdentifier> identifierToRemove,
+	private void removeIdentifiersFromGraph(List<InternalIdentifier> identifierToRemove,
 			InternalIdentifierGraph graph) {
 		for (InternalIdentifier graphIdentifier : graph.getIdentifiers()) {
-			log.trace("looking for '"
-					+ graphIdentifier
-					+ "' in identifiersToRemove");
-			int indexOfOldEquivalent = identifierToRemove
-					.indexOf(graphIdentifier);
+			log.trace("looking for '" + graphIdentifier + "' in identifiersToRemove");
+			int indexOfOldEquivalent = identifierToRemove.indexOf(graphIdentifier);
 			if (indexOfOldEquivalent != -1) {
-				log.trace("found '"
-						+ graphIdentifier + "'");
-				InternalIdentifier oldEquivalent = identifierToRemove
-						.get(indexOfOldEquivalent);
-				stripMetadataFromIdentifier(graphIdentifier,
-						oldEquivalent.getMetadata());
-				disconnectLinksFromIdentifier(graphIdentifier,
-						oldEquivalent.getLinks());
+				log.trace("found '" + graphIdentifier + "'");
+				InternalIdentifier oldEquivalent = identifierToRemove.get(indexOfOldEquivalent);
+				stripMetadataFromIdentifier(graphIdentifier, oldEquivalent.getMetadata());
+				disconnectLinksFromIdentifier(graphIdentifier, oldEquivalent.getLinks());
 
-				if (graphIdentifier.getMetadata().isEmpty()
-						&& graphIdentifier.getLinks().isEmpty()) {
-					log.trace("removing '"
-							+ graphIdentifier + "' from graph");
+				if (graphIdentifier.getMetadata().isEmpty() && graphIdentifier.getLinks().isEmpty()) {
+					log.trace("removing '" + graphIdentifier + "' from graph");
 					graph.removeIdentifier(graphIdentifier);
 				}
 			}
@@ -383,36 +366,27 @@ public class SimpleGraphService implements GraphService {
 
 	}
 
-	private void stripMetadataFromIdentifier(InternalIdentifier id,
-			List<InternalMetadata> metadata) {
+	private void stripMetadataFromIdentifier(InternalIdentifier id, List<InternalMetadata> metadata) {
 		for (InternalMetadata meta : metadata) {
 			id.removeMetadata(meta, false);
 		}
 	}
 
-	private void stripMetadataFromLink(InternalLink link,
-			List<InternalMetadata> metadata) {
+	private void stripMetadataFromLink(InternalLink link, List<InternalMetadata> metadata) {
 		for (InternalMetadata meta : metadata) {
 			link.removeMetadata(meta, false);
 		}
 	}
 
-	private void disconnectLinksFromIdentifier(InternalIdentifier id,
-			List<InternalLink> links) {
+	private void disconnectLinksFromIdentifier(InternalIdentifier id, List<InternalLink> links) {
 		List<InternalLink> linksToDelete = new ArrayList<>();
 		for (InternalLink l : links) {
 			InternalIdentifierPair pair = l.getIdentifiers();
-			InternalIdentifier opposite = (pair.getFirst().equals(id)) ? pair
-					.getSecond() : pair.getFirst();
+			InternalIdentifier opposite = (pair.getFirst().equals(id)) ? pair.getSecond() : pair.getFirst();
 			for (InternalLink deleteCandidate : id.getLinks()) {
-				InternalIdentifierPair candidatePair = deleteCandidate
-						.getIdentifiers();
-				if ((candidatePair.getFirst().equals(opposite)
-						&& candidatePair
-								.getSecond().equals(id))
-						|| (candidatePair.getFirst().equals(id)
-								&& candidatePair
-										.getSecond().equals(opposite))) {
+				InternalIdentifierPair candidatePair = deleteCandidate.getIdentifiers();
+				if ((candidatePair.getFirst().equals(opposite) && candidatePair.getSecond().equals(id))
+						|| (candidatePair.getFirst().equals(id) && candidatePair.getSecond().equals(opposite))) {
 					stripMetadataFromLink(deleteCandidate, l.getMetadata());
 					if (deleteCandidate.getMetadata().isEmpty()) {
 						linksToDelete.add(l);
@@ -425,8 +399,7 @@ public class SimpleGraphService implements GraphService {
 		}
 	}
 
-	private List<InternalIdentifier> mergeToList(
-			List<InternalIdentifierGraph> graphs) {
+	private List<InternalIdentifier> mergeToList(List<InternalIdentifierGraph> graphs) {
 		List<InternalIdentifier> ids = new ArrayList<>();
 		for (InternalIdentifierGraph g : graphs) {
 			ids.addAll(g.getIdentifiers());
@@ -448,14 +421,12 @@ public class SimpleGraphService implements GraphService {
 
 	public IdentifierGraph filterGraph(List<InternalIdentifierGraph> graphList, GraphFilter filter) {
 		Identifier startId = filter.getStartIdentifier();
-		log.debug("Start identifier (from filter): "
-				+ startId);
+		log.debug("Start identifier (from filter): " + startId);
 		InternalIdentifier internalStartId = null;
 		InternalIdentifierGraph graph = null;
 		for (InternalIdentifierGraph g : graphList) {
 			for (InternalIdentifier id : g.getIdentifiers()) {
-				log.debug("Identifier from graph:"
-						+ id);
+				log.debug("Identifier from graph:" + id);
 				if (id.sameAs(startId)) {
 					graph = g;
 					internalStartId = id;
@@ -524,11 +495,10 @@ public class SimpleGraphService implements GraphService {
 						for (InternalMetadata currentLinkMeta : currentLink.getMetadata()) {
 							result.insert(currentLinkMeta);
 							InternalIdentifierPair ip = currentLink.getIdentifiers();
-							InternalIdentifier other =
-									(ip.getFirst().equals(currentId) ? ip.getSecond() : ip.getFirst());
+							InternalIdentifier other = (ip.getFirst().equals(currentId) ? ip.getSecond()
+									: ip.getFirst());
 							if (!result.getIdentifiers().contains(other)) {
-								searchRoutine(graph, other, result, currentDepth
-										+ 1, maxDepth, filter);
+								searchRoutine(graph, other, result, currentDepth + 1, maxDepth, filter);
 							} else {
 								for (InternalIdentifier tmp : result.getIdentifiers()) {
 									if (tmp.equals(other)) {
@@ -604,27 +574,23 @@ public class SimpleGraphService implements GraphService {
 
 	@Override
 	public Map<Long, double[][]> getAdjacencyMatrices(String name) throws ConnectionException {
-
 		Map<Long, double[][]> graphMap = new HashMap<>();
 
 		GraphService graphservice = Application.getConnectionManager().getGraphService(name);
 		SortedMap<Long, Long> graphs = graphservice.getChangesMap();
 
-		for (long timestamp: graphs.keySet() ) {
-			// List of Graphs that each is garanteed to be a simple graph
+		for (long timestamp : graphs.keySet()) {
+			// List of Graphs that each is guaranteed to be a simple graph
 			List<IdentifierGraph> listgraph = graphservice.getGraphAt(timestamp);
 
 			Adjacency adj = new Adjacency();
 
-			if(listgraph != null && listgraph.size() >= 1) {
-				System.out.println("NICHT null");
-				System.out.println("size: " + listgraph.size());
-
-				for (IdentifierGraph ig: listgraph ) {
+			if (listgraph != null && listgraph.size() >= 1) {
+				for (IdentifierGraph ig : listgraph) {
 					List<Identifier> graph = ig.getIdentifiers();
 
-					for (Identifier ident : graph ) {
-						for (Link link: ident.getLinks() ) {
+					for (Identifier ident : graph) {
+						for (Link link : ident.getLinks()) {
 							Identifier from = link.getIdentifiers().getFirst();
 							Identifier to = link.getIdentifiers().getSecond();
 							adj.addNeighbors(from, to);
@@ -632,20 +598,11 @@ public class SimpleGraphService implements GraphService {
 						}
 					}
 				}
-
 			}
-			else
-				System.out.println("NUUUULLLLLLL");
 
 			graphMap.put(timestamp, adj.getMatrix());
-
 		}
 
-
-		//List<Adjacency> list = new ArrayList<>();
-		//list.add(new Adjacency());
-//        list.add(2.0);
-//        list.add(3.0);
 		return graphMap;
 	}
 }

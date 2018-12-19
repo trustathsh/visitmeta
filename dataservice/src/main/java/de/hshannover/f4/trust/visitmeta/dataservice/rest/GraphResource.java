@@ -288,8 +288,7 @@ public class GraphResource {
 		}
 		//List<Adjacency> list = new ArrayList<>();
 
-		Gson gson = new Gson();
-		return gson.toJson(list);
+		return new Gson().toJson(list);
 	}
 
 	/**

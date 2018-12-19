@@ -93,5 +93,11 @@ public enum LayoutType{
 	 * <p>A hierarchical layout that spans vertically.</p>
 	 * <p>Developed by Sunni Hu during her bachelor thesis.</p>
 	 */
-	HIERARCHICAL_VERTICAL
+	HIERARCHICAL_VERTICAL,
+	
+	/**
+	 * <p>This implementation (LayoutKamadaKawai2D) uses the functionalities of KKLayout of JUNG2.
+	 * JUNG2 uses a self-implemented Fruchterman-Reingold Force-Directed-Layout.</p>
+	 */
+	KAMADA_KAWAI
 }

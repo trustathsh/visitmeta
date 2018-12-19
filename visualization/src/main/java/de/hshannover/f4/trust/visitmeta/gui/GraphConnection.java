@@ -443,6 +443,7 @@ public class GraphConnection implements Observer {
 		} else if (o instanceof TimeHolder) {
 			if (!mTimeHolder.isLiveView()) {
 				delta();
+				mFacadeLogic.recalculateGraph();
 			} else if (mTimeHolder.isSetLive()) {
 				loadCurrentGraph();
 			}

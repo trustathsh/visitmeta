@@ -78,11 +78,14 @@ public class Piccolo2DGraphicWrapperFactory {
 
 	private static String getTypeName(PNode node) {
 		if (node != null) {
-			Object data = node.getParent().getAttribute("data");
-			if (data instanceof Propable) {
-				Propable propable = (Propable) data;
-				String typName = propable.getTypeName();
-				return typName;
+			PNode parent = node.getParent();
+			if (parent != null) {
+				Object data = parent.getAttribute("data");
+				if (data != null && data instanceof Propable) {
+					Propable propable = (Propable) data;
+					String typName = propable.getTypeName();
+					return typName;
+				}
 			}
 		}
 		return null;

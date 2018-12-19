@@ -47,19 +47,21 @@ import java.util.Observable;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
 import de.hshannover.f4.trust.visitmeta.datawrapper.ExpandedLink;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeIdentifier;
 import de.hshannover.f4.trust.visitmeta.datawrapper.NodeMetadata;
 import de.hshannover.f4.trust.visitmeta.datawrapper.Position;
 import de.hshannover.f4.trust.visitmeta.datawrapper.UpdateContainer;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.jung.Graph2D;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 
 public class JungCalculator implements Calculator {
 
 	private static final Logger LOGGER = Logger.getLogger(JungCalculator.class);
+	private Properties mConfig = Main.getConfig();
 
-	public static final LayoutType DEFAULT_LAYOUT_TYPE = LayoutType.FORCE_DIRECTED;
-	
 	private Graph2D             mGraph2D;
 	private LayoutType          mLayoutType;
 	private MetadataCollocation mExpandedEdgeType;
@@ -68,7 +70,7 @@ public class JungCalculator implements Calculator {
 	public JungCalculator() {
 
 		// TODO: Initialize layout type (and layout parameters) from user settings/preferences. <VA> 2014-08-05
-		mLayoutType         = DEFAULT_LAYOUT_TYPE;
+		mLayoutType         = LayoutType.valueOf(mConfig.getString(VisualizationConfig.KEY_CALCULATION_DEFAULT_LAYOUTTYPE, VisualizationConfig.DEFAULT_VALUE_CALCULATION_DEFAULT_LAYOUTTYPE));
 		mExpandedEdgeType   = MetadataCollocation.FORK;
 		mIdentifierEdgeType = MetadataCollocation.FORK;
 

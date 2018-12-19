@@ -52,12 +52,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
 
-import de.hshannover.f4.trust.visitmeta.datawrapper.GraphContainer;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
@@ -102,7 +113,8 @@ public class MainWindow extends JFrame {
 
 	private JSplitPane mMainSplitPane = null;
 	private JPanel mLeftMainPanel = null;
-	private JSplitPane mRightMainPanel = null;
+	private JSplitPane mRightMainPanelSplitPane = null;
+	private JPanel mRightMainPanel = null;
 	private NavigationPanel mProjectionView;
 	private JPanel mGraphPanel;
 	private JPanel mJpParameter;
@@ -124,8 +136,7 @@ public class MainWindow extends JFrame {
 	 * @param guiController
 	 */
 	public MainWindow(MotionControllerHandler motionControllerHandler) {
-		super("VisITMeta GUI v"
-				+ Main.VISUALIZATION_VERSION);
+		super("VisITMeta GUI v" + Main.VISUALIZATION_VERSION);
 
 		mMotionControllerHandler = motionControllerHandler;
 
@@ -139,14 +150,14 @@ public class MainWindow extends JFrame {
 		this.setLookAndFeel();
 		this.setMinimumSize(new Dimension(800, 600));
 
-		Image visitMetaIcon16px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX)
-				.getPath()).getImage();
-		Image visitMetaIcon32px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX)
-				.getPath()).getImage();
-		Image visitMetaIcon64px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX)
-				.getPath()).getImage();
-		Image visitMetaIcon128px = new ImageIcon(MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX)
-				.getPath()).getImage();
+		Image visitMetaIcon16px = new ImageIcon(
+				MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_16PX).getPath()).getImage();
+		Image visitMetaIcon32px = new ImageIcon(
+				MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_32PX).getPath()).getImage();
+		Image visitMetaIcon64px = new ImageIcon(
+				MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_64PX).getPath()).getImage();
+		Image visitMetaIcon128px = new ImageIcon(
+				MainWindow.class.getClassLoader().getResource(VISITMETA_ICON_128PX).getPath()).getImage();
 
 		List<? extends Image> visitMetaIcons = Arrays.asList(visitMetaIcon16px, visitMetaIcon32px, visitMetaIcon64px,
 				visitMetaIcon128px);
@@ -157,7 +168,8 @@ public class MainWindow extends JFrame {
 
 		mMainSplitPane = new JSplitPane();
 		mMainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		mMainSplitPane.setResizeWeight(0.125);
+		mMainSplitPane.setResizeWeight(0.125);		
+		mMainSplitPane.setRightComponent(mRightMainPanelSplitPane);
 		mMainSplitPane.setRightComponent(mRightMainPanel);
 		mMainSplitPane.setLeftComponent(mLeftMainPanel);
 		mMainSplitPane.setOneTouchExpandable(true);
@@ -191,7 +203,8 @@ public class MainWindow extends JFrame {
 		mLeftMainPanel.setLayout(new GridBagLayout());
 
 		// x y w h wx wy
-		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane, LayoutHelper.LABEL_INSETS);
+		LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 1.0, mLeftMainPanel, mConnectionScrollPane,
+				LayoutHelper.LABEL_INSETS);
 	}
 
 	public void changeParameterPanel() {
@@ -254,7 +267,8 @@ public class MainWindow extends JFrame {
 			mJpParameterSouth.add(mJbParameterReset);
 			mJpParameterSouth.add(mJbParameterSave);
 
-			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues, LayoutHelper.LABEL_INSETS);
+			LayoutHelper.addComponent(0, 0, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterValues,
+					LayoutHelper.LABEL_INSETS);
 			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mJpParameter, mJpParameterSouth, LayoutHelper.LABEL_INSETS);
 			LayoutHelper.addComponent(0, 1, 1, 1, 1.0, 0.0, mLeftMainPanel, mJpParameter, LayoutHelper.LABEL_INSETS);
 			mLeftMainPanel.updateUI();
@@ -262,7 +276,8 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * Adds a component to a JTabbedPane with a little "close tab" button on the right side of the tab.
+	 * Adds a component to a JTabbedPane with a little "close tab" button on the
+	 * right side of the tab.
 	 *
 	 * @param cTab
 	 *            the ConnectionTab that should be added
@@ -297,8 +312,8 @@ public class MainWindow extends JFrame {
 		tabPane.setTabComponentAt(pos, pnlTab);
 
 		/**
-		 * Remove the current tab from the tab pane and from the
-		 * MotionController if it is closed in the GUI.
+		 * Remove the current tab from the tab pane and from the MotionController if it
+		 * is closed in the GUI.
 		 */
 		ActionListener listener = new ActionListener() {
 			@Override
@@ -318,8 +333,8 @@ public class MainWindow extends JFrame {
 		mTabbedConnectionPaneLeft = new JTabbedPane();
 
 		/**
-		 * Whenever the current tab inside the GUI changes, the
-		 * MotionControllerHandler instance is informed.
+		 * Whenever the current tab inside the GUI changes, the MotionControllerHandler
+		 * instance is informed.
 		 */
 		mTabbedConnectionPaneLeft.addChangeListener(new ChangeListener() {
 			@Override
@@ -328,8 +343,7 @@ public class MainWindow extends JFrame {
 				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
 				if (currentTab != null) {
 					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
-					LOGGER.debug("Tab changed to "
-							+ currentTab.getConnName());
+					LOGGER.debug("Tab changed to " + currentTab.getConnName());
 				}
 			}
 		});
@@ -337,7 +351,8 @@ public class MainWindow extends JFrame {
 		mTabbedConnectionPaneRight = new JTabbedPane();
 
 		/**
-		 * Whenever the current tab inside the GUI changes, the MotionControllerHandler instance is informed.
+		 * Whenever the current tab inside the GUI changes, the MotionControllerHandler
+		 * instance is informed.
 		 */
 		mTabbedConnectionPaneRight.addChangeListener(new ChangeListener() {
 			@Override
@@ -346,8 +361,7 @@ public class MainWindow extends JFrame {
 				ConnectionTab currentTab = (ConnectionTab) sourceTabbedPane.getSelectedComponent();
 				if (currentTab != null) {
 					mMotionControllerHandler.setCurrentConnectionTab(currentTab);
-					LOGGER.debug("Tab changed to "
-							+ currentTab.getConnName());
+					LOGGER.debug("Tab changed to " + currentTab.getConnName());
 				}
 			}
 		});
@@ -359,15 +373,20 @@ public class MainWindow extends JFrame {
 			mGraphPanel.add(mTabbedConnectionPaneRight);
 		}
 
-		mProjectionView = new NavigationPanel();
+		boolean useNavigationPanel = mConfig.getBoolean(VisualizationConfig.KEY_GUI_NAVIGATION_PANEL,
+				VisualizationConfig.DEFAULT_VALUE_GUI_NAVIGATION_PANEL);
+		if (useNavigationPanel) {
+			mProjectionView = new NavigationPanel();
 
-		mRightMainPanel = new JSplitPane();
-		mRightMainPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		mRightMainPanel.setResizeWeight(0.125);
-		mRightMainPanel.setRightComponent(mGraphPanel);
-		mRightMainPanel.setLeftComponent(mProjectionView);
-		mRightMainPanel.setOneTouchExpandable(true);
-
+			mRightMainPanelSplitPane = new JSplitPane();
+			mRightMainPanelSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+			mRightMainPanelSplitPane.setResizeWeight(0.125);
+			mRightMainPanelSplitPane.setRightComponent(mGraphPanel);
+			mRightMainPanelSplitPane.setLeftComponent(mProjectionView);
+			mRightMainPanelSplitPane.setOneTouchExpandable(true);
+		} else {
+			mRightMainPanel = mGraphPanel;
+		}
 
 	}
 
@@ -407,20 +426,22 @@ public class MainWindow extends JFrame {
 	 * Loads Properties
 	 */
 	private void loadProperties() {
-		setLocation(mConfig.getInt(VisualizationConfig.KEY_WINDOW_POSITION_X,
-				VisualizationConfig.DEFAULT_VALUE_WINDOW_POSITION_X),
+		setLocation(
+				mConfig.getInt(VisualizationConfig.KEY_WINDOW_POSITION_X,
+						VisualizationConfig.DEFAULT_VALUE_WINDOW_POSITION_X),
 				mConfig.getInt(VisualizationConfig.KEY_WINDOW_POSITION_Y,
 						VisualizationConfig.DEFAULT_VALUE_WINDOW_POSITION_Y));
-		setPreferredSize(new Dimension(mConfig.getInt(VisualizationConfig.KEY_WINDOW_WIDTH,
-				VisualizationConfig.DEFAULT_VALUE_WINDOW_WIDTH),
-				mConfig.getInt(VisualizationConfig.KEY_WINDOW_HEIGHT, VisualizationConfig.DEFAULT_VALUE_WINDOW_HEIGHT)));
+		setPreferredSize(new Dimension(
+				mConfig.getInt(VisualizationConfig.KEY_WINDOW_WIDTH, VisualizationConfig.DEFAULT_VALUE_WINDOW_WIDTH),
+				mConfig.getInt(VisualizationConfig.KEY_WINDOW_HEIGHT,
+						VisualizationConfig.DEFAULT_VALUE_WINDOW_HEIGHT)));
 		mMainSplitPane.setDividerLocation(mConfig.getInt(VisualizationConfig.KEY_WINDOW_DIVIDER,
 				VisualizationConfig.DEFAULT_VALUE_WINDOW_DIVIDER));
 	}
 
 	/**
-	 * Adds a listener to the window in order to save the windows' position and
-	 * size and sets the close operation
+	 * Adds a listener to the window in order to save the windows' position and size
+	 * and sets the close operation
 	 */
 	private void setCloseOperation() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -428,14 +449,11 @@ public class MainWindow extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent we) {
 				try {
-					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_X,
-							(int) getLocationOnScreen().getX());
-					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_Y,
-							(int) getLocationOnScreen().getY());
+					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_X, (int) getLocationOnScreen().getX());
+					mConfig.set(VisualizationConfig.KEY_WINDOW_POSITION_Y, (int) getLocationOnScreen().getY());
 					mConfig.set(VisualizationConfig.KEY_WINDOW_WIDTH, getWidth());
 					mConfig.set(VisualizationConfig.KEY_WINDOW_HEIGHT, getHeight());
-					mConfig.set(VisualizationConfig.KEY_WINDOW_DIVIDER,
-							mMainSplitPane.getDividerLocation());
+					mConfig.set(VisualizationConfig.KEY_WINDOW_DIVIDER, mMainSplitPane.getDividerLocation());
 				} catch (PropertyException e) {
 					LOGGER.fatal(e.toString(), e);
 					throw new RuntimeException("could not save properties");

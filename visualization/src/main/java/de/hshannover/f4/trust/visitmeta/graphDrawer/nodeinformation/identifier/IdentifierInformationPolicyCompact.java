@@ -43,12 +43,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.hshannover.f4.trust.visitmeta.IfmapStrings;
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.util.DocumentUtils;
-import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierHelper;
 import de.hshannover.f4.trust.visitmeta.util.IdentifierWrapper;
 import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
@@ -73,7 +74,12 @@ import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
  */
 public class IdentifierInformationPolicyCompact extends IdentifierInformationStrategy {
 
-	private static final List<String> POLICY_TYPENAMES = Arrays.asList("signature", "condition", "rule", "action", "anomaly", "hint", "policy", "patternvertex");
+	// list of extended identifer inner typenames of irongpm and/or irondetect
+	// policy identifiers
+	private static final List<String> ESUKOM_TYPENAMES = Arrays.asList("signature", "condition", "action", "anomaly",
+			"hint", "category");
+	private static final List<String> SIMU_TYPENAMES = Arrays.asList("pattern-vertex", "service", "implementation",
+			"vulnerability");
 
 	@Override
 	public String createTextForAccessRequest(Identifier identifier) {
@@ -81,8 +87,7 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.ACCESS_REQUEST_ATTR_NAME, "name")); // name
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.ACCESS_REQUEST_ATTR_NAME, "name")); // name
 		return sb.toString();
 	}
 
@@ -92,11 +97,9 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IP_ADDRESS_ATTR_VALUE, "value")); // value
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IP_ADDRESS_ATTR_VALUE, "value")); // value
 		sb.append(" (");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IP_ADDRESS_ATTR_TYPE, "type")); // type
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IP_ADDRESS_ATTR_TYPE, "type")); // type
 		sb.append(")");
 		return sb.toString();
 	}
@@ -107,19 +110,16 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
-		sb.append(wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.MAC_ADDRESS_ATTR_VALUE, "value")); // value
+		sb.append(wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.MAC_ADDRESS_ATTR_VALUE, "value")); // value
 		return sb.toString();
 	}
 
 	@Override
 	public String createTextForIdentity(Identifier identifier) {
 		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-		String type = wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IDENTITY_ATTR_TYPE, "type"); // type
-		String name = wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
-		
+		String type = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_TYPE, "type"); // type
+		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
+
 		StringBuilder sb = new StringBuilder();
 		sb.append(wrapper.getTypeName());
 		sb.append(": ");
@@ -130,27 +130,145 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 		return sb.toString();
 	}
 
-	private void handlePolicyIdentifier(StringBuilder sb, Identifier identifier) {
-		String extendedTypeName = ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
-		Document document = ExtendedIdentifierHelper.getDocument(identifier);
-		
-		String administrativeDomain = document.getDocumentElement().getAttribute("administrative-domain");
-		
-		String id = "";
-		NodeList idElement = document.getElementsByTagName("id");
-		if (idElement.getLength() > 0) {
-			id = idElement.item(0).getTextContent();
+	@Override
+	public String createTextForDevice(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		StringBuilder sb = new StringBuilder();
+		sb.append(wrapper.getTypeName());
+		sb.append(": ");
+		sb.append(wrapper.getValueForXpathExpressionOrElse(IfmapStrings.DEVICE_NAME_EL_NAME, "name")); // name
+		return sb.toString();
+	}
+
+	@Override
+	protected String createTextForExtendedIdentifier(Identifier identifier) {
+		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
+		String name = wrapper.getValueForXpathExpressionOrElse("@" + IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
+		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
+				"@" + IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF, "other-type-definition"); // other-type-definition
+
+		StringBuilder sb = new StringBuilder();
+		boolean showExtendedIdentifierPrefix = mConfig.getBoolean(
+				VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
+				VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
+		if (showExtendedIdentifierPrefix) {
+			sb.append("extended-identifier: ");
 		}
-		
+
+		int idxFirstSemicolon = name.indexOf(";");
+		if (idxFirstSemicolon != -1) {
+			Document innerDocument = DocumentUtils.parseEscapedXmlString(name);
+			String extendedTypeName = name.substring(name.indexOf(";") + 1, name.indexOf(" "));
+
+			String administrativeDomain = getAdministrativeDomain(innerDocument);
+			boolean administrativeDomainNotNullOrEmpty = (administrativeDomain != null)
+					&& (!administrativeDomain.equals(""));
+
+			sb.append(extendedTypeName);
+
+			if (SIMU_TYPENAMES.contains(extendedTypeName)) {
+				handleSIMUIdentifiers(sb, extendedTypeName, innerDocument);
+			} else if (administrativeDomainNotNullOrEmpty && administrativeDomain.contains("irongpm-policy")) {
+				handleSIMUIdentifiers(sb, extendedTypeName, innerDocument);
+			} else if (ESUKOM_TYPENAMES.contains(extendedTypeName)) {
+				handleESUKOMIdentifiers(sb, extendedTypeName, innerDocument);
+			} else if (administrativeDomainNotNullOrEmpty && administrativeDomain.contains("irondetect-policy")) {
+				handleESUKOMIdentifiers(sb, extendedTypeName, innerDocument);
+			} else {
+				handleUnknownExtendedIdentifier(sb, extendedTypeName, innerDocument);
+			}
+		} else {
+			sb.append(name); // name
+			sb.append(" (");
+			sb.append(otherTypeDefinition); // other-type-definition
+			sb.append(")");
+		}
+
+		return sb.toString();
+	}
+
+	private void handleSIMUIdentifiers(StringBuilder sb, String extendedTypeName, Document document) {
+		String internalTypename;
+
+		NodeList tmpElements;
+		Node tmpItem;
+		NamedNodeMap attributes;
+
+		switch (extendedTypeName) {
+		case "pattern-vertex":
+			internalTypename = document.getElementsByTagName("typename").item(0).getTextContent();
+			sb.append(": " + internalTypename);
+			addProperties(document, sb);
+			break;
+		case "rule":
+			sb.append(": ");
+			tmpElements = document.getElementsByTagName("name");
+			sb.append(tmpElements.item(0).getTextContent());
+			tmpElements = document.getElementsByTagName("id");
+			sb.append(", #" + tmpElements.item(0).getTextContent());
+			// tmpElements = document.getElementsByTagName("description");
+			// sb.append(tmpElements.item(0).getTextContent());
+			// tmpElements = document.getElementsByTagName("recommendation");
+			// sb.append(", #" + tmpElements.item(0).getTextContent());
+			break;
+		case "policy":
+			sb.append(": ");
+			tmpElements = document.getElementsByTagName("name");
+			sb.append(tmpElements.item(0).getTextContent());
+			break;
+		case "service":
+			sb.append(": ");
+			attributes = document.getFirstChild().getAttributes();
+			tmpItem = attributes.getNamedItem("name");
+			sb.append(tmpItem.getTextContent());
+			tmpItem = attributes.getNamedItem("port");
+			sb.append(", @port: ");
+			sb.append(tmpItem.getTextContent());
+			tmpItem = attributes.getNamedItem("type");
+			sb.append("\ntype: ");
+			sb.append(tmpItem.getTextContent());
+			break;
+		case "implementation":
+			sb.append(": ");
+			attributes = document.getFirstChild().getAttributes();
+			tmpItem = attributes.getNamedItem("name");
+			sb.append(tmpItem.getTextContent());
+			tmpItem = attributes.getNamedItem("version");
+			sb.append(", version ");
+			sb.append(tmpItem.getTextContent());
+			break;
+		case "vulnerability":
+			sb.append(": ");
+			attributes = document.getFirstChild().getAttributes();
+			tmpItem = attributes.getNamedItem("id");
+			sb.append(tmpItem.getTextContent());
+			tmpItem = attributes.getNamedItem("type");
+			sb.append(" (");
+			sb.append(tmpItem.getTextContent());			
+			sb.append(")");
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void handleESUKOMIdentifiers(StringBuilder sb, String extendedTypeName, Document document) {
+		// String extendedTypeName =
+		// ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier);
+		// Document document = ExtendedIdentifierHelper.getDocument(identifier);
+
+		String tmpString;
+
 		switch (extendedTypeName) {
 		case "signature":
 			sb.append(": ");
-			sb.append(id);
+			tmpString = document.getElementsByTagName("id").item(0).getTextContent();
+			sb.append(tmpString);
 			sb.append("\n");
 			NodeList featureExpressions = document.getElementsByTagName("featureExpression");
 			for (int i = 0; i < featureExpressions.getLength(); i++) {
 				String featureExpression = featureExpressions.item(i).getTextContent();
-				sb.append("featureExpression #");
+				sb.append("feature-expression #");
 				sb.append(i + 1);
 				sb.append(": ");
 				sb.append(featureExpression);
@@ -159,79 +277,92 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 			break;
 		case "condition":
 			sb.append(": ");
-			sb.append(id);
+			tmpString = document.getElementsByTagName("id").item(0).getTextContent();
+			sb.append(tmpString);
 			sb.append("\n");
 			NodeList conditionExpressions = document.getElementsByTagName("conditionExpression");
 			for (int i = 0; i < conditionExpressions.getLength(); i++) {
 				String conditionExpression = conditionExpressions.item(i).getTextContent();
-				sb.append("conditionExpression #");
+				sb.append("condition-expression #");
 				sb.append(i + 1);
 				sb.append(": ");
 				sb.append(conditionExpression);
 				sb.append("\n");
 			}
 			break;
-		case "rule":
-			if (administrativeDomain.equals("irongpm-policy")) {
-				String description = document.getElementsByTagName("description").item(0).getTextContent();
-				String name = document.getElementsByTagName("name").item(0).getTextContent();
-				String recommendation = document.getElementsByTagName("recommendation").item(0).getTextContent();
-				sb.append(": ");
-				sb.append(name);
-				sb.append("\n");
-				sb.append("id: ");
-				sb.append(id);
-				sb.append("\n");
-				sb.append("description: ");
-				sb.append(description);
-				sb.append("\n");
-				sb.append("recommendation: ");
-				sb.append(recommendation);
-			} else {
-				sb.append(": ");
-				sb.append(id);				
-			}
-			break;
-		case "policy":
-			if (administrativeDomain.equals("irongpm-policy")) {
-				String name = document.getElementsByTagName("name").item(0).getTextContent();
-				sb.append(": ");
-				sb.append(name);
-			} else {
-				sb.append(": ");
-				sb.append(id);
-			}
-			break;
 		case "action":
 			sb.append(": ");
-			sb.append(id);
+			tmpString = document.getElementsByTagName("id").item(0).getTextContent();
+			sb.append(tmpString);
 			String operation = document.getElementsByTagName("operation").item(0).getTextContent();
 			sb.append("\n");
 			sb.append("operation: ");
 			sb.append(operation);
 			break;
-		case "patternvertex":
-			String typeName = document.getElementsByTagName("typename").item(0).getTextContent();;
-			String properties = document.getElementsByTagName("properties").item(0).getTextContent();
+		case "rule":
 			sb.append(": ");
-			sb.append(typeName);
-			if (!properties.equals("[]")) {
-				sb.append("\n");
-				sb.append("properties: ");
-				sb.append(properties);
-			}
+			tmpString = document.getElementsByTagName("name").item(0).getTextContent();
+			sb.append(tmpString);
+			tmpString = document.getElementsByTagName("id").item(0).getTextContent();
+			sb.append(tmpString);
+			sb.append(" (ID)");
+			sb.append(tmpString);
+			break;
+		case "policy":
+			sb.append(": ");
+			tmpString = document.getElementsByTagName("id").item(0).getTextContent();
+			sb.append(tmpString);
 			break;
 		default:
-			sb.append("\n");
 			break;
 		}
 	}
 
-	private void appendFurtherInformationWhenAvailable(StringBuilder sb,
-			Document document) {
+	private void handleUnknownExtendedIdentifier(StringBuilder sb, String extendedTypeName, Document innerDocument) {
+		sb.append("\n");
+		appendFurtherInformationWhenAvailable(sb, innerDocument);
+	}
 
-		Map<String, String> furtherInformationWhenAvailable = DocumentUtils
-				.extractInformation(document, DocumentUtils.NAME_TYPE_VALUE);
+	private void addProperties(Document document, StringBuilder sb) {
+		NodeList properties = document.getElementsByTagName("properties");
+
+		if (properties.getLength() > 0) {
+			sb.append("\n");
+
+			for (int i = 0; i < properties.getLength(); i++) {
+				String property = properties.item(i).getTextContent();
+				if (!property.contains("typename") && !property.equals("[]")) {
+					sb.append(property.substring(property.lastIndexOf("/")));
+
+					if (i < properties.getLength() - 1) {
+						sb.append("\n");
+					}
+				}
+			}
+		}
+	}
+
+	private String getAdministrativeDomain(Document document) {
+		NamedNodeMap attributes = document.getFirstChild().getAttributes();
+
+		if (attributes != null && attributes.getLength() > 0) {
+			Node node = attributes.getNamedItem(("administrative-domain"));
+			if (node != null) {
+				return node.getTextContent();
+			} else {
+				for (int i = 0; i < attributes.getLength(); i++) {
+				}
+				return "";
+			}
+		} else {
+			return "";
+		}
+	}
+
+	private void appendFurtherInformationWhenAvailable(StringBuilder sb, Document document) {
+
+		Map<String, String> furtherInformationWhenAvailable = DocumentUtils.extractInformation(document,
+				DocumentUtils.NAME_TYPE_VALUE);
 
 		String name = furtherInformationWhenAvailable.get("name");
 		String type = furtherInformationWhenAvailable.get("value");
@@ -269,56 +400,5 @@ public class IdentifierInformationPolicyCompact extends IdentifierInformationStr
 		} else if (valueExists) {
 			sb.append(value);
 		}
-	}
-
-	@Override
-	public String createTextForDevice(Identifier identifier) {
-		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-		StringBuilder sb = new StringBuilder();
-		sb.append(wrapper.getTypeName());
-		sb.append(": ");
-		sb.append(wrapper.getValueForXpathExpressionOrElse(
-				IfmapStrings.DEVICE_NAME_EL_NAME, "name")); // name
-		return sb.toString();
-	}
-
-	@Override
-	protected String createTextForExtendedIdentifier(Identifier identifier) {
-		IdentifierWrapper wrapper = IdentifierHelper.identifier(identifier);
-		String name = wrapper.getValueForXpathExpressionOrElse("@"
-				+ IfmapStrings.IDENTITY_ATTR_NAME, "name"); // name
-		String otherTypeDefinition = wrapper.getValueForXpathExpressionOrElse(
-				"@"
-						+ IfmapStrings.IDENTITY_ATTR_OTHER_TYPE_DEF,
-				"other-type-definition"); // other-type-definition
-		
-		StringBuilder sb = new StringBuilder();
-		boolean showExtendedIdentifierPrefix =
-				mConfig.getBoolean(VisualizationConfig.KEY_SHOW_EXTENDED_IDENTIFIER_PREFIX,
-						VisualizationConfig.DEFAULT_VALUE_SHOW_EXTENDED_IDENTIFIER_PREFIX);
-		if (showExtendedIdentifierPrefix) {
-			sb.append("extended-identifier: ");
-		}
-
-		int idxFirstSemicolon = name.indexOf(";");
-		if (idxFirstSemicolon != -1) {
-			String extendedTypeName = name.substring(name.indexOf(";") + 1,
-					name.indexOf(" "));
-			sb.append(extendedTypeName);
-			if (POLICY_TYPENAMES.contains(extendedTypeName)) {
-				handlePolicyIdentifier(sb, identifier);
-			} else {
-				sb.append("\n");
-				Document document = DocumentUtils.parseEscapedXmlString(name);
-				appendFurtherInformationWhenAvailable(sb, document);
-			}
-		} else {
-			sb.append(name); // name
-			sb.append(" (");
-			sb.append(otherTypeDefinition); // other-type-definition
-			sb.append(")");
-		}
-		
-		return sb.toString();
 	}
 }

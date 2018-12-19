@@ -1003,19 +1003,27 @@ public class Piccolo2DPanel implements GraphPanel, Searchable {
 	public void mouseEntered(GraphicWrapper node) {
 		LOGGER.trace("Method mouseEntered("
 				+ node + ") called.");
-		if ((node != null)
-				&& (mMouseOverNode != node)) {
-			mMouseOverNode = node;
-			repaintNodes(NodeType.IDENTIFIER);
-			repaintNodes(NodeType.METADATA);
+		// do nothing if another node is already selected
+		if (mSelectedNode == null) {
+			if ((node != null)
+					&& (mMouseOverNode != node)) {
+				mMouseOverNode = node;
+				repaintNodes(NodeType.IDENTIFIER);
+				repaintNodes(NodeType.METADATA);
+				// TODO only repaint the old and new nodes
+			}
 		}
+		
 	}
 
 	@Override
 	public void mouseExited() {
-		mMouseOverNode = null;
-		repaintNodes(NodeType.IDENTIFIER);
-		repaintNodes(NodeType.METADATA);
+		// only repaint anything if there was a previous entered node, i.e. when another node was selected
+		if (mMouseOverNode != null) {
+			mMouseOverNode = null;
+			repaintNodes(NodeType.IDENTIFIER);
+			repaintNodes(NodeType.METADATA);
+		}
 	}
 
 	@Override

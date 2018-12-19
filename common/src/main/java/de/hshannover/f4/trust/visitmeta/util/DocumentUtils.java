@@ -53,6 +53,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -153,6 +154,7 @@ public class DocumentUtils {
 	private static String extractSingleInformation(Document document, String key) {
 		Element documentElement = document.getDocumentElement();
 
+		// try all element children of the given document
 		NodeList childNodes = document.getChildNodes();
 		String result = null;
 		for (int i = 0; i < childNodes.getLength(); i++) {
@@ -161,11 +163,28 @@ public class DocumentUtils {
 			if (item.getNodeName().equals(key)) {
 				result = item.getNodeValue();
 			}
+			
+			// try the attributes associated with the current element
+			if (result == null) {
+				NamedNodeMap attributes = item.getAttributes();
+				Node attribute;
+				for (int j = 0; j < attributes.getLength(); j++) {
+					attribute = attributes.item(i);
+					if (attribute.getNodeName().equals(key)) {
+						result = attribute.getNodeValue();
+					}
+				}
+				
+			}
 		}
 
+		// if still nothing found, try the attributes of the the main element aka document
 		if (result == null
 				|| result.equals("")) {
-			result = documentElement.getAttribute(key);
+			String attribute = documentElement.getAttribute(key);
+			if (!attribute.equals("")) {
+				result = attribute;				
+			}
 		}
 
 		return result;

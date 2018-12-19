@@ -211,8 +211,8 @@ public class FacadeLogic extends Observable implements Observer, Runnable {
 	 */
 	public synchronized void recalculateGraph() {
 		LOGGER.trace("Method recalculateGraph() called.");
-		mCalculator.adjustGraphAnew(Main.getConfig().getInt(VisualizationConfig.KEY_CALCUCATION_ITERATIONS,
-				VisualizationConfig.DEFAULT_VALUE_CALCUCATION_ITERATIONS));
+		mCalculator.adjustGraphAnew(Main.getConfig().getInt(VisualizationConfig.KEY_CALCULATION_ITERATIONS,
+				VisualizationConfig.DEFAULT_VALUE_CALCULATION_ITERATIONS));
 	}
 
 	@Override

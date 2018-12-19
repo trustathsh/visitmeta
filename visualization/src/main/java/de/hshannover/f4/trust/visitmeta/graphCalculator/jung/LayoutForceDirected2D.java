@@ -42,6 +42,9 @@ import java.awt.Dimension;
 
 import org.apache.log4j.Logger;
 
+import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.visitmeta.Main;
+import de.hshannover.f4.trust.visitmeta.util.VisualizationConfig;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 
 /**
@@ -54,6 +57,8 @@ public class LayoutForceDirected2D extends Layout2D{
 
 	protected FRLayout<Node2D, Edge2D> mLayout;
 
+	private Properties mConfig = Main.getConfig();
+	
 	/**
 	 * <p>How much edges try to keep their nodes together.</p>
 	 * <p>Default: 0.25</p>
@@ -77,11 +82,11 @@ public class LayoutForceDirected2D extends Layout2D{
 
 	public LayoutForceDirected2D(Graph2D graph){
 		super(graph, true);
-
-		mAttractionMultiplier = 0.25;
-		mRepulsionMultiplier = 0.75;
+		
+		mAttractionMultiplier = mConfig.getDouble(VisualizationConfig.KEY_CALCULATION_JUNG_FORCEDIRECTED_ATTRACTION_MULTIPLIER, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_ATTRACTION_MULTIPLIER);
+		mRepulsionMultiplier = mConfig.getDouble(VisualizationConfig.KEY_CALCULATION_JUNG_FORCEDIRECTED_REPULSION_MULTIPLIER, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_REPULSION_MULTIPLIER);
 		mDimension = new Dimension(1_000_000_000, 1_000_000_000);
-		mMaxIterations = 500;
+		mMaxIterations = mConfig.getInt(VisualizationConfig.KEY_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS);
 
 		mLayout = new FRLayout<>(mGraph.getGraph());
 
@@ -99,7 +104,7 @@ public class LayoutForceDirected2D extends Layout2D{
 		mAttractionMultiplier = attractionMultiplier;
 		mRepulsionMultiplier = repulsionMultiplier;
 		mDimension = new Dimension(1_000_000_000, 1_000_000_000);
-		mMaxIterations = 500;
+		mMaxIterations = mConfig.getInt(VisualizationConfig.KEY_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS, VisualizationConfig.DEFAULT_VALUE_CALCULATION_JUNG_FORCEDIRECTED_MAX_ITERATIONS);
 
 		mLayout = new FRLayout<>(mGraph.getGraph());
 

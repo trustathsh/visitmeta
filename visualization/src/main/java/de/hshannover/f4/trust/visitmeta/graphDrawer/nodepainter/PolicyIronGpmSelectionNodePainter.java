@@ -20,8 +20,8 @@ public class PolicyIronGpmSelectionNodePainter extends SelectionNodePainter {
 
 	private static final Logger LOGGER = Logger.getLogger(PolicyIronGpmSelectionNodePainter.class);
 	
-	private static final List<String> POLICY_IDENTIFIER_TYPENAMES = Arrays.asList("rule", "policy", "patternvertex");
-	private static final List<String> POLICY_METADATA_TYPENAMES = Arrays.asList("policy-rule", "rule-pattern", "patternedge", "patternmetadata");
+	private static final List<String> POLICY_IDENTIFIER_TYPENAMES = Arrays.asList("rule", "policy", "pattern-vertex");
+	private static final List<String> POLICY_METADATA_TYPENAMES = Arrays.asList("policy-rule", "rule-pattern", "pattern-edge", "pattern-metadata", "pattern-matched");
 	
 	private static final String POLICY_METADATA_NS_URI = "http://www.trust.f4.hs-hannover.de/2016/POLICY/IRONGPM/METADATA/1";
 	private static final String POLICY_IDENTIFIER_NS_URI = "http://www.trust.f4.hs-hannover.de/2016/POLICY/IRONGPM/IDENTIFIER/1";

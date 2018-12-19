@@ -230,11 +230,9 @@ public class ProxyGraphService implements GraphService {
 				.accept(MediaType.APPLICATION_JSON)
 				.get(String.class);
 		Map<Long, double[][]> out = new HashMap<>();
-		//System.out.println(json);
 
 		java.lang.reflect.Type type = new TypeToken<HashMap<Long, double[][]>>(){}.getType();
-		out = new Gson().fromJson(json, type);
-		return out;
+		return new Gson().fromJson(json, type);
 	}
 
 	private Delta extractDeltasFromJson(String json) {

@@ -90,12 +90,12 @@ public class PolicyHierarchy {
 		policyHierarchyIronDetect.put(action.type, action);
 		policyHierarchyIronDetect.put(policyAction.type, policyAction);
 		
-		PolicyHierarchy ironGpmPatternVertex = new PolicyHierarchy("patternvertex");
+		PolicyHierarchy ironGpmPatternVertex = new PolicyHierarchy("pattern-vertex");
 		
-		PolicyHierarchy ironGpmPatternEdge = new PolicyHierarchy("patternedge");
+		PolicyHierarchy ironGpmPatternEdge = new PolicyHierarchy("pattern-edge");
 		ironGpmPatternEdge.childs.add(ironGpmPatternVertex);
 		
-		PolicyHierarchy ironGpmPatternMetadata = new PolicyHierarchy("patternmetadata");
+		PolicyHierarchy ironGpmPatternMetadata = new PolicyHierarchy("pattern-metadata");
 		ironGpmPatternMetadata.childs = Collections.emptyList();
 
 		ironGpmPatternVertex.childs.add(ironGpmPatternMetadata);

@@ -58,8 +58,8 @@ import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.IdentityGraph
 
 public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper implements PolicyActionGraphicWrapper {
 
-	private static final List<String> VALIDE_CONDITION_ELEMENT_NODE_NAMES = Arrays.asList(new String[] {
-			"signature-result", "anomaly-result" });
+	private static final List<String> VALIDE_CONDITION_ELEMENT_NODE_NAMES = Arrays
+			.asList(new String[] { "signature-result", "anomaly-result" });
 
 	private static final String VALIDE_FEATURE_ELEMENT_NODE_NAME = "feature";
 
@@ -77,7 +77,9 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 
 	private static final String ELEMENT_TYPE_NAME_POLICY_ACTION = "policy-action";
 
-	private static final String ELEMENT_TYPE_NAME_HAS_ELEMET = "has-element";
+	private static final List<String> TYPENAMES_FROM_IRONDETECT = Arrays.asList("device-has-policy", "policy-has-rule",
+			"rule-has-condition", "rule-has-action", "condition-has-anomaly", "condition-has-signature",
+			"anomaly-has-hint");
 
 	public Piccolo2DPolicyActionGraphicWrapper(PPath node, PText text) {
 		super(node, text);
@@ -189,7 +191,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 	public List<PolicyActionGraphicWrapper> getPolicyActionsSameRule() {
 		List<PolicyActionGraphicWrapper> allPolicyActions = getAllPolicyActionsFromRule();
 		List<PolicyActionGraphicWrapper> policyActionsSameRule = new ArrayList<PolicyActionGraphicWrapper>();
-		
+
 		String ruleId = getRuleId();
 
 		for (PolicyActionGraphicWrapper policyAction : allPolicyActions) {
@@ -610,7 +612,8 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 	}
 
 	protected PolicyActionGraphicWrapper getPreviousPolicyActionSameRuleAndDevice() {
-		return getPreviousPolicyAction(getOtherPolicyActionsSameRuleAndDevice(), getTimeStamp(), getTimeStampFraction());
+		return getPreviousPolicyAction(getOtherPolicyActionsSameRuleAndDevice(), getTimeStamp(),
+				getTimeStampFraction());
 	}
 
 	protected PolicyActionGraphicWrapper getCurrentPolicyActionSameRule() {
@@ -816,7 +819,7 @@ public class Piccolo2DPolicyActionGraphicWrapper extends Piccolo2DGraphicWrapper
 
 				List<GraphicWrapper> identifierEdgesNodes = identityNode.getEdgesNodes();
 				for (GraphicWrapper metadataNode : identifierEdgesNodes) {
-					if (!ELEMENT_TYPE_NAME_HAS_ELEMET.equals(metadataNode.getNodeTypeName())) {
+					if (!TYPENAMES_FROM_IRONDETECT.contains(metadataNode.getNodeTypeName())) {
 						continue;
 					}
 

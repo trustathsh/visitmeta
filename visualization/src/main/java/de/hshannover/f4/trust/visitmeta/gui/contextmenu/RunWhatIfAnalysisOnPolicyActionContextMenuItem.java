@@ -68,15 +68,15 @@ public class RunWhatIfAnalysisOnPolicyActionContextMenuItem implements ContextMe
 		Propable propable = wrapper.getData();
 		Metadata metadata = (Metadata) propable;
 		Long timestamp = metadata.getPublishTimestamp();
-		logger.debug("Timestamp: " + timestamp);
+		logger.debug("Timestamp of selected metadata object: " + timestamp);
 		
 		String json = mDataserviceConnection.getGraphAt(timestamp);
-		logger.debug("Json result: " + json);
+		logger.debug("Json data (for graph at timestamp '" + timestamp + "': " + json);
 		
 		String response;
 		try {
 			response = mIronDetectConnection.send(json);
-			logger.debug(response);
+			logger.debug("Response from sending graph data to irondetect: " + response);
 		} catch (UniformInterfaceException | PropertyException e) {
 			DialogHelper.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
 			logger.error(e.getMessage());

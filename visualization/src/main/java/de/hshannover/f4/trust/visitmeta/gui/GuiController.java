@@ -160,6 +160,13 @@ public class GuiController {
 		}
 	}
 
+	public void recenterGraph() {
+		if (checkForSelectedConnection(
+				"A connection must be selected to (re-)center the graph.", "(Re-)Center graph")) {
+			mSelectedConnection.getConnection().recenterGraph();
+		}
+	}
+
 	public MainWindow getMainWindow() {
 		return mMainWindow;
 	}

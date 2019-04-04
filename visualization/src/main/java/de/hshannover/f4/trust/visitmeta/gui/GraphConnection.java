@@ -68,6 +68,7 @@ import de.hshannover.f4.trust.visitmeta.graphCalculator.FacadeLogic;
 import de.hshannover.f4.trust.visitmeta.graphCalculator.LayoutType;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.GraphPanelFactory;
+import de.hshannover.f4.trust.visitmeta.graphDrawer.Piccolo2DPanel;
 import de.hshannover.f4.trust.visitmeta.graphDrawer.graphicwrapper.GraphicWrapper;
 import de.hshannover.f4.trust.visitmeta.gui.contextmenu.ContextMenuItem;
 import de.hshannover.f4.trust.visitmeta.gui.contextmenu.ContextMenuItemFactory;
@@ -335,6 +336,16 @@ public class GraphConnection implements Observer {
 	public void redrawGraph() {
 		LOGGER.trace("Method redrawGraph() called.");
 		mFacadeLogic.recalculateGraph();
+	}
+	
+	/**
+	 * Recenter the graph.
+	 */
+	public void recenterGraph() {
+		LOGGER.trace("Method recenterGraph() called.");
+		if (mGraphPanel instanceof Piccolo2DPanel) {
+			((Piccolo2DPanel) mGraphPanel).setFocusToCenter();
+		}
 	}
 
 	/**

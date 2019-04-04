@@ -387,18 +387,26 @@ public class MainWindow extends JFrame {
 		} else {
 			mRightMainPanel = mGraphPanel;
 		}
-
 	}
 
 	public void openConnectedMapServerConnections() {
 		Dataservices dataservices = (Dataservices) mConnectionTree.getModel().getRoot();
 
+		int index = 0;
 		for (Data dataservice : dataservices.getSubData()) {
-			for (Data mapServerConnection : dataservice.getSubData()) {
-				if (mapServerConnection instanceof MapServerRestConnectionImpl) {
-					if (((MapServerRestConnectionImpl) mapServerConnection).isConnected()) {
-						showConnectedGraph((MapServerRestConnectionImpl) mapServerConnection);
+			for (Data data : dataservice.getSubData()) {
+				if (data instanceof MapServerRestConnectionImpl) {
+					MapServerRestConnectionImpl mapServerConnection = (MapServerRestConnectionImpl) data;
+					if (mapServerConnection.isConnected()) {
+						showConnectedGraph(mapServerConnection);
+						
+						if (mapServerConnection.getConnectionName().equals("default") || (dataservice.getSubData().size() == 1) || (index == 0)) {	// TODO maybe change to first entry in YAML file for dataservice connection; MAP server connection is not known on GUI side
+							LOGGER.debug("Found MAP server connection named \"default\" OR only 1 connection is present OR first entry of many; therefore selecting it in the connection tree");
+							TreePath pathToMapServerConnection = new TreePath(new Object[] {dataservices, dataservice, data});
+							mConnectionTree.setSelectionPath(pathToMapServerConnection);
+						}
 					}
+					index++;
 				}
 			}
 		}

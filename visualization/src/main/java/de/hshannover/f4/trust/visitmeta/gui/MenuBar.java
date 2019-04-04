@@ -38,8 +38,10 @@
  */
 package de.hshannover.f4.trust.visitmeta.gui;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -82,6 +85,7 @@ public class MenuBar extends JMenuBar {
 	private JMenu mMenuLayout = null;
 	private JMenuItem mItemStopMotion = null;
 	private JMenuItem mItemRedrawGraph = null;
+	private JMenuItem mItemCenterGraph = null;;
 	private JMenuItem mItemSetColors = null;
 	private JMenuItem mItemTimings = null;
 	private JCheckBoxMenuItem mMenuItemDualViewGraph;
@@ -93,26 +97,7 @@ public class MenuBar extends JMenuBar {
 	public MenuBar(final GuiController guiController) {
 		super();
 		mController = guiController;
-		/* Connections */
-		JMenu mnConnections = new JMenu("Connections");
-		add(mnConnections);
 
-		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
-		mntmAddConnection.addActionListener(new ActionListener() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				MainWindow mainWindow = mController.getMainWindow();
-				List<Data> dataserviceList = ((Dataservices) mainWindow.getConnectionTree().getModel().getRoot())
-						.getSubData();
-
-				ConnectionDialog cD = new ConnectionDialog(mainWindow,
-						(List<DataserviceConnection>) (List<?>) dataserviceList);
-				cD.setVisible(true);
-			}
-		});
-
-		mnConnections.add(mntmAddConnection);
 		/* Actions */
 		mMenuActions = new JMenu("Actions");
 		add(mMenuActions);
@@ -130,6 +115,7 @@ public class MenuBar extends JMenuBar {
 		// mMenuLevelOfDetail.add(mItemLevel2);
 
 		mItemStopMotion = new JMenuItem("Stop Motion");
+		mItemStopMotion.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mItemStopMotion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
@@ -145,7 +131,8 @@ public class MenuBar extends JMenuBar {
 		});
 		mMenuActions.add(mItemStopMotion);
 
-		mItemRedrawGraph = new JMenuItem("Redraw");
+		mItemRedrawGraph = new JMenuItem("Redraw graph");
+		mItemRedrawGraph.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mItemRedrawGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent pE) {
@@ -154,7 +141,76 @@ public class MenuBar extends JMenuBar {
 			}
 		});
 		mMenuActions.add(mItemRedrawGraph);
+		
+		mItemCenterGraph = new JMenuItem("(Re-)Center graph");
+		mItemCenterGraph.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		mItemCenterGraph.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent pE) {
+				LOGGER.debug("(Re-)Center graph.");
+				mController.recenterGraph();
+			}
+		});
+		mMenuActions.add(mItemCenterGraph);
+		
+		mMenuItemDualViewGraph = new JCheckBoxMenuItem("Dual View");
+		mMenuItemDualViewGraph.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (mMenuItemDualViewGraph.isSelected()) {
+					mController.getMainWindow().showDualViewGraph();
+				} else {
+					mController.getMainWindow().showSingleViewGraph();
+				}
+			}
+		});
+		mMenuActions.add(mMenuItemDualViewGraph);
+
+		mMenuLayout = new JMenu("Layout");
+		add(mMenuLayout);
+
+		@SuppressWarnings("serial")
+		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(
+				LayoutType.class) {
+			{
+				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem(
+						"Force-directed (JUNG2)"));
+				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
+				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
+				put(LayoutType.CIRCULAR, new JCheckBoxMenuItem("Circular"));
+				put(LayoutType.HIERARCHICAL_HORIZONAL_1, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant A)"));
+				put(LayoutType.HIERARCHICAL_HORIZONAL_2, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant B)"));
+				put(LayoutType.HIERARCHICAL_VERTICAL, new JCheckBoxMenuItem("Hierarchical (vertical)"));
+				put(LayoutType.KAMADA_KAWAI, new JCheckBoxMenuItem("Kamada-Kawai"));
+			}
+		};
+
+		int mnemonicIndex = 1;
+		for (final Entry<LayoutType, JCheckBoxMenuItem> layout : layoutMap
+				.entrySet()) {
+			mMenuLayout.add(layout.getValue());
+			layout.getValue().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0 + mnemonicIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			mnemonicIndex++;
+			layout.getValue().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					mController.setLayoutType(layout.getKey());
+					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap
+							.entrySet()) {
+						if (otherLayout.getKey() != layout.getKey()) {
+							otherLayout.getValue().setSelected(false);
+						}
+					}
+				}
+			});
+		}
+		
+		String layoutTypeString = mConfig.getString(VisualizationConfig.KEY_CALCULATION_DEFAULT_LAYOUTTYPE,
+				VisualizationConfig.DEFAULT_VALUE_CALCULATION_DEFAULT_LAYOUTTYPE);
+		LayoutType layoutType = LayoutType.valueOf(layoutTypeString);
+		layoutMap.get(layoutType).setSelected(true);
+		
 		/* Filter */
 		// JMenu mnFilter = new JMenu("Filter");
 		// add(mnFilter);
@@ -178,6 +234,23 @@ public class MenuBar extends JMenuBar {
 		/* Settings */
 		JMenu mnSettings = new JMenu("Settings");
 		add(mnSettings);
+		
+		/* Connections */
+		JMenuItem mntmAddConnection = new JMenuItem("Manage Connections");
+		mntmAddConnection.addActionListener(new ActionListener() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				MainWindow mainWindow = mController.getMainWindow();
+				List<Data> dataserviceList = ((Dataservices) mainWindow.getConnectionTree().getModel().getRoot())
+						.getSubData();
+
+				ConnectionDialog cD = new ConnectionDialog(mainWindow,
+						(List<DataserviceConnection>) (List<?>) dataserviceList);
+				cD.setVisible(true);
+			}
+		});
+		mnSettings.add(mntmAddConnection);
 
 		mItemSetColors = new JMenuItem("Colors");
 		mItemSetColors.addActionListener(new ActionListener() {
@@ -253,62 +326,6 @@ public class MenuBar extends JMenuBar {
 		//
 		// JMenuItem mntmAbout = new JMenuItem("About");
 		// mnHelp.add(mntmAbout);
-
-		mMenuLayout = new JMenu("Layout");
-		mnSettings.add(mMenuLayout);
-
-		@SuppressWarnings("serial")
-		final Map<LayoutType, JCheckBoxMenuItem> layoutMap = new EnumMap<LayoutType, JCheckBoxMenuItem>(
-				LayoutType.class) {
-			{
-				put(LayoutType.FORCE_DIRECTED, new JCheckBoxMenuItem(
-						"Force-directed (JUNG2)"));
-				put(LayoutType.SPRING, new JCheckBoxMenuItem("Spring (JUNG2)"));
-				put(LayoutType.BIPARTITE, new JCheckBoxMenuItem("Bipartite"));
-				put(LayoutType.CIRCULAR, new JCheckBoxMenuItem("Circular"));
-				put(LayoutType.HIERARCHICAL_HORIZONAL_1, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant A)"));
-				put(LayoutType.HIERARCHICAL_HORIZONAL_2, new JCheckBoxMenuItem("Hierarchical (horizontal, Variant B)"));
-				put(LayoutType.HIERARCHICAL_VERTICAL, new JCheckBoxMenuItem("Hierarchical (vertical)"));
-				put(LayoutType.KAMADA_KAWAI, new JCheckBoxMenuItem("Kamada-Kawai"));
-			}
-		};
-
-		for (final Entry<LayoutType, JCheckBoxMenuItem> layout : layoutMap
-				.entrySet()) {
-			mMenuLayout.add(layout.getValue());
-			layout.getValue().addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					mController.setLayoutType(layout.getKey());
-					for (Entry<LayoutType, JCheckBoxMenuItem> otherLayout : layoutMap
-							.entrySet()) {
-						if (otherLayout.getKey() != layout.getKey()) {
-							otherLayout.getValue().setSelected(false);
-						}
-					}
-				}
-			});
-		}
-
-		mMenuItemDualViewGraph = new JCheckBoxMenuItem("Dual View");
-		mnSettings.add(mMenuItemDualViewGraph);
-
-		mMenuItemDualViewGraph.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (mMenuItemDualViewGraph.isSelected()) {
-					mController.getMainWindow().showDualViewGraph();
-				} else {
-					mController.getMainWindow().showSingleViewGraph();
-				}
-			}
-		});
-		
-		String layoutTypeString = mConfig.getString(VisualizationConfig.KEY_CALCULATION_DEFAULT_LAYOUTTYPE,
-				VisualizationConfig.DEFAULT_VALUE_CALCULATION_DEFAULT_LAYOUTTYPE);
-		LayoutType layoutType = LayoutType.valueOf(layoutTypeString);
-		layoutMap.get(layoutType).setSelected(true);
 	}
 
 }

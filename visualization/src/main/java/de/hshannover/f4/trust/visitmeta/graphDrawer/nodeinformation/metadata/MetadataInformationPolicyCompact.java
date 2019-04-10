@@ -41,9 +41,7 @@ package de.hshannover.f4.trust.visitmeta.graphDrawer.nodeinformation.metadata;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -225,7 +223,7 @@ public class MetadataInformationPolicyCompact implements MetadataInformationStra
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "magnitude", "\nmagnitude: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "confidence", "\nconfidence: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "significance", "\nsignificance: ", "");
-			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\ntpye: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\ntype: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "other-type-definition", ", ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "vulnerability-uri", ", ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "information", "\n", "");

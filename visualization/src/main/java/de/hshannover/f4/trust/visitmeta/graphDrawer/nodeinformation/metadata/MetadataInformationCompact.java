@@ -139,7 +139,7 @@ public class MetadataInformationCompact implements MetadataInformationStrategy {
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "magnitude", "\nmagnitude: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "confidence", "\nconfidence: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "significance", "\nsignificance: ", "");
-			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\ntpye: ", "");
+			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "type", "\ntype: ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "other-type-definition", ", ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "vulnerability-uri", ", ", "");
 			appendIfNotEmpty(sb, metadata, xpathPrefixElement + "information", "\n", "");

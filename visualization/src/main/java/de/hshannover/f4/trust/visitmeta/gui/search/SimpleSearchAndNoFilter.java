@@ -52,9 +52,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultFormatter;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import de.hshannover.f4.trust.visitmeta.interfaces.Identifier;
 import de.hshannover.f4.trust.visitmeta.interfaces.Metadata;
 import de.hshannover.f4.trust.visitmeta.interfaces.Propable;
+import de.hshannover.f4.trust.visitmeta.util.ExtendedIdentifierHelper;
 
 /**
  * Implementation of the {@link SearchAndFilterStrategy}, that allows simple
@@ -269,6 +274,26 @@ public class SimpleSearchAndNoFilter implements SearchAndFilterStrategy {
 	private boolean searchForEqualString(Propable propable, String searchTerm) {
 		String typeName = propable.getTypeName();
 		List<String> properties = propable.getProperties();
+
+		if (propable instanceof Identifier) {
+			Identifier identifier = (Identifier) propable;
+			if (ExtendedIdentifierHelper.isExtendedIdentifier(identifier)) {
+				if (ExtendedIdentifierHelper.getExtendedIdentifierInnerTypeName(identifier).equals(searchTerm)) {
+					return true;
+				}
+
+				Document document = ExtendedIdentifierHelper.getDocument(propable);
+				NodeList nodeList = document.getElementsByTagName("*");
+				for (int i = 0; i < nodeList.getLength(); i++) {
+					Node node = nodeList.item(i);
+					if (node.getNodeType() == Node.TEXT_NODE) {
+						if (node.getTextContent().equals(searchTerm)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
 
 		if (typeName.equals(searchTerm)) {
 			return true;
